@@ -1,0 +1,102 @@
+
+
+.admin-sidebar {
+    width: 272px;
+    height: 100vh;
+    overflow-y: auto;
+    position: relative;
+    background-color: #F8F9FA;
+}
+
+.sidebar-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Add to your adminsidebar.css file */
+.sidebar-icon {
+    transition: transform 0.3s ease;
+}
+
+/* Optional: Add a subtle transform effect when menu items are active */
+.bg-blue-600 .sidebar-icon {
+    transform: scale(1.1);
+    filter: brightness(1.5);
+}
+
+/* Smooth transition for hover states */
+.admin-sidebar div[class*="cursor-pointer"]:hover {
+    transform: translateX(2px);
+}
+
+/* Make dropdown transitions smoother */
+.admin-sidebar div[class*="overflow-hidden"] {
+    transition: max-height 0.5s cubic-bezier(0, 1, 0, 1),
+        opacity 0.3s ease-in-out,
+        margin 0.3s ease;
+}
+
+.sidebar-icon {
+    filter: brightness(0) saturate(100%) invert(8%) sepia(7%) saturate(629%) hue-rotate(289deg) brightness(95%) contrast(90%);
+}
+
+
+.menu-active {
+    background-color: #1458A2;
+    color: white;
+}
+
+.menu-active .sidebar-icon {
+    filter: brightness(0) saturate(100%) invert(100%) sepia(9%) saturate(2%) hue-rotate(207deg) brightness(104%) contrast(101%);
+}
+
+
+.menu-text {
+    font-family: 'Inter Tight';
+    font-size: 14px;
+    font-weight: 400;
+    line-height: normal;
+    font-style: normal;
+    letter-spacing: 0.5px;
+    color: #201D1E;
+}
+
+.menu-active .menu-text {
+    color: white;
+}
+
+.category-head {
+    font-family: 'Inter Tight';
+    font-size: 12px;
+    font-weight: 400;
+    line-height: normal;
+    font-style: normal;
+    color: #999999;
+}
+
+.sub-menu {
+    font-family: "Plus Jakarta Sans";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    color: #999999;
+}
+
+.sub-menu:hover {
+    color: #201D1E;
+}
+
+.submenu-active {
+    color: #1458A2;
+}
+
+.side-footer-text {
+    font-family: 'Inter Tight';
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    color: #9C9C9C;
+}
