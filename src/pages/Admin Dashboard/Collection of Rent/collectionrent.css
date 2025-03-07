@@ -1,0 +1,60 @@
+.rent-head {
+    font-family: 'Inter Tight';
+    font-size: 21px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    color: #201D1E;
+}
+
+.period-text {
+    font-family: 'Inter Tight';
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    color: #201D1E;
+}
+
+.period-options {
+    font-family: 'Inter Tight';
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.total-text {
+    font-family: 'Inter Tight';
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    color: #677487;
+}
+
+.total-count {
+    font-family: 'Inter Tight';
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    color: #1458A2;
+    margin-bottom: 10px;
+}
+
+.collected-text, .pending-text {
+    font-family: 'Inter Tight';
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.collected-count, .pending-count {
+    font-family: 'Inter Tight';
+    font-size: 18px;
+    font-style: normal;
+    line-height: normal;
+    font-weight: 500;
+}

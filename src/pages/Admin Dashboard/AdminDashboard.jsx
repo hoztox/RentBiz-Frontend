@@ -5,7 +5,7 @@ import CollectionRent from "./Collection of Rent/CollectionRent"
 
 const AdminDashboard = () => {
   return (
-    <div className='flex w-full'>
+    <div className='flex w-full gap-5'>
       <PropertiesCards />
       <CollectionRent />
     </div>
