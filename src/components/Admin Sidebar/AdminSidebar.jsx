@@ -332,7 +332,7 @@ const AdminSidebar = () => {
             </div>
 
             {/* Footer */}
-            <div className="mx-5 border-t border-[#E8E8E8] text-start py-6 side-footer-text">
+            <div className="mx-5 border-t border-[#E8E8E8] text-start py-6 side-footer-text ">
                 Powered By RentBiz - 2025
             </div>
         </div>
