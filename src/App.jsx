@@ -4,6 +4,7 @@ import AdminLogin from './pages/Admin Login/AdminLogin';
 import Layout from './pages/Layout';
 import AdminDashboard from './pages/Admin Dashboard/AdminDashboard';
 import "./app.css"
+import AdminUsers from './pages/Admin Users Management/AdminUsers';
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
 
         <Route path='/admin' element={<Layout />}>
           <Route path='dashboard' element={<AdminDashboard />} />
+          <Route path='users-manage' element={<AdminUsers />} />
         </Route>
 
       </Routes>

@@ -1,0 +1,26 @@
+.properties-head {
+    font-family: 'Inter Tight';
+    font-size: 21px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    color: #201D1E;
+}
+
+.cards-title{
+    font-family: 'Inter Tight';
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    color: #677487;
+}
+
+.cards-count {
+    font-family: 'Inter Tight';
+    font-size: 21px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    color: #1458A2;
+}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import logo from "../../assets/Images/Admin Sidebar/Rentbiz Logo.svg"
 import dashboard from "../../assets/Images/Admin Sidebar/dashboard.svg";
 import users from "../../assets/Images/Admin Sidebar/users.svg";
@@ -22,6 +23,14 @@ import "./adminsidebar.css"
 
 const AdminSidebar = () => {
     const [activeItem, setActiveItem] = useState('Dashboard');
+    const navigate = useNavigate();
+
+    const handleNonDropdownClick = (item, path) => {
+        setActiveItem(item);
+        navigate(path); // Navigate to the provided path
+    };
+
+
     const [expandedMenus, setExpandedMenus] = useState({
         Properties: false,
         Tenants: false,
@@ -48,16 +57,16 @@ const AdminSidebar = () => {
     };
     
     // For non-dropdown menu items, close all dropdowns
-    const handleNonDropdownClick = (item) => {
-        setActiveItem(item);
-        setExpandedMenus({
-            Properties: false,
-            Tenants: false,
-            Tenancy: false,
-            Masters: false,
-            Currency: false
-        });
-    };
+    // const handleNonDropdownClick = (item) => {
+    //     setActiveItem(item);
+    //     setExpandedMenus({
+    //         Properties: false,
+    //         Tenants: false,
+    //         Tenancy: false,
+    //         Masters: false,
+    //         Currency: false
+    //     });
+    // };
 
     return (
         <div className="flex flex-col admin-sidebar">
@@ -72,7 +81,7 @@ const AdminSidebar = () => {
                 <div className="mx-5 mb-8">
                     <div
                         className={`flex items-center px-[12px] py-[7px] gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === 'Dashboard' ? 'menu-active' : 'text-gray-700 hover:bg-gray-200'}`}
-                        onClick={() => handleNonDropdownClick('Dashboard')}
+                        onClick={() => handleNonDropdownClick('Dashboard', '/admin/dashboard')}
                     >
                         <img src={dashboard} alt="Dashboard" className='w-[18px] sidebar-icon' />
                         <p className='pb-[2px] menu-text'>Dashboard</p>
@@ -83,7 +92,7 @@ const AdminSidebar = () => {
                     <h3 className="pb-3 category-head">USER MANAGEMENT</h3>
                     <div
                         className={`flex items-center py-[7px] px-3 mb-6 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === 'Users' ? 'menu-active' : 'text-gray-700 hover:bg-gray-200'}`}
-                        onClick={() => handleNonDropdownClick('Users')}
+                        onClick={() => handleNonDropdownClick('Users', '/admin/users-manage')}
                     >
                         <img src={users} alt="Users" className='w-[18px] sidebar-icon' />
                         <p className='pb-[2px] menu-text'>Users</p>

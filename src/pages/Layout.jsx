@@ -9,7 +9,7 @@ const Layout = () => {
             <AdminSidebar />
             <div className="flex-1 flex flex-col">
                 <AdminNavbar />
-                <div className="flex-1 overflow-y-auto bg-[#FBFBFB]">
+                <div className="flex-1 overflow-y-auto bg-[white] p-5">
                     <Outlet />
                 </div>
             </div>
