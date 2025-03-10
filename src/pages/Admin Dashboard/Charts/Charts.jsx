@@ -1,5 +1,6 @@
 import React from 'react'
 import Chart1 from './Chart1/Chart1'
+import Chart2 from './Chart2/Chart2';
 
 const Charts = () => {
     const tenancyData = [
@@ -10,8 +11,9 @@ const Charts = () => {
 
     return (
         <>
-            <div className='flex'>
+            <div className='flex w-full gap-5'>
                 <Chart1 data={tenancyData} />
+                <Chart2/>
             </div>
         </>
     )

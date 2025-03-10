@@ -1,0 +1,73 @@
+.revenue-report-head {
+    font-family: 'Inter Tight';
+    font-size: 21px;
+    font-style: normal;
+    font-weight: 500;
+    line-height:normal;
+    color: #201D1E;
+}
+
+.select-period {
+    font-family: 'Inter Tight';
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    color: #201D1E;
+}
+
+.money-in {
+    background-color: #F8F8FF;
+    border-radius: 6px;
+}
+.money-out {
+    background-color: #FFFAF8;
+    border-radius: 6px;
+}
+.money-in-count {
+    font-family: 'Inter Tight';
+    font-size: 24px;
+    font-style: normal;
+    line-height: normal;
+    font-weight: 600;
+    color: #1458A2;
+}
+
+.money-out-count {
+    font-family: 'Inter Tight';
+    font-size: 24px;
+    font-style: normal;
+    line-height: normal;
+    font-weight: 600;
+    color: #FF9F43;
+}
+
+.money-in-head, .percentage, .money-out-head {
+    font-family: 'Inter Tight';
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    color: #201D1E;
+}
+
+.entry-name {
+    font-family: 'Inter Tight';
+    font-size: 14px;
+    color: #201D1E;
+}
+
+.label, .entry-amount {
+    font-family: 'Inter Tight';
+    color: #201D1E;
+    font-weight: 600;
+}
+
+.earning-text, .expense-text {
+    font-family: 'Inter Tight';
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+    color: #677487;
+}
