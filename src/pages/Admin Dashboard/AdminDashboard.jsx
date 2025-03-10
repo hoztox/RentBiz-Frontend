@@ -3,6 +3,7 @@ import "./admindashboard.css"
 import PropertiesCards from './Properties Cards/PropertiesCards'
 import CollectionRent from "./Collection of Rent/CollectionRent"
 import Charts from './Charts/Charts'
+import CollectionList from './Collection List/CollectionList'
 
 const AdminDashboard = () => {
   return (
@@ -12,6 +13,7 @@ const AdminDashboard = () => {
         <CollectionRent />
       </div>
       <Charts />
+      <CollectionList/>
     </>
   )
 }

@@ -67,16 +67,10 @@ const AdminNavbar = () => {
                 English
               </button>
               <button 
-                onClick={() => selectLanguage('Arabic')}
+                onClick={() => selectLanguage('العربية')}
                 className="block w-full text-left px-4 py-2 options-text hover:bg-gray-100"
               >
-                Arabic
-              </button>
-              <button 
-                onClick={() => selectLanguage('Spanish')}
-                className="block w-full text-left px-4 py-2 options-text hover:bg-gray-100"
-              >
-                Spanish
+                العربية
               </button>
             </div>
           </div>

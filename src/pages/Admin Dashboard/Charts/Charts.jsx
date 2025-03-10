@@ -11,7 +11,7 @@ const Charts = () => {
 
     return (
         <>
-            <div className='flex w-full gap-5'>
+            <div className='flex w-full gap-5 mb-5'>
                 <Chart1 data={tenancyData} />
                 <Chart2/>
             </div>
