@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import "./collectionlist.css"
 import { ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -126,46 +127,46 @@ const CollectionList = () => {
 
     return (
         <div className="w-full rounded-md border border-[#E9E9E9]">
-            <h1 className="px-5 pt-5 pb-[18px] text-lg font-medium">Collection List</h1>
+            <h1 className="collection-list-head px-5 pt-5 pb-[18px]">Collection List</h1>
 
             {/* Filter tabs */}
             <div className="flex justify-between border-b border-[#E9E9E9]">
                 <div className='px-5 pb-5 space-x-[10px]'>
                     <button
-                        className={`px-5 py-2 rounded-[4px] duration-100 w-[70px] ${
+                        className={`px-5 py-2 rounded-[4px] duration-100 w-[70px] filter-btns ${
                             activeFilter === 'Paid' 
-                                ? 'bg-[#EEFFE1] text-[#28C76F]' 
-                                : 'bg-[#F8F8F8] text-[#677487]'
+                                ? 'paid-active ' 
+                                : 'paid-inactive'
                         }`}
                         onClick={() => handleFilterChange('Paid')}
                     >
                         Paid
                     </button>
                     <button
-                        className={`px-5 py-2 rounded-[4px] duration-100 w-[88px] ${
+                        className={`px-5 py-2 rounded-[4px] duration-100 w-[88px] filter-btns ${
                             activeFilter === 'Unpaid' 
-                                ? 'bg-[#EA545529] text-[#EA5455]' 
-                                : 'bg-[#F8F8F8] text-[#677487]'
+                                ? 'unpaid-active' 
+                                : 'unpaid-inactive'
                         }`}
                         onClick={() => handleFilterChange('Unpaid')}
                     >
                         Unpaid
                     </button>
                     <button
-                        className={`px-5 py-2 rounded-[4px] duration-100 w-[98px] ${
+                        className={`px-5 py-2 rounded-[4px] duration-100 w-[98px] filter-btns ${
                             activeFilter === 'Overdue' 
-                                ? 'bg-[#A8AAAE29] text-[#A8AAAE]' 
-                                : 'bg-[#F8F8F8] text-[#677487]'
+                                ? 'overdue-active' 
+                                : 'overdue-inactive'
                         }`}
                         onClick={() => handleFilterChange('Overdue')}
                     >
                         Overdue
                     </button>
                     <button
-                        className={`px-5 py-2 rounded-[4px] duration-100 w-[58px] ${
+                        className={`px-5 py-2 rounded-[4px] duration-100 w-[58px] filter-btns ${
                             activeFilter === 'All' 
-                                ? 'bg-[#daecff] text-[#1458A2] border' 
-                                : 'bg-[#F8F8F8] text-[#677487]'
+                                ? 'all-active' 
+                                : 'all-inactive'
                         }`}
                         onClick={() => handleFilterChange('All')}
                     >
@@ -177,14 +178,14 @@ const CollectionList = () => {
                     <input
                         type="text"
                         placeholder="Search"
-                        className="border border-[#E9E9E9] rounded-md w-[253px] h-[38px] px-[14px] py-[7px] outline-none focus:border-gray-300 duration-150"
+                        className="border border-[#E9E9E9] rounded-md w-[253px] h-[38px] px-[14px] py-[7px] outline-none focus:border-gray-300 duration-150 search-input"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                     <div className="relative w-[121px]">
                         {/* Dropdown button */}
                         <button
-                            className="w-full px-[14px] py-[7px] border border-[#E9E9E9] rounded-md h-[38px] bg-white flex items-center justify-between cursor-pointer focus:border-gray-300 duration-150"
+                            className="w-full px-[14px] py-[7px] border border-[#E9E9E9] rounded-md h-[38px] flex items-center justify-between cursor-pointer focus:border-gray-300 duration-150 table-drop-down-btn"
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                         >
                             {selectedOption}
@@ -228,27 +229,27 @@ const CollectionList = () => {
                 <table className="min-w-full bg-white">
                     <thead>
                         <tr className="text-gray-500 text-left text-sm border-b border-[#E9E9E9] h-[57px]">
-                            <th className="px-5 font-medium">ID</th>
-                            <th className="px-5 font-medium">TENANT NAME</th>
-                            <th className="px-5 font-medium">BUILDING NAME</th>
-                            <th className="px-5 font-medium">UNIT NAME</th>
-                            <th className="px-5 font-medium">CHARGE CODE</th>
-                            <th className="px-5 font-medium w-[13%]">TOTAL</th>
-                            <th className="px-5 font-medium">DUE DATE</th>
-                            <th className="px-5 font-medium text-end w-[7%]">STATUS</th>
+                            <th className="px-5 collection-list-thead">ID</th>
+                            <th className="px-5 collection-list-thead">TENANT NAME</th>
+                            <th className="px-5 collection-list-thead">BUILDING NAME</th>
+                            <th className="px-5 collection-list-thead">UNIT NAME</th>
+                            <th className="px-5 collection-list-thead">CHARGE CODE</th>
+                            <th className="px-5 collection-list-thead w-[13%]">TOTAL</th>
+                            <th className="px-5 collection-list-thead">DUE DATE</th>
+                            <th className="px-5 collection-list-thead text-end w-[7%]">STATUS</th>
                         </tr>
                     </thead>
                     <tbody>
                         {currentItems.map((item, index) => (
                             <tr key={index} className="hover:bg-gray-50 cursor-pointer h-[57px] border-b border-[#E9E9E9]">
-                                <td className="px-5 text-sm">{item.id}</td>
-                                <td className="px-5 text-sm">{item.tenant}</td>
-                                <td className="px-5 text-sm">{item.building}</td>
-                                <td className="px-5 text-sm">{item.unit}</td>
-                                <td className="px-5 text-sm">{item.charge}</td>
-                                <td className="px-5 text-sm">{item.total.toFixed(2)}</td>
-                                <td className="px-5 text-sm">{item.dueDate}</td>
-                                <td className="px-5 flex justify-end items-center h-[57px]">
+                                <td className="px-5 collection-list-data">{item.id}</td>
+                                <td className="px-5 collection-list-data">{item.tenant}</td>
+                                <td className="px-5 collection-list-data">{item.building}</td>
+                                <td className="px-5 collection-list-data">{item.unit}</td>
+                                <td className="px-5 collection-list-data">{item.charge}</td>
+                                <td className="px-5 collection-list-data">{item.total.toFixed(2)}</td>
+                                <td className="px-5 collection-list-data">{item.dueDate}</td>
+                                <td className="px-5 collection-list-data flex justify-end items-center h-[57px]">
                                     <StatusBadge status={item.status} />
                                 </td>
                             </tr>
@@ -259,12 +260,12 @@ const CollectionList = () => {
 
             {/* Pagination */}
             <div className="flex items-center justify-between px-5 h-[78px]">
-                <div className="text-sm text-gray-500">
+                <div className="collection-list-pagination">
                     Showing {startIndex + 1} to {endIndex} of {totalItems} entries
                 </div>
                 <div className="flex gap-[4px]">
                     <button
-                        className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer text-sm"
+                        className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
                         disabled={currentPage === 1}
                         onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                     >
@@ -274,7 +275,7 @@ const CollectionList = () => {
                     {generatePaginationButtons()}
 
                     <button
-                        className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer text-sm"
+                        className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
                         disabled={currentPage === totalPages}
                         onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                     >
