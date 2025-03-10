@@ -1,0 +1,68 @@
+.chart1-head {
+    font-family: 'Inter Tight';
+    font-size: 21px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    color: #201D1E;
+}
+
+.total-properties-count {
+    font-family: 'Inter Tight';
+    font-size: 36px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    color: #1458A2;
+}
+
+.total-properties-head {
+    font-family: 'Inter Tight';
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    color: #201D1E;
+}
+
+.entry-value {
+    font-family: 'Inter Tight';
+    font-size: 21px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    color: #201D1E;
+}
+
+.entry-name {
+    font-family: 'Inter Tight';
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+    color: #677487;
+}
+
+.border-style {
+    border-right: 1px solid #E9E9E9;
+    padding-left: 40px;
+    padding-right: 40px;
+}
+
+@media(max-width:1618px) {
+    .border-style {
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+}
+
+@media(max-width:1446px) {
+    .border-style {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .legends {
+        justify-content: space-between;
+    }
+}
