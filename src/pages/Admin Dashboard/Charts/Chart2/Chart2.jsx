@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from 'recharts';
-import { ChevronDown, Pointer } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
+import { motion } from 'framer-motion';
 import moneyin from "../../../../assets/Images/Dashboard/money-in.svg"
 import moneyout from '../../../../assets/Images/Dashboard/money-out.svg';
 import "./chart2.css"
@@ -23,7 +24,7 @@ const Chart2 = ({ initialData = sampleData }) => {
   // Responsive settings
   const barSettings = {
     barGap: windowWidth < 1600 ? -6 : -8, // Adjust based on screen size
-    barCategoryGap: windowWidth < 1600 ? "43%" : "45%",
+    barCategoryGap: windowWidth < 1600 ? "41%" : "43%",
   };
 
   const [highlightedBar, setHighlightedBar] = useState(null);
@@ -158,26 +159,30 @@ const Chart2 = ({ initialData = sampleData }) => {
             className="flex items-center gap-2 px-3 py-[5px] border rounded-md select-period"
             onClick={() => setShowDropdown(!showDropdown)}
           >
-            {selectedPeriod} <ChevronDown size={20} />
+            {selectedPeriod}  <ChevronDown size={20} className={`transition-transform duration-300 ${showDropdown ? "rotate-180" : ""}`} />
           </button>
 
           {showDropdown && (
-            <div className="absolute right-0 mt-1 w-full bg-white border rounded-lg shadow-md z-10">
-              <div className="">
-                {periods.map(period => (
-                  <button
-                    key={period}
-                    className="w-full text-left py-2 hover:bg-gray-100 rounded"
-                    onClick={() => {
-                      setSelectedPeriod(period);
-                      setShowDropdown(false);
-                    }}
-                  >
-                    <p className='px-2 period-options'>{period}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="absolute right-0 mt-1 w-full bg-white border rounded-lg shadow-md z-10"
+            >
+              {periods.map(period => (
+                <button
+                  key={period}
+                  className="w-full text-left py-2 hover:bg-gray-100 rounded"
+                  onClick={() => {
+                    setSelectedPeriod(period);
+                    setShowDropdown(false);
+                  }}
+                >
+                  <p className='px-2 period-options'>{period}</p>
+                </button>
+              ))}
+            </motion.div>
           )}
         </div>
       </div>
@@ -287,15 +292,18 @@ const Chart2 = ({ initialData = sampleData }) => {
 
 // Sample data
 const sampleData = [
-  { month: 'Jan', earning: 950, expense: -550 },
-  { month: 'Feb', earning: 540, expense: -600 },
-  { month: 'Mar', earning: 540, expense: -550 },
-  { month: 'Apr', earning: 540, expense: -550 },
-  { month: 'May', earning: 540, expense: -700 },
-  { month: 'Jun', earning: 540, expense: -450 },
-  { month: 'Jul', earning: 540, expense: -500 },
-  { month: 'Aug', earning: 540, expense: -750 },
-  { month: 'Sep', earning: 540, expense: -250 }
+  { month: 'Jan', earning: 1450, expense: -550 },
+  { month: 'Feb', earning: 1250, expense: -600 },
+  { month: 'Mar', earning: 1100, expense: -550 },
+  { month: 'Apr', earning: 1340, expense: -550 },
+  { month: 'May', earning: 1050, expense: -700 },
+  { month: 'Jun', earning: 1540, expense: -450 },
+  { month: 'Jul', earning: 1380, expense: -500 },
+  { month: 'Aug', earning: 1740, expense: -750 },
+  { month: 'Sep', earning: 1900, expense: -450 },
+  { month: 'Oct', earning: 1640, expense: -750 },
+  { month: 'Nov', earning: 2040, expense: -950 },
+  { month: 'Dec', earning: 1820, expense: -650 }
 ];
 
 export default Chart2
