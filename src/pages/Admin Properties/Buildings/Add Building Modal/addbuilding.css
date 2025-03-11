@@ -1,0 +1,23 @@
+.building-modal-styles {
+    width: 1188px;
+    border-radius: 6px;
+    background-color:white;
+}
+
+.building-modal-header {
+    background-color: white;
+    padding: 23px 20px;
+    border-radius: 12px;
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.building-modal-title {
+    font-family: 'Inter Tight';
+    font-size: 21px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    color: #201D1E;
+}

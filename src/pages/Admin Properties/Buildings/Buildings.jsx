@@ -5,12 +5,23 @@ import downloadicon from "../../../assets/Images/Admin Buildings/download-icon.s
 import editicon from "../../../assets/Images/Admin Buildings/edit-icon.svg"
 import deletesicon from "../../../assets/Images/Admin Buildings/delete-icon.svg"
 import "./buildings.css"
+import AddBuildingModal from './Add Building Modal/AddBuildingModal';
 
 const Buildings = () => {
     const [isSelectOpen, setIsSelectOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
+
+    const [buildingModalOpen, setBuildingModalOpen] = useState(false);
+
+    const openBuildingModal = () => {
+        setBuildingModalOpen(true);
+    };
+
+    const closeBuildingModal = () => {
+        setBuildingModalOpen(false);
+    };
 
     const demoData = [
         { id: "B24090001", date: "09 Sept 2024", name: "Emaar Square Area", address: "Boulevard Downtown Dubai, PO Box 111969 Dubai, UAE", units: "12 Shops", status: "Active" },
@@ -45,7 +56,7 @@ const Buildings = () => {
                     <input
                         type="text"
                         placeholder="Search"
-                        value={searchTerm} 
+                        value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-[302px] focus:border-gray-300 duration-200 building-search"
                     />
@@ -63,7 +74,10 @@ const Buildings = () => {
                         </select>
                         <ChevronDown className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"}`} />
                     </div>
-                    <button className="flex items-center justify-center gap-2 w-[176px] h-[38px] rounded-md add-new-building duration-200">Add New Building
+                    <button className="flex items-center justify-center gap-2 w-[176px] h-[38px] rounded-md add-new-building duration-200"
+                     onClick={openBuildingModal}
+                    >
+                        Add New Building
                         <img src={plusicon} alt="plus icon" className='w-[15px] h-[15px]' />
                     </button>
                     <button className="flex items-center justify-center gap-2 w-[122px] h-[38px] rounded-md duration-200 download-btn">Download
@@ -162,6 +176,8 @@ const Buildings = () => {
                     </button>
                 </div>
             </div>
+             {/* Add TXN Modal */}
+             <AddBuildingModal open={buildingModalOpen} onClose={closeBuildingModal} title="Create New Building" />
         </div>
     );
 };
