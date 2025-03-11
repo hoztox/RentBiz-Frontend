@@ -24,3 +24,9 @@
     line-height: normal;
     color: #1458A2;
 }
+
+@media(max-width:480px) {
+    .properties-cards {
+        width: 100%;
+    }
+}

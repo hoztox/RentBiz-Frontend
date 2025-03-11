@@ -8,7 +8,8 @@ import CollectionList from './Collection List/CollectionList'
 const AdminDashboard = () => {
   return (
     <>
-      <div className='flex w-full gap-5 mb-5'>
+        <h1 className='body-head'>Dashboard Overview</h1>
+      <div className='flex w-full gap-5 mb-5 cards-progress'>
         <PropertiesCards />
         <CollectionRent />
       </div>

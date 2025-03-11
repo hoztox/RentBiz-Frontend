@@ -1,12 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
+import logo from "../../assets/Images/Admin Sidebar/Rentbiz Logo.svg"
 import profile from "../../assets/Images/Admin Navbar/profile.svg";
+import mobilemenu from "../../assets/Images/Admin Navbar/mobile-menu.svg";
 import "./adminnavbar.css";
 
 const AdminNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState('English');
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -29,15 +33,24 @@ const AdminNavbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleLogoClick = () => {
+    navigate('/admin/dashboard');
+  }
+
   return (
-    <nav className="flex items-center justify-between mx-5 h-[86px] border-b border-[#E9E9E9] bg-white">
+    <nav className="flex items-center justify-between mx-5 h-[86px] border-b border-[#E9E9E9] bg-white admin-navbar">
       
       <div>
         <h1 className="navbar-head">Dashboard Overview</h1>
+        <img src={logo} alt="RentBiz Logo" className='RentBiz-Logo' onClick={handleLogoClick} />
       </div>
 
+      <button className='mobile-menu'>
+        <img src={mobilemenu} alt="Menu Icon" className='w-[18px] h-[18px]' />
+      </button>
+
       
-      <div className="flex items-center">
+      <div className="flex items-center navbar-right-side">
         
         <div className="relative mr-5" ref={dropdownRef}>
           <button

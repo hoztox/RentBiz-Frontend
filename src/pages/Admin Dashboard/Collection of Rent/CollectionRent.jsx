@@ -52,7 +52,7 @@ const CollectionRent = () => {
       // initial={{ opacity: 0, y: 20 }}
       // animate={{ opacity: 1, y: 0 }}
       // transition={{ duration: 0.5 }}
-      className=" rounded-md border border-[#E9E9E9] p-5 w-[40%] h-auto"
+      className=" rounded-md border border-[#E9E9E9] p-5 w-[40%] h-auto collection-rent"
     >
       <div className="flex justify-between items-center mb-[14px]">
         <h2 className="rent-head">Collection of Rent</h2>

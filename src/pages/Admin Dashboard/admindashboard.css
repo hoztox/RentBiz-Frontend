@@ -1,0 +1,26 @@
+.body-head {
+    font-family: 'Inter Tight';
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    color: #201D1E;
+    text-align: center;
+}
+
+@media(min-width:481px) {
+    .body-head {
+        display: none;
+    }
+}
+
+@media(max-width:480px) {
+    .body-head {
+        max-width: calc(100vw - 40px);
+        margin-bottom: 24px;
+    }
+    .cards-progress {
+        flex-direction: column;
+        max-width: calc(100vw - 40px);
+    }
+}

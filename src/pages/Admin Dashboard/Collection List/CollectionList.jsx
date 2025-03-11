@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import "./collectionlist.css"
 import { ChevronDown } from "lucide-react";
+import arrow from "../../../assets/Images/Dashboard/downarrow.svg";
 import { motion, AnimatePresence } from "framer-motion";
 
 const CollectionList = () => {
@@ -10,6 +11,41 @@ const CollectionList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(5);
     const [searchQuery, setSearchQuery] = useState('');
+
+    const [activeDropdowns, setActiveDropdowns] = useState({});
+
+    const toggleDropdown = (collectionId) => {
+        setActiveDropdowns(prev => {
+            // Create a new object where only the clicked traveler's dropdown is open
+            const newActiveDropdowns = {};
+
+            // If the clicked dropdown is not already open, open it
+            if (!prev[collectionId]) {
+                newActiveDropdowns[collectionId] = true;
+            }
+
+            return newActiveDropdowns;
+        });
+    };
+
+    const dropdownVariants = {
+        hidden: {
+            opacity: 0,
+            height: 0,
+            transition: {
+                duration: 0.2,
+                ease: "easeInOut",
+            },
+        },
+        visible: {
+            opacity: 1,
+            height: "auto",
+            transition: {
+                duration: 0.3,
+                ease: "easeInOut",
+            },
+        },
+    };
 
     // Sample data
     const data = [
@@ -24,9 +60,9 @@ const CollectionList = () => {
     // Filter by status and search query
     const filteredData = data
         .filter(item => activeFilter === 'All' || item.status === activeFilter)
-        .filter(item => 
-            searchQuery === '' || 
-            Object.values(item).some(val => 
+        .filter(item =>
+            searchQuery === '' ||
+            Object.values(item).some(val =>
                 String(val).toLowerCase().includes(searchQuery.toLowerCase())
             )
         );
@@ -66,7 +102,7 @@ const CollectionList = () => {
         } else {
             // Calculate which pages to show
             const halfButtons = Math.floor(maxButtonsToShow / 2);
-            
+
             if (currentPage <= halfButtons + 1) {
                 // Near the start
                 startPage = 1;
@@ -86,11 +122,10 @@ const CollectionList = () => {
             buttons.push(
                 <button
                     key={i}
-                    className={`px-3 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
-                        currentPage === i
-                            ? 'bg-[#1458A2] text-white'
-                            : 'bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]'
-                    }`}
+                    className={`px-4 h-[38px] rounded-[3px] cursor-pointer duration-200 page-no-btns ${currentPage === i
+                        ? 'bg-[#1458A2] text-white'
+                        : 'bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]'
+                        }`}
                     onClick={() => setCurrentPage(i)}
                 >
                     {i}
@@ -130,51 +165,47 @@ const CollectionList = () => {
             <h1 className="collection-list-head px-5 pt-5 pb-[18px]">Collection List</h1>
 
             {/* Filter tabs */}
-            <div className="flex justify-between border-b border-[#E9E9E9]">
-                <div className='px-5 pb-5 space-x-[10px]'>
+            <div className="flex justify-between border-b border-[#E9E9E9] collection-list-tabs">
+                <div className='px-5 pb-5 space-x-[10px] tabs'>
                     <button
-                        className={`px-5 py-2 rounded-[4px] duration-100 w-[70px] filter-btns ${
-                            activeFilter === 'Paid' 
-                                ? 'paid-active ' 
-                                : 'paid-inactive'
-                        }`}
+                        className={`px-5 py-2 rounded-[4px] duration-100 w-[70px] filter-btns ${activeFilter === 'Paid'
+                            ? 'paid-active '
+                            : 'paid-inactive'
+                            }`}
                         onClick={() => handleFilterChange('Paid')}
                     >
                         Paid
                     </button>
                     <button
-                        className={`px-5 py-2 rounded-[4px] duration-100 w-[88px] filter-btns ${
-                            activeFilter === 'Unpaid' 
-                                ? 'unpaid-active' 
-                                : 'unpaid-inactive'
-                        }`}
+                        className={`px-5 py-2 rounded-[4px] duration-100 w-[88px] filter-btns ${activeFilter === 'Unpaid'
+                            ? 'unpaid-active'
+                            : 'unpaid-inactive'
+                            }`}
                         onClick={() => handleFilterChange('Unpaid')}
                     >
                         Unpaid
                     </button>
                     <button
-                        className={`px-5 py-2 rounded-[4px] duration-100 w-[98px] filter-btns ${
-                            activeFilter === 'Overdue' 
-                                ? 'overdue-active' 
-                                : 'overdue-inactive'
-                        }`}
+                        className={`px-5 py-2 rounded-[4px] duration-100 w-[98px] filter-btns ${activeFilter === 'Overdue'
+                            ? 'overdue-active'
+                            : 'overdue-inactive'
+                            }`}
                         onClick={() => handleFilterChange('Overdue')}
                     >
                         Overdue
                     </button>
                     <button
-                        className={`px-5 py-2 rounded-[4px] duration-100 w-[58px] filter-btns ${
-                            activeFilter === 'All' 
-                                ? 'all-active' 
-                                : 'all-inactive'
-                        }`}
+                        className={`px-5 py-2 rounded-[4px] duration-100 w-[58px] filter-btns ${activeFilter === 'All'
+                            ? 'all-active'
+                            : 'all-inactive'
+                            }`}
                         onClick={() => handleFilterChange('All')}
                     >
                         All
                     </button>
                 </div>
 
-                <div className="flex mx-5 gap-[13.36px]">
+                <div className="flex mx-5 gap-[13.36px] inputs-drop">
                     <input
                         type="text"
                         placeholder="Search"
@@ -190,9 +221,8 @@ const CollectionList = () => {
                         >
                             {selectedOption}
                             <ChevronDown
-                                className={`w-4 h-4 ml-2 transition-transform duration-300 ${
-                                    isDropdownOpen ? "rotate-180" : "rotate-0"
-                                }`}
+                                className={`w-4 h-4 ml-2 transition-transform duration-300 ${isDropdownOpen ? "rotate-180" : "rotate-0"
+                                    }`}
                             />
                         </button>
 
@@ -232,40 +262,105 @@ const CollectionList = () => {
                             <th className="px-5 collection-list-thead">ID</th>
                             <th className="px-5 collection-list-thead">TENANT NAME</th>
                             <th className="px-5 collection-list-thead">BUILDING NAME</th>
-                            <th className="px-5 collection-list-thead">UNIT NAME</th>
-                            <th className="px-5 collection-list-thead">CHARGE CODE</th>
-                            <th className="px-5 collection-list-thead w-[13%]">TOTAL</th>
-                            <th className="px-5 collection-list-thead">DUE DATE</th>
-                            <th className="px-5 collection-list-thead text-end w-[7%]">STATUS</th>
+                            <th className="px-5 collection-list-thead list-mob">UNIT NAME</th>
+                            <th className="px-5 collection-list-thead list-mob">CHARGE CODE</th>
+                            <th className="px-5 collection-list-thead w-[13%] list-mob">TOTAL</th>
+                            <th className="px-5 collection-list-thead list-mob">DUE DATE</th>
+                            <th className="px-5 collection-list-thead text-end w-[7%] list-mob">STATUS</th>
+                            <div className="collection-drop-down-fields"></div>
                         </tr>
                     </thead>
                     <tbody>
                         {currentItems.map((item, index) => (
-                            <tr key={index} className="hover:bg-gray-50 cursor-pointer h-[57px] border-b border-[#E9E9E9]">
-                                <td className="px-5 collection-list-data">{item.id}</td>
-                                <td className="px-5 collection-list-data">{item.tenant}</td>
-                                <td className="px-5 collection-list-data">{item.building}</td>
-                                <td className="px-5 collection-list-data">{item.unit}</td>
-                                <td className="px-5 collection-list-data">{item.charge}</td>
-                                <td className="px-5 collection-list-data">{item.total.toFixed(2)}</td>
-                                <td className="px-5 collection-list-data">{item.dueDate}</td>
-                                <td className="px-5 collection-list-data flex justify-end items-center h-[57px]">
-                                    <StatusBadge status={item.status} />
-                                </td>
-                            </tr>
+                            <React.Fragment key={`${item.id}-${index}`}>
+                                <tr key={index} className={`hover:bg-gray-50 cursor-pointer h-[57px] border-b border-[#E9E9E9]  duration-300 ${activeDropdowns[item.id] ? 'bg-[#EEEFFF]' : ''}`}>
+                                    <td className="px-5 collection-list-data">{item.id}</td>
+                                    <td className="px-5 collection-list-data">{item.tenant}</td>
+                                    <td className="px-5 collection-list-data">{item.building}</td>
+                                    <td className="px-5 collection-list-data list-mob">{item.unit}</td>
+                                    <td className="px-5 collection-list-data list-mob">{item.charge}</td>
+                                    <td className="px-5 collection-list-data list-mob">{item.total.toFixed(2)}</td>
+                                    <td className="px-5 collection-list-data list-mob">{item.dueDate}</td>
+                                    <td className="px-5 collection-list-data flex justify-end items-center h-[57px] list-mob">
+                                        <StatusBadge status={item.status} />
+                                    </td>
+                                    <div
+                                        className={`collection-drop-down-field ${activeDropdowns[item.id] ? "active" : ""}`}
+                                        onClick={() => toggleDropdown(item.id)}
+                                    >
+                                        <img
+                                            src={arrow}
+                                            alt="drop-down arrow"
+                                            className={`collection-dropdown-img w-[13px] ${activeDropdowns[item.id] ? "rotated" : ""}`}
+                                        />
+                                    </div>
+                                </tr>
+                                <AnimatePresence>
+                                    {activeDropdowns[item.id] && (
+                                        <motion.tr
+                                            className="collection-dropdown-row bg-[#EEEFFF]"
+                                            initial="hidden"
+                                            animate="visible"
+                                            exit="hidden"
+                                            variants={dropdownVariants}
+                                        >
+                                            <td colSpan="4" className="">
+                                                {/* Dropdown content goes here */}
+                                                <div className="grid grid-cols-3">
+                                                    <div>
+                                                        <h4>UNIT NAME</h4>
+                                                        <p>
+                                                            {item.unit}
+                                                        </p>
+                                                    </div>
+                                                    <div className='flex items-center flex-col'>
+                                                        <h4>CHARGE CODE</h4>
+                                                        <p>
+                                                            {item.charge}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <h4>TOTAL</h4>
+                                                        <p>
+                                                            {item.total.toFixed(2)}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-3">
+                                                    <div>
+                                                        <h4>DUE DATE</h4>
+                                                        <p>
+                                                            {item.dueDate}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <h4>STATUS</h4>
+                                                        <StatusBadge status={item.status} />
+                                                    </div>
+                                                    <div>
+                                                      
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                        </motion.tr>
+                                    )}
+                                </AnimatePresence>
+                            </React.Fragment>
                         ))}
                     </tbody>
                 </table>
             </div>
 
             {/* Pagination */}
-            <div className="flex items-center justify-between px-5 h-[78px]">
+            <div className="flex items-center justify-between px-5 h-[78px] collection-list-pagination-div ">
                 <div className="collection-list-pagination">
                     Showing {startIndex + 1} to {endIndex} of {totalItems} entries
                 </div>
-                <div className="flex gap-[4px]">
+                <div className="flex gap-[5px]">
                     <button
-                        className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+                        className="px-[10px] py-[6px] rounded-[3px] bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
                         disabled={currentPage === 1}
                         onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                     >
@@ -275,7 +370,7 @@ const CollectionList = () => {
                     {generatePaginationButtons()}
 
                     <button
-                        className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+                        className="px-[10px] py-[6px] rounded-[3px] bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
                         disabled={currentPage === totalPages}
                         onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                     >

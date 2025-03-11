@@ -58,3 +58,10 @@
     line-height: normal;
     font-weight: 500;
 }
+
+
+@media(max-width:480px) {
+    .collection-rent {
+        width: 100%;
+    }
+}

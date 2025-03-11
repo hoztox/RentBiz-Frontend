@@ -47,3 +47,34 @@
     line-height: normal;
     color: #999999;
 }
+
+
+@media(min-width:481px) {
+    .RentBiz-Logo, .mobile-menu {
+        display: none;
+    }
+}
+
+@media(max-width:480px) {
+    .admin-navbar {
+        max-width: calc(100vw - 40px);
+        border-bottom: none;
+        height: 107px;
+        display: flex;
+        align-items: end;
+    }
+    .navbar-head, .navbar-right-side {
+        display: none;
+    }
+    .RentBiz-Logo {
+        height: 55.955px;
+        width: 91px;
+        margin-bottom: 15px;
+    }
+    .mobile-menu {
+        background-color: #1458A2;
+        border-radius: 100%;
+        padding: 10px;
+        margin-bottom: 25px;
+    }
+}

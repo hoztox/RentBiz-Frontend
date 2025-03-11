@@ -11,7 +11,7 @@ const Chart1 = ({ data }) => {
     const totalProperties = data.reduce((sum, entry) => sum + entry.value, 0);
 
     return (
-        <div className="relative p-5 rounded-md border border-[#E9E9E9] w-[35%]">
+        <div className="relative p-5 rounded-md border border-[#E9E9E9] w-[35%] chart1">
             <h2 className="chart1-head text-start">Tenancy Which are Expiring</h2>
 
             <div className="relative flex flex-col items-center">

@@ -66,3 +66,10 @@
         justify-content: space-between;
     }
 }
+
+
+@media(max-width:480px) {
+    .chart1 {
+        width: 100%;
+    }
+}

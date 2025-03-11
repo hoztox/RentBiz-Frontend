@@ -14,7 +14,7 @@ const Chart2 = ({ initialData = sampleData }) => {
   ];
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  
+
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
@@ -23,9 +23,11 @@ const Chart2 = ({ initialData = sampleData }) => {
 
   // Responsive settings
   const barSettings = {
-    barGap: windowWidth < 1600 ? -6 : -8, // Adjust based on screen size
-    barCategoryGap: windowWidth < 1600 ? "41%" : "43%",
+    barGap: windowWidth < 390 ? -6 : windowWidth < 430 ? -8 : windowWidth < 480 ? -8 : windowWidth < 1600 ? -6 : -8,
+    barCategoryGap: windowWidth < 390 ? "34%" : windowWidth < 430 ? "33%" : windowWidth < 480 ? "34%" : windowWidth < 1600 ? "41%" : "43%",
   };
+
+
 
   const [highlightedBar, setHighlightedBar] = useState(null);
 
@@ -150,7 +152,7 @@ const Chart2 = ({ initialData = sampleData }) => {
   };
 
   return (
-    <div className="p-5 rounded-md w-[65%] border border-[#E9E9E9]">
+    <div className="p-5 rounded-md w-[65%] border border-[#E9E9E9] chart2">
       <div className="flex justify-between items-center mb-6">
         <h1 className="revenue-report-head">Revenue Report</h1>
 
@@ -189,7 +191,7 @@ const Chart2 = ({ initialData = sampleData }) => {
 
       <div className='flex justify-between'>
 
-        <div className="w-full">
+        <div className="w-full line-chart">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={data}
@@ -244,7 +246,7 @@ const Chart2 = ({ initialData = sampleData }) => {
           </ResponsiveContainer>
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col money-status-desktop">
           <div className='p-5 w-[186px] money-in mb-6'>
             <div className="money-in-count mb-[6px]">{formatCurrency(totalMoneyIn)}</div>
             <div className="flex justify-between items-center">
@@ -283,6 +285,30 @@ const Chart2 = ({ initialData = sampleData }) => {
         >
           <div className="w-4 h-4 rounded-full bg-[#FF9F43]"></div>
           <span className="expense-text">Expense</span>
+        </div>
+      </div>
+
+      <div className="flex flex-col money-status-mob space-x-5">
+        <div className='p-5 w-[186px] money-in mb-6'>
+          <div className="money-in-count mb-[6px]">{formatCurrency(totalMoneyIn)}</div>
+          <div className="flex justify-between items-center money-in-div">
+            <span className="money-in-head">Money in</span>
+            <div className="flex items-center">
+              <img src={moneyin} alt="money In" className='w-[18px] h-[18px]' />
+              <span className="percentage ml-[5.46px]">{incomingGrowth}%</span>
+            </div>
+          </div>
+        </div>
+
+        <div className='p-5 w-[186px] money-out'>
+          <div className="money-out-count mb-[6px]">{formatCurrency(totalMoneyOut)}</div>
+          <div className="flex justify-between items-center money-out-div">
+            <span className="money-out-head">Money Out</span>
+            <div className="flex items-center">
+              <img src={moneyout} alt="money In" className='w-[18px] h-[18px]' />
+              <span className="percentage ml-[5.46px]">{outgoingGrowth}%</span>
+            </div>
+          </div>
         </div>
       </div>
 

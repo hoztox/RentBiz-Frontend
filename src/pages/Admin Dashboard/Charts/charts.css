@@ -1,0 +1,6 @@
+@media(max-width:480px) {
+    .charts {
+        flex-direction: column;
+        max-width: calc(100vw - 40px);
+    }
+}
