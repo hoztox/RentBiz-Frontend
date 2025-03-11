@@ -84,12 +84,12 @@
     color: #999999;
 }
 
-.sub-menu:hover {
-    color: #201D1E;
-}
 
-.submenu-active {
-    color: #1458A2;
+
+.sub-menu.submenu-active {
+    color: white;
+    background-color: #1458A2;
+    font-family: 'Inter Tight';
 }
 
 .side-footer-text {

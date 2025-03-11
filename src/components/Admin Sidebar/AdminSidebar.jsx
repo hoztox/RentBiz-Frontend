@@ -154,22 +154,22 @@ const AdminSidebar = () => {
                   : "max-h-0 opacity-0"
               }`}
             >
-              <div className="ml-10 text-sm">
+              <div>
                 <div
-                  className={`cursor-pointer mb-3 transition-all duration-300 ease-in-out sub-menu ${
+                  className={`cursor-pointer mb-2 transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
                     activeItem === "Buildings" ? "submenu-active" : ""
                   }`}
                   onClick={() => setActiveItem("Buildings")}
                 >
-                  <p>Buildings</p>
+                  <p className="pl-10 py-[7px]">Buildings</p>
                 </div>
                 <div
-                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu ${
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
                     activeItem === "Units" ? "submenu-active" : ""
                   }`}
                   onClick={() => setActiveItem("Units")}
                 >
-                  <p>Units</p>
+                  <p className="pl-10 py-[7px]">Units</p>
                 </div>
               </div>
             </div>
