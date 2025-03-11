@@ -60,7 +60,7 @@ const FormTimeline = ({ currentStep, progress }) => {
           </div>
 
           {index < steps.length - 1 && (
-            <div className="relative h-48">
+            <div className="relative ml-[15px] h-48">
               <div
                 className="absolute w-0.5 bg-[#2892CE] origin-top transition-all duration-1000 ease-out"
                 style={{

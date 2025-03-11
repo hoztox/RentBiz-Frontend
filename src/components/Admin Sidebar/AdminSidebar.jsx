@@ -66,6 +66,12 @@ const AdminSidebar = () => {
     setExpandedMenus(newExpandedState);
   };
 
+  const handleLogoClick = () => {
+    setActiveItem("Dashboard"); // Update the active state
+    navigate('/admin/dashboard');
+  };
+
+
   return (
     <div className="flex flex-col admin-sidebar">
       {/* Logo */}
@@ -74,6 +80,7 @@ const AdminSidebar = () => {
           src={logo}
           alt="Rentbiz Logo"
           className="h-[78px] w-[128px] cursor-pointer"
+          onClick={handleLogoClick}
         />
       </div>
 
@@ -165,10 +172,10 @@ const AdminSidebar = () => {
                 <div
                   className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Units" ? "submenu-active" : ""
                     }`}
-                    onClick={() => {
-                      setActiveItem("Units");
-                      navigate("/admin/units");
-                    }}
+                  onClick={() => {
+                    setActiveItem("Units");
+                    navigate("/admin/units");
+                  }}
                 >
                   <p className="pl-10 py-[7px]">Units</p>
                 </div>
