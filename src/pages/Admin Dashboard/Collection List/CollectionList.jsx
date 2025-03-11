@@ -89,7 +89,7 @@ const CollectionList = () => {
                     className={`px-3 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
                         currentPage === i
                             ? 'bg-[#1458A2] text-white'
-                            : 'bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]'
+                            : 'bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]'
                     }`}
                     onClick={() => setCurrentPage(i)}
                 >
