@@ -1,0 +1,58 @@
+.buildings-head {
+    font-family: 'Inter Tight';
+    font-size: 21px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    color: #201D1E;
+}
+
+.building-search {
+    font-family: 'Inter Tight';
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+}
+
+.building-selection {
+      font-family: "Public Sans", sans-serif;
+      font-size: 15px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 24px;
+      color: #201D1E;
+}
+
+.add-new-building {
+    background-color: #2892CE;
+    color: white;
+    font-family: 'Inter Tight';
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0.43px;
+}
+.add-new-building:hover {
+    background-color: #076094;
+}
+
+.download-btn {
+    background-color: #F0F0F0;
+    font-family: 'Inter Tight';
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0.43px;
+    color: #4D4E4D;
+}
+
+.download-btn:hover {
+    background-color: #201D1E;
+    color: white;
+}
+.download-btn:hover .download-img {
+    filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%) hue-rotate(47deg) brightness(118%) contrast(100%);
+}

@@ -81,11 +81,10 @@ const AdminSidebar = () => {
       <div className="flex flex-col overflow-y-auto">
         <div className="mx-5 mb-8">
           <div
-            className={`flex items-center px-[12px] py-[7px] gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
-              activeItem === "Dashboard"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`flex items-center px-[12px] py-[7px] gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Dashboard"
+              ? "menu-active"
+              : "text-gray-700 hover:bg-gray-200"
+              }`}
             onClick={() =>
               handleNonDropdownClick("Dashboard", "/admin/dashboard")
             }
@@ -102,11 +101,10 @@ const AdminSidebar = () => {
         <div className="mx-5">
           <h3 className="pb-3 category-head">USER MANAGEMENT</h3>
           <div
-            className={`flex items-center py-[7px] px-3 mb-6 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
-              activeItem === "Users"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`flex items-center py-[7px] px-3 mb-6 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Users"
+              ? "menu-active"
+              : "text-gray-700 hover:bg-gray-200"
+              }`}
             onClick={() =>
               handleNonDropdownClick("Users", "/admin/users-manage")
             }
@@ -123,11 +121,10 @@ const AdminSidebar = () => {
           {/* Properties with dropdown */}
           <div>
             <div
-              className={`flex items-center justify-between px-3 py-[7px] rounded-[4px] mb-3 cursor-pointer transition-all duration-300 ease-in-out ${
-                activeItem === "Properties"
-                  ? "menu-active"
-                  : "text-gray-700 hover:bg-gray-200"
-              }`}
+              className={`flex items-center justify-between px-3 py-[7px] rounded-[4px] mb-3 cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Properties"
+                ? "menu-active"
+                : "text-gray-700 hover:bg-gray-200"
+                }`}
               onClick={() => {
                 toggleMenu("Properties");
                 setActiveItem("Properties");
@@ -142,32 +139,36 @@ const AdminSidebar = () => {
                 <p className="pb-[2px] menu-text">Properties</p>
               </div>
               <ChevronDown
-                className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${
-                  expandedMenus.Properties ? "rotate-180" : ""
-                }`}
+                className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${expandedMenus.Properties ? "rotate-180" : ""
+                  }`}
               />
             </div>
             <div
-              className={`overflow-hidden transition-all duration-500 ease-in-out ${
-                expandedMenus.Properties
-                  ? "max-h-24 opacity-100 mb-3"
-                  : "max-h-0 opacity-0"
-              }`}
+              className={`overflow-hidden transition-all duration-500 ease-in-out ${expandedMenus.Properties
+                ? "max-h-24 opacity-100 mb-3"
+                : "max-h-0 opacity-0"
+                }`}
             >
               <div>
                 <div
-                  className={`cursor-pointer mb-2 transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
-                    activeItem === "Buildings" ? "submenu-active" : ""
-                  }`}
-                  onClick={() => setActiveItem("Buildings")}
+                  className={`cursor-pointer mb-2 transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Buildings" ? "submenu-active" : ""
+                    }`}
+                  onClick={() => {
+                    setActiveItem("Buildings");
+                    navigate("/admin/buildings");
+                  }}
                 >
                   <p className="pl-10 py-[7px]">Buildings</p>
                 </div>
+
+
                 <div
-                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
-                    activeItem === "Units" ? "submenu-active" : ""
-                  }`}
-                  onClick={() => setActiveItem("Units")}
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Units" ? "submenu-active" : ""
+                    }`}
+                    onClick={() => {
+                      setActiveItem("Units");
+                      navigate("/admin/units");
+                    }}
                 >
                   <p className="pl-10 py-[7px]">Units</p>
                 </div>
@@ -178,11 +179,10 @@ const AdminSidebar = () => {
           {/* Tenants with dropdown */}
           <div>
             <div
-              className={`flex items-center justify-between px-3 py-[7px] rounded-[4px] mb-3 cursor-pointer transition-all duration-300 ease-in-out ${
-                activeItem === "Tenants"
-                  ? "menu-active"
-                  : "text-gray-700 hover:bg-gray-200"
-              }`}
+              className={`flex items-center justify-between px-3 py-[7px] rounded-[4px] mb-3 cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Tenants"
+                ? "menu-active"
+                : "text-gray-700 hover:bg-gray-200"
+                }`}
               onClick={() => {
                 toggleMenu("Tenants");
                 setActiveItem("Tenants");
@@ -197,17 +197,15 @@ const AdminSidebar = () => {
                 <p className="pb-[2px] menu-text">Tenants</p>
               </div>
               <ChevronDown
-                className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${
-                  expandedMenus.Tenants ? "rotate-180" : ""
-                }`}
+                className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${expandedMenus.Tenants ? "rotate-180" : ""
+                  }`}
               />
             </div>
             <div
-              className={`overflow-hidden transition-all duration-500 ease-in-out ${
-                expandedMenus.Tenants
-                  ? "max-h-24 opacity-100 mb-3"
-                  : "max-h-0 opacity-0"
-              }`}
+              className={`overflow-hidden transition-all duration-500 ease-in-out ${expandedMenus.Tenants
+                ? "max-h-24 opacity-100 mb-3"
+                : "max-h-0 opacity-0"
+                }`}
             >
               <div className="ml-12 text-sm">
                 {/* Dropdown items would go here */}
@@ -218,9 +216,8 @@ const AdminSidebar = () => {
           {/* Tenancy with dropdown */}
           <div className="mb-6">
             <div
-              className={`flex items-center justify-between px-3 py-[7px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
-                activeItem === "Tenancy" ? "menu-active" : " hover:bg-gray-200"
-              }`}
+              className={`flex items-center justify-between px-3 py-[7px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Tenancy" ? "menu-active" : " hover:bg-gray-200"
+                }`}
               onClick={() => {
                 toggleMenu("Tenancy");
                 setActiveItem("Tenancy");
@@ -235,17 +232,15 @@ const AdminSidebar = () => {
                 <p className="pb-[2px] menu-text">Tenancy</p>
               </div>
               <ChevronDown
-                className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${
-                  expandedMenus.Tenancy ? "rotate-180" : ""
-                }`}
+                className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${expandedMenus.Tenancy ? "rotate-180" : ""
+                  }`}
               />
             </div>
             <div
-              className={`overflow-hidden transition-all duration-500 ease-in-out ${
-                expandedMenus.Tenancy
-                  ? "max-h-24 opacity-100 mb-3"
-                  : "max-h-0 opacity-0"
-              }`}
+              className={`overflow-hidden transition-all duration-500 ease-in-out ${expandedMenus.Tenancy
+                ? "max-h-24 opacity-100 mb-3"
+                : "max-h-0 opacity-0"
+                }`}
             >
               <div className="ml-12 text-sm">
                 {/* Dropdown items would go here */}
@@ -260,11 +255,10 @@ const AdminSidebar = () => {
           {/* Masters with dropdown */}
           <div>
             <div
-              className={`flex items-center justify-between px-3 py-[7px] rounded-[4px] mb-3 cursor-pointer transition-all duration-300 ease-in-out ${
-                activeItem === "Masters"
-                  ? "menu-active"
-                  : "text-gray-700 hover:bg-gray-200"
-              }`}
+              className={`flex items-center justify-between px-3 py-[7px] rounded-[4px] mb-3 cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Masters"
+                ? "menu-active"
+                : "text-gray-700 hover:bg-gray-200"
+                }`}
               onClick={() => {
                 toggleMenu("Masters");
                 setActiveItem("Masters");
@@ -279,17 +273,15 @@ const AdminSidebar = () => {
                 <p className="pb-[2px] menu-text">Masters</p>
               </div>
               <ChevronDown
-                className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${
-                  expandedMenus.Masters ? "rotate-180" : ""
-                }`}
+                className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${expandedMenus.Masters ? "rotate-180" : ""
+                  }`}
               />
             </div>
             <div
-              className={`overflow-hidden transition-all duration-500 ease-in-out ${
-                expandedMenus.Masters
-                  ? "max-h-24 opacity-100 mb-3"
-                  : "max-h-0 opacity-0"
-              }`}
+              className={`overflow-hidden transition-all duration-500 ease-in-out ${expandedMenus.Masters
+                ? "max-h-24 opacity-100 mb-3"
+                : "max-h-0 opacity-0"
+                }`}
             >
               <div className="ml-12 text-sm">
                 {/* Dropdown items would go here */}
@@ -300,11 +292,10 @@ const AdminSidebar = () => {
           {/* Currency with dropdown */}
           <div className="mb-6">
             <div
-              className={`flex items-center justify-between px-3 py-[7px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
-                activeItem === "Currency"
-                  ? "menu-active"
-                  : "text-gray-700 hover:bg-gray-200"
-              }`}
+              className={`flex items-center justify-between px-3 py-[7px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Currency"
+                ? "menu-active"
+                : "text-gray-700 hover:bg-gray-200"
+                }`}
               onClick={() => {
                 toggleMenu("Currency");
                 setActiveItem("Currency");
@@ -319,17 +310,15 @@ const AdminSidebar = () => {
                 <p className="pb-[2px] menu-text">Currency</p>
               </div>
               <ChevronDown
-                className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${
-                  expandedMenus.Currency ? "rotate-180" : ""
-                }`}
+                className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${expandedMenus.Currency ? "rotate-180" : ""
+                  }`}
               />
             </div>
             <div
-              className={`overflow-hidden transition-all duration-500 ease-in-out ${
-                expandedMenus.Currency
-                  ? "max-h-24 opacity-100 mb-3"
-                  : "max-h-0 opacity-0"
-              }`}
+              className={`overflow-hidden transition-all duration-500 ease-in-out ${expandedMenus.Currency
+                ? "max-h-24 opacity-100 mb-3"
+                : "max-h-0 opacity-0"
+                }`}
             >
               <div className="ml-12 text-sm">
                 {/* Dropdown items would go here */}
@@ -342,11 +331,10 @@ const AdminSidebar = () => {
         <div className="mx-5">
           <h3 className="pb-3 category-head">FINANCIAL</h3>
           <div
-            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
-              activeItem === "AdditionalCharges"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "AdditionalCharges"
+              ? "menu-active"
+              : "text-gray-700 hover:bg-gray-200"
+              }`}
             onClick={() => handleNonDropdownClick("AdditionalCharges")}
           >
             <img
@@ -357,11 +345,10 @@ const AdminSidebar = () => {
             <p className="pb-[2px] menu-text">Additional Charges</p>
           </div>
           <div
-            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
-              activeItem === "Invoice"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Invoice"
+              ? "menu-active"
+              : "text-gray-700 hover:bg-gray-200"
+              }`}
             onClick={() => handleNonDropdownClick("Invoice")}
           >
             <img
@@ -372,11 +359,10 @@ const AdminSidebar = () => {
             <p className="pb-[2px] menu-text">Invoice</p>
           </div>
           <div
-            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
-              activeItem === "MonthlyInvoice"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "MonthlyInvoice"
+              ? "menu-active"
+              : "text-gray-700 hover:bg-gray-200"
+              }`}
             onClick={() => handleNonDropdownClick("MonthlyInvoice")}
           >
             <img
@@ -387,11 +373,10 @@ const AdminSidebar = () => {
             <p className="pb-[2px] menu-text">Monthly Invoice</p>
           </div>
           <div
-            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
-              activeItem === "Collection"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Collection"
+              ? "menu-active"
+              : "text-gray-700 hover:bg-gray-200"
+              }`}
             onClick={() => handleNonDropdownClick("Collection")}
           >
             <img
@@ -402,11 +387,10 @@ const AdminSidebar = () => {
             <p className="pb-[2px] menu-text">Collection</p>
           </div>
           <div
-            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
-              activeItem === "Expense"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Expense"
+              ? "menu-active"
+              : "text-gray-700 hover:bg-gray-200"
+              }`}
             onClick={() => handleNonDropdownClick("Expense")}
           >
             <img
@@ -417,11 +401,10 @@ const AdminSidebar = () => {
             <p className="pb-[2px] menu-text">Expense</p>
           </div>
           <div
-            className={`flex items-center py-[7px] px-3 mb-6 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
-              activeItem === "Refund"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`flex items-center py-[7px] px-3 mb-6 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Refund"
+              ? "menu-active"
+              : "text-gray-700 hover:bg-gray-200"
+              }`}
             onClick={() => handleNonDropdownClick("Refund")}
           >
             <img src={refund} alt="Refund" className="w-[18px] sidebar-icon" />
@@ -433,11 +416,10 @@ const AdminSidebar = () => {
         <div className="mx-5">
           <h3 className="pb-3 category-head">REPORTS</h3>
           <div
-            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
-              activeItem === "TenancyReport"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "TenancyReport"
+              ? "menu-active"
+              : "text-gray-700 hover:bg-gray-200"
+              }`}
             onClick={() => handleNonDropdownClick("TenancyReport")}
           >
             <img
@@ -448,11 +430,10 @@ const AdminSidebar = () => {
             <p className="pb-[2px] menu-text">Tenancy Report</p>
           </div>
           <div
-            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
-              activeItem === "UpcomingCollection"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "UpcomingCollection"
+              ? "menu-active"
+              : "text-gray-700 hover:bg-gray-200"
+              }`}
             onClick={() => handleNonDropdownClick("UpcomingCollection")}
           >
             <img
@@ -463,11 +444,10 @@ const AdminSidebar = () => {
             <p className="pb-[2px] menu-text">Upcoming Collection</p>
           </div>
           <div
-            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
-              activeItem === "ReportCollection"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "ReportCollection"
+              ? "menu-active"
+              : "text-gray-700 hover:bg-gray-200"
+              }`}
             onClick={() => handleNonDropdownClick("ReportCollection")}
           >
             <img
@@ -478,11 +458,10 @@ const AdminSidebar = () => {
             <p className="pb-[2px] menu-text">Collection</p>
           </div>
           <div
-            className={`flex items-center py-[7px] px-3 mb-6 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
-              activeItem === "IncomeExpense"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`flex items-center py-[7px] px-3 mb-6 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "IncomeExpense"
+              ? "menu-active"
+              : "text-gray-700 hover:bg-gray-200"
+              }`}
             onClick={() => handleNonDropdownClick("IncomeExpense")}
           >
             <img
