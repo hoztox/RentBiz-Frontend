@@ -57,7 +57,7 @@ const Chart1 = ({ data }) => {
                 {data.map((entry, index) => (
                     <div
                         key={index}
-                        className="flex flex-col items-start cursor-pointer border-style last:border-r-0"
+                        className="flex flex-col items-start cursor-pointer border-style last:border-r-0 days-period"
                         onMouseEnter={() => setActiveIndex(index)}
                         onMouseLeave={() => setActiveIndex(null)}
                     >

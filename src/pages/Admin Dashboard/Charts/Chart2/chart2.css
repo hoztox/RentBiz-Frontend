@@ -114,9 +114,28 @@
     }
 
     .select-period {
-        width: 190px;
         padding-right: 5px;
         padding-left: 5px;
         justify-content: end;
+    }
+
+    .revenue-report-head {
+        width: 90px;
+    }
+    .money-in-count, .money-out-count {
+        font-size: 21px;
+    }
+    .money-in-head, .money-out-head {
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+}
+
+@media(max-width:370px) {
+     .revenue-report-head {
+        font-size: 20px;
+    }
+    .select-period {
+        font-size: 11px;
     }
 }

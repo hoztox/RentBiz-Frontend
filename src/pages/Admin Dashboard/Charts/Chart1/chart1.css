@@ -72,4 +72,16 @@
     .chart1 {
         width: 100%;
     }
+    .days-period {
+        padding-left: 0;
+    }
+    .legends {
+        margin-left: 12px;
+    }
+}
+
+@media(max-width:370px) {
+    .chart1-head {
+        font-size: 20px;
+    }
 }

@@ -59,7 +59,7 @@ const CollectionRent = () => {
         <div className="relative">
           <motion.button 
             onClick={() => setIsOpen(!isOpen)} 
-            className="flex items-center gap-2 px-3 py-[5px] bg-[#FBFBFB] rounded-md border border-[#E9E9E9] hover:bg-gray-100 duration-100"
+            className="flex items-center gap-2 px-3 py-[5px] bg-[#FBFBFB] rounded-md border border-[#E9E9E9] hover:bg-gray-100 duration-100 period-tab"
             whileTap={{ scale: 0.97 }}
           >
             <span className="period-text">{selectedPeriod}</span>

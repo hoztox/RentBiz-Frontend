@@ -125,6 +125,14 @@
     letter-spacing: 0.43px;
 }
 
+.collection-list-status {
+    font-family: 'Inter Tight';
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 14px;
+}
+
 
 @media(min-width:481px) {
     .collection-drop-down-fields, .collection-drop-down-field {
@@ -133,8 +141,12 @@
 }
 
 @media(max-width:480px) {
+    .collection-list-table {
+        max-width: calc(100vw - 40px);
+    }
     .collection-list-tabs {
         flex-direction: column-reverse;
+        border-bottom: none;
 
     }
     .search-input, .table-drop-down-btn {
@@ -181,5 +193,86 @@
       .collection-dropdown-img.rotated {
         transform: rotate(180deg);
       }
+      .tabs button {
+        padding: 5px 10px;
+      }
+      .collection-list-theads {
+        height: auto;
+        background-color: #F7F7F7;
+        border-bottom: none;
+      }
 
+      .collection-list-thead {
+        padding-right: 0px;
+        /* font-size: 10px; */
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+      .collection-list-tenet {
+        padding-left: 5px;
+      }
+
+      .collection-list-building, .collection-list-data-building {
+        padding-left: 14px;
+      }
+      .collection-list-data-building {
+        padding-right: 0px;
+      }
+      .collection-list-id {
+        padding-right: 10px;
+      }
+      .drop-down-head {
+        font-family: 'Inter Tight';
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: normal;
+        letter-spacing: 1px;
+        color: #677487;
+      }
+      .drop-down-data {
+        font-family: 'Inter Tight';
+        font-size: 13px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 22px;
+      }
+
+      .collection-list-status {
+       padding: 5px 9px; 
+       border-radius: 3px;
+       margin-top: 5px;
+      }
+
+      .mobile-no-border {
+        border-bottom: none !important;
+      }
+      
+      .mobile-with-border {
+        border-bottom: 1px solid #E9E9E9;
+      }
+      .pagination-btn {
+        font-size: 13px;
+        padding: 0px 10px;
+        height: 28px;
+      }
+      .page-no-btns {
+        font-size: 13px;
+        padding: 0px 10px;
+        height: 28px;
+      }
+}
+
+@media(max-width:414px){
+    .collection-list-thead {
+        font-size: 11px;
+    }
+}
+@media(max-width:394px){
+    .collection-list-thead {
+        font-size: 10px;
+    }
+    .collection-list-data {
+        font-size: 12.5px;
+    }
 }

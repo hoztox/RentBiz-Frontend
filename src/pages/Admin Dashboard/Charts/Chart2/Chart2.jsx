@@ -8,9 +8,9 @@ import "./chart2.css"
 
 const Chart2 = ({ initialData = sampleData }) => {
   const periods = [
-    "April 2022 - March 2023",
-    "January 2023 - December 2023",
-    "April 2023 - March 2024"
+    "Janaury 2022 - Dec 2022",
+    "Jan 2023 - Dec 2023",
+    "Jan 2024 - Dec 2024"
   ];
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -43,28 +43,37 @@ const Chart2 = ({ initialData = sampleData }) => {
   const [yAxisDomain, setYAxisDomain] = useState([-500, 500]);
 
   // Calculate dynamic Y-axis based on data with fixed 50 unit intervals
-  const calculateYAxisSettings = (currentData) => {
+  const calculateYAxisSettings = (currentData, windowWidth) => {
     const maxEarning = Math.max(...currentData.map(item => item.earning));
     const maxExpense = Math.max(...currentData.map(item => Math.abs(item.expense)));
     const overallMax = Math.max(maxEarning, maxExpense);
-
-    // Round up to the nearest 50
-    const roundedMax = Math.ceil(overallMax / 50) * 50;
-
+  
+    // Round up to the nearest 100
+    const roundedMax = Math.ceil(overallMax / 100) * 100;
+  
     // Ensure domain is symmetrical and extends beyond the max values
     const domainMax = Math.max(300, roundedMax * 1.2);
-    // Round domain to nearest 50
-    const adjustedDomainMax = Math.ceil(domainMax / 50) * 50;
+    const adjustedDomainMax = Math.ceil(domainMax / 100) * 100;
     const newDomain = [-adjustedDomainMax, adjustedDomainMax];
-
-    // Generate Y-axis ticks with 50 unit intervals: 0, ±50, ±100, ±150, ...
-    const newTicks = [0];
-    for (let i = 50; i <= adjustedDomainMax; i += 50) {
-      newTicks.push(i, -i);
+  
+    // Adjust the Y-axis intervals based on screen size
+    let interval = 100; // Default interval
+    if (windowWidth < 480) {
+      interval = 50; // Smaller screens get a finer scale
     }
-
-    return { domain: newDomain, ticks: newTicks.sort((a, b) => a - b) };
+  
+    // Generate Y-axis ticks based on the selected interval
+    const newTicks = [];
+    for (let i = -adjustedDomainMax; i <= adjustedDomainMax; i += interval) {
+      newTicks.push(i);
+    }
+  
+    return { domain: newDomain, ticks: newTicks };
   };
+  
+  
+  
+  
 
   // Effect to filter/adjust data when period changes
   useEffect(() => {
@@ -204,13 +213,15 @@ const Chart2 = ({ initialData = sampleData }) => {
                 tickLine={false}
                 tick={{ fill: '#9CA3AF' }}
               />
-              <YAxis
-                axisLine={false}
-                tickLine={false}
-                tick={{ fill: '#9CA3AF' }}
-                domain={yAxisDomain}
-                ticks={yAxisTicks}
-              />
+<YAxis
+  axisLine={false}
+  tickLine={false}
+  tick={{ fill: '#9CA3AF' }}
+  domain={yAxisDomain}
+  ticks={yAxisTicks} // Now set to 100-unit intervals
+/>
+
+
               <Tooltip
                 content={<CustomTooltip />}
                 cursor={{ opacity: 0 }}
@@ -318,18 +329,18 @@ const Chart2 = ({ initialData = sampleData }) => {
 
 // Sample data
 const sampleData = [
-  { month: 'Jan', earning: 1450, expense: -550 },
-  { month: 'Feb', earning: 1250, expense: -600 },
-  { month: 'Mar', earning: 1100, expense: -550 },
-  { month: 'Apr', earning: 1340, expense: -550 },
-  { month: 'May', earning: 1050, expense: -700 },
-  { month: 'Jun', earning: 1540, expense: -450 },
-  { month: 'Jul', earning: 1380, expense: -500 },
-  { month: 'Aug', earning: 1740, expense: -750 },
-  { month: 'Sep', earning: 1900, expense: -450 },
-  { month: 'Oct', earning: 1640, expense: -750 },
-  { month: 'Nov', earning: 2040, expense: -950 },
-  { month: 'Dec', earning: 1820, expense: -650 }
+  { month: 'Jan', earning: 450, expense: -550 },
+  { month: 'Feb', earning: 450, expense: -600 },
+  { month: 'Mar', earning: 500, expense: -550 },
+  { month: 'Apr', earning: 640, expense: -550 },
+  { month: 'May', earning: 650, expense: -700 },
+  { month: 'Jun', earning: 540, expense: -450 },
+  { month: 'Jul', earning: 380, expense: -500 },
+  { month: 'Aug', earning: 740, expense: -750 },
+  { month: 'Sep', earning: 900, expense: -450 },
+  { month: 'Oct', earning: 640, expense: -750 },
+  { month: 'Nov', earning: 740, expense: -950 },
+  { month: 'Dec', earning: 820, expense: -650 }
 ];
 
 export default Chart2

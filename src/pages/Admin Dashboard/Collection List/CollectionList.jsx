@@ -154,14 +154,14 @@ const CollectionList = () => {
         }
 
         return (
-            <span className={`px-[10px] py-[5px] rounded-[4px] ${bgColor}`}>
+            <span className={`px-[10px] py-[5px] rounded-[4px] collection-list-status ${bgColor}`}>
                 {status}
             </span>
         );
     };
 
     return (
-        <div className="w-full rounded-md border border-[#E9E9E9]">
+        <div className="w-full rounded-md border border-[#E9E9E9] collection-list-table">
             <h1 className="collection-list-head px-5 pt-5 pb-[18px]">Collection List</h1>
 
             {/* Filter tabs */}
@@ -258,10 +258,10 @@ const CollectionList = () => {
             <div className="overflow-x-auto">
                 <table className="min-w-full bg-white">
                     <thead>
-                        <tr className="text-gray-500 text-left text-sm border-b border-[#E9E9E9] h-[57px]">
-                            <th className="px-5 collection-list-thead">ID</th>
-                            <th className="px-5 collection-list-thead">TENANT NAME</th>
-                            <th className="px-5 collection-list-thead">BUILDING NAME</th>
+                        <tr className="text-gray-500 text-left text-sm border-b border-[#E9E9E9] h-[57px] collection-list-theads">
+                            <th className="px-5 collection-list-thead ">ID</th>
+                            <th className="px-5 collection-list-thead collection-list-tenet">TENANT NAME</th>
+                            <th className="px-5 collection-list-thead collection-list-building">BUILDING NAME</th>
                             <th className="px-5 collection-list-thead list-mob">UNIT NAME</th>
                             <th className="px-5 collection-list-thead list-mob">CHARGE CODE</th>
                             <th className="px-5 collection-list-thead w-[13%] list-mob">TOTAL</th>
@@ -273,10 +273,16 @@ const CollectionList = () => {
                     <tbody>
                         {currentItems.map((item, index) => (
                             <React.Fragment key={`${item.id}-${index}`}>
-                                <tr key={index} className={`hover:bg-gray-50 cursor-pointer h-[57px] border-b border-[#E9E9E9]  duration-300 ${activeDropdowns[item.id] ? 'bg-[#EEEFFF]' : ''}`}>
-                                    <td className="px-5 collection-list-data">{item.id}</td>
-                                    <td className="px-5 collection-list-data">{item.tenant}</td>
-                                    <td className="px-5 collection-list-data">{item.building}</td>
+                                <tr
+                                    key={index}
+                                    className={`lg:hover:bg-gray-50 cursor-pointer h-[57px] ${activeDropdowns[item.id]
+                                        ? 'mobile-no-border'
+                                        : 'border-b border-[#E9E9E9]'
+                                        }`}
+                                >
+                                    <td className="px-5 collection-list-data collection-list-id">{item.id}</td>
+                                    <td className="px-5 collection-list-data collection-list-tenet">{item.tenant}</td>
+                                    <td className="px-5 collection-list-data collection-list-data-building">{item.building}</td>
                                     <td className="px-5 collection-list-data list-mob">{item.unit}</td>
                                     <td className="px-5 collection-list-data list-mob">{item.charge}</td>
                                     <td className="px-5 collection-list-data list-mob">{item.total.toFixed(2)}</td>
@@ -298,48 +304,51 @@ const CollectionList = () => {
                                 <AnimatePresence>
                                     {activeDropdowns[item.id] && (
                                         <motion.tr
-                                            className="collection-dropdown-row bg-[#EEEFFF]"
+                                            className={`collection-dropdown-row ${activeDropdowns[item.id]
+                                                    ? 'mobile-with-border'
+                                                    : ''
+                                                }`}
                                             initial="hidden"
                                             animate="visible"
                                             exit="hidden"
                                             variants={dropdownVariants}
                                         >
-                                            <td colSpan="4" className="">
+                                            <td colSpan="4" className="pb-5">
                                                 {/* Dropdown content goes here */}
-                                                <div className="grid grid-cols-3">
-                                                    <div>
-                                                        <h4>UNIT NAME</h4>
-                                                        <p>
+                                                <div className="grid grid-cols-3 px-5">
+                                                    <div className='flex flex-col items-start'>
+                                                        <h4 className='drop-down-head'>UNIT NAME</h4>
+                                                        <p className='drop-down-data'>
                                                             {item.unit}
                                                         </p>
                                                     </div>
-                                                    <div className='flex items-center flex-col'>
-                                                        <h4>CHARGE CODE</h4>
-                                                        <p>
+                                                    <div className='flex flex-col items-start'>
+                                                        <h4 className='drop-down-head w-[100px]'>CHARGE CODE</h4>
+                                                        <p className='drop-down-data'>
                                                             {item.charge}
                                                         </p>
                                                     </div>
-                                                    <div>
-                                                        <h4>TOTAL</h4>
-                                                        <p>
+                                                    <div className='flex flex-col items-start pl-4'>
+                                                        <h4 className='drop-down-head'>TOTAL</h4>
+                                                        <p className='drop-down-data'>
                                                             {item.total.toFixed(2)}
                                                         </p>
                                                     </div>
                                                 </div>
 
-                                                <div className="grid grid-cols-3">
+                                                <div className="grid grid-cols-3 px-5 mt-6">
                                                     <div>
-                                                        <h4>DUE DATE</h4>
-                                                        <p>
+                                                        <h4 className='drop-down-head'>DUE DATE</h4>
+                                                        <p className='drop-down-data'>
                                                             {item.dueDate}
                                                         </p>
                                                     </div>
                                                     <div>
-                                                        <h4>STATUS</h4>
+                                                        <h4 className='drop-down-head pb-1'>STATUS</h4>
                                                         <StatusBadge status={item.status} />
                                                     </div>
                                                     <div>
-                                                      
+
                                                     </div>
                                                 </div>
                                             </td>

@@ -65,3 +65,20 @@
         width: 100%;
     }
 }
+
+
+@media(max-width:380px) {
+    .period-tab {
+        padding: 5px 5px;
+        gap: 5px;
+    }
+}
+
+@media(max-width:370px) {
+    .rent-head {
+        font-size: 20px;
+    }
+    .period-text {
+        font-size: 11px;
+    }
+}
