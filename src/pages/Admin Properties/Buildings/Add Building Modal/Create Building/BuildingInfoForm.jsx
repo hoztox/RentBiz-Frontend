@@ -1,5 +1,6 @@
-// BuildingInfoForm.jsx
 import React, { useState } from 'react';
+import "./buildinginfoform.css";
+import { ChevronDown, ChevronUp } from 'lucide-react'; // Import both icons
 
 const BuildingInfoForm = ({ onNext }) => {
   // Form state
@@ -17,12 +18,31 @@ const BuildingInfoForm = ({ onNext }) => {
     nearByLandmark: '',
   });
 
+  // State to track if select is focused
+  const [isSelectFocused, setIsSelectFocused] = useState(false);
+
   // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
     setFormState({
       ...formState,
       [name]: value,
+    });
+  
+    // If the changed input is 'status', reset isSelectFocused
+    if (name === "status") {
+      setIsSelectFocused(false);
+    }
+  };
+  
+
+  // Function to handle incrementing/decrementing number inputs
+  const handleNumberStep = (name, step) => {
+    const currentValue = parseFloat(formState[name]) || 0;
+    setFormState({
+      ...formState,
+      [name]: (currentValue + step).toString()
     });
   };
 
@@ -38,10 +58,10 @@ const BuildingInfoForm = ({ onNext }) => {
 
   return (
     <form onSubmit={handleSubmit} className="flex-1">
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 gap-5">
         {/* Building No */}
         <div className="col-span-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block building-info-form-label">
             Building No*
           </label>
           <input
@@ -49,14 +69,14 @@ const BuildingInfoForm = ({ onNext }) => {
             name="buildingNo"
             value={formState.buildingNo}
             onChange={handleInputChange}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
             required
           />
         </div>
         
         {/* Plot No */}
         <div className="col-span-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block building-info-form-label">
             Plot No*
           </label>
           <input
@@ -64,61 +84,61 @@ const BuildingInfoForm = ({ onNext }) => {
             name="plotNo"
             value={formState.plotNo}
             onChange={handleInputChange}
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
             required
           />
         </div>
         
         {/* Building Name */}
         <div className="col-span-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block building-info-form-label">
             Building Name*
           </label>
-          <input
+          <textarea
             type="text"
             name="buildingName"
             value={formState.buildingName}
             onChange={handleInputChange}
-            placeholder="Lorem ipsum dolor"
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder=""
+            className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
             required
           />
         </div>
         
         {/* Address */}
         <div className="col-span-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block building-info-form-label">
             Address*
           </label>
-          <input
+          <textarea
             type="text"
             name="address"
             value={formState.address}
             onChange={handleInputChange}
-            placeholder="Boulevard Downtown Dubai, PO Box 111969 Dubai, UAE"
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder=""
+            className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
             required
           />
         </div>
         
         {/* Description */}
         <div className="col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block building-info-form-label">
             Description
           </label>
           <textarea
             name="description"
             value={formState.description}
             onChange={handleInputChange}
-            placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi orci ante, scelerisque faucibus condimentum a, maximus vel enim. Nunc"
-            rows="4"
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-          ></textarea>
+            placeholder=""
+            rows="2"
+            className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
+          />
         </div>
         
         {/* Remarks 1 */}
         <div className="col-span-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block building-info-form-label">
             Remarks 1
           </label>
           <input
@@ -126,14 +146,14 @@ const BuildingInfoForm = ({ onNext }) => {
             name="remarks1"
             value={formState.remarks1}
             onChange={handleInputChange}
-            placeholder="Lorem ipsum dolor"
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder=""
+            className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
           />
         </div>
         
         {/* Remarks 2 */}
         <div className="col-span-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block building-info-form-label">
             Remarks 2
           </label>
           <input
@@ -141,14 +161,14 @@ const BuildingInfoForm = ({ onNext }) => {
             name="remarks2"
             value={formState.remarks2}
             onChange={handleInputChange}
-            placeholder="Lorem ipsum dolor"
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder=""
+            className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
           />
         </div>
         
         {/* Status */}
         <div className="col-span-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block building-info-form-label">
             Status*
           </label>
           <div className="relative">
@@ -156,7 +176,9 @@ const BuildingInfoForm = ({ onNext }) => {
               name="status"
               value={formState.status}
               onChange={handleInputChange}
-              className="w-full p-2 border border-gray-300 rounded appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onFocus={() => setIsSelectFocused(true)}
+              onBlur={() => setIsSelectFocused(false)}
+              className="w-full appearance-none building-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer"
               required
             >
               <option value="Active">Active</option>
@@ -164,60 +186,82 @@ const BuildingInfoForm = ({ onNext }) => {
               <option value="Pending">Pending</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
+              <ChevronDown 
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${isSelectFocused ? 'rotate-180' : ''}`}
+              />
             </div>
           </div>
         </div>
         
         {/* Latitude */}
         <div className="col-span-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block building-info-form-label">
             Latitude
           </label>
           <div className="relative">
             <input
-              type="text"
+              type="number"
               name="latitude"
               value={formState.latitude}
               onChange={handleInputChange}
-              placeholder="5"
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="0.00"
+              className="w-full appearance-none building-info-form-inputs focus:border-gray-300 duration-200 pr-8"
             />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
+            <div className="absolute right-0 top-[-8px] inset-y-0 flex flex-col justify-center pr-2">
+              <button 
+                type="button"
+                className="flex items-center justify-center h-4 text-[#201D1E]"
+                onClick={() => handleNumberStep('latitude', 0.01)}
+              >
+                <ChevronUp size={14} />
+              </button>
+              <button 
+                type="button"
+                className="flex items-center justify-center h-0 text-[#201D1E]"
+                onClick={() => handleNumberStep('latitude', -0.01)}
+              >
+                <ChevronDown size={14} />
+              </button>
             </div>
           </div>
         </div>
         
         {/* Longitude */}
         <div className="col-span-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block building-info-form-label">
             Longitude
           </label>
           <div className="relative">
             <input
-              type="text"
+              type="number"
               name="longitude"
               value={formState.longitude}
               onChange={handleInputChange}
-              placeholder="00000.00"
-              className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="0.00"
+              className="w-full building-info-form-inputs focus:border-gray-300 duration-200 pr-8"
             />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
+            <div className="absolute right-0 top-[-8px] inset-y-0 flex flex-col justify-center pr-2">
+              <button 
+                type="button"
+                className="flex items-center justify-center h-4 text-[#201D1E]"
+                onClick={() => handleNumberStep('longitude', 0.01)}
+              >
+                <ChevronUp size={14} />
+              </button>
+              <button 
+                type="button"
+                className="flex items-center justify-center h-0 text-[#201D1E]"
+                onClick={() => handleNumberStep('longitude', -0.01)}
+              >
+                <ChevronDown size={14} />
+              </button>
             </div>
           </div>
         </div>
         
         {/* Near By Landmark */}
         <div className="col-span-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block building-info-form-label">
             Near By Landmark
           </label>
           <input
@@ -225,8 +269,8 @@ const BuildingInfoForm = ({ onNext }) => {
             name="nearByLandmark"
             value={formState.nearByLandmark}
             onChange={handleInputChange}
-            placeholder="Lorem ipsum dolor"
-            className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder=""
+            className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
           />
         </div>
       </div>
@@ -235,7 +279,7 @@ const BuildingInfoForm = ({ onNext }) => {
       <div className="mt-6 text-right">
         <button
           type="submit"
-          className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-300"
+          className="w-[150px] h-[38px] next-btn duration-300"
         >
           Next
         </button>

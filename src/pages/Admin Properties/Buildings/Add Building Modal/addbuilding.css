@@ -1,12 +1,11 @@
 .building-modal-styles {
-    width: 1188px;
+    width: 1300px;
     border-radius: 6px;
     background-color:white;
 }
 
 .building-modal-header {
     background-color: white;
-    padding: 23px 20px;
     border-radius: 12px;
     display:flex;
     justify-content: space-between;

@@ -1,76 +1,53 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import bgimg from "../../../../assets/Images/Admin Buildings/modal-bg-img.svg"
+import arrow from "../../../../assets/Images/Admin Buildings/timeline-arrow.svg"
 import "./formtimeline.css"
-import activecircle from "../../../../assets/Images/Admin Buildings/active-circle.svg";
-import inactivecircle from "../../../../assets/Images/Admin Buildings/inactive-circle.svg";
 
-const FormTimeline = ({ currentStep, progress }) => {
-  const steps = [
-    { id: 1, name: "Create Building", key: "createBuilding" },
-    { id: 2, name: "Upload Documents", key: "uploadDocuments" },
-    { id: 3, name: "Submitted", key: "submitted" },
-  ];
+const steps = [
+  { id: 1, name: "Create Building", key: "createBuilding" },
+  { id: 2, name: "Upload Documents", key: "uploadDocuments" },
+  { id: 3, name: "Submitted", key: "submitted" },
+];
 
-  const [delayedStep, setDelayedStep] = useState(1);
-
-  useEffect(() => {
-    if (currentStep > delayedStep) {
-      setTimeout(() => {
-        setDelayedStep(currentStep);
-      }, 800); // Delay to match the progress line fill
-    }
-  }, [currentStep]);
-
-  const calculateProgressHeight = (stepId, stepKey) => {
-    if (currentStep > stepId) {
-      return "100%";
-    } else if (currentStep === stepId) {
-      const progressValue = progress[stepKey] || 0;
-      const boundedProgress = Math.max(0, Math.min(100, progressValue));
-      return `${boundedProgress}%`;
-    }
-    return "0%";
-  };
-
+const FormTimeline = ({ currentStep }) => {
   return (
-    <div className="w-[240px] pr-8 relative">
-      <div
-        className="absolute w-0.5 bg-[#DBDBDB] left-[15px] top-6"
-        style={{
-          height: `${steps.length * 125}px`,
-        }}
-      ></div>
-
-      {steps.map((step, index) => (
-        <div key={step.id} className="relative z-10">
-          <div className="flex items-center mb-4 absolute">
-            <div className="w-8 h-6 flex items-center justify-center bg-white rounded-full z-10">
-              <img
-                src={delayedStep >= step.id ? activecircle : inactivecircle}
-                alt={`Step ${step.id} ${delayedStep >= step.id ? "active" : "inactive"}`}
-                className="w-6 h-6 transition-opacity duration-500"
-              />
-            </div>
-
-            <span
-              className={`ml-3 transition-colors duration-500 step-name ${delayedStep >= step.id ? "text-[#2892CE]" : "text-[#DBDBDB]"
-                }`}
-            >
-              {step.name}
-            </span>
+    <div className="w-[350px] h-full bg-[#1458A2] text-white relative flex flex-col justify-start rounded-md">
+      <div className="mt-[60px]">
+      {steps.map((step) => (
+        <div key={step.id} className="relative flex justify-between items-center mb-9 px-[34px]">
+          {/* Step Circle with Animation */}
+          <div className="flex items-center">
+          <div
+            className={`w-10 h-10 flex items-center justify-center rounded-full circle transition-all duration-500 ease-in-out
+            ${currentStep >= step.id ? "bg-white text-[#1458A2] scale-110" : "border border-[#64A2E7] text-[#64A2E7]"}`}
+          >
+            {step.id}
           </div>
 
-          {index < steps.length - 1 && (
-            <div className="relative ml-[15px] h-48">
-              <div
-                className="absolute w-0.5 bg-[#2892CE] origin-top transition-all duration-1000 ease-out"
-                style={{
-                  height: calculateProgressHeight(step.id, step.key),
-                }}
-              ></div>
-            </div>
-          )}
+          {/* Step Label with Animation */}
+          <span
+            className={`ml-4 step-label transition-colors duration-500 ease-in-out
+            ${currentStep >= step.id ? "active font-semibold" : "inactive opacity-70"}`}
+          >
+            {step.name}
+          </span>
+          </div>
+
+          {/* Arrow Icon for Active Step with Animation */}
+          <div className={`arrow-container transition-opacity duration-500 ease-in-out ${currentStep === step.id ? "opacity-100" : "opacity-0"}`}>
+            {currentStep === step.id ? (
+              <img src={arrow} alt="Right Arrow" className="animate-fadeIn" />
+            ) : (
+              <div className="w-6 h-6"></div> // Placeholder to maintain layout
+            )}
+          </div>
         </div>
       ))}
+      </div>
+
+      <div className="absolute bottom-0 left-0 w-full h-full bg-no-repeat bg-bottom"
+        style={{ backgroundImage: `url(${bgimg})` }}>
+      </div>
     </div>
   );
 };
