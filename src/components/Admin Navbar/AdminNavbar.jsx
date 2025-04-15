@@ -41,7 +41,7 @@ const AdminNavbar = () => {
     <nav className="flex items-center justify-between mx-5 h-[86px] border-b border-[#E9E9E9] bg-white admin-navbar">
       
       <div>
-        <h1 className="navbar-head">Dashboard </h1>
+        <h1 className="navbar-head">Dashboard Overview</h1>
         <img src={logo} alt="RentBiz Logo" className='RentBiz-Logo' onClick={handleLogoClick} />
       </div>
 
