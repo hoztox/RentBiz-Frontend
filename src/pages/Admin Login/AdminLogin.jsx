@@ -1,9 +1,9 @@
 import "./AdminLogin.css";
 import { useState, useEffect } from "react";
 import logo from "../../assets/Images/Admin Login/RentBizLogo.svg";
-import slide1 from "../../assets/Images/Admin Login/Slide1.svg";
+import slide1 from "../../assets/Images/Admin Login/Slide1.jpg" 
 import slide2 from "../../assets/Images/Admin Login/slide2.jpg";
-import slide3 from "../../assets/Images/Admin Login/Slide1.svg";
+import slide3 from "../../assets/Images/Admin Login/Slide1.jpg";
 import viewIcon from "../../assets/Images/Admin Login/ViewIcon.svg";
 import inActiveSliderIcon from "../../assets/Images/Admin Login/inActiveSliderIcon.svg";
 import activeSliderIcon from "../../assets/Images/Admin Login/activeSliderIcon.svg";
