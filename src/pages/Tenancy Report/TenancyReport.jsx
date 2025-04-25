@@ -132,9 +132,8 @@ const TenancyReport = () => {
               <option value="all">All</option>
             </select>
             <ChevronDown
-              className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                isSelectOpen ? "rotate-180" : "rotate-0"
-              }`}
+              className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
+                }`}
             />
           </div>
           <button className="flex items-center justify-center gap-2 w-[132px] h-[38px] rounded-md duration-200 export-btn">
@@ -224,11 +223,10 @@ const TenancyReport = () => {
               </td>
               <td className="px-5 text-center tenancy-report-data">
                 <span
-                  className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
-                    report.status === "Pending"
+                  className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${report.status === "Pending"
                       ? "bg-[#E8EFF6] text-[#1458A2]"
                       : "bg-[#E8EFF6] text-[#1458A2]"
-                  }`}
+                    }`}
                 >
                   {report.status}
                 </span>
@@ -264,11 +262,10 @@ const TenancyReport = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
-                currentPage === startPage + i
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${currentPage === startPage + i
                   ? "bg-[#1458A2] text-white"
                   : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-              }`}
+                }`}
               onClick={() => setCurrentPage(startPage + i)}
             >
               {startPage + i}

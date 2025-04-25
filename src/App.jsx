@@ -26,6 +26,8 @@ import Collection from './pages/Collection/Collection';
 import Expense from './pages/Expense/Expense';
 import Refund from './pages/Refund/Refund';
 import TenancyReport from './pages/Tenancy Report/TenancyReport';
+import UpcomingCollection from './pages/UpcomingCollection/UpcomingCollection';
+import ReportCollection from './pages/ReportCollection/ReportCollection';
 
 const App = () => {
   return (
@@ -60,6 +62,8 @@ const App = () => {
           <Route path='expense' element={<Expense />} />
           <Route path='refund' element={<Refund />} />
           <Route path='tenancy-report' element={<TenancyReport />} />
+          <Route path='upcoming-collection' element={<UpcomingCollection />} />
+          <Route path='collection-report' element={<ReportCollection />} />
         </Route>
 
       </Routes>
