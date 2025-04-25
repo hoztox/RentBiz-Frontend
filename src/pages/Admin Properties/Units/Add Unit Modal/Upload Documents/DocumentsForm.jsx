@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import documentIcon from '../../../../../assets/Images/Admin Units/document-icon.svg';
 import calendarIcon from '../../../../../assets/Images/Admin Units/calendar-icon.svg';
 import closeIcon from '../../../../../assets/Images/Admin Units/close-icon-white.svg';
@@ -61,7 +61,7 @@ const DocumentsForm = ({ onNext }) => {
         <div className="flex-1 overflow-y-auto">
           {/* Document List */}
           <div>
-            {documents.map((doc, index) => (
+            {documents.map((doc) => (
               <div key={doc.id} className="border-b">
                 <div className="grid grid-cols-12 gap-x-4 gap-y-6 px-6 py-6">
                   <div className="col-span-3">

@@ -251,7 +251,6 @@ const Buildings = () => {
       <AddBuildingModal
         open={buildingModalOpen}
         onClose={closeBuildingModal}
-        title="Create New Building"
       />
     </div>
   );

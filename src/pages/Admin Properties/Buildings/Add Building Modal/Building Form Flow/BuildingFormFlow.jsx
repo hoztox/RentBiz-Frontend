@@ -3,24 +3,38 @@ import closeicon from "../../../../../assets/Images/Admin Buildings/close-icon.s
 import FormTimeline from '../FormTimeline';
 import BuildingInfoForm from '../Create Building/BuildingInfoForm';
 import DocumentsForm from '../Upload Documents/DocumentsForm';
+import ReviewPage from '../ReviewPage/ReviewPage';
 import SubmissionConfirmation from '../Submit/SubmissionConfirmation';
 
-const BuildingFormFlow = ({ title, onClose }) => {
+const BuildingFormFlow = ({ onClose }) => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [formData, setFormData] = useState({});
   const [formProgress, setFormProgress] = useState({
     createBuilding: 0,
     uploadDocuments: 0,
+    review: 0,
     submitted: 0,
   });
   const [animating, setAnimating] = useState(false);
+
+  // Dynamic page titles based on current page
+  const pageTitles = [
+    "Create New Building",
+    "Upload Documents",
+    "Review",
+    ""
+  ];
+
+
+  // Get current title based on page index
+  const currentTitle = pageTitles[currentPageIndex];
 
   useEffect(() => {
     const newProgress = { createBuilding: 0, uploadDocuments: 0, submitted: 0 };
 
     if (currentPageIndex >= 1) newProgress.createBuilding = 100;
     if (currentPageIndex >= 2) newProgress.uploadDocuments = 100;
-    
+
     if (currentPageIndex === 0 && formData.buildingNo) {
       const requiredFields = ['buildingNo', 'plotNo', 'buildingName', 'address'];
       const filledFields = requiredFields.filter(field => formData[field]?.trim()).length;
@@ -31,18 +45,26 @@ const BuildingFormFlow = ({ title, onClose }) => {
   }, [currentPageIndex, formData]);
 
   const handleNextPage = (pageData) => {
-    // Start animation
+
     setAnimating(true);
-    
-    // Update form data immediately
     setFormData(prevData => ({ ...prevData, ...pageData }));
-    
+
     // Delay the page change to allow for animation
     setTimeout(() => {
       setCurrentPageIndex(prev => prev + 1);
       setAnimating(false);
     }, 500); // Match this with your CSS transition duration
   };
+
+  const handlePreviousPage = () => {
+    setAnimating(true);
+
+    setTimeout(() => {
+      setCurrentPageIndex(prev => Math.max(prev - 1, 0)); // prevent going below 0
+      setAnimating(false);
+    }, 500);
+  };
+
 
   const handleClose = () => {
     setCurrentPageIndex(0);
@@ -53,9 +75,12 @@ const BuildingFormFlow = ({ title, onClose }) => {
 
   const pageComponents = [
     <BuildingInfoForm key="info" onNext={handleNextPage} />,
-    <DocumentsForm key="docs" onNext={handleNextPage} />,
+    <DocumentsForm key="docs" onNext={handleNextPage} onBack={handlePreviousPage} />,
+    <ReviewPage key="review" formData={formData} onNext={handleNextPage} onBack={handlePreviousPage} />,
     <SubmissionConfirmation key="confirm" formData={formData} />
   ];
+
+
 
   return (
     <div className="flex">
@@ -65,10 +90,10 @@ const BuildingFormFlow = ({ title, onClose }) => {
       </div>
 
       {/* Right Side - Form Steps & Modal Header */}
-      <div className="w-[1010px] px-[53px] pt-[50px] pb-[40px]">
-        {/* Modal Header */}
+      <div className="w-full h-[700px] px-[33px] pt-[50px] pb-[40px]">
+        {/* Modal Header with Dynamic Title */}
         <div className="building-modal-header flex justify-between items-center mb-[41px]">
-          {title && <h3 className="building-modal-title">{title}</h3>}
+          <h3 className="building-modal-title">{currentTitle}</h3>
           <button onClick={handleClose} className="border border-[#E9E9E9] rounded-full p-[11px]">
             <img src={closeicon} alt="Close" className="w-[15px] h-[15px]" />
           </button>

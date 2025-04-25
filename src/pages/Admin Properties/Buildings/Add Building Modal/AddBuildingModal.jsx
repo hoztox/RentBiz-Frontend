@@ -2,7 +2,7 @@ import React from 'react';
 import "./addbuilding.css";
 import BuildingFormFlow from './Building Form Flow/BuildingFormFlow';
 
-const AddBuildingModal = ({ open, onClose, title }) => {
+const AddBuildingModal = ({ open, onClose }) => {
     return (
         <div
             onClick={onClose}
@@ -15,7 +15,7 @@ const AddBuildingModal = ({ open, onClose, title }) => {
                     ${open ? "scale-100 opacity-100" : "scale-125 opacity-0"}`}
             >
                 {/* Content Here */}
-                <BuildingFormFlow title={title} onClose={onClose} />
+                <BuildingFormFlow onClose={onClose} />
             </div>
         </div>
     );

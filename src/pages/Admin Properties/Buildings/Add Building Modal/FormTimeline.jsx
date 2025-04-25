@@ -6,7 +6,8 @@ import "./formtimeline.css"
 const steps = [
   { id: 1, name: "Create Building", key: "createBuilding" },
   { id: 2, name: "Upload Documents", key: "uploadDocuments" },
-  { id: 3, name: "Submitted", key: "submitted" },
+  { id: 3, name: "Review", key: "review" },
+  { id: 4, name: "Submitted", key: "submitted" },
 ];
 
 const FormTimeline = ({ currentStep }) => {
