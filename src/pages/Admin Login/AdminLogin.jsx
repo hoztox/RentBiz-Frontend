@@ -7,11 +7,13 @@ import slide3 from "../../assets/Images/Admin Login/Slide1.svg";
 import viewIcon from "../../assets/Images/Admin Login/ViewIcon.svg";
 import inActiveSliderIcon from "../../assets/Images/Admin Login/inActiveSliderIcon.svg";
 import activeSliderIcon from "../../assets/Images/Admin Login/activeSliderIcon.svg";
+import { useNavigate } from "react-router-dom";
 
 const slides = [slide1, slide2, slide3];
 
 const AdminLogin = () => {
   const [current, setCurrent] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -19,6 +21,10 @@ const AdminLogin = () => {
     }, 4000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleLogin = () => {
+    navigate('/admin/dashboard')
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-white">
@@ -145,6 +151,7 @@ const AdminLogin = () => {
             </div>
             <button
               type="submit"
+              onClick={handleLogin}
               className="w-full bg-[#1458A2] hover:bg-[#104880] text-white py-2 mt-[32px] rounded-full login-btn"
               style={{
                 width: "445px",
