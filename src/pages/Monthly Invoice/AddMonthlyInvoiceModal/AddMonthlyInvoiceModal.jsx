@@ -108,7 +108,7 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
             <label className="block mb-3 invoice-modal-label">Due Date</label>
             <div className="relative">
               <input
-                type="text"
+                type="date"
                 name="dueDate"
                 placeholder="dd/mm/yyyy"
                 value={formData.dueDate}
@@ -116,7 +116,7 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
                 className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-input"
               />
               <div className="absolute inset-y-0 right-1 flex items-center pr-3 pointer-events-none">
-                <img src={calendaricon} alt="Calendar" className="w-5 h-5" />
+                {/* <img src={calendaricon} alt="Calendar" className="w-5 h-5" /> */}
               </div>
             </div>
           </div>
@@ -127,15 +127,15 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
             </label>
             <div className="relative">
               <input
-                type="text"
+                type="date"
                 name="inoviceDate"
                 placeholder="mm/dd/yyyy"
                 value={formData.invoiceDate}
                 onChange={handleChange}
-                className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-input"
+                className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-input appearance-none"
               />
               <div className="absolute inset-y-0 right-1 flex items-center pr-3 pointer-events-none">
-                <img src={calendaricon} alt="Calendar" className="w-5 h-5" />
+                {/* <img src={calendaricon} alt="Calendar" className="w-5 h-5" /> */}
               </div>
             </div>
           </div>

@@ -268,100 +268,118 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
             >
               Additional Charges
             </h3>
-            <div className="overflow-x-auto">
-              <table className="min-w-full charges-table">
+            <div className="mt-6 overflow-x-auto border border-[#E9E9E9] rounded-md">
+              <table className="w-full border-collapse">
                 <thead>
-                  <tr className="bg-gray-50">
-                    <th className="py-2 px-3 text-left text-[#677487] uppercase tenancy-charges-head">
+                  <tr className="border-b border-[#E9E9E9] h-[57px]">
+                    <th className="px-[10px] text-left invoice-modal-thead uppercase w-[20px]">
                       NO
                     </th>
-                    <th className="py-2 px-3 text-left text-[#677487] uppercase tenancy-charges-head">
+                    <th className="px-[10px] text-left invoice-modal-thead uppercase w-[138px]">
                       CHARGE TYPE
                     </th>
-                    <th className="py-2 px-3 text-left text-[#677487] uppercase tenancy-charges-head">
+                    <th className="px-[10px] text-left invoice-modal-thead uppercase w-[162px]">
                       REASON
                     </th>
-                    <th className="py-2 px-3 text-left text-[#677487] uppercase tenancy-charges-head">
+                    <th className="px-[10px] text-left invoice-modal-thead uppercase w-[173px]">
                       DUE DATE
                     </th>
-                    <th className="py-2 px-3 text-left text-[#677487] uppercase tenancy-charges-head">
+                    <th className="px-[10px] text-left invoice-modal-thead uppercase w-[55px]">
                       STATUS
                     </th>
-                    <th className="py-2 px-3 text-left text-[#677487] uppercase tenancy-charges-head">
+                    <th className="px-[10px] text-left invoice-modal-thead uppercase w-[148px]">
                       AMOUNT
                     </th>
-                    <th className="py-2 px-3 text-left text-[#677487] uppercase tenancy-charges-head">
+                    <th className="px-[10px] text-left invoice-modal-thead uppercase w-[25px]">
                       VAT
                     </th>
-                    <th className="py-2 px-3 text-left text-[#677487] uppercase tenancy-charges-head">
+                    <th className="px-[10px] text-left invoice-modal-thead uppercase w-[43px]">
                       TOTAL
                     </th>
-                    <th className="py-2 px-3 text-left text-[#677487] uppercase tenancy-charges-head">
+                    <th className="px-[10px] text-left invoice-modal-thead uppercase w-[61px]">
                       REMOVE
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {additionalCharges.map((charge) => (
-                    <tr key={charge.id} className="border-t border-gray-200">
-                      <td className="py-2 px-3 text-sm">{charge.id}</td>
-                      <td className="py-2 px-3">
-                        <div className="relative">
-                          <select
-                            className="w-full p-1 pl-2 text-sm appearance-none input-box"
-                            onFocus={() => setIsSelectOpen(true)}
-                            onBlur={() => setIsSelectOpen(false)}
-                          >
-                            <option>Choose</option>
-                          </select>
-                          <ChevronDown
-                            className={`absolute right-[5px] top-[7px] text-gray-400 pointer-events-none transition-transform duration-300 ${
-                              isSelectOpen ? "rotate-180" : "rotate-0"
-                            }`}
-                            width={18}
-                            height={18}
-                            color="#201D1E"
-                          />
-                        </div>
+                  {additionalCharges.map((charge, index) => (
+                    <tr key={charge.id} className="border-t border-[#E9E9E9]">
+                      {/* NO */}
+                      <td className="px-[10px] py-[5px] w-[20px] text-[14px] text-[#201D1E]">
+                        {charge.id}
                       </td>
-                      <td className="py-2 px-3">
+
+                      {/* CHARGE TYPE */}
+                      <td className="px-[10px] py-[5px] w-[138px] relative">
+                        <select
+                          className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white invoice-modal-table-select"
+                          onFocus={() => setIsSelectOpen(true)}
+                          onBlur={() => setIsSelectOpen(false)}
+                        >
+                          <option value="">Choose</option>
+                        </select>
+                        <ChevronDown
+                          className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
+                            isSelectOpen ? "rotate-180" : ""
+                          }`}
+                        />
+                      </td>
+
+                      {/* REASON */}
+                      <td className="px-[10px] py-[5px] w-[162px]">
                         <input
                           type="text"
                           placeholder="Enter Reason"
-                          className="w-full p-1 text-sm input-box"
+                          className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
                         />
                       </td>
-                      <td className="py-2 px-3">
-                        <div className="relative">
-                          <input
-                            type="text"
-                            placeholder="mm/dd/yyyy"
-                            className="w-full p-1 text-sm pr-8 input-box"
-                          />
-                          <div className="absolute inset-y-0 right-0 flex items-center pr-2">
-                            <img
-                              src={calendaricon}
-                              alt=""
-                              className="w-5 h-5"
-                            />
-                          </div>
-                        </div>
+
+                      {/* DUE DATE */}
+                      <td className="px-[10px] py-[5px] w-[173px] relative">
+                        <input
+                          type="text"
+                          placeholder="mm/dd/yyyy"
+                          className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
+                        />
+                        <img
+                          src={calendaricon}
+                          alt="Calendar"
+                          className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
+                        />
                       </td>
-                      <td className="py-2 px-3 text-sm">Pending</td>
-                      <td className="py-2 px-3">
+
+                      {/* STATUS */}
+                      <td className="px-[10px] py-[5px] w-[55px] text-[14px] text-[#201D1E]">
+                        Pending
+                      </td>
+
+                      {/* AMOUNT */}
+                      <td className="px-[10px] py-[5px] w-[148px]">
                         <input
                           type="text"
                           placeholder="Enter Amount"
-                          className="w-full p-1 text-sm input-box"
+                          className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
                         />
                       </td>
-                      <td className="py-2 px-3 text-sm text-center">
+
+                      {/* VAT */}
+                      <td className="px-[10px] py-[5px] w-[25px] text-[14px] text-[#201D1E] text-center">
                         {charge.vat}
                       </td>
-                      <td className="py-2 px-3 text-sm">0.000</td>
-                      <td className="py-2 px-3">
+
+                      {/* TOTAL */}
+                      <td className="px-[10px] py-[5px] w-[35px] text-[14px] text-[#201D1E]">
+                        {Number(charge.total || 0).toFixed(4)}
+                      </td>
+
+                      {/* REMOVE */}
+                      <td className="px-[10px] py-[5px] w-[30px]">
                         <button>
-                          <img src={deleteicon} alt="delete" className="w-[30px] h-[18px]"/>
+                          <img
+                            src={deleteicon}
+                            alt="delete"
+                            className="w-[60px] h-[20px] mt-1"
+                          />
                         </button>
                       </td>
                     </tr>
@@ -374,7 +392,11 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               className="mt-6 bg-[#2892CE] hover:bg-[#1f6c99] text-white px-4 pl-6 mb-10 flex items-center addrow-btn"
             >
               Add Row
-              <img src={plusicon} alt="add" className="w-[20px] h-[20px] ml-2" />
+              <img
+                src={plusicon}
+                alt="add"
+                className="w-[20px] h-[20px] ml-2"
+              />
             </button>
           </div>
 
@@ -389,83 +411,110 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
             </button>
 
             {showPaymentSchedule && (
-              <div className="mt-4 overflow-x-auto">
-              <table className="min-w-full border border-gray-200">
-                <thead className="h-[57px]">
-                  <tr className="bg-gray-50">
-                    <th className="py-2 px-3 text-left text-[#677487] tenancy-charges-head w-[60px]">
-                      NO
-                    </th>
-                    <th className="py-2 px-3 text-left text-[#677487] tenancy-charges-head w-[120px]">
-                      CHARGE TYPE
-                    </th>
-                    <th className="py-2 px-3 text-left text-[#677487] tenancy-charges-head  w-[150px]">
-                      REASON
-                    </th>
-                    <th className="py-2 px-3 text-left text-[#677487] tenancy-charges-head w-[120px]">
-                      DUE DATE
-                    </th>
-                    <th className="py-2 px-3 text-left text-[#677487] tenancy-charges-head  w-[100px]">
-                      STATUS
-                    </th>
-                    <th className="py-2 px-3 text-left text-[#677487] tenancy-charges-head w-[100px]">
-                      AMOUNT
-                    </th>
-                    <th className="py-2 px-3 text-left text-[#677487] tenancy-charges-head  w-[80px]">
-                      VAT
-                    </th>
-                    <th className="py-2 px-3 text-left text-[#677487] tenancy-charges-head  w-[100px]">
-                      TOTAL
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paymentSchedule.map((item) => (
-                    <tr key={item.id} className="border-t border-gray-200">
-                      <td className="py-2 px-3 text-sm">{item.id}</td>
-                      <td className="py-2 px-3 text-sm">{item.chargeType}</td>
-                      <td className="py-2 px-3 text-sm">{item.reason}</td>
-                      <td className="py-2 px-3 text-sm">
-                        {item.id === "03" ? (
-                          <div className="relative">
-                            <input
-                              type="text"
-                              placeholder="mm/dd/yyyy"
-                              className="w-32 p-1 text-sm pr-8 border border-gray-300 rounded input-box"
-                            />
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-2">
+              <div className="mt-6 overflow-x-auto border border-[#E9E9E9] rounded-md">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="border-b border-[#E9E9E9] h-[57px]">
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[20px]">
+                        NO
+                      </th>
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[138px]">
+                        CHARGE TYPE
+                      </th>
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[162px]">
+                        REASON
+                      </th>
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[173px]">
+                        DUE DATE
+                      </th>
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[55px]">
+                        STATUS
+                      </th>
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[148px]">
+                        AMOUNT
+                      </th>
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[25px]">
+                        VAT
+                      </th>
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[43px]">
+                        TOTAL
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paymentSchedule.map((item) => (
+                      <tr key={item.id} className="border-t border-[#E9E9E9] h-[57px]">
+                        {/* NO */}
+                        <td className="px-[10px] py-[5px] w-[20px] text-[14px] text-[#201D1E]">
+                          {item.id}
+                        </td>
+
+                        {/* CHARGE TYPE */}
+                        <td className="px-[10px] py-[5px] w-[138px] text-[14px] text-[#201D1E]">
+                          {item.chargeType}
+                        </td>
+
+                        {/* REASON */}
+                        <td className="px-[10px] py-[5px] w-[162px] text-[14px] text-[#201D1E]">
+                          {item.reason}
+                        </td>
+
+                        {/* DUE DATE */}
+                        <td className="px-[10px] py-[5px] w-[173px] relative">
+                          {item.id === "03" ? (
+                            <div className="relative">
+                              <input
+                                type="text"
+                                placeholder="mm/dd/yyyy"
+                                className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
+                              />
                               <img
                                 src={calendaricon}
-                                alt=""
-                                className="w-5 h-5 mr-[5px]"
+                                alt="Calendar"
+                                className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
                               />
                             </div>
-                          </div>
-                        ) : (
-                          item.dueDate
-                        )}
-                      </td>
-                      <td className="py-2 px-3 text-sm">{item.status}</td>
-                      <td className="py-2 px-3 text-sm">
-                        {item.id === "03" ? (
-                          <input
-                            type="text"
-                            placeholder="Enter Amount"
-                            className="w-28 p-1 text-sm border border-gray-300 rounded charges-table"
-                          />
-                        ) : (
-                          item.amount
-                        )}
-                      </td>
-                      <td className="py-2 px-3 text-sm text-center">
-                        {item.vat}
-                      </td>
-                      <td className="py-2 px-3 text-sm">{item.total}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                          ) : (
+                            <span className="text-[14px] text-[#201D1E]">
+                              {item.dueDate}
+                            </span>
+                          )}
+                        </td>
+
+                        {/* STATUS */}
+                        <td className="px-[10px] py-[5px] w-[55px] text-[14px] text-[#201D1E]">
+                          {item.status}
+                        </td>
+
+                        {/* AMOUNT */}
+                        <td className="px-[10px] py-[5px] w-[148px]">
+                          {item.id === "03" ? (
+                            <input
+                              type="text"
+                              placeholder="Enter Amount"
+                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
+                            />
+                          ) : (
+                            <span className="text-[14px] text-[#201D1E]">
+                              {item.amount}
+                            </span>
+                          )}
+                        </td>
+
+                        {/* VAT */}
+                        <td className="px-[10px] py-[5px] w-[25px] text-[14px] text-[#201D1E] text-center">
+                          {item.vat}
+                        </td>
+
+                        {/* TOTAL */}
+                        <td className="px-[10px] py-[5px] w-[35px] text-[14px] text-[#201D1E]">
+                          {Number(item.total || 0).toFixed(4)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
 
