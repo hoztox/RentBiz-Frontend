@@ -93,11 +93,11 @@ const IncomeExpenseReport = () => {
   ];
 
   const getUnique = (key) => [...new Set(demoData.map((item) => item[key]))];
-  const uniqueDates = getUnique("date");
+  
   const uniqueTenants = getUnique("tenant");
   const uniqueBuildings = getUnique("building");
   const uniqueUnits = getUnique("unit");
-  const uniqueInvoices = getUnique("invoice");
+  
 
   const clearFilters = () => {
     const cleared = {
