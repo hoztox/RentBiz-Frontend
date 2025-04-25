@@ -6,11 +6,15 @@ import downloadicon from "../../assets/Images/Refund/download-icon.svg";
 import editicon from "../../assets/Images/Refund/edit-icon.svg";
 import printericon from "../../assets/Images/Refund/printer-icon.svg";
 import downloadactionicon from "../../assets/Images/Refund/download-action-icon.svg";
+import AddRefundModal from "./AddRefundModal/AddRefundModal";
+import UpdateRefundModal from "./UpdateRefundModal/UpdateRefundModal";
 
 const Refund = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const itemsPerPage = 10;
 
   const demoData = [
@@ -82,6 +86,22 @@ const Refund = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
+  const openAddModal = () => {
+    setIsAddModalOpen(true)
+  }
+
+  const closeAddModal = () => {
+    setIsAddModalOpen(false)
+  }
+
+  const openUpdateModal = () => {
+    setIsUpdateModalOpen(true)
+  }
+
+  const closeUpdateModal = () => {
+    setIsUpdateModalOpen(false)
+  }
+
   return (
     <div className="border border-[#E9E9E9]  rounded-md">
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9]">
@@ -112,7 +132,7 @@ const Refund = () => {
               }`}
             />
           </div>
-          <button className="flex items-center justify-center gap-2 w-[176px] h-[38px] rounded-md add-refund duration-200">
+          <button className="flex items-center justify-center gap-2 w-[176px] h-[38px] rounded-md add-refund duration-200" onClick={openAddModal}>
             Add Refund
             <img src={plusicon} alt="plus icon" className="w-[15px] h-[15px]" />
           </button>
@@ -168,7 +188,7 @@ const Refund = () => {
               </td>
 
               <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                <button>
+                <button onClick={openUpdateModal}>
                   <img
                     src={editicon}
                     alt="Edit"
@@ -250,8 +270,10 @@ const Refund = () => {
         </div>
       </div>
       {/* Add Refund Modal */}
+      <AddRefundModal isOpen={isAddModalOpen} onClose={closeAddModal} />
 
       {/* Update Refund Modal */}
+      <UpdateRefundModal isOpen={isUpdateModalOpen} onClose={closeUpdateModal} />
     </div>
   );
 };

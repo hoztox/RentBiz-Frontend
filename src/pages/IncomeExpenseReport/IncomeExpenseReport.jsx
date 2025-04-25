@@ -1,0 +1,481 @@
+import React, { useState, useRef, useEffect } from "react";
+import "./IncomeExpenseReport.css";
+import { ChevronDown } from "lucide-react";
+
+const IncomeExpenseReport = () => {
+  const [openSelectKey, setOpenSelectKey] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filters, setFilters] = useState({
+    id: "",
+    tenant: "",
+    building: "",
+    unit: "",
+    status: "",
+    start_date: "",
+    end_date: "",
+  });
+  const [tempFilters, setTempFilters] = useState({
+    id: "",
+    tenant: "",
+    building: "",
+    unit: "",
+    status: "",
+    start_date: "",
+    end_date: "",
+  });
+
+  const dateRangeRef = useRef(null);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        openSelectKey === "date_range" &&
+        dateRangeRef.current &&
+        !dateRangeRef.current.contains(event.target)
+      ) {
+        setOpenSelectKey(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openSelectKey]);
+
+  const itemsPerPage = 10;
+
+  const demoData = [
+    {
+      date: "09 Sept 2024",
+      building: "Emaar Square Area",
+      unit: "SHOP10",
+      tenant: "Coffee",
+      charge: "Deposit",
+      invoice_no: "INV2410009",
+      income_amount: "120.50",
+      income_vat: "120.50",
+      income_total: "120.50",
+      expense_amount: "120.50",
+      expense_vat: "120.50",
+      expense_total: "120.50",
+    },
+    {
+      date: "09 Sept 2024",
+      building: "Emaar Square Area",
+      unit: "SHOP10",
+      tenant: "Coffee",
+      charge: "Deposit",
+      invoice_no: "INV2410009",
+      income_amount: "120.50",
+      income_vat: "120.50",
+      income_total: "120.50",
+      expense_amount: "120.50",
+      expense_vat: "120.50",
+      expense_total: "120.50",
+    },
+    {
+      date: "09 Sept 2024",
+      building: "Emaar Square Area",
+      unit: "SHOP10",
+      tenant: "Coffee",
+      charge: "Deposit",
+      invoice_no: "INV2410009",
+      income_amount: "120.50",
+      income_vat: "120.50",
+      income_total: "120.50",
+      expense_amount: "120.50",
+      expense_vat: "120.50",
+      expense_total: "120.50",
+    },
+  ];
+
+  const getUnique = (key) => [...new Set(demoData.map((item) => item[key]))];
+  const uniqueDates = getUnique("date");
+  const uniqueTenants = getUnique("tenant");
+  const uniqueBuildings = getUnique("building");
+  const uniqueUnits = getUnique("unit");
+  const uniqueInvoices = getUnique("invoice");
+
+  const clearFilters = () => {
+    const cleared = {
+      date: "",
+      tenant: "",
+      building: "",
+      unit: "",
+      start_date: "",
+      end_date: "",
+    };
+    setFilters(cleared);
+    setTempFilters(cleared);
+    setSearchTerm("");
+    setCurrentPage(1);
+  };
+
+  const filteredData = demoData.filter((report) => {
+    const matchesSearch = Object.values(report).some((val) =>
+      val.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const matchesFilters =
+      (!filters.date || report.date === filters.date) &&
+      (!filters.building || report.building === filters.building) &&
+      (!filters.unit || report.unit === filters.unit) &&
+      (!filters.tenant || report.tenant === filters.tenant) &&
+      (!filters.charge || report.charge === filters.charge) &&
+      (!filters.invoice_no || report.invoice_no === filters.invoice_no) &&
+      (!filters.start_date ||
+        new Date(report.invoice_date) >= new Date(filters.start_date)) &&
+      (!filters.end_date ||
+        new Date(report.due_date) <= new Date(filters.end_date));
+
+    return matchesSearch && matchesFilters;
+  });
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const maxPageButtons = 5;
+  const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+  const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+  // Toggle date range dropdown
+  const toggleDateRange = () => {
+    setOpenSelectKey(openSelectKey === "date_range" ? null : "date_range");
+  };
+
+  return (
+    <div className="border border-[#E9E9E9] rounded-md">
+      <div className="p-5 border-b border-[#E9E9E9]">
+        <div className="flex justify-between items-center pb-5">
+          <h1 className="income-expense-head">Income-Expense Report</h1>
+          <div className="flex gap-[10px]">
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-[302px] focus:border-gray-300 duration-200 income-expense-search"
+            />
+            <div className="relative">
+              <select
+                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[121px] cursor-pointer focus:border-gray-300 duration-200 income-expense-selection"
+                onFocus={() => setOpenSelectKey("showing")}
+                onBlur={() => setOpenSelectKey(null)}
+              >
+                <option value="showing">Showing</option>
+                <option value="all">All</option>
+              </select>
+              <ChevronDown
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
+                  openSelectKey === "showing" ? "rotate-180" : "rotate-0"
+                }`}
+              />
+            </div>
+            <button className="flex items-center justify-center gap-2 w-[132px] h-[38px] rounded-md duration-200 export-btn">
+              Export To Excel
+            </button>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="flex gap-[10px] flex-wrap">
+            <div className="relative">
+              <select
+                name="tenant"
+                className="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer focus:border-gray-300 duration-200 income-expense-selection"
+                value={tempFilters.tenant}
+                onChange={(e) =>
+                  setTempFilters((prev) => ({
+                    ...prev,
+                    tenant: e.target.value,
+                  }))
+                }
+                onFocus={() => setOpenSelectKey("tenant")}
+                onBlur={() => setOpenSelectKey(null)}
+              >
+                <option value="">All Tenancy</option>
+                {uniqueTenants.map((item, i) => (
+                  <option key={i} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
+                  openSelectKey === "tenant" ? "rotate-180" : "rotate-0"
+                }`}
+              />
+            </div>
+
+            <div className="relative">
+              <select
+                name="building"
+                className="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer focus:border-gray-300 duration-200 income-expense-selection"
+                value={tempFilters.building}
+                onChange={(e) =>
+                  setTempFilters((prev) => ({
+                    ...prev,
+                    building: e.target.value,
+                  }))
+                }
+                onFocus={() => setOpenSelectKey("building")}
+                onBlur={() => setOpenSelectKey(null)}
+              >
+                <option value="">All Buildings</option>
+                {uniqueBuildings.map((item, i) => (
+                  <option key={i} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
+                  openSelectKey === "building" ? "rotate-180" : "rotate-0"
+                }`}
+              />
+            </div>
+
+            <div className="relative">
+              <select
+                name="unit"
+                className="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer focus:border-gray-300 duration-200 income-expense-selection"
+                value={tempFilters.unit}
+                onChange={(e) =>
+                  setTempFilters((prev) => ({
+                    ...prev,
+                    unit: e.target.value,
+                  }))
+                }
+                onFocus={() => setOpenSelectKey("unit")}
+                onBlur={() => setOpenSelectKey(null)}
+              >
+                <option value="">All Units</option>
+                {uniqueUnits.map((item, i) => (
+                  <option key={i} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 income-expense-selection ${
+                  openSelectKey === "unit" ? "rotate-180" : "rotate-0"
+                }`}
+              />
+            </div>
+
+            {/* Date Range Filter */}
+            <div className="relative" ref={dateRangeRef}>
+              <div
+                className="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer flex items-center justify-between income-expense-selection"
+                onClick={toggleDateRange}
+              >
+                Date Range
+                <ChevronDown
+                  className={`absolute right-2 top-[10px] w-[20px] h-[20px] duration-300 ${
+                    openSelectKey === "date_range" ? "rotate-180" : "rotate-0"
+                  }`}
+                />
+              </div>
+              {openSelectKey === "date_range" && (
+                <div className="absolute z-10 bg-white p-4 mt-1 border border-gray-300 rounded-md shadow-md w-[250px]">
+                  <label className="block text-sm mb-1 filter-btn">
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    value={tempFilters.start_date}
+                    onChange={(e) =>
+                      setTempFilters((prev) => ({
+                        ...prev,
+                        start_date: e.target.value,
+                      }))
+                    }
+                    className="w-full border border-gray-300 rounded-md px-2 py-1 mb-3 outline-none"
+                  />
+                  <label className="block text-sm mb-1 filter-btn">
+                    End Date
+                  </label>
+                  <input
+                    type="date"
+                    value={tempFilters.end_date}
+                    onChange={(e) =>
+                      setTempFilters((prev) => ({
+                        ...prev,
+                        end_date: e.target.value,
+                      }))
+                    }
+                    className="w-full border border-gray-300 rounded-md px-2 py-1 outline-none"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="flex gap-[10px]">
+            <button
+              onClick={() => {
+                setFilters(tempFilters);
+                setCurrentPage(1);
+              }}
+              className="bg-[#201D1E] text-white w-[105px] h-[38px] rounded-md hover:bg-[#F0F0F0] hover:text-[#201D1E] duration-200 filter-btn"
+            >
+              Filter
+            </button>
+            <button
+              onClick={clearFilters}
+              className="w-[105px] h-[38px] bg-[#F0F0F0] text-[#4D4E4D] rounded-md clear-btn hover:bg-[#201D1E] hover:text-white duration-200"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="h-[57px]">
+              {/* First row with section headers */}
+              <th
+                colSpan="6"
+                className="border-b border-[#E9E9E9] income-expense-header"
+              ></th>
+              <th
+                colSpan="3"
+                className="px-5 text-center border-b bg-[#F2FCF7] text-[#28C76F] income-expense-header"
+              >
+                INCOME
+              </th>
+              <th
+                colSpan="3"
+                className="px-5 text-center border-b border-[#E9E9E9] bg-[#FFF7F6] text-[#FE7062] income-expense-header"
+              >
+                EXPENSE
+              </th>
+            </tr>
+            <tr className="border-b border-[#E9E9E9] h-[57px]">
+              <th className="px-5 text-left income-expense-thead">DATE</th>
+              <th className="px-5 text-left income-expense-thead">BUILDING</th>
+              <th className="px-5 text-left income-expense-thead">UNIT</th>
+              <th className="px-5 text-left income-expense-thead">TENANT</th>
+              <th className="px-5 text-left income-expense-thead">CHARGE</th>
+              <th className="px-5 text-left income-expense-thead whitespace-nowrap">
+                INVOICE NO/ <br />
+                EXPENSE NO
+              </th>
+
+              {/* Income columns */}
+              <th className="px-5 text-center income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">
+                AMOUNT
+              </th>
+              <th className="px-5 text-center income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">
+                VAT
+              </th>
+              <th className="px-5 text-center income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">
+                TOTAL
+              </th>
+
+              {/* Expense columns */}
+              <th className="px-5 text-center income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
+                AMOUNT
+              </th>
+              <th className="px-5 text-center income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
+                VAT
+              </th>
+              <th className="px-5 text-center income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
+                TOTAL
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedData.map((income, index) => (
+              <tr
+                key={index}
+                className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
+              >
+                <td className="px-5 income-expense-data">{income.date}</td>
+                <td className="px-5 income-expense-data">{income.building}</td>
+                <td className="px-5 income-expense-data">{income.unit}</td>
+                <td className="px-5 income-expense-data">{income.tenant}</td>
+                <td className="px-5 income-expense-data">{income.charge}</td>
+                <td className="px-5 income-expense-data">
+                  {income.invoice_no}
+                </td>
+
+                {/* Income data */}
+                <td className="px-5 text-center income-expense-data bg-[#F2FCF7] !text-[#28C76F]">
+                  {income.income_amount}
+                </td>
+                <td className="px-5 text-center income-expense-data bg-[#F2FCF7] !text-[#28C76F]">
+                  {income.income_vat}
+                </td>
+                <td className="px-5 text-center income-expense-data bg-[#F2FCF7] !text-[#28C76F]">
+                  {income.income_total}
+                </td>
+
+                {/* Expense data */}
+                <td className="px-5 text-center income-expense-data bg-[#FFF7F6] !text-[#FE7062]">
+                  {income.expense_amount}
+                </td>
+                <td className="px-5 text-center income-expense-data bg-[#FFF7F6] !text-[#FE7062]">
+                  {income.expense_vat}
+                </td>
+                <td className="px-5 text-center income-expense-data bg-[#FFF7F6] !text-[#FE7062]">
+                  {income.expense_total}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="flex justify-between items-center h-[77.5px] px-5">
+        <span className="collection-list-pagination">
+          Showing{" "}
+          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+          {filteredData.length} entries
+        </span>
+        <div className="flex gap-[4px]">
+          <button
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage((prev) => prev - 1)}
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 pagination-btn"
+          >
+            Previous
+          </button>
+          {[...Array(endPage - startPage + 1)].map((_, i) => {
+            const page = startPage + i;
+            return (
+              <button
+                key={page}
+                className={`px-4 h-[38px] rounded-md duration-200 ${
+                  page === currentPage
+                    ? "bg-[#1458A2] text-white"
+                    : "bg-[#F4F4F4] text-[#8a94a3] hover:bg-[#e6e6e6]"
+                }`}
+                onClick={() => setCurrentPage(page)}
+              >
+                {page}
+              </button>
+            );
+          })}
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 pagination-btn"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default IncomeExpenseReport;

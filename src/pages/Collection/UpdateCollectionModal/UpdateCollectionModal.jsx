@@ -56,7 +56,7 @@ const UpdateCollectionModal = ({ isOpen, onClose, selectedRow }) => {
     }));
   };
 
-  const handleSave = () => {
+  const handleUpdate = () => {
     const {
       selectTenancy,
       buildingName,
@@ -124,6 +124,7 @@ const UpdateCollectionModal = ({ isOpen, onClose, selectedRow }) => {
   }, [isOpen, selectedRow]);
 
   if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-md w-[1006px] shadow-lg p-1">
@@ -450,7 +451,7 @@ const UpdateCollectionModal = ({ isOpen, onClose, selectedRow }) => {
             <div className="flex items-end justify-end mb-1">
               <button
                 type="button"
-                onClick={handleSave}
+                onClick={handleUpdate}
                 className="bg-[#2892CE] text-white update-collection-save-btn duration-200"
               >
                 Save

@@ -648,7 +648,7 @@ const AdminSidebar = () => {
               ? "menu-active"
               : "text-gray-700 hover:bg-gray-200"
               }`}
-            onClick={() => handleNonDropdownClick("IncomeExpense")}
+            onClick={() => handleNonDropdownClick("IncomeExpense", "/admin/income-expense-report")}
           >
             <img
               src={incomeExpense}

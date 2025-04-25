@@ -1,66 +1,41 @@
-import React, { useState } from "react";
-import "./AddExpenseModal.css";
+import React, { useState, useEffect } from "react";
+import "./UpdateExpenseModal.css";
 import { ChevronDown } from "lucide-react";
 import closeicon from "../../../assets/Images/Expense/close-icon.svg";
 import calendaricon from "../../../assets/Images/Expense/calendar-icon.svg";
 
-const AddExpenseModal = ({ isOpen, onClose }) => {
-  const initialFormData = {
+const UpdateExpenseModal = ({ isOpen, onClose, expenseData }) => {
+  const [formData, setFormData] = useState({
+    id: "",
+    date: "",
     tenant: "",
     building: "",
     units: "",
     expense: "",
-    date: "",
     amount: "",
     vatAmount: "",
     totalAmount: "",
     description: "",
     status: "",
-  };
-  const [formData, setFormData] = useState(initialFormData);
+  });
   const [isSelectOpenTenant, setIsSelectOpenTenant] = useState(false);
   const [isSelectOpenExpense, setIsSelectOpenExpense] = useState(false);
   const [isSelectOpenStatus, setIsSelectOpenStatus] = useState(false);
 
-  const handleChange = (field) => (e) => {
-    setFormData({ ...formData, [field]: e.target.value });
-  };
-
-  const handleSave = () => {
-    const {
-      tenant,
-      building,
-      units,
-      expense,
-      date,
-      amount,
-      vatAmount,
-      totalAmount,
-      description,
-      status,
-    } = formData;
-    if (
-      tenant &&
-      building &&
-      units &&
-      expense &&
-      date &&
-      amount &&
-      vatAmount &&
-      totalAmount &&
-      description &&
-      status
-    ) {
-      console.log("New Charge Added: ", formData);
-      onClose();
-    } else {
-      console.log("Please fill all required fields");
+  useEffect(() => {
+    if (expenseData) {
+      setFormData(expenseData);
     }
+  }, [expenseData]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleClose = () => {
-    setFormData(initialFormData); // Reset form data
-    onClose(); // Call the original onClose prop
+  const handleUpdate = (e) => {
+    e.preventDefault();
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -69,12 +44,10 @@ const AddExpenseModal = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-md w-[1006px] shadow-lg p-1">
         <div className="flex justify-between items-center p-6 mt-2">
-          <h2 className="text-[#201D1E] add-expense-head">
-            Create New Expense
-          </h2>
+          <h2 className="text-[#201D1E] update-expense-head">Update Expense</h2>
           <button
-            onClick={handleClose}
-            className="add-expense-close-btn hover:bg-gray-100 duration-200"
+            onClick={onClose}
+            className="update-expense-close-btn hover:bg-gray-100 duration-200"
           >
             <img src={closeicon} alt="close" className="w-[15px] h-[15px]" />
           </button>
@@ -84,15 +57,16 @@ const AddExpenseModal = ({ isOpen, onClose }) => {
           <div className="grid grid-cols-2 gap-6">
             {/* Tenant */}
             <div className="space-y-2">
-              <label className="block add-expense-label">Tenant*</label>
+              <label className="block update-expense-label">Tenant*</label>
               <div className="relative">
                 <select
+                  name="tenent"
                   value={formData.tenant}
-                  onChange={handleChange("tenant")}
+                  onChange={handleChange}
                   onFocus={() => setIsSelectOpenTenant(true)}
                   onBlur={() => setIsSelectOpenTenant(false)}
-                  className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-expense-selection ${
-                    formData.tenant === "" ? "add-expense-selected" : ""
+                  className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-expense-selection ${
+                    formData.tenant === "" ? "update-expense-selected" : ""
                   }`}
                 >
                   <option value="" disabled hidden>
@@ -114,41 +88,41 @@ const AddExpenseModal = ({ isOpen, onClose }) => {
 
             {/* Building */}
             <div className="space-y-2">
-              <label className="block add-expense-label">Building*</label>
+              <label className="block update-expense-label">Building*</label>
               <input
                 type="text"
+                name="building"
                 value={formData.building}
-                onChange={handleChange("building")}
+                onChange={handleChange}
                 placeholder="Enter Building"
-                className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-expense-input"
+                className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-expense-input"
               />
             </div>
 
-            {/* Units */}
             <div className="space-y-2">
-              <label className="block add-expense-label">Units*</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={formData.units}
-                  onChange={handleChange("units")}
-                  placeholder="Enter Units"
-                  className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-expense-input"
-                />
-              </div>
+              <label className="block update-expense-label">Units*</label>
+              <input
+                name="units"
+                type="text"
+                value={formData.units}
+                onChange={handleChange}
+                placeholder="Enter Units"
+                className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-expense-input"
+              />
             </div>
 
             {/* Expense */}
             <div className="space-y-2">
-              <label className="block add-expense-label">Expense*</label>
+              <label className="block update-expense-label">Expense*</label>
               <div className="relative">
                 <select
+                  name="expense"
                   value={formData.expense}
-                  onChange={handleChange("expense")}
+                  onChange={handleChange}
                   onFocus={() => setIsSelectOpenExpense(true)}
                   onBlur={() => setIsSelectOpenExpense(false)}
-                  className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-expense-selection ${
-                    formData.expense === "" ? "add-expense-selected" : ""
+                  className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-expense-selection ${
+                    formData.expense === "" ? "update-expense-selected" : ""
                   }`}
                 >
                   <option value="" disabled hidden>
@@ -170,14 +144,15 @@ const AddExpenseModal = ({ isOpen, onClose }) => {
 
             {/* Date */}
             <div className="space-y-2">
-              <label className="block add-expense-label">Date*</label>
+              <label className="block update-expense-label">Date*</label>
               <div className="relative">
                 <input
+                  name="date"
                   type="text"
                   value={formData.date}
-                  onChange={handleChange("date")}
+                  onChange={handleChange}
                   placeholder="dd/mm/yyyy"
-                  className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-expense-input"
+                  className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-expense-input"
                 />
                 <div className="absolute inset-y-0 right-1 flex items-center px-2">
                   <img src={calendaricon} alt="calendar" className="w-5 h-5" />
@@ -187,65 +162,68 @@ const AddExpenseModal = ({ isOpen, onClose }) => {
 
             {/* Amount */}
             <div className="space-y-2">
-              <label className="block add-expense-label">Amount</label>
+              <label className="block update-expense-label">Amount</label>
               <input
+                name="amount"
                 type="text"
                 value={formData.amount}
-                onChange={handleChange("amount")}
+                onChange={handleChange}
                 placeholder="Enter Amount"
-                className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-expense-input"
+                className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-expense-input"
               />
             </div>
 
             {/* VAT Amount */}
             <div className="space-y-2">
-              <label className="block add-expense-label">Vat Amount*</label>
+              <label className="block update-expense-label">Vat Amount*</label>
               <input
+                name="vatAmount"
                 type="text"
                 value={formData.vatAmount}
-                onChange={handleChange("vatAmount")}
+                onChange={handleChange}
                 placeholder="Enter Vat Amount"
-                className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-expense-input"
+                className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-expense-input"
               />
             </div>
 
             {/* Total Amount */}
             <div className="space-y-2">
-              <label className="block add-expense-label">Total Amount</label>
+              <label className="block update-expense-label">Total Amount</label>
               <input
+                name="totalAmount"
                 type="text"
                 value={formData.totalAmount}
-                onChange={handleChange("totalAmount")}
+                onChange={handleChange}
                 placeholder="Enter Total Amount"
-                className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-expense-input"
+                className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-expense-input"
               />
             </div>
 
             {/* Description */}
             <div className="space-y-2">
-              <label className="block add-expense-label">Description</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={formData.description}
-                  onChange={handleChange("description")}
-                  placeholder="Enter Description"
-                  className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-expense-input"
-                />
-              </div>
+              <label className="block update-expense-label">Description</label>
+              <input
+                name="description"
+                type="text"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder="Enter Description"
+                className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-expense-input"
+              />
             </div>
 
             {/* Status */}
             <div className="space-y-2">
-              <label className="block add-expense-label">Status*</label>
+              <label className="block update-expense-label">Status*</label>
               <div className="relative">
                 <select
+                  name="status"
                   value={formData.status}
-                  onChange={handleChange("status")}
+                  onChange={handleChange}
                   onFocus={() => setIsSelectOpenStatus(true)}
                   onBlur={() => setIsSelectOpenStatus(false)}
-                  className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-expense-selection ${
-                    formData.status === "" ? "add-expense-selected" : ""
+                  className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-expense-selection ${
+                    formData.status === "" ? "update-expense-selected" : ""
                   }`}
                 >
                   <option value="" disabled hidden>
@@ -269,8 +247,8 @@ const AddExpenseModal = ({ isOpen, onClose }) => {
             <div className="flex items-end justify-end col-span-2 mt-4">
               <button
                 type="button"
-                onClick={handleSave}
-                className="bg-[#2892CE] text-white add-expense-save-btn duration-200"
+                onClick={handleUpdate}
+                className="bg-[#2892CE] text-white update-expense-save-btn duration-200"
               >
                 Save
               </button>
@@ -282,4 +260,4 @@ const AddExpenseModal = ({ isOpen, onClose }) => {
   );
 };
 
-export default AddExpenseModal;
+export default UpdateExpenseModal;

@@ -7,12 +7,15 @@ import editicon from "../../assets/Images/Expense/edit-icon.svg";
 import printericon from "../../assets/Images/Expense/printer-icon.svg";
 import downloadactionicon from "../../assets/Images/Expense/download-action-icon.svg";
 import AddExpenseModal from "./AddExpenseModal/AddExpenseModal";
+import UpdateExpenseModal from "./UpdateExpenseModal/UpdateExpenseModal";
 
 const Expense = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isAddModalOpen, setIsAddModalOpen] = useState()
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState(null);
   const itemsPerPage = 10;
 
   const demoData = [
@@ -90,6 +93,16 @@ const Expense = () => {
 
   const closeAddModal = () => {
     setIsAddModalOpen(false)
+  }
+
+  const openUpdateModal = (expense) => {
+      setSelectedExpense(expense)
+      setIsUpdateModalOpen(true)
+  }
+
+  const closeUpdateModal = () => {
+    setIsUpdateModalOpen(false)
+    setSelectedExpense(null);
   }
 
   return (
@@ -182,7 +195,7 @@ const Expense = () => {
               </td>
 
               <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                <button>
+                <button onClick={() => openUpdateModal(expense)}>
                   <img
                     src={editicon}
                     alt="Edit"
@@ -267,6 +280,7 @@ const Expense = () => {
       <AddExpenseModal isOpen={isAddModalOpen} onClose={closeAddModal} />
 
       {/* Update Expense Modal */}
+      <UpdateExpenseModal isOpen={isUpdateModalOpen} onClose={closeUpdateModal} expenseData={selectedExpense} />
     </div>
   );
 };
