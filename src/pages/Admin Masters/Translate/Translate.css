@@ -1,0 +1,79 @@
+.translate-head {
+    font-family: "Inter Tight";
+    font-size: 21px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    color: #201d1e;
+  }
+  
+  .translate-search {
+    font-family: "Inter Tight";
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+  }
+  
+  .translate-selection {
+    font-family: "Public Sans", sans-serif;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+    color: #201d1e;
+  }
+  
+  .update-btn {
+    background-color: #2892ce;
+    color: white;
+    font-family: "Inter Tight";
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0.43px;
+  }
+  .update-btn:hover {
+    background-color: #076094;
+  }
+  
+  .translate-thead {
+    font-family: "Inter Tight";
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    letter-spacing: 1px;
+    color: #818da0;
+    white-space: nowrap;
+  }
+  
+  .translate-data {
+    font-family: "Inter Tight";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22px;
+    color: #201d1e;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .custom-input {
+    border-radius: 6px;
+    outline-style: none;
+    font-family: "Inter Tight";
+  }
+
+  .custom-input::placeholder {
+    font-family: 'Inter Tight';
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 24px;
+    letter-spacing: 0px;
+  }
+  
+ 
+  

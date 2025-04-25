@@ -1,0 +1,56 @@
+.unit-info-form-label {
+    margin-bottom: 10px;
+    font-family: 'Inter Tight';
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    color: #201D1E;
+}
+
+.building-info-form-inputs::placeholder {
+    font-family: 'Inter Tight';
+    font-size: 15px;
+}
+
+.unit-info-form-inputs {
+    border: 1px solid #E9E9E9;
+    background-color: white;
+    border-radius: 6px;
+    padding: 7px 14px;
+    outline: none;
+    font-family: 'Inter Tight';
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+    color: #8a898b;
+}
+
+.next-btn {
+    background-color: #2892CE;
+    border-radius: 6px;
+    color: white;
+    font-family: 'Inter Tight';
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 18px;
+    letter-spacing: 0.43px;
+}
+
+.next-btn:hover {
+    background-color: #0d74af;
+}
+
+
+/* Hide number input spinners */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}

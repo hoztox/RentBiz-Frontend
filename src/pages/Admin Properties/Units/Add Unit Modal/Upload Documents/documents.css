@@ -1,0 +1,68 @@
+.remove-btn {
+  font-family: "Inter Tight";
+  width: 41px;
+  height: 38px;
+  border-radius: 6px;
+}
+
+.back-button {
+  font-family: "Inter Tight";
+  width: 150px;
+  height: 38px;
+  border-radius: 6px;
+  border: 1px solid #201d1e;
+}
+
+.next-button {
+  font-family: "Inter Tight";
+  width: 150px;
+  height: 38px;
+  border-radius: 6px;
+}
+
+.add-button {
+  font-family: "Inter Tight";
+  width: 137px;
+  height: 42px;
+  border-radius: 6px;
+  border: 1px solid #201d1e;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.doctype-input {
+    font-family: 'Inter Tight';
+    width: 226px;
+    height: 38px;
+    border-radius: 6px;
+    border: 1px solid #E9E9E9;
+    padding: 7px 12px 7px 12px;
+}
+
+.phone-input {
+    font-family: 'Inter Tight';
+    width: 168px;
+    height: 38px;
+    border-radius: 6px;
+    border: 1px solid #E9E9E9;
+    padding: 7px 12px 7px 12px;
+}
+
+.date-input {
+    font-family: 'Inter Tight';
+    width: 149px;
+    height: 38px;
+    border-radius: 6px;
+    border: 1px solid #E9E9E9;
+    padding: 7px 12px 7px 12px;
+}
+
+.attachfile-button {
+    font-family: 'Inter Tight';
+    width: 161px;
+    height: 38px;
+    border-radius: 6px;
+    border: 1px solid #E9E9E9;
+    padding: 7px 12px 7px 12px;
+}

@@ -1,0 +1,173 @@
+/* Heading on the image */
+.heading-on-image {
+  position: absolute;
+  top: -50px;
+  left: 0.51px;
+  width: 310px;
+  height: 29px;
+  font-family: "Inter Tight";
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 100%;
+  letter-spacing: 0px;
+  color: #ffffff;
+  z-index: 10; /* Make sure it appears above other elements */
+}
+
+/* Paragraph and slider icon container */
+.paragraph-container {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white; /* Assuming white text for visibility */
+  margin-top: 10px;
+}
+
+.gradient-overlay {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 11%, #000000 100%);
+  z-index: 5;
+}
+
+/* Slider Icon */
+.slider-icon {
+  opacity: 0.8;
+  margin-left: 15px; /* Add space between the paragraph and icon */
+}
+
+/* Container for the image and text */
+.login-container {
+  width: 1291px;
+  height: 875px;
+  border-radius: 28px;
+  display: flex;
+  background-color: white;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: relative;
+}
+
+.image-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.login-image-wrapper {
+  width: 685px;
+  height: 835px;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  background-color: white;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.login-slide-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.login-slide-description {
+  font-family: "Inter Tight";
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0%;
+}
+
+/* Adjusting padding and margin for clarity */
+.slide-text {
+  position: absolute;
+  bottom: 60px;
+  left: 0;
+  width: 100%;
+  padding: 20px 24px;
+  color: white;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.slide-text h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.slide-text p {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.slide-icon {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  opacity: 0.8;
+}
+
+.right-section-heading {
+  width: 414px;
+  height: 44px;
+  font-family: "Inter Tight";
+  font-weight: 500;
+  font-size: 36px;
+  line-height: 100%;
+  letter-spacing: 0px;
+}
+
+.input-label {
+  font-family: "Inter Tight";
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 100%;
+  letter-spacing: 0px;
+}
+
+.input-field {
+  width: 445px;
+  height: 52px;
+  top: 31px; /* Adjust the vertical position of the input */
+  border-radius: 76px;
+  border-width: 1px;
+  border-color: #e8e8e8; /* Light gray border color */
+  padding-left: 16px;
+  padding-right: 16px;
+  font-size: 16px;
+  margin-top: 12px;
+  color: #201D1E;
+}
+
+.input-field::placeholder{
+    font-family: "Inter Tight";
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    color: #C2C2C2;
+    left: 20px;
+}
+
+.login-btn {
+    font-family: "Inter Tight";
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 100%;
+    letter-spacing: 0%;
+}
+
+.login-slide-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.5s ease-in-out;
+  opacity: 1;
+}
+
+.login-slide-image.fade-out {
+  opacity: 0;
+}

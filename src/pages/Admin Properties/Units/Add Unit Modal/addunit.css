@@ -1,0 +1,22 @@
+.unit-modal-styles {
+    width: 1300px;
+    border-radius: 6px;
+    background-color:white;
+}
+
+.unit-modal-header {
+    background-color: white;
+    border-radius: 12px;
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.unit-modal-title {
+    font-family: 'Inter Tight';
+    font-size: 21px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    color: #201D1E;
+}

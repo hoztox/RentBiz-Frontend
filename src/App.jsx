@@ -7,6 +7,25 @@ import "./app.css"
 import AdminUsers from './pages/Admin Users Management/AdminUsers';
 import Buildings from './pages/Admin Properties/Buildings/Buildings';
 import Units from './pages/Admin Properties/Units/Units';
+import TenantsMaster from './pages/Admin Tenants/TenantsMaster/TenantsMaster';
+import TenancyMaster from './pages/Admin Tenancy/TenancyMaster/TenancyMaster';
+import TenancyConfirm from './pages/Admin Tenancy/TenancyConfirm/TenancyConfirm';
+import TenancyRenewal from './pages/Admin Tenancy/TenancyRenewal/TenancyRenewal';
+import TenancyTermination from './pages/Admin Tenancy/TenancyTermination/TenancyTermination';
+import CloseTenancy from './pages/Admin Tenancy/CloseTenancy/CloseTenancy';
+import DocumentType from './pages/Admin Masters/DocumentType/DocumentType';
+import UnitType from './pages/Admin Masters/UnitType/UnitType';
+import IdType from './pages/Admin Masters/IdType/IdType';
+import Charges from './pages/Admin Masters/Charges/Charges';
+import Translate from './pages/Admin Masters/Translate/Translate';
+import Currency from './pages/Admin Masters/Masters Currency/Currency';
+import AdditionalCharges from './pages/Additional Charges/AdditionalCharges';
+import Invoice from './pages/Invoice/Invoice';
+import MonthlyInvoice from './pages/Monthly Invoice/MonthlyInvoice';
+import Collection from './pages/Collection/Collection';
+import Expense from './pages/Expense/Expense';
+import Refund from './pages/Refund/Refund';
+import TenancyReport from './pages/Tenancy Report/TenancyReport';
 
 const App = () => {
   return (
@@ -22,6 +41,25 @@ const App = () => {
           <Route path='users-manage' element={<AdminUsers />} />
           <Route path='buildings' element={<Buildings />} />
           <Route path='units' element={<Units />} />
+          <Route path='tenants' element={<TenantsMaster />} />
+          <Route path='tenancy-master' element={<TenancyMaster />} />
+          <Route path='tenancy-confirm' element={<TenancyConfirm />} />
+          <Route path='tenancy-renewal' element={<TenancyRenewal />} />
+          <Route path='tenancy-termination' element={<TenancyTermination />} />
+          <Route path='tenancy-close' element={<CloseTenancy />} />
+          <Route path='masters-unit-type' element={<UnitType/>} />
+          <Route path='masters-id-type' element={<IdType />} />
+          <Route path='masters-charges' element={<Charges />} />
+          <Route path='masters-document-type' element={<DocumentType />} />
+          <Route path='masters-translate' element={<Translate />} />
+          <Route path='masters-currency' element={<Currency />} />
+          <Route path='additional-charges' element={<AdditionalCharges />} /> 
+          <Route path='invoice' element={<Invoice />} /> 
+          <Route path='monthly-invoice' element={<MonthlyInvoice />} /> 
+          <Route path='collection' element={<Collection />} /> 
+          <Route path='expense' element={<Expense />} />
+          <Route path='refund' element={<Refund />} />
+          <Route path='tenancy-report' element={<TenancyReport />} />
         </Route>
 
       </Routes>
