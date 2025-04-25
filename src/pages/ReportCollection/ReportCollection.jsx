@@ -11,7 +11,7 @@ const ReportCollection = () => {
         tenant: "",
         building: "",
         unit: "",
-        status: "",
+        payment: "",
         start_date: "",
         end_date: "",
     });
@@ -20,7 +20,7 @@ const ReportCollection = () => {
         tenant: "",
         building: "",
         unit: "",
-        status: "",
+        payment: "",
         start_date: "",
         end_date: "",
     });
@@ -47,27 +47,25 @@ const ReportCollection = () => {
     const demoData = [
         {
             id: "TC0019-1",
-            invoice_no: "457893",
-            invoice_date: "2024-09-09",
+            tenancy: "457893",
+            date: "2024-09-09",
             tenant: "Coffee",
             building: "Down Town",
             unit: "SHOP10",
-            charge: "Rent",
             amount: "120.00",
-            due_date: "2024-09-15",
-            status: "Paid",
+            remark: "Anonymous",
+            payment: "Cash",
         },
         {
             id: "TC0020-1",
-            invoice_no: "457894",
-            invoice_date: "2024-09-10",
+            tenancy: "457894",
+            date: "2024-09-10",
             tenant: "anonymous",
             building: "Al Reem",
             unit: "SHOP11",
-            charge: "Rent",
             amount: "120.00",
-            due_date: "2024-09-18",
-            status: "Unpaid",
+            remark: "Anonymous",
+            payment: "Bank",
         },
     ];
 
@@ -77,7 +75,7 @@ const ReportCollection = () => {
     const uniqueTenants = getUnique("tenant");
     const uniqueBuildings = getUnique("building");
     const uniqueUnits = getUnique("unit");
-    const uniqueStatuses = getUnique("status");
+    const uniquePayments = getUnique("payment");
 
     const clearFilters = () => {
         const cleared = {
@@ -85,7 +83,7 @@ const ReportCollection = () => {
             tenant: "",
             building: "",
             unit: "",
-            status: "",
+            payment: "",
             start_date: "",
             end_date: "",
         };
@@ -105,9 +103,9 @@ const ReportCollection = () => {
             (!filters.tenant || report.tenant === filters.tenant) &&
             (!filters.building || report.building === filters.building) &&
             (!filters.unit || report.unit === filters.unit) &&
-            (!filters.status || report.status === filters.status) &&
-            (!filters.start_date || new Date(report.invoice_date) >= new Date(filters.start_date)) &&
-            (!filters.end_date || new Date(report.due_date) <= new Date(filters.end_date));
+            (!filters.payment || report.payment === filters.payment) &&
+            (!filters.start_date || new Date(report.date) >= new Date(filters.start_date)) &&
+            (!filters.end_date || new Date(report.date) <= new Date(filters.end_date));
 
         return matchesSearch && matchesFilters;
     });
@@ -127,19 +125,8 @@ const ReportCollection = () => {
         setOpenSelectKey(openSelectKey === "date_range" ? null : "date_range");
     };
 
-    // Helper function to get status style
-    const getStatusStyle = (status) => {
-        switch (status) {
-            case 'Paid':
-                return 'bg-[#28C76F20] text-[#34A853]';
-            case 'Unpaid':
-                return 'bg-[#FFF7F6] text-[#FF725E]';
-            case 'Overdue':
-                return 'bg-[#FEF7E0] text-[#FBBC04]';
-            default:
-                return 'bg-[#E8EFF6] text-[#1458A2]';
-        }
-    };
+
+
 
     return (
         <div className="border border-[#E9E9E9] rounded-md">
@@ -180,7 +167,7 @@ const ReportCollection = () => {
                             ["tenant", "All Tenants", uniqueTenants],
                             ["building", "All Buildings", uniqueBuildings],
                             ["unit", "All Units", uniqueUnits],
-                            ["status", "All Status", uniqueStatuses],
+                            ["payment", "All Payment ..", uniquePayments],
                         ].map(([key, label, options]) => (
                             <div key={key} className="relative">
                                 <select
@@ -266,15 +253,14 @@ const ReportCollection = () => {
                 <thead>
                     <tr className="border-b border-[#E9E9E9] h-[57px]">
                         <th className="px-5 text-left report-collection-thead">ID</th>
-                        <th className="px-5 text-left report-collection-thead">INVOICE NO</th>
-                        <th className="px-5 text-left report-collection-thead">INVOICE DATE</th>
+                        <th className="px-5 text-left report-collection-thead">DATE</th>
+                        <th className="px-5 text-left report-collection-thead">TENANCY</th>
                         <th className="px-5 text-left report-collection-thead">TENANT</th>
                         <th className="px-5 text-left report-collection-thead">BUILDING</th>
                         <th className="px-5 text-left report-collection-thead">UNIT</th>
-                        <th className="px-5 text-left report-collection-thead">CHARGE</th>
                         <th className="px-5 text-left report-collection-thead">AMOUNT</th>
-                        <th className="px-5 text-left report-collection-thead">DUE DATE</th>
-                        <th className="px-5 text-center report-collection-thead">STATUS</th>
+                        <th className="px-5 text-left report-collection-thead">REMARK</th>
+                        <th className="px-5 text-center report-collection-thead">PAYMENT METHOD</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -284,19 +270,14 @@ const ReportCollection = () => {
                             className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
                         >
                             <td className="px-5 report-collection-data">{report.id}</td>
-                            <td className="px-5 report-collection-data">{report.invoice_no}</td>
-                            <td className="px-5 report-collection-data">{report.invoice_date}</td>
+                            <td className="px-5 report-collection-data">{report.date}</td>
+                            <td className="px-5 report-collection-data">{report.tenancy}</td>
                             <td className="px-5 report-collection-data">{report.tenant}</td>
                             <td className="px-5 report-collection-data">{report.building}</td>
                             <td className="px-5 report-collection-data">{report.unit}</td>
-                            <td className="px-5 report-collection-data">{report.charge}</td>
                             <td className="px-5 report-collection-data">{report.amount}</td>
-                            <td className="px-5 report-collection-data">{report.due_date}</td>
-                            <td className="px-5 text-center report-collection-data">
-                                <span className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${getStatusStyle(report.status)}`}>
-                                    {report.status}
-                                </span>
-                            </td>
+                            <td className="px-5 report-collection-data">{report.remark}</td>
+                            <td className="px-5 text-center report-collection-data">{report.payment}</td>
                         </tr>
                     ))}
                 </tbody>
