@@ -8,6 +8,8 @@ import viewicon from "../../../assets/Images/Admin Tenancy/view-icon.svg";
 import confirmicon from "../../../assets/Images/Admin Tenancy/confirm-icon.svg";
 import TenancyConfirmModal from './TenancyConfirmModal/TenancyConfirmModal';
 import CreateTenancyModal from '../CreateTenancy/CreateTenancyModal';
+import UpdateTenancyModal from '../UpdateTenancyModal/UpdateTenancyModal';
+import TenancyViewModal from '../TenancyViewModal/TenancyViewModal';
 
 
 const TenancyConfirm = () => {
@@ -19,12 +21,34 @@ const TenancyConfirm = () => {
   // State for the Create Tenancy Modal
   const [createTenancyModal, setCreateTenancyModal] = useState(false);
 
+  // State for tenancy Update Modal
+  const [updateTenancyModal, setUpdateTenancyModal] = useState(false)
+
+  // State for tenancy View Modal
+  const [tenancyViewModal, setTenencyViewModal] = useState(false)
+
   const openCreateTenancyModal = () => {
     setCreateTenancyModal(true);
   }
 
   const closeCreateTenancyModal = () => {
     setCreateTenancyModal(false);
+  }
+
+  const openUpdateTenancyModal = () => {
+    setUpdateTenancyModal(true)
+  }
+
+  const closeUpdateTenancyModal = () => {
+    setUpdateTenancyModal(false)
+  }
+
+  const openTenancyViewModal = () => {
+    setTenencyViewModal(true)
+  }
+
+  const closeViewTenancyModal = () => {
+    setTenencyViewModal(false)
   }
 
   // State for the confirm modal
@@ -111,6 +135,7 @@ const TenancyConfirm = () => {
     const maxPageButtons = 5;
     const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
     const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
   return (
     <div className="border border-[#E9E9E9]  rounded-md">
           <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9]">
@@ -205,7 +230,7 @@ const TenancyConfirm = () => {
                     </span>
                   </td>
                   <td className="pl-12 pr-5 pt-2 text-center">
-                    <button>
+                    <button onClick={openTenancyViewModal}>
                     <img
                       src={tenancy.view}
                       alt="View"
@@ -214,7 +239,7 @@ const TenancyConfirm = () => {
                     </button>
                   </td>
                   <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                    <button>
+                    <button onClick={openUpdateTenancyModal}>
                       <img
                         src={editicon}
                         alt="Edit"
@@ -291,6 +316,12 @@ const TenancyConfirm = () => {
           </div>
           {/* Create Tenancy Modal */}
           <CreateTenancyModal isOpen={createTenancyModal} onClose={closeCreateTenancyModal} />
+
+          {/* Update Tenancy Modal */}
+          <UpdateTenancyModal isOpen={updateTenancyModal} onClose={closeUpdateTenancyModal} />
+
+          {/* Tenancy View Modal */}
+          <TenancyViewModal isOpen={tenancyViewModal} onClose={closeViewTenancyModal} />
 
            {/* Confirm Modal */}
             <TenancyConfirmModal 

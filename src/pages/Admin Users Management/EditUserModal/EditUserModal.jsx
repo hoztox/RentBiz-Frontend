@@ -9,14 +9,14 @@ const EditUserModal = ({ isOpen, onClose }) => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="modal-container relative bg-white rounded-[6px] overflow-hidden shadow-lg">
+      <div className="edit-modal-container relative bg-white rounded-[6px] overflow-hidden shadow-lg">
         {/* Header */}
         <div className="bg-[#F8F9FA] h-[133px] rounded-t-[6px] flex justify-between items-start px-6 pt-6">
           <h2 className="absolute top-[40px] left-[30px] heading-text">
             Edit User
           </h2>
           <button
-            className="close-button hover:bg-gray-100 duration-200"
+            className="close-button hover:bg-gray-200 duration-200"
             onClick={onClose}
           >
             <img src={closeicon} alt="Close" className="w-4 h-4" />
@@ -31,7 +31,11 @@ const EditUserModal = ({ isOpen, onClose }) => {
 
             {/* Icon on black background */}
             <div className="absolute bottom-[8px] left-1/2 transform -translate-x-1/2">
-              <img src={addImageIcon} alt="Add" className="h-[22px] w-[22px]" />
+              <img
+                src={addImageIcon}
+                alt="Add"
+                className="h-[22px] w-[22px] cursor-pointer"
+              />
             </div>
 
             {/* Hidden file input */}
@@ -49,7 +53,7 @@ const EditUserModal = ({ isOpen, onClose }) => {
             <input
               type="text"
               placeholder="Enter Name"
-              className="input-style"
+              className="input-style focus:border-gray-700"
             />
           </div>
 
@@ -61,7 +65,7 @@ const EditUserModal = ({ isOpen, onClose }) => {
             <input
               type="email"
               placeholder="Enter Your Email"
-              className="input-style"
+              className="input-style focus:border-gray-700"
             />
           </div>
 
@@ -71,7 +75,7 @@ const EditUserModal = ({ isOpen, onClose }) => {
               Role*
             </label>
             <select
-              className="input-style select custom-select"
+              className="input-style select custom-select focus:border-gray-700"
               onFocus={() => setIsSelectOpen(true)}
               onBlur={() => setIsSelectOpen(false)}
             >
@@ -96,23 +100,21 @@ const EditUserModal = ({ isOpen, onClose }) => {
             />
           </div>
           {/* Change Password Button */}
-
           <div>
-            <button className="reset-button hover:bg-gray-100 duration-200">
+            <button className="reset-button hover:bg-[#A3C1E5] hover:text-white duration-200">
               Reset Password
             </button>
           </div>
 
           <div className="px-6  mb-6">
-          <button
-            className="bg-[#2892CE] hover:bg-[#076094] duration-200 create-user-button"
-            onClick={onClose}
-          >
-            Edit User
-          </button>
+            <button
+              className="bg-[#2892CE] hover:bg-[#076094] duration-200 edit-user-button"
+              onClick={onClose}
+            >
+              Edit User
+            </button>
+          </div>
         </div>
-        </div>
-        
       </div>
     </div>
   );

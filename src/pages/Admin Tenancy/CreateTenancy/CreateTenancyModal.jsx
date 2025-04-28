@@ -7,9 +7,8 @@ import plusicon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/plus-i
 import { ChevronDown } from "lucide-react";
 
 const CreateTenancyModal = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
-
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
+  // State to track open status of each select box
+  const [selectOpenStates, setSelectOpenStates] = useState({});
   const [showPaymentSchedule, setShowPaymentSchedule] = useState(true);
   const [additionalCharges, setAdditionalCharges] = useState([
     {
@@ -56,6 +55,14 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
     },
   ]);
 
+  // Function to toggle select box open state
+  const toggleSelectOpen = (selectId) => {
+    setSelectOpenStates((prev) => ({
+      ...prev,
+      [selectId]: !prev[selectId],
+    }));
+  };
+
   const addRow = () => {
     const newId = (additionalCharges.length + 1).toString().padStart(2, "0");
     setAdditionalCharges([
@@ -74,7 +81,9 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
   };
 
   const removeRow = (id) => {
-    setAdditionalCharges(additionalCharges.filter((charge) => charge.id !== id));
+    setAdditionalCharges(
+      additionalCharges.filter((charge) => charge.id !== id)
+    );
   };
 
   const togglePaymentSchedule = () => {
@@ -82,12 +91,25 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white overflow-y-auto relative modal">
+    <div
+      onClick={onClose}
+      className={`fixed inset-0 flex items-center justify-center transition-colors z-50 ${
+        isOpen ? "visible bg-black/70" : "invisible"
+      }`}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={`bg-white overflow-y-auto relative modal transition-all ${
+          isOpen ? "scale-100 opacity-100" : "scale-125 opacity-0"
+        }`}
+      >
         <div className="p-8 pt-8">
           <div className="flex justify-between items-center mb-8">
             <h2 className="modal-head">Create New Tenancy</h2>
-            <button onClick={onClose} className="close-btn hover:bg-gray-100 duration-200">
+            <button
+              onClick={onClose}
+              className="close-btn hover:bg-gray-100 duration-200"
+            >
               <img src={closeicon} alt="close-button" />
             </button>
           </div>
@@ -98,14 +120,14 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               <div className="relative">
                 <select
                   className="w-full p-2 appearance-none input-box"
-                  onFocus={() => setIsSelectOpen(true)}
-                  onBlur={() => setIsSelectOpen(false)}
+                  onFocus={() => toggleSelectOpen("tenantName")}
+                  onBlur={() => toggleSelectOpen("tenantName")}
                 >
                   <option>Choose</option>
                 </select>
                 <ChevronDown
                   className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
-                    isSelectOpen ? "rotate-180" : "rotate-0"
+                    selectOpenStates["tenantName"] ? "rotate-180" : "rotate-0"
                   }`}
                   width={22}
                   height={22}
@@ -118,14 +140,14 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               <div className="relative">
                 <select
                   className="w-full p-2 appearance-none input-box"
-                  onFocus={() => setIsSelectOpen(true)}
-                  onBlur={() => setIsSelectOpen(false)}
+                  onFocus={() => toggleSelectOpen("building")}
+                  onBlur={() => toggleSelectOpen("building")}
                 >
                   <option>Choose</option>
                 </select>
                 <ChevronDown
                   className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
-                    isSelectOpen ? "rotate-180" : "rotate-0"
+                    selectOpenStates["building"] ? "rotate-180" : "rotate-0"
                   }`}
                   width={22}
                   height={22}
@@ -140,14 +162,14 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                 <div className="relative">
                   <select
                     className="w-full p-2 appearance-none input-box"
-                    onFocus={() => setIsSelectOpen(true)}
-                    onBlur={() => setIsSelectOpen(false)}
+                    onFocus={() => toggleSelectOpen("unit")}
+                    onBlur={() => toggleSelectOpen("unit")}
                   >
                     <option>Choose</option>
                   </select>
                   <ChevronDown
                     className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
-                      isSelectOpen ? "rotate-180" : "rotate-0"
+                      selectOpenStates["unit"] ? "rotate-180" : "rotate-0"
                     }`}
                     width={22}
                     height={22}
@@ -160,7 +182,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                 <input
                   type="text"
                   placeholder="Enter Rental Months"
-                  className="w-full p-2 input-box"
+                  className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 input-box"
                 />
               </div>
             </div>
@@ -171,7 +193,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                   <input
                     type="text"
                     placeholder="dd/mm/yyyy"
-                    className="w-full p-2 pr-10 input-box"
+                    className="w-full p-2 pr-10 focus:outline-none focus:border-gray-700 focus:ring-gray-700 input-box"
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                     <img src={calendaricon} alt="" className="w-5 h-5" />
@@ -184,7 +206,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                   <input
                     type="text"
                     placeholder="dd/mm/yyyy"
-                    className="w-full p-2 pr-10 input-box"
+                    className="w-full p-2 pr-10 focus:outline-none focus:border-gray-700 focus:ring-gray-700 input-box"
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                     <img src={calendaricon} alt="" className="w-5 h-5" />
@@ -199,7 +221,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                 <input
                   type="text"
                   placeholder="Enter No. Of Payments"
-                  className="w-full p-2 input-box"
+                  className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 input-box"
                 />
               </div>
               <div className="w-1/2">
@@ -208,7 +230,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                   <input
                     type="text"
                     placeholder="mm/dd/yyyy"
-                    className="w-full p-2 pr-10 input-box"
+                    className="w-full p-2 pr-10 focus:outline-none focus:border-gray-700 focus:ring-gray-700 input-box"
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                     <img src={calendaricon} alt="" className="w-5 h-5" />
@@ -221,7 +243,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               <input
                 type="text"
                 placeholder="Enter Rent Per Frequency"
-                className="w-full p-2 input-box"
+                className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 input-box"
               />
             </div>
 
@@ -230,7 +252,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               <input
                 type="text"
                 placeholder="Enter Total Rent Receivable"
-                className="w-full p-2 input-box"
+                className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 input-box"
               />
             </div>
             <div>
@@ -238,7 +260,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               <input
                 type="text"
                 placeholder="Enter Deposit"
-                className="w-full p-2 input-box"
+                className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 input-box"
               />
             </div>
 
@@ -247,7 +269,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               <input
                 type="text"
                 placeholder="Enter Commission"
-                className="w-full p-2 input-box"
+                className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 input-box"
               />
             </div>
             <div>
@@ -255,7 +277,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               <input
                 type="text"
                 placeholder="Enter Remarks"
-                className="w-full p-2 input-box"
+                className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 input-box"
               />
             </div>
           </div>
@@ -307,42 +329,39 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                 <tbody>
                   {additionalCharges.map((charge, index) => (
                     <tr key={charge.id} className="border-t border-[#E9E9E9]">
-                      {/* NO */}
                       <td className="px-[10px] py-[5px] w-[20px] text-[14px] text-[#201D1E]">
                         {charge.id}
                       </td>
-
-                      {/* CHARGE TYPE */}
                       <td className="px-[10px] py-[5px] w-[138px] relative">
                         <select
-                          className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white invoice-modal-table-select"
-                          onFocus={() => setIsSelectOpen(true)}
-                          onBlur={() => setIsSelectOpen(false)}
+                          className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-700 focus:border-gray-700 bg-white invoice-modal-table-select"
+                          onFocus={() =>
+                            toggleSelectOpen(`charge-${charge.id}`)
+                          }
+                          onBlur={() => toggleSelectOpen(`charge-${charge.id}`)}
                         >
                           <option value="">Choose</option>
                         </select>
                         <ChevronDown
                           className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
-                            isSelectOpen ? "rotate-180" : ""
+                            selectOpenStates[`charge-${charge.id}`]
+                              ? "rotate-180"
+                              : ""
                           }`}
                         />
                       </td>
-
-                      {/* REASON */}
                       <td className="px-[10px] py-[5px] w-[162px]">
                         <input
                           type="text"
                           placeholder="Enter Reason"
-                          className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
+                          className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 invoice-modal-table-input"
                         />
                       </td>
-
-                      {/* DUE DATE */}
                       <td className="px-[10px] py-[5px] w-[173px] relative">
                         <input
                           type="text"
                           placeholder="mm/dd/yyyy"
-                          className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
+                          className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 invoice-modal-table-input"
                         />
                         <img
                           src={calendaricon}
@@ -350,32 +369,22 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                           className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
                         />
                       </td>
-
-                      {/* STATUS */}
                       <td className="px-[10px] py-[5px] w-[55px] text-[14px] text-[#201D1E]">
                         Pending
                       </td>
-
-                      {/* AMOUNT */}
                       <td className="px-[10px] py-[5px] w-[148px]">
                         <input
                           type="text"
                           placeholder="Enter Amount"
-                          className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
+                          className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 invoice-modal-table-input"
                         />
                       </td>
-
-                      {/* VAT */}
                       <td className="px-[10px] py-[5px] w-[25px] text-[14px] text-[#201D1E] text-center">
                         {charge.vat}
                       </td>
-
-                      {/* TOTAL */}
                       <td className="px-[10px] py-[5px] w-[35px] text-[14px] text-[#201D1E]">
                         {Number(charge.total || 0).toFixed(4)}
                       </td>
-
-                      {/* REMOVE */}
                       <td className="px-[10px] py-[5px] w-[30px]">
                         <button onClick={() => removeRow(charge.id)}>
                           <img
@@ -408,6 +417,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               onClick={togglePaymentSchedule}
               className="bg-white text-[#2892CE] px-4 py-2 border border-[#E9E9E9] rounded hidepayement-btn"
             >
+              .future
               {showPaymentSchedule
                 ? "Hide Payment Schedule"
                 : "Show Payment Schedule"}
@@ -446,30 +456,26 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                   </thead>
                   <tbody>
                     {paymentSchedule.map((item) => (
-                      <tr key={item.id} className="border-t border-[#E9E9E9] h-[57px]">
-                        {/* NO */}
+                      <tr
+                        key={item.id}
+                        className="border-t border-[#E9E9E9] h-[57px]"
+                      >
                         <td className="px-[10px] py-[5px] w-[20px] text-[14px] text-[#201D1E]">
                           {item.id}
                         </td>
-
-                        {/* CHARGE TYPE */}
                         <td className="px-[10px] py-[5px] w-[138px] text-[14px] text-[#201D1E]">
                           {item.chargeType}
                         </td>
-
-                        {/* REASON */}
                         <td className="px-[10px] py-[5px] w-[162px] text-[14px] text-[#201D1E]">
                           {item.reason}
                         </td>
-
-                        {/* DUE DATE */}
                         <td className="px-[10px] py-[5px] w-[173px] relative">
                           {item.id === "03" ? (
                             <div className="relative">
                               <input
                                 type="text"
                                 placeholder="mm/dd/yyyy"
-                                className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
+                                className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 invoice-modal-table-input"
                               />
                               <img
                                 src={calendaricon}
@@ -483,19 +489,15 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                             </span>
                           )}
                         </td>
-
-                        {/* STATUS */}
                         <td className="px-[10px] py-[5px] w-[55px] text-[14px] text-[#201D1E]">
                           {item.status}
                         </td>
-
-                        {/* AMOUNT */}
                         <td className="px-[10px] py-[5px] w-[148px]">
                           {item.id === "03" ? (
                             <input
                               type="text"
                               placeholder="Enter Amount"
-                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
+                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 invoice-modal-table-input"
                             />
                           ) : (
                             <span className="text-[14px] text-[#201D1E]">
@@ -503,13 +505,9 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                             </span>
                           )}
                         </td>
-
-                        {/* VAT */}
                         <td className="px-[10px] py-[5px] w-[25px] text-[14px] text-[#201D1E] text-center">
                           {item.vat}
                         </td>
-
-                        {/* TOTAL */}
                         <td className="px-[10px] py-[5px] w-[35px] text-[14px] text-[#201D1E]">
                           {Number(item.total || 0).toFixed(4)}
                         </td>

@@ -1,17 +1,18 @@
 /* Heading on the image */
 .heading-on-image {
-  position: absolute;
-  top: -50px;
-  left: 0.51px;
-  width: 310px;
-  height: 29px;
   font-family: "Inter Tight";
   font-weight: 500;
-  font-size: 24px;
+  font-size: 21px;
   line-height: 100%;
   letter-spacing: 0px;
   color: #ffffff;
-  z-index: 10; /* Make sure it appears above other elements */
+  z-index: 10;
+}
+
+@media (max-width: 767px) {
+  .heading-on-image {
+    transform: translateY(0); /* Moves the heading 10px upwards */
+  }
 }
 
 /* Paragraph and slider icon container */
@@ -20,7 +21,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: white; /* Assuming white text for visibility */
+  color: white;
   margin-top: 10px;
 }
 
@@ -29,93 +30,85 @@
   z-index: 5;
 }
 
-/* Slider Icon */
-.slider-icon {
-  opacity: 0.8;
-  margin-left: 15px; /* Add space between the paragraph and icon */
-}
-
 /* Container for the image and text */
 .login-container {
-  width: 1291px;
-  height: 875px;
-  border-radius: 28px;
-  display: flex;
+  width: 100%;
+  max-width: 1291px;
+  min-height: 100vh;
+  border-radius: 0;
   background-color: white;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
   overflow: hidden;
   position: relative;
+}
+
+@media (min-width: 768px) {
+  .login-container {
+    min-height: 875px;
+    border-radius: 28px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  }
 }
 
 .image-section {
-  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 0;
 }
 
 .login-image-wrapper {
-  width: 685px;
-  height: 835px;
-  border-radius: 14px;
-  overflow: hidden;
+  width: 100%;
+  height: 348px;
   position: relative;
   background-color: white;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: none;
+  overflow: hidden;
+  margin-top: -5px;
+  border-bottom-right-radius: 16px;
+  border-bottom-left-radius: 16px;
+}
+
+@media (min-width: 768px) {
+  .login-image-wrapper {
+    width: 685px;
+    height: 835px;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    margin-top: 0;
+  }
 }
 
 .login-slide-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
+
 
 .login-slide-description {
   font-family: "Inter Tight";
   font-weight: 400;
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 14px;
+  line-height: 20px;
   letter-spacing: 0%;
+  max-width: 436px;
+  margin: 0 auto;
 }
 
-/* Adjusting padding and margin for clarity */
-.slide-text {
-  position: absolute;
-  bottom: 60px;
-  left: 0;
-  width: 100%;
-  padding: 20px 24px;
-  color: white;
-  background: rgba(0, 0, 0, 0.3);
-}
-
-.slide-text h2 {
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
-.slide-text p {
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
-  line-height: 1.4;
-}
-
-.slide-icon {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  width: 40px;
-  height: 40px;
-  opacity: 0.8;
+@media (min-width: 768px) {
+  .login-slide-description {
+    font-size: 16px;
+    line-height: 24px;
+    max-width: 436px;
+    margin: 0;
+  }
 }
 
 .right-section-heading {
-  width: 414px;
-  height: 44px;
   font-family: "Inter Tight";
   font-weight: 500;
-  font-size: 36px;
   line-height: 100%;
   letter-spacing: 0px;
 }
@@ -126,48 +119,96 @@
   font-size: 16px;
   line-height: 100%;
   letter-spacing: 0px;
+  display: block;
+  margin-bottom: 6px;
 }
 
 .input-field {
-  width: 445px;
   height: 52px;
-  top: 31px; /* Adjust the vertical position of the input */
   border-radius: 76px;
   border-width: 1px;
-  border-color: #e8e8e8; /* Light gray border color */
+  border-color: #e8e8e8;
   padding-left: 16px;
   padding-right: 16px;
   font-size: 16px;
-  margin-top: 12px;
   color: #201D1E;
 }
 
-.input-field::placeholder{
-    font-family: "Inter Tight";
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 100%;
-    letter-spacing: 0%;
-    color: #C2C2C2;
-    left: 20px;
+.input-field::placeholder {
+  font-family: "Inter Tight";
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  color: #C2C2C2;
 }
 
 .login-btn {
-    font-family: "Inter Tight";
-    font-weight: 500;
-    font-size: 18px;
-    line-height: 100%;
-    letter-spacing: 0%;
+  font-family: "Inter Tight";
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  height: 52px;
+  border-radius: 76px;
 }
 
 .login-slide-image {
+  transition: opacity 0.5s ease-in-out;
+  opacity: 1;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: opacity 0.5s ease-in-out;
-  opacity: 1;
+  display: block;
+  border-radius: inherit; /* optional, if you face clipping issues */
 }
 
 .login-slide-image.fade-out {
   opacity: 0;
+}
+
+/* For smaller devices - less than 490px */
+@media (max-width: 490px) {
+  body {
+    background-color: #f5f5f5;
+  }
+
+  .login-container {
+    margin: 0;
+    box-shadow: none;
+  }
+
+  .image-section {
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .login-image-wrapper {
+    width: 100%;
+    margin: 0;
+    /* Only keep bottom radius */
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    overflow: hidden; /* important to keep image inside the border */
+  }
+}
+
+/* For tablet and bigger - 768px and above */
+@media (min-width: 768px) {
+  .login-container {
+    min-height: 875px;
+    border-radius: 28px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  .login-image-wrapper {
+    width: 685px;
+    height: 835px;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    margin-top: 0;
+  }
 }

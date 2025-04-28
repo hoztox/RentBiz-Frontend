@@ -57,7 +57,9 @@
 
 @media(max-width:480px) {
     .admin-navbar {
-        max-width: calc(100vw - 40px);
+        /* max-width: calc(100vw - 40px); */
+        width: 100vw; /* Ensure full viewport width */
+        margin: 0; /* Remove horizontal margins */
         border-bottom: none;
         height: 107px;
         display: flex;
@@ -70,11 +72,13 @@
         height: 55.955px;
         width: 91px;
         margin-bottom: 15px;
+        margin-left: 20px;
     }
     .mobile-menu {
         background-color: #1458A2;
         border-radius: 100%;
         padding: 10px;
         margin-bottom: 25px;
+        margin-right: 20px;
     }
 }

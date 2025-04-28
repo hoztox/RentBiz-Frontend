@@ -28,14 +28,14 @@ const TenancyConfirmModal = ({
           <div className="flex gap-3">
             <button
               onClick={onCancel}
-              className="flex-1 text-[#201D1E] hover:bg-gray-100 focus:outline-none cancel-btn"
+              className="flex-1 text-[#201D1E] hover:bg-gray-100 duration-200 focus:outline-none cancel-btn"
             >
               Cancel
             </button>
 
             <button
               onClick={onConfirm}
-              className="flex-1 bg-[#2892CE] text-white hover:bg-[#1f709e] focus:outline-none modal-confirm-btn"
+              className="flex-1 bg-[#2892CE] text-white hover:bg-[#1f709e] duration-200 focus:outline-none modal-confirm-btn"
             >
               Confirm
             </button>

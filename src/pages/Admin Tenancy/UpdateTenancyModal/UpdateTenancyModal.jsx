@@ -9,7 +9,8 @@ import plusicon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/plus-i
 const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
   if (!isOpen) return null;
 
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
+  // State to track open status of each select box
+  const [selectOpenStates, setSelectOpenStates] = useState({});
   const [showPaymentSchedule, setShowPaymentSchedule] = useState(true);
   const [additionalCharges, setAdditionalCharges] = useState(
     tenancyData?.additionalCharges || [
@@ -60,6 +61,14 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
     ]
   );
 
+  // Function to toggle select box open state
+  const toggleSelectOpen = (selectId) => {
+    setSelectOpenStates((prev) => ({
+      ...prev,
+      [selectId]: !prev[selectId],
+    }));
+  };
+
   const addRow = () => {
     const newId = (additionalCharges.length + 1).toString().padStart(2, "0");
     setAdditionalCharges([
@@ -107,8 +116,8 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
               <div className="relative">
                 <select
                   className="w-full p-2 appearance-none input-box"
-                  onFocus={() => setIsSelectOpen(true)}
-                  onBlur={() => setIsSelectOpen(false)}
+                  onFocus={() => toggleSelectOpen("tenantName")}
+                  onBlur={() => toggleSelectOpen("tenantName")}
                   defaultValue={tenancyData?.tenantName || ""}
                 >
                   <option>Choose</option>
@@ -118,7 +127,7 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                 </select>
                 <ChevronDown
                   className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
-                    isSelectOpen ? "rotate-180" : "rotate-0"
+                    selectOpenStates["tenantName"] ? "rotate-180" : "rotate-0"
                   }`}
                   width={22}
                   height={22}
@@ -131,8 +140,8 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
               <div className="relative">
                 <select
                   className="w-full p-2 appearance-none input-box"
-                  onFocus={() => setIsSelectOpen(true)}
-                  onBlur={() => setIsSelectOpen(false)}
+                  onFocus={() => toggleSelectOpen("building")}
+                  onBlur={() => toggleSelectOpen("building")}
                   defaultValue={tenancyData?.building || ""}
                 >
                   <option>Choose</option>
@@ -142,7 +151,7 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                 </select>
                 <ChevronDown
                   className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
-                    isSelectOpen ? "rotate-180" : "rotate-0"
+                    selectOpenStates["building"] ? "rotate-180" : "rotate-0"
                   }`}
                   width={22}
                   height={22}
@@ -157,8 +166,8 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                 <div className="relative">
                   <select
                     className="w-full p-2 appearance-none input-box"
-                    onFocus={() => setIsSelectOpen(true)}
-                    onBlur={() => setIsSelectOpen(false)}
+                    onFocus={() => toggleSelectOpen("unit")}
+                    onBlur={() => toggleSelectOpen("unit")}
                     defaultValue={tenancyData?.unit || ""}
                   >
                     <option>Choose</option>
@@ -166,7 +175,7 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                   </select>
                   <ChevronDown
                     className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
-                      isSelectOpen ? "rotate-180" : "rotate-0"
+                      selectOpenStates["unit"] ? "rotate-180" : "rotate-0"
                     }`}
                     width={22}
                     height={22}
@@ -175,11 +184,13 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                 </div>
               </div>
               <div className="w-1/2">
-                <label className="block update-modal-label">Rental Months*</label>
+                <label className="block update-modal-label">
+                  Rental Months*
+                </label>
                 <input
                   type="text"
                   placeholder="Enter Rental Months"
-                  className="w-full p-2 input-box"
+                  className="w-full p-2 focus:outline-none focus:ring-gray-700 focus:border-gray-700 input-box"
                   defaultValue={tenancyData?.rentalMonths || ""}
                 />
               </div>
@@ -191,7 +202,7 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                   <input
                     type="text"
                     placeholder="dd/mm/yyyy"
-                    className="w-full p-2 pr-10 input-box"
+                    className="w-full p-2 pr-10 focus:outline-none focus:ring-gray-700 focus:border-gray-700 input-box"
                     defaultValue={tenancyData?.startDate || ""}
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -205,10 +216,10 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                   <input
                     type="text"
                     placeholder="dd/mm/yyyy"
-                    className="w-full p-2 pr-10 input-box"
+                    className="w-full p-2 pr-10 focus:outline-none focus:ring-gray-700 focus:border-gray-700 input-box"
                     defaultValue={tenancyData?.endDate || ""}
                   />
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                  <div className="absolute inset-y-0 right-0 flex items-items-center pr-3">
                     <img src={calendaricon} alt="" className="w-5 h-5" />
                   </div>
                 </div>
@@ -217,21 +228,25 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
 
             <div className="flex gap-4">
               <div className="w-1/2">
-                <label className="block update-modal-label">No. Of Payments*</label>
+                <label className="block update-modal-label">
+                  No. Of Payments*
+                </label>
                 <input
                   type="text"
                   placeholder="Enter No. Of Payments"
-                  className="w-full p-2 input-box"
+                  className="w-full p-2 focus:outline-none focus:ring-gray-700 focus:border-gray-700 input-box"
                   defaultValue={tenancyData?.numberOfPayments || ""}
                 />
               </div>
               <div className="w-1/2">
-                <label className="block update-modal-label">First Rent Due On*</label>
+                <label className="block update-modal-label">
+                  First Rent Due On*
+                </label>
                 <div className="relative">
                   <input
                     type="text"
                     placeholder="mm/dd/yyyy"
-                    className="w-full p-2 pr-10 input-box"
+                    className="w-full p-2 pr-10 focus:outline-none focus:ring-gray-700 focus:border-gray-700 input-box"
                     defaultValue={tenancyData?.firstRentDue || ""}
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -241,40 +256,48 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
               </div>
             </div>
             <div>
-              <label className="block update-modal-label">Rent Per Frequency</label>
+              <label className="block update-modal-label">
+                Rent Per Frequency
+              </label>
               <input
                 type="text"
                 placeholder="Enter Rent Per Frequency"
-                className="w-full p-2 input-box"
+                className="w-full p-2 focus:outline-none focus:ring-gray-700 focus:border-gray-700 input-box"
                 defaultValue={tenancyData?.rentPerFrequency || ""}
               />
             </div>
 
             <div>
-              <label className="block update-modal-label">Total Rent Receivable</label>
+              <label className="block update-modal-label">
+                Total Rent Receivable
+              </label>
               <input
                 type="text"
                 placeholder="Enter Total Rent Receivable"
-                className="w-full p-2 input-box"
+                className="w-full p-2 focus:outline-none focus:ring-gray-700 focus:border-gray-700 input-box"
                 defaultValue={tenancyData?.totalRentReceivable || ""}
               />
             </div>
             <div>
-              <label className="block update-modal-label">Deposit (If Any)</label>
+              <label className="block update-modal-label">
+                Deposit (If Any)
+              </label>
               <input
                 type="text"
                 placeholder="Enter Deposit"
-                className="w-full p-2 input-box"
+                className="w-full p-2 focus:outline-none focus:ring-gray-700 focus:border-gray-700 input-box"
                 defaultValue={tenancyData?.deposit || ""}
               />
             </div>
 
             <div>
-              <label className="block update-modal-label">Commission (If Any)</label>
+              <label className="block update-modal-label">
+                Commission (If Any)
+              </label>
               <input
                 type="text"
                 placeholder="Enter Commission"
-                className="w-full p-2 input-box"
+                className="w-full p-2 focus:outline-none focus:ring-gray-700 focus:border-gray-700 input-box"
                 defaultValue={tenancyData?.commission || ""}
               />
             </div>
@@ -283,7 +306,7 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
               <input
                 type="text"
                 placeholder="Enter Remarks"
-                className="w-full p-2 input-box"
+                className="w-full p-2 focus:outline-none focus:ring-gray-700 focus:border-gray-700 input-box"
                 defaultValue={tenancyData?.remarks || ""}
               />
             </div>
@@ -341,9 +364,11 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                       </td>
                       <td className="px-[10px] py-[5px] w-[138px] relative">
                         <select
-                          className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white invoice-modal-table-select"
-                          onFocus={() => setIsSelectOpen(true)}
-                          onBlur={() => setIsSelectOpen(false)}
+                          className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-700 focus:border-gray-700 bg-white invoice-modal-table-select"
+                          onFocus={() =>
+                            toggleSelectOpen(`charge-${charge.id}`)
+                          }
+                          onBlur={() => toggleSelectOpen(`charge-${charge.id}`)}
                           defaultValue={charge.chargeType || ""}
                         >
                           <option value="">Choose</option>
@@ -353,7 +378,9 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                         </select>
                         <ChevronDown
                           className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
-                            isSelectOpen ? "rotate-180" : ""
+                            selectOpenStates[`charge-${charge.id}`]
+                              ? "rotate-180"
+                              : ""
                           }`}
                         />
                       </td>
@@ -361,7 +388,7 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                         <input
                           type="text"
                           placeholder="Enter Reason"
-                          className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
+                          className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 invoice-modal-table-input"
                           defaultValue={charge.reason || ""}
                         />
                       </td>
@@ -369,7 +396,7 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                         <input
                           type="text"
                           placeholder="mm/dd/yyyy"
-                          className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
+                          className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 invoice-modal-table-input"
                           defaultValue={charge.dueDate || ""}
                         />
                         <img
@@ -385,7 +412,7 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                         <input
                           type="text"
                           placeholder="Enter Amount"
-                          className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
+                          className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 invoice-modal-table-input"
                           defaultValue={charge.amount || ""}
                         />
                       </td>
@@ -484,7 +511,7 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                               <input
                                 type="text"
                                 placeholder="mm/dd/yyyy"
-                                className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
+                                className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 invoice-modal-table-input"
                                 defaultValue={item.dueDate || ""}
                               />
                               <img
@@ -507,7 +534,7 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                             <input
                               type="text"
                               placeholder="Enter Amount"
-                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
+                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 invoice-modal-table-input"
                               defaultValue={item.amount || ""}
                             />
                           ) : (
@@ -532,7 +559,7 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
 
           <div className="flex justify-end mt-6 mb-4">
             <button className="bg-[#2892CE] hover:bg-[#1f6c99] duration-200 text-white px-8 py-2 save-btn">
-              Save 
+              Save
             </button>
           </div>
         </div>

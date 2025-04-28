@@ -5,11 +5,15 @@ import downloadicon from "../../../assets/Images/Admin Tenancy/download-icon.svg
 import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Tenancy/delete-icon.svg";
 import viewicon from "../../../assets/Images/Admin Tenancy/view-icon.svg";
+import TenancyViewModal from "../TenancyViewModal/TenancyViewModal";
+import UpdateTenancyModal from "../UpdateTenancyModal/UpdateTenancyModal";
 
 const TenancyRenewal = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isTenancyViewModalOpen, setIsTenancyViewModalOpen] = useState(false);
+  const [isTenancyUpdateModalOpen, setIsTenancyUpdateModalOpen] = useState(false)
   const itemsPerPage = 10;
 
   const demoData = [
@@ -83,6 +87,22 @@ const TenancyRenewal = () => {
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+  const openTenancyViewModal = () => {
+    setIsTenancyViewModalOpen(true);
+  };
+
+  const closeTenancyViewModal = () => {
+    setIsTenancyViewModalOpen(false);
+  };
+
+  const openTenancyUpdateModal = () => {
+    setIsTenancyUpdateModalOpen(true)
+  }
+
+  const closeTenancyUpdateModal = () => {
+    setIsTenancyUpdateModalOpen(false)
+  }
   return (
     <div className="border border-[#E9E9E9]  rounded-md">
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9]">
@@ -163,7 +183,7 @@ const TenancyRenewal = () => {
                 {tenancy.renew}
               </td>
               <td className="pl-14 text-center pr-5 pt-2">
-                <button>
+                <button onClick={openTenancyViewModal}>
                   <img
                     src={tenancy.view}
                     alt="View"
@@ -172,7 +192,7 @@ const TenancyRenewal = () => {
                 </button>
               </td>
               <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                <button>
+                <button onClick={openTenancyUpdateModal}>
                   <img
                     src={editicon}
                     alt="Edit"
@@ -246,6 +266,12 @@ const TenancyRenewal = () => {
           </button>
         </div>
       </div>
+
+      {/* Tenancy View Modal */}
+      <TenancyViewModal isOpen={isTenancyViewModalOpen} onClose={closeTenancyViewModal} />
+
+      {/* Tenancy Update Modal */}
+      <UpdateTenancyModal isOpen={isTenancyUpdateModalOpen} onClose={closeTenancyUpdateModal} />
     </div>
   );
 };

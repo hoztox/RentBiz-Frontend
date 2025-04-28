@@ -5,11 +5,15 @@ import downloadicon from "../../../assets/Images/Admin Tenancy/download-icon.svg
 import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
 import deleteicon from "../../../assets/Images/Admin Tenancy/delete-icon.svg";
 import viewicon from "../../../assets/Images/Admin Tenancy/view-icon.svg";
+import TenancyViewModal from "../TenancyViewModal/TenancyViewModal";
+import UpdateTenancyModal from "../UpdateTenancyModal/UpdateTenancyModal";
 
 const CloseTenancy = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false)
   const itemsPerPage = 10;
 
   const demoData = [
@@ -83,6 +87,23 @@ const CloseTenancy = () => {
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+  const openViewModal = () => {
+    setIsViewModalOpen(true)
+  }
+
+  const closeViewModal = () => {
+    setIsViewModalOpen(false)
+  } 
+
+  const openUpdateModal = () => {
+    setIsUpdateModalOpen(true)
+  }
+
+  const closeUpdateModal = () => {
+    setIsUpdateModalOpen(false)
+  }
+
   return (
     <div className="border border-[#E9E9E9]  rounded-md">
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9]">
@@ -161,7 +182,7 @@ const CloseTenancy = () => {
               <td className="pl-5 text-left tenancy-data">{tenancy.endDate}</td>
 
               <td className="pl-14 text-center pr-5 pt-2">
-                <button>
+                <button onClick={openViewModal}>
                   <img
                     src={tenancy.view}
                     alt="View"
@@ -170,7 +191,7 @@ const CloseTenancy = () => {
                 </button>
               </td>
               <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                <button>
+                <button onClick={openUpdateModal}>
                   <img
                     src={editicon}
                     alt="Edit"
@@ -244,6 +265,12 @@ const CloseTenancy = () => {
           </button>
         </div>
       </div>
+
+      {/* Tenancy View Modal */}
+      <TenancyViewModal isOpen={isViewModalOpen} onClose={closeViewModal} />
+
+      {/* Tenancy Update Modal */}
+      <UpdateTenancyModal isOpen={isUpdateModalOpen} onClose={closeUpdateModal} />
     </div>
   );
 };

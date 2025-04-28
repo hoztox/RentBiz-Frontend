@@ -16,7 +16,7 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
           <h2 className="absolute top-[40px] left-[30px] heading-text">
             Create User
           </h2>
-          <button className="close-button" onClick={onClose}>
+          <button className="close-button hover:bg-gray-200 duration-200" onClick={onClose}>
             <img src={cancelIcon} alt="Close" className="w-5 h-5" />
           </button>
         </div>
@@ -47,7 +47,7 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
             <input
               type="text"
               placeholder="Enter Name"
-              className="input-style"
+              className="input-style focus:border-gray-700"
             />
           </div>
 
@@ -59,7 +59,7 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
             <input
               type="email"
               placeholder="Enter Your Email"
-              className="input-style"
+              className="input-style focus:border-gray-700"
             />
           </div>
 
@@ -69,7 +69,7 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
               Role*
             </label>
             <select
-              className="input-style select custom-select"
+              className="input-style select custom-select focus:border-gray-700"
               onFocus={() => setIsSelectOpen(true)}
               onBlur={() => setIsSelectOpen(false)}
             >
@@ -104,7 +104,7 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
             <input
               type="password"
               placeholder="Password"
-              className="input-style"
+              className="input-style focus:border-gray-700"
             />
           </div>
 
@@ -116,7 +116,7 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
             <input
               type="password"
               placeholder="Confirm Password"
-              className="input-style"
+              className="input-style focus:border-gray-700"
             />
           </div>
         </div>
@@ -124,7 +124,7 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
         {/* Button */}
         <div className="px-6 mt-8 mb-6">
           <button
-            className="bg-[#2892CE] hover:bg-[#076094] create-user-button"
+            className="bg-[#2892CE] hover:bg-[#076094] duration-200 create-user-button"
             onClick={onClose}
           >
             Create User

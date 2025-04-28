@@ -1,6 +1,6 @@
-.modal-container {
+.edit-modal-container {
   width: 830px;
-  height: 548px;
+  height: 464px;
   border-radius: 6px;
 }
 
@@ -78,12 +78,12 @@
   vertical-align: middle;
 }
 
-.create-user-button {
+.edit-user-button {
   position: absolute;
   width: 375px;
   height: 38px;
-  top: 479px;
-  left: 425px;
+  top: 400px;
+  left: 422px;
   border-radius: 6px;
   color: white;
   font-weight: 500;

@@ -1,7 +1,7 @@
 import "./AdminLogin.css";
 import { useState, useEffect } from "react";
 import logo from "../../assets/Images/Admin Login/RentBizLogo.svg";
-import slide1 from "../../assets/Images/Admin Login/Slide1.jpg" 
+import slide1 from "../../assets/Images/Admin Login/Slide1.jpg";
 import slide2 from "../../assets/Images/Admin Login/slide2.jpg";
 import slide3 from "../../assets/Images/Admin Login/Slide1.jpg";
 import viewIcon from "../../assets/Images/Admin Login/ViewIcon.svg";
@@ -23,15 +23,15 @@ const AdminLogin = () => {
   }, []);
 
   const handleLogin = () => {
-    navigate('/admin/dashboard')
-  }
+    navigate("/admin/dashboard");
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-white">
-      <div className="login-container flex items-center">
-        {/* Left side with white padding and image inside */}
-        <div className="image-section">
-          <div className="login-image-wrapper relative">
+      <div className="login-container flex flex-col md:flex-row items-center">
+        {/* Image section - full width on mobile, left side on desktop */}
+        <div className="image-section w-full md:w-1/2">
+          <div className="login-image-wrapper relative md:left-[20px]">
             <img
               src={slides[current]}
               alt="Slide"
@@ -39,41 +39,32 @@ const AdminLogin = () => {
             />
 
             {/* Bottom gradient overlay */}
-            <div className="gradient-overlay absolute bottom-0 left-0 w-full h-[19rem] z-10" />
+            <div className="gradient-overlay absolute bottom-0 left-0 w-full h-[16rem] md:h-[19rem] z-10" />
 
             {/* Overlay for text and slider */}
-            <div
-              className="absolute bottom-6 left-6 right-6 text-white z-10"
-              style={{
-                width: "436px",
-                height: "72px",
-                top: "715.31px",
-                left: "50.51px",
-              }}
-            >
-              {/* Heading */}
-              <div>
-                <h2 className="heading-on-image">
-                  Manage Properties Efficiently
-                </h2>
-              </div>
+            <div className="absolute bottom-8 left-0 right-0 text-white z-10 w-full px-4 md:px-6">
+              <div className="flex flex-col md:flex-row items-center md:items-end justify-between w-full">
+                {/* Left Side: Heading + Paragraph */}
+                <div className="text-center md:text-left md:mb-[25px] md:ml-[25px]">
+                  <h2 className="heading-on-image mb-2 md:mb-4">
+                    Manage Properties Efficiently
+                  </h2>
 
-              {/* Paragraph */}
-              <div className="paragraph-container flex justify-between items-center">
-                <p className="login-slide-description">
-                  Lorem Ipsum has been the industry's standard dummy text ever
-                  since the 1500s, when an unknown printer took a galley of type
-                  and scrambled it to make a type specimen book.
-                </p>
-                <div
-                  className="absolute right-5 flex gap-1"
-                  style={{
-                    width: "66px",
-                    height: "3px",
-                    top: "50px",
-                    left: "519px",
-                  }}
-                >
+                  {/* Short Paragraph for Mobile */}
+                  <p className="login-slide-description text-sm md:hidden w-[271.5px]">
+                    Lorem Ipsum has been the industry's standard dummy text ever
+                    since the 1500s
+                  </p>
+
+                  <p className="login-slide-description text-sm hidden md:block">
+                    Lorem Ipsum has been the industry's standard dummy text ever
+                    since the 1500s, when an unknown printer took a galley of
+                    type and scrambled it to make a type specimen book.
+                  </p>
+                </div>
+
+                {/* Right Side: Slider dots */}
+                <div className="flex gap-1 mt-4 md:mt-0 md:mb-[32px]">
                   {slides.map((_, index) => (
                     <img
                       key={index}
@@ -97,54 +88,36 @@ const AdminLogin = () => {
           </div>
         </div>
 
-        {/* Right side - login form */}
-        <div className="flex flex-col justify-center items-center px-10 pt-[187px] pb-[187px] flex-1">
+        {/* Login form section - full width on mobile, right side on desktop */}
+        <div className="flex flex-col justify-center items-center px-6 md:px-10 pt-8 pb-8 md:pt-[187px] md:pb-[187px] w-full md:w-1/2">
           <img
             src={logo}
             alt="RentBiz Logo"
-            className="h-[78px] mb-[62px]"
-            style={{
-              width: "128.19px",
-              height: "78.09px",
-              left: "158.41px",
-            }}
+            className="h-[60px] md:h-[78px] mb-6 md:mb-[62px]"
           />
-          <h2
-            className="right-section-heading mb-8 text-[#201D1E]"
-            style={{
-              width: "414px",
-              height: "44px",
-              fontFamily: "Inter Tight",
-              fontWeight: "500",
-              fontSize: "36px",
-              lineHeight: "100%",
-              letterSpacing: "0px",
-            }}
-          >
+          <h2 className="right-section-heading mb-8 text-[#201D1E] text-4xl hidden md:block">
             Welcome Back to RentBiz!
           </h2>
-          <form className="w-full space-y-5">
+          <form className="w-full space-y-8 md:space-y-9 max-w-[445px]">
             <div>
-              <label className="w-[103px] h-[19px]  text-[#606060] input-label">
+              <label className="text-[#606060] input-label">
                 Email address*
               </label>
               <input
                 type="email"
                 placeholder="tetst@gmail.com"
-                className="focus:outline-none focus:ring-2 focus:ring-blue-500 input-field"
+                className="focus:outline-none focus:ring-2 focus:ring-gray-700 input-field w-full mt-2"
               />
             </div>
             <div>
-              <label className="w-[103px] h-[19px] text-[#606060] input-label">
-                Password*
-              </label>
-              <div className="relative mt-[6px]">
+              <label className="text-[#606060] input-label">Password*</label>
+              <div className="relative">
                 <input
                   type="password"
                   placeholder="tetst@gmail.com"
-                  className="focus:outline-none focus:ring-2 focus:ring-blue-500 input-field"
+                  className="focus:outline-none focus:ring-2 focus:ring-gray-700 input-field w-full mt-2"
                 />
-                <span className="absolute inset-y-0 right-[65px] top-[17px] flex items-center text-gray-400 cursor-pointer">
+                <span className="absolute inset-y-0 right-5 top-[11px] md:top-[13px] flex items-center text-gray-400 cursor-pointer">
                   <img src={viewIcon} alt="" className="w-5 h-5" />
                 </span>
               </div>
@@ -152,13 +125,7 @@ const AdminLogin = () => {
             <button
               type="submit"
               onClick={handleLogin}
-              className="w-full bg-[#1458A2] hover:bg-[#104880] text-white py-2 mt-[32px] rounded-full login-btn"
-              style={{
-                width: "445px",
-                height: "52px",
-                borderRadius: "76px",
-                marginTop: "32px",
-              }}
+              className="w-full bg-[#1458A2] hover:bg-[#104880] duration-200 text-white py-2 rounded-full login-btn"
             >
               LOGIN
             </button>

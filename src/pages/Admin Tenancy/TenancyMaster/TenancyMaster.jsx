@@ -8,6 +8,7 @@ import deletesicon from "../../../assets/Images/Admin Tenancy/delete-icon.svg";
 import viewicon from "../../../assets/Images/Admin Tenancy/view-icon.svg";
 import CreateTenancyModal from "../CreateTenancy/CreateTenancyModal";
 import UpdateTenancyModal from "../UpdateTenancyModal/UpdateTenancyModal";
+import TenancyViewModal from "../TenancyViewModal/TenancyViewModal";
 
 const TenancyMaster = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -17,6 +18,7 @@ const TenancyMaster = () => {
 
   const [createTenancyModal, setCreateTenancyModal] = useState(false);
   const [updateTenancyModal, setUpdateTenancyModal] = useState(false);
+  const [viewTenancyModal, setViewTenancyModal] = useState(false)
 
   const openCreateTenancyModal = () => {
     setCreateTenancyModal(true);
@@ -33,6 +35,15 @@ const TenancyMaster = () => {
   const closeUpdateTenancyModal = () => {
     setUpdateTenancyModal(false)
   }
+
+  const openViewTenancyModal = () => {
+    setViewTenancyModal(true)  
+  }
+
+  const closeViewTenancyModal = () => {
+    setViewTenancyModal(false);
+  }
+
   const demoData = [
     {
       id: "#TC0018-1",
@@ -195,7 +206,7 @@ const TenancyMaster = () => {
                 </span>
               </td>
               <td className="pl-12 pr-5 pt-2 text-center">
-                <button>
+                <button onClick={openViewTenancyModal}>
                   <img
                     src={tenancy.view}
                     alt="View"
@@ -286,6 +297,9 @@ const TenancyMaster = () => {
 
       {/* Update Tenancy Modal */}
       <UpdateTenancyModal isOpen={updateTenancyModal} onClose={closeUpdateTenancyModal} />
+
+      {/* View Tenancy Modal */}
+      <TenancyViewModal isOpen={viewTenancyModal} onClose={closeViewTenancyModal} />
     </div>
   );
 };

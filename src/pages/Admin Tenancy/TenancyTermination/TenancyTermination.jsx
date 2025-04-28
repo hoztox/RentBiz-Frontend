@@ -5,11 +5,13 @@ import downloadicon from "../../../assets/Images/Admin Tenancy/download-icon.svg
 import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
 import terminateicon from "../../../assets/Images/Admin Tenancy/terminate-icon.svg";
 import TenancyTerminateModal from "./TenancyTerminateModal/TenancyTerminateModal";
+import UpdateTenancyModal from "../UpdateTenancyModal/UpdateTenancyModal";
 
 const TenancyTermination = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false)
   const itemsPerPage = 10;
 
   // Add state for the terminate modal
@@ -86,6 +88,15 @@ const TenancyTermination = () => {
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+  const openUpdateModal = () => {
+    setIsUpdateModalOpen(true)
+  }
+
+  const closeUpdateModal = () => {
+    setIsUpdateModalOpen(false)
+  }
+
   return (
     <div className="border border-[#E9E9E9]  rounded-md">
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9]">
@@ -166,7 +177,7 @@ const TenancyTermination = () => {
 
               <td className="px-4 text-right">
                 <div className="flex gap-3 justify-end items-center">
-                  <button>
+                  <button onClick={openUpdateModal}>
                     <img
                       src={editicon}
                       alt="Edit"
@@ -241,7 +252,8 @@ const TenancyTermination = () => {
           </button>
         </div>
       </div>
-      {/* Add Tenancy Modal */}
+      {/* Update Tenancy Modal */}
+      <UpdateTenancyModal isOpen={isUpdateModalOpen} onClose={closeUpdateModal} />
 
       {/* Termination Modal */}
       <TenancyTerminateModal isOpen={terminateModalOpen} onCancel={()=> setTerminateModalOpen(false)} onTerminate={handleTerminateAction}  />
