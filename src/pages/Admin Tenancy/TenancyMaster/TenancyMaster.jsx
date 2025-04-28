@@ -7,6 +7,7 @@ import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Tenancy/delete-icon.svg";
 import viewicon from "../../../assets/Images/Admin Tenancy/view-icon.svg";
 import CreateTenancyModal from "../CreateTenancy/CreateTenancyModal";
+import UpdateTenancyModal from "../UpdateTenancyModal/UpdateTenancyModal";
 
 const TenancyMaster = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -15,6 +16,7 @@ const TenancyMaster = () => {
   const itemsPerPage = 10;
 
   const [createTenancyModal, setCreateTenancyModal] = useState(false);
+  const [updateTenancyModal, setUpdateTenancyModal] = useState(false);
 
   const openCreateTenancyModal = () => {
     setCreateTenancyModal(true);
@@ -24,6 +26,13 @@ const TenancyMaster = () => {
     setCreateTenancyModal(false);
   };
 
+  const openUpdateTenancyModal = () => {
+    setUpdateTenancyModal(true);
+  }
+
+  const closeUpdateTenancyModal = () => {
+    setUpdateTenancyModal(false)
+  }
   const demoData = [
     {
       id: "#TC0018-1",
@@ -195,7 +204,7 @@ const TenancyMaster = () => {
                 </button>
               </td>
               <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                <button>
+                <button onClick={openUpdateTenancyModal}>
                   <img
                     src={editicon}
                     alt="Edit"
@@ -274,6 +283,9 @@ const TenancyMaster = () => {
         isOpen={createTenancyModal}
         onClose={closeCreateTenancyModal}
       />
+
+      {/* Update Tenancy Modal */}
+      <UpdateTenancyModal isOpen={updateTenancyModal} onClose={closeUpdateTenancyModal} />
     </div>
   );
 };

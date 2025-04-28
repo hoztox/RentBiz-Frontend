@@ -1,0 +1,108 @@
+.modal-container {
+  width: 830px;
+  height: 548px;
+  border-radius: 6px;
+}
+
+.heading-text {
+  font-family: "Inter Tight";
+  font-weight: 500;
+  font-size: 21px;
+  line-height: 24px;
+  letter-spacing: 0px;
+  vertical-align: middle;
+}
+
+.input-style {
+  width: 375px;
+  height: 38px;
+  border-radius: 6px;
+  border: 1px solid #e9e9e9;
+  padding: 0 12px;
+  font-size: 14px;
+  color: #111827;
+  background-color: #ffffff;
+  outline: none;
+}
+
+.input-style::placeholder {
+  font-family: "Inter Tight";
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 24px;
+  letter-spacing: 0;
+  vertical-align: middle;
+  color: #cfcfcf;
+}
+
+.input-style.select {
+  padding-right: 40px;
+  appearance: none;
+}
+
+.custom-select {
+  font-size: 15px;
+  font-weight: 400;
+  font-family: "Inter Tight";
+  color: #cfcfcf;
+  appearance: none;
+  outline: none;
+}
+
+.custom-select option {
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-weight: 400;
+  color: #201d1e;
+}
+
+.close-button {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  top: 31px;
+  left: 758px;
+  border-radius: 60px;
+  border: 1px solid #e9e9e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-label {
+  font-family: "Inter Tight";
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 100%;
+  letter-spacing: 0;
+  vertical-align: middle;
+}
+
+.create-user-button {
+  position: absolute;
+  width: 375px;
+  height: 38px;
+  top: 479px;
+  left: 425px;
+  border-radius: 6px;
+  color: white;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter Tight';
+}
+
+.reset-button {
+    width: 375px;
+    height: 38px;
+    border-radius: 6px;
+    border: 1px solid #1458A2;
+    margin-top: 30px;
+    font-family: 'Inter Tight';
+    font-size: 15px;
+    font-weight: 400;
+    color: #1458A2;
+    background-color: #ffffff;
+    outline: none;
+}

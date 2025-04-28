@@ -6,6 +6,7 @@ import editicon from "../../assets/Images/Admin Users Management/edit-icon.svg";
 import deletesicon from "../../assets/Images/Admin Users Management/delete-icon.svg";
 import "./AdminUsers.css";
 import AdminCreateUserModal from "../../components/AdminCreateUserModal/AdminCreateUserModal";
+import EditUserModal from "./EditUserModal/EditUserModal";
 
 const AdminUsers = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -14,6 +15,7 @@ const AdminUsers = () => {
   const itemsPerPage = 10;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // State to track toggle state for each user
   const [toggleStates, setToggleStates] = useState({
@@ -44,6 +46,14 @@ const AdminUsers = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+  const openEditModal = () => {
+      setIsEditModalOpen(true);
+  }
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+  }
 
   const demoData = [
     {
@@ -250,7 +260,7 @@ const AdminUsers = () => {
                 />
               </td>
               <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                <button>
+                <button onClick={openEditModal}>
                   <img
                     src={editicon}
                     alt="Edit"
@@ -326,6 +336,9 @@ const AdminUsers = () => {
       </div>
       {/* Create User Modal */}
       <AdminCreateUserModal isOpen={isModalOpen} onClose={closeModal} />
+
+      {/* Edit User Modal */}
+      <EditUserModal isOpen={isEditModalOpen} onClose={closeEditModal} />
     </div>
   );
 };
