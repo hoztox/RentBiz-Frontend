@@ -3,10 +3,19 @@ import "./TenancyViewModal.css";
 import closeicon from "../../../assets/Images/Admin Tenancy/close-icon.svg";
 
 const TenancyViewModal = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-md w-[1006px] h-[862px] p-6">
+    <div
+      onClick={onClose}
+      className={`fixed inset-0 flex items-center justify-center transition-colors z-50 ${
+        isOpen ? "visible bg-black/70" : "invisible"
+      }`}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={`bg-white rounded-md w-[1006px] h-[862px] p-6 transition-all ${
+          isOpen ? "scale-100 opacity-100" : "scale-125 opacity-0"
+        }`}
+      >
         <div className="flex justify-between items-center mt-[5px] mb-[30px]">
           <h2 className="tenancy-view-modal-head">Tenancy View</h2>
           <button
@@ -120,84 +129,53 @@ const TenancyViewModal = ({ isOpen, onClose }) => {
               </thead>
               <tbody>
                 <tr className="h-[57px] border-b border-[#E9E9E9] hover:bg-gray-100">
-                  {/* NO */}
                   <td className="px-[10px] py-[5px] w-[20px] view-tenancy-charges-tdata">
                     01
                   </td>
-
-                  {/* CHARGE TYPE */}
                   <td className="px-[10px] py-[5px] w-[96px] view-tenancy-charges-tdata">
                     Test
                   </td>
-
-                  {/* REASON */}
                   <td className="px-[10px] py-[5px] w-[163px] view-tenancy-charges-tdata">
                     Lorem ipsum dolor sit amet
                   </td>
-
-                  {/* DUE DATE */}
                   <td className="px-[10px] py-[5px] w-[120px] view-tenancy-charges-tdata">
                     300.20
                   </td>
-
-                  {/* STATUS */}
                   <td className="px-[10px] py-[5px] w-[60px] text-left text-[14px] view-tenancy-charges-tdata">
                     Pending
                   </td>
-
-                  {/* AMOUNT */}
                   <td className="px-[10px] py-[5px] w-[60px] text-left text-[14px] view-tenancy-charges-tdata">
                     300.20
                   </td>
-
-                  {/* VAT */}
                   <td className="px-[10px] py-[5px] w-[60px] text-left text-[14px] view-tenancy-charges-tdata">
                     3.20
                   </td>
-
-                  {/* TOTAL */}
                   <td className="px-[10px] py-[5px] w-[60px] text-left text-[14px] view-tenancy-charges-tdata">
                     303.40
                   </td>
                 </tr>
-
                 <tr className="h-[57px] hover:bg-gray-100">
-                  {/* NO */}
                   <td className="px-[10px] py-[5px] w-[20px] view-tenancy-charges-tdata">
                     02
                   </td>
-
-                  {/* CHARGE TYPE */}
                   <td className="px-[10px] py-[5px] w-[96px] view-tenancy-charges-tdata">
                     Test
                   </td>
-
-                  {/* REASON */}
                   <td className="px-[10px] py-[5px] w-[163px] view-tenancy-charges-tdata">
                     Lorem ipsum dolor sit amet
                   </td>
-
-                  {/* DUE DATE */}
                   <td className="px-[10px] py-[5px] w-[120px] view-tenancy-charges-tdata">
                     300.20
                   </td>
-
-                  {/* STATUS */}
                   <td className="px-[10px] py-[5px] w-[60px] text-left text-[14px] view-tenancy-charges-tdata">
                     Pending
                   </td>
-
-                  {/* AMOUNT */}
                   <td className="px-[10px] py-[5px] w-[60px] text-left text-[14px] view-tenancy-charges-tdata">
                     300.20
                   </td>
-
-                  {/* VAT */}
                   <td className="px-[10px] py-[5px] w-[60px] text-left text-[14px] view-tenancy-charges-tdata">
                     3.20
                   </td>
-
-                  {/* TOTAL */}
                   <td className="px-[10px] py-[5px] w-[60px] text-left text-[14px] view-tenancy-charges-tdata">
                     303.40
                   </td>

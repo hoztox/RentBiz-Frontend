@@ -5,43 +5,54 @@ import addImageIcon from "../../assets/Images/Admin Create Modal/addImageIcon.sv
 import { ChevronDown } from "lucide-react";
 
 const AdminCreateUserModal = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
   const [isSelectOpen, setIsSelectOpen] = useState(false);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="modal-container relative bg-white rounded-[6px] overflow-hidden shadow-lg">
+    <div
+      onClick={onClose}
+      className={`fixed inset-0 z-50 flex items-center justify-center transition-colors duration-300 modal-overlay ${
+        isOpen ? "visible bg-black/70" : "invisible bg-black/0"
+      }`}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={`relative bg-white rounded-[6px] overflow-hidden shadow-lg w-full max-w-[830px] h-auto md:h-[548px] flex flex-col transform transition-all duration-300 modal-container ${
+          isOpen ? "scale-100 opacity-100" : "scale-125 opacity-0"
+        }`}
+      >
         {/* Header */}
-        <div className="bg-[#F8F9FA] h-[133px] rounded-t-[6px] flex justify-between items-start px-6 pt-6">
-          <h2 className="absolute top-[40px] left-[30px] heading-text">
+        <div className="h-[100px] md:h-[133px] md:bg-[#F8F9FA] rounded-t-[6px] flex justify-between items-start px-4 md:px-6 pt-6">
+          <h2 className="absolute top-[30px] md:top-[40px] left-4 md:left-[30px] heading-text">
             Create User
           </h2>
-          <button className="close-button hover:bg-gray-200 duration-200" onClick={onClose}>
+          <button
+            className="close-button hover:bg-gray-200 duration-200"
+            onClick={onClose}
+          >
             <img src={cancelIcon} alt="Close" className="w-5 h-5" />
           </button>
         </div>
 
         {/* Profile Image Section */}
-        <div className="absolute top-[71px] left-1/2 transform -translate-x-1/2 flex justify-center">
-          <div className="relative w-[123px] h-[123px] bg-gray-100 rounded-full border overflow-hidden">
-            {/* Black bottom overlay */}
-            <div className="absolute bottom-0 left-0 right-0 h-[37px] bg-[#201D1E] rounded-b-full"></div>
-
-            {/* Icon on black background */}
-            <div className="absolute bottom-[8px] left-1/2 transform -translate-x-1/2">
-              <img src={addImageIcon} alt="Add" className="h-[22px] w-[22px]" />
+        <div className="absolute top-[50px] md:top-[71px] left-1/2 transform -translate-x-1/2 flex justify-center">
+          <div className="relative w-[100px] md:w-[123px] h-[100px] md:h-[123px] bg-[#F3F3F3] rounded-full border overflow-hidden">
+            <div className="absolute bottom-0 left-0 right-0 h-[30px] md:h-[37px] bg-[#201D1E] rounded-b-full"></div>
+            <div className="absolute bottom-[6px] md:bottom-[8px] left-1/2 transform -translate-x-1/2">
+              <img
+                src={addImageIcon}
+                alt="Add"
+                className="h-[18px] md:h-[22px] w-[18px] md:w-[22px]"
+              />
             </div>
-
-            {/* Hidden file input */}
             <input type="file" className="hidden" />
           </div>
         </div>
 
         {/* Form */}
-        <div className="px-6 pt-6 grid grid-cols-2 gap-x-3 gap-y-5 mt-[68px]">
+        <div className="px-4 md:px-6 pt-4 md:pt-6 grid grid-cols-1 md:grid-cols-2 gap-x-3 gap-y-4 md:gap-y-5 mt-[60px] md:mt-[68px]">
           {/* Name */}
           <div>
-            <label className="block text-sm text-[#201D1E] mb-[10px] form-label">
+            <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
               Name
             </label>
             <input
@@ -53,7 +64,7 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
 
           {/* Email */}
           <div>
-            <label className="block text-sm text-[#201D1E] mb-[10px] form-label">
+            <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
               Email
             </label>
             <input
@@ -65,7 +76,7 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
 
           {/* Role */}
           <div className="relative">
-            <label className="block text-sm text-[#201D1E] mb-[10px]">
+            <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px]">
               Role*
             </label>
             <select
@@ -85,20 +96,21 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
               </option>
             </select>
             <ChevronDown
-              className={`absolute right-[25px] top-[40px] text-gray-400 pointer-events-none transition-transform duration-300 ${
+              className={`absolute right-[20px] md:right-[25px] top-[36px] md:top-[40px] text-gray-400 pointer-events-none transition-transform duration-300 drop-down-icon ${
                 isSelectOpen ? "rotate-180" : "rotate-0"
               }`}
-              width={22}
-              height={22}
+              width={20}
+              height={20}
               color="#201D1E"
             />
           </div>
 
-          <div></div>
+          {/* Empty div for layout on desktop */}
+          <div className="hidden md:block"></div>
 
           {/* Password */}
           <div>
-            <label className="block text-sm text-[#201D1E] mb-[10px] form-label">
+            <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
               Password*
             </label>
             <input
@@ -110,7 +122,7 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
 
           {/* Confirm Password */}
           <div>
-            <label className="block text-sm text-[#201D1E] mb-[10px] form-label">
+            <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
               Confirm Password*
             </label>
             <input
@@ -122,7 +134,7 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
         </div>
 
         {/* Button */}
-        <div className="px-6 mt-8 mb-6">
+        <div className="px-4 md:px-6 mt-6 md:mt-8 mb-4 md:mb-6 flex justify-center">
           <button
             className="bg-[#2892CE] hover:bg-[#076094] duration-200 create-user-button"
             onClick={onClose}

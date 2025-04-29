@@ -7,8 +7,6 @@ import deleteicon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/dele
 import plusicon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/plus-icon.svg";
 
 const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
-  if (!isOpen) return null;
-
   // State to track open status of each select box
   const [selectOpenStates, setSelectOpenStates] = useState({});
   const [showPaymentSchedule, setShowPaymentSchedule] = useState(true);
@@ -97,8 +95,18 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white overflow-y-auto relative update-modal">
+    <div
+      onClick={onClose}
+      className={`fixed inset-0 flex items-center justify-center transition-colors z-50 ${
+        isOpen ? "visible bg-black/70" : "invisible"
+      }`}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={`bg-white overflow-y-auto relative update-modal transition-all ${
+          isOpen ? "scale-100 opacity-100" : "scale-125 opacity-0"
+        }`}
+      >
         <div className="p-8 pt-8">
           <div className="flex justify-between items-center mb-8">
             <h2 className="update-modal-head">Update Tenancy</h2>
@@ -219,7 +227,7 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                     className="w-full p-2 pr-10 focus:outline-none focus:ring-gray-700 focus:border-gray-700 input-box"
                     defaultValue={tenancyData?.endDate || ""}
                   />
-                  <div className="absolute inset-y-0 right-0 flex items-items-center pr-3">
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                     <img src={calendaricon} alt="" className="w-5 h-5" />
                   </div>
                 </div>
