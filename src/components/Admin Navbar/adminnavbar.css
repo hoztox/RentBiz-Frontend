@@ -61,7 +61,7 @@
         width: 100vw; /* Ensure full viewport width */
         margin: 0; /* Remove horizontal margins */
         border-bottom: none;
-        height: 107px;
+        height: 90px;
         display: flex;
         align-items: end;
     }

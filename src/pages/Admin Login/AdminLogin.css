@@ -189,6 +189,7 @@
   .login-image-wrapper {
     width: 100%;
     margin: 0;
+    height: 348px;
     /* Only keep bottom radius */
     border-top-left-radius: 0;
     border-top-right-radius: 0;
