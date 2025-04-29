@@ -98,7 +98,7 @@ const AdminLogin = () => {
           <h2 className="right-section-heading mb-8 text-[#201D1E] text-4xl hidden md:block">
             Welcome Back to RentBiz!
           </h2>
-          <form className="w-full space-y-8 md:space-y-9 max-w-[445px]">
+          <form className="w-full space-y-4 md:space-y-9 max-w-[445px]">
             <div>
               <label className="text-[#606060] input-label">
                 Email address*
