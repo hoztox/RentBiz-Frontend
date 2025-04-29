@@ -48,6 +48,47 @@
     color: #999999;
 }
 
+/* === Mobile Slide Menu Base === */
+.mobile-slide-menu {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 250px;
+    height: 100vh;
+    background-color: white;
+    z-index: 9999;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* When Open */
+  .mobile-slide-menu.open {
+    transform: translateX(0);
+  }
+  
+  /* === Overlay behind menu (optional but recommended) === */
+  .mobile-slide-overlay {
+    display: none;
+  }
+  
+  .mobile-slide-overlay.active {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 9998;
+  }
+  
+  /* === Show Mobile Slide Menu only on mobile === */
+  @media (max-width: 768px) {
+    .mobile-slide-menu {
+      display: block;
+    }
+  
+    .navbar-right-side {
+      display: none !important;
+    }
+  }
 
 @media(min-width:481px) {
     .RentBiz-Logo, .mobile-menu {

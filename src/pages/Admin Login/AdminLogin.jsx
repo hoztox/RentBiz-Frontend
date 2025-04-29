@@ -92,13 +92,13 @@ const AdminLogin = () => {
         <div className="flex flex-col justify-center items-center px-6 md:px-10 pt-8 pb-8 md:pt-[187px] md:pb-[187px] w-full md:w-1/2">
           <img
             src={logo}
-            alt="RentBiz Logo"
+            alt="RentBiz Logo Login"
             className="h-[60px] md:h-[78px] mb-6 md:mb-[62px]"
           />
           <h2 className="right-section-heading mb-8 text-[#201D1E] text-4xl hidden md:block">
             Welcome Back to RentBiz!
           </h2>
-          <form className="w-full space-y-4 md:space-y-9 max-w-[445px]">
+          <form className="w-full space-y-4 md:space-y-7 max-w-[445px]">
             <div>
               <label className="text-[#606060] input-label">
                 Email address*
@@ -111,7 +111,7 @@ const AdminLogin = () => {
             </div>
             <div>
               <label className="text-[#606060] input-label">Password*</label>
-              <div className="relative mb-4">
+              <div className="relative mb-4 md:mb-1">
                 <input
                   type="password"
                   placeholder="tetst@gmail.com"
