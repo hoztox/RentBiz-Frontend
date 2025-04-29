@@ -21,13 +21,15 @@ import upcomingCollection from "../../assets/Images/Admin Sidebar/upcoming colle
 import reportCollection from "../../assets/Images/Admin Sidebar/report collection.svg";
 import incomeExpense from "../../assets/Images/Admin Sidebar/income-expense.svg";
 import closeicon from "../../assets/Images/Admin Navbar/close-icon.svg";
-import AdminCreateUserModal from "../AdminCreateUserModal/AdminCreateUserModal";
-import CreateTenancyModal from "../../pages/Admin Tenancy/CreateTenancy/CreateTenancyModal";
 
-const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
+
+const MobileSlideMenu = ({
+  isMobileMenuOpen,
+  toggleMobileMenu,
+  openModal,
+  openTenancyModal,
+}) => {
   const [activeItem, setActiveItem] = useState("Dashboard");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isTenancyModalOpen, setIsTenancyModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const [expandedMenus, setExpandedMenus] = useState({
@@ -69,26 +71,6 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
     toggleMobileMenu();
   };
 
-  const openModal = () => {
-    setIsModalOpen(true);
-    setActiveItem("Manage Users");
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setActiveItem("Manage Users");
-    navigate("/admin/users-manage");
-  };
-
-  const openTenancyModal = () => {
-    setIsTenancyModalOpen(true);
-    setActiveItem("Tenancy Master");
-  };
-
-  const closeTenancyModal = () => {
-    setIsTenancyModalOpen(false);
-    setActiveItem("Tenancy Master");
-  };
   return (
     <>
       {/* Overlay */}
@@ -178,6 +160,7 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
                     activeItem === "Create User" ? "submenu-active" : ""
                   }`}
                   onClick={() => {
+                    setActiveItem("Create User");
                     openModal();
                     toggleMobileMenu();
                   }}
@@ -777,13 +760,6 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
             Powered By RentBiz - 2025
           </div>
         </div>
-
-        {/* Modals */}
-        <AdminCreateUserModal isOpen={isModalOpen} onClose={closeModal} />
-        <CreateTenancyModal
-          isOpen={isTenancyModalOpen}
-          onClose={closeTenancyModal}
-        />
       </div>
     </>
   );

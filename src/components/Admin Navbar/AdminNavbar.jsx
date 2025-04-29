@@ -6,11 +6,15 @@ import profile from "../../assets/Images/Admin Navbar/profile.svg";
 import mobilemenu from "../../assets/Images/Admin Navbar/mobile-menu.svg";
 import "./adminnavbar.css";
 import MobileSlideMenu from "../MobileSlideMenu/MobileSlideMenu";
+import AdminCreateUserModal from "../AdminCreateUserModal/AdminCreateUserModal";
+import CreateTenancyModal from "../../pages/Admin Tenancy/CreateTenancy/CreateTenancyModal";
 
 const AdminNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("English");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [isTenancyModalOpen, setIsTenancyModalOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
@@ -26,6 +30,22 @@ const AdminNavbar = () => {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  const openUserModal = () => {
+    setIsUserModalOpen(true);
+  };
+
+  const closeUserModal = () => {
+    setIsUserModalOpen(false);
+  };
+
+  const openTenancyModal = () => {
+    setIsTenancyModalOpen(true)
+  }
+
+  const closeTenancyModal = () => {
+    setIsTenancyModalOpen(false)
+  }
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -115,12 +135,17 @@ const AdminNavbar = () => {
         </div>
       </nav>
 
-        {/* Mobile Slide Menu */}
-        <MobileSlideMenu
+      {/* Mobile Slide Menu */}
+      <MobileSlideMenu
         isMobileMenuOpen={isMobileMenuOpen}
         toggleMobileMenu={toggleMobileMenu}
+        openModal={openUserModal}
+        openTenancyModal={openTenancyModal}
       />
-      
+
+      {/* Modals */}
+      <AdminCreateUserModal isOpen={isUserModalOpen} onClose={closeUserModal} />
+      <CreateTenancyModal isOpen={isTenancyModalOpen} onClose={closeTenancyModal} />
     </>
   );
 };
