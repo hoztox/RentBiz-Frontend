@@ -99,23 +99,22 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
 
       {/* Mobile Slide Menu */}
       <div className={`mobile-slide-menu ${isMobileMenuOpen ? "open" : ""}`}>
-        {/* Close Button */}
-        <div className="flex justify-end p-4">
-          <button onClick={toggleMobileMenu}>
-            <img src={closeicon} alt="Close" className="w-[24px] h-[24px]" />
-          </button>
-        </div>
-
         <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="flex justify-center items-center pt-[30px] pb-[32px] sidebar-logo">
+          {/* Header with Logo and Close Icon in Same Row */}
+          <div className="flex justify-between items-center px-5 pt-6 pb-4">
             <img
               src={logo}
               alt="Rentbiz Logo"
-              className="h-[78px] w-[128px] cursor-pointer"
+              className="h-[55.96px] w-[91.86px] cursor-pointer"
               onClick={handleLogoClick}
             />
+            <button onClick={toggleMobileMenu}>
+              <img src={closeicon} alt="Close" className="w-[24px] h-[24px]" />
+            </button>
           </div>
+
+          {/* Border Bottom */}
+          <div className="border-t border-[#E8E8E8] mx-5 mb-4"></div>
 
           {/* Navigation */}
           <div className="flex flex-col overflow-y-auto">

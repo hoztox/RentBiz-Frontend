@@ -67,6 +67,12 @@
     }
 }
 
+@media(max-width:480px){
+    .tenancy-chart {
+        top: 70px !important;
+    }
+}
+
 
 @media(max-width:480px) {
     .chart1 {

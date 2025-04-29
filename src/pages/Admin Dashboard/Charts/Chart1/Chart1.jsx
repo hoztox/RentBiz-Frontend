@@ -43,7 +43,7 @@ const Chart1 = ({ data }) => {
                 </PieChart>
 
                 {/* Centered Total Properties Text */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <div className="absolute inset-0 flex flex-col items-center justify-center tenancy-chart">
                     <h3 className="total-properties-count">
                         {totalProperties < 10 ? "0" : ""}
                         <CountUp end={totalProperties} duration={2} />
