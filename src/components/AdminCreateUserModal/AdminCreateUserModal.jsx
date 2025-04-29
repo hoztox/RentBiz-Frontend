@@ -5,21 +5,12 @@ import addImageIcon from "../../assets/Images/Admin Create Modal/addImageIcon.sv
 import { ChevronDown } from "lucide-react";
 
 const AdminCreateUserModal = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
   const [isSelectOpen, setIsSelectOpen] = useState(false);
 
   return (
-    <div
-      onClick={onClose}
-      className={`fixed inset-0 z-50 flex items-center justify-center transition-colors duration-300 modal-overlay ${
-        isOpen ? "visible bg-black/70" : "invisible bg-black/0"
-      }`}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className={`relative bg-white rounded-[6px] overflow-hidden shadow-lg w-full max-w-[830px] h-auto md:h-[548px] flex flex-col transform transition-all duration-300 modal-container ${
-          isOpen ? "scale-100 opacity-100" : "scale-125 opacity-0"
-        }`}
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 modal-overlay">
+      <div className="modal-container relative bg-white rounded-[6px] overflow-hidden shadow-lg w-full max-w-[830px] h-auto md:h-[548px] flex flex-col">
         {/* Header */}
         <div className="h-[100px] md:h-[133px] md:bg-[#F8F9FA] rounded-t-[6px] flex justify-between items-start px-4 md:px-6 pt-6">
           <h2 className="absolute top-[30px] md:top-[40px] left-4 md:left-[30px] heading-text">
