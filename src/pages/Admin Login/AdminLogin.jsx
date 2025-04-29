@@ -111,7 +111,7 @@ const AdminLogin = () => {
             </div>
             <div>
               <label className="text-[#606060] input-label">Password*</label>
-              <div className="relative">
+              <div className="relative mb-[32px]">
                 <input
                   type="password"
                   placeholder="tetst@gmail.com"
