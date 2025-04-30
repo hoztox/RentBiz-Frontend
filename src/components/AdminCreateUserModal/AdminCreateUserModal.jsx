@@ -26,7 +26,7 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
 
         {/* Profile Image Section */}
         <div className="absolute top-[50px] md:top-[71px] left-1/2 transform -translate-x-1/2 flex justify-center">
-          <div className="relative w-[100px] md:w-[123px] h-[100px] md:h-[123px] bg-[#F3F3F3] rounded-full border overflow-hidden">
+          <div className="relative top-[-30px] w-[100px] md:w-[123px] h-[100px] md:h-[123px] bg-[#F3F3F3] rounded-full border overflow-hidden">
             <div className="absolute bottom-0 left-0 right-0 h-[30px] md:h-[37px] bg-[#201D1E] rounded-b-full"></div>
             <div className="absolute bottom-[6px] md:bottom-[8px] left-1/2 transform -translate-x-1/2">
               <img
@@ -125,7 +125,7 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
         </div>
 
         {/* Button */}
-        <div className="px-4 md:px-6 mt-6 md:mt-8 mb-40 md:mb-6 flex justify-center">
+        <div className="px-4 md:px-6 mt-6 md:mt-8 mb-48 md:mb-6 flex justify-center">
           <button
             className="bg-[#2892CE] hover:bg-[#076094] duration-200 create-user-button"
             onClick={onClose}
