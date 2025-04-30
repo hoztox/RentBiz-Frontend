@@ -2,8 +2,8 @@
   width: 1011px;
   height: 786px;
   border-radius: 6px;
+  
 }
-
 .modal-head {
   font-family: "Inter Tight";
   font-weight: 500;
@@ -24,12 +24,12 @@
 }
 
 .modal-label {
-  font-family: 'Inter Tight';
-  font-weight: 400;
-  font-size: 13px;
-  line-height: 100%;
-  letter-spacing: 0px;
-  margin-bottom: 10px;
+    font-family: 'Inter Tight';
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 100%;
+    letter-spacing: 0px;
+    margin-bottom: 10px;
 }
 
 .input-box {
@@ -60,7 +60,7 @@
   letter-spacing: 0.43px;
 }
 
-.hidepayement-btn {
+.hidepayment-btn {
   border-radius: 6px;
   font-family: 'Public Sans';
   font-weight: 400;
@@ -74,111 +74,4 @@
   font-weight: 400;
   font-size: 15px;
   letter-spacing: 0.43px;
-}
-
-/* Mobile-specific styles */
-@media (max-width: 425px) {
-  .modal {
-    width: 100%;
-    height: 100vh; /* Full viewport height */
-    border-radius: 0; /* Remove border radius for full-screen modal */
-    margin: 0;
-    position: fixed;
-    top: 0;
-    left: 0;
-    overflow-y: auto; /* Keep scrollable */
-  }
-
-  /* Remove overlay for mobile */
-  .modal-container {
-    background: none !important; /* Override background */
-    display: block !important; /* Ensure no flex centering */
-  }
-
-  /* Adjust padding for mobile */
-  .modal > div {
-    padding: 16px;
-  }
-
-  /* Stack form fields vertically */
-  .grid-cols-2 {
-    grid-template-columns: 1fr; /* Single column */
-    gap: 16px;
-  }
-
-  /* Ensure flex containers stack vertically */
-  .flex.gap-4 {
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .flex.gap-4 > div {
-    width: 100% !important; /* Full width for inputs */
-  }
-
-  /* Adjust modal header */
-  .modal-head {
-    font-size: 18px; /* Slightly smaller for mobile */
-  }
-
-  .close-btn {
-    width: 36px;
-    height: 36px;
-    padding: 8px;
-  }
-
-  /* Table adjustments for mobile */
-  .overflow-x-auto {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-  }
-
-  table {
-    min-width: 600px; /* Ensure table is scrollable horizontally */
-  }
-
-  .invoice-modal-thead {
-    font-size: 12px; /* Smaller table headers */
-  }
-
-  .invoice-modal-table-input,
-  .invoice-modal-table-select {
-    height: 34px; /* Slightly smaller inputs */
-    font-size: 14px;
-  }
-
-  /* Adjust button sizes */
-  .addrow-btn,
-  .save-btn {
-    width: 100%; /* Full width buttons */
-    height: 40px;
-    font-size: 14px;
-  }
-
-  .hidepayement-btn {
-    width: 100%;
-    font-size: 14px;
-    padding: 10px;
-  }
-
-  /* Adjust image sizes in tables */
-  td img {
-    width: 16px !important;
-    height: 16px !important;
-  }
-
-  /* Ensure calendar icon is properly positioned */
-  .relative img {
-    right: 10px !important;
-  }
-
-  /* Adjust additional charges and payment schedule sections */
-  .mt-6 {
-    margin-top: 16px;
-  }
-
-  /* Fix button alignment */
-  .flex.justify-end {
-    justify-content: center;
-  }
 }
