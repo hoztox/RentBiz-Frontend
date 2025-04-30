@@ -417,7 +417,6 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               onClick={togglePaymentSchedule}
               className="bg-white text-[#2892CE] px-4 py-2 border border-[#E9E9E9] rounded hidepayement-btn"
             >
-              .future
               {showPaymentSchedule
                 ? "Hide Payment Schedule"
                 : "Show Payment Schedule"}
