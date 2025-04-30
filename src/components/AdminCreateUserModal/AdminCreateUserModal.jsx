@@ -125,7 +125,7 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
         </div>
 
         {/* Button */}
-        <div className="px-4 md:px-6 mt-6 md:mt-8 mb-4 md:mb-6 flex justify-center">
+        <div className="px-4 md:px-6 mt-6 md:mt-8 mb-40 md:mb-6 flex justify-center">
           <button
             className="bg-[#2892CE] hover:bg-[#076094] duration-200 create-user-button"
             onClick={onClose}
