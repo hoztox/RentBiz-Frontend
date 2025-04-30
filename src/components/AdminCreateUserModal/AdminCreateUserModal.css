@@ -1,13 +1,16 @@
 .modal-container {
   width: 100%;
+  max-width: 100vw; /* Ensure modal doesn't exceed viewport width */
   height: 100vh;
   border-radius: 0;
   background-color: #F8F9FA; /* Single background for mobile */
+  box-sizing: border-box; /* Include padding/borders in width */
 }
 
 @media (min-width: 768px) {
   .modal-container {
     width: 830px;
+    max-width: 830px; /* Fixed width for desktop */
     height: 548px;
     border-radius: 6px;
     background-color: #ffffff; /* White background for desktop */
@@ -19,6 +22,29 @@
     position: absolute;
     top: 90px;
     z-index: 100;
+    width: calc(100vw - 20px); /* Account for small margin to prevent overflow */
+    margin: 0 10px; /* Center with small margins */
+    left: 0;
+    right: 0;
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    position: static; /* Neutralizes fixed positioning */
+    inset: auto; /* Removes inset: 0 */
+    display: block; /* Removes flexbox centering */
+    background-color: transparent; /* Removes the black background */
+    opacity: 1; /* Resets opacity */
   }
 }
 
@@ -149,23 +175,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: #2892CE;
 }
 
 @media (min-width: 768px) {
   .create-user-button {
     width: 375px;
-    position: absolute;
-    top: 479px;
-    left: 423px;
   }
 }
 
 @media (max-width: 480px) {
-  .modal-overlay {
-    position: static; /* Neutralizes fixed positioning */
-    inset: auto; /* Removes inset: 0 */
-    display: block; /* Removes flexbox centering */
-    background-color: transparent; /* Removes the black background */
-    opacity: 1; /* Resets opacity */
+  .create-user-button {
+    max-width: calc(100vw - 35px);
   }
 }
