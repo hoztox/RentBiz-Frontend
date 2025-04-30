@@ -253,6 +253,11 @@
 
   .user-dropdown-img {
     width: 10px;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .user-dropdown-field.active .user-dropdown-img {
+    transform: rotate(180deg); 
   }
 
   .user-table-row-head {

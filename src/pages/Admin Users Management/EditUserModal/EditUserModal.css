@@ -1,20 +1,77 @@
 .edit-modal-container {
-  width: 830px;
-  height: 464px;
-  border-radius: 6px;
+  width: 100%;
+  max-width: 100vw; /* Ensure modal doesn't exceed viewport width */
+  height: 100vh;
+  border-radius: 0;
+  background-color: #F8F9FA; /* Single background for mobile */
+  box-sizing: border-box; /* Include padding/borders in width */
+}
+
+@media (min-width: 768px) {
+  .edit-modal-container {
+    width: 830px;
+    max-width: 830px; /* Fixed width for desktop */
+    height: 464px;
+    border-radius: 6px;
+    background-color: #ffffff; /* White background for desktop */
+  }
+}
+
+@media (max-width: 480px) {
+  .edit-modal-container {
+    position: absolute;
+    top: 90px;
+    z-index: 100;
+    width: calc(100vw - 20px); /* Account for small margin to prevent overflow */
+    margin: 0 10px; /* Center with small margins */
+    left: 0;
+    right: 0;
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    position: static;
+    inset: auto;
+    display: block;
+    background-color: transparent;
+    opacity: 1;
+  }
 }
 
 .heading-text {
   font-family: "Inter Tight";
   font-weight: 500;
-  font-size: 21px;
-  line-height: 24px;
+  font-size: 18px;
+  line-height: 22px;
   letter-spacing: 0px;
   vertical-align: middle;
 }
 
+@media (min-width: 768px) {
+  .heading-text {
+    font-size: 21px;
+    line-height: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .heading-text {
+    display: none;
+  }
+}
+
 .input-style {
-  width: 375px;
+  width: 100%;
   height: 38px;
   border-radius: 6px;
   border: 1px solid #e9e9e9;
@@ -23,6 +80,19 @@
   color: #111827;
   background-color: #ffffff;
   outline: none;
+}
+
+@media (min-width: 768px) {
+  .input-style {
+    width: 375px;
+  }
+}
+
+@media (max-width: 480px) {
+  .input-style {
+    max-width: calc(100vw - 35px);
+    background-color: #F8F9FA !important;
+  }
 }
 
 .input-style::placeholder {
@@ -56,17 +126,31 @@
   color: #201d1e;
 }
 
+@media (max-width: 480px) {
+  .drop-down-icon {
+    top: 38px;
+    right: 15px;
+  }
+}
+
 .close-button {
   position: absolute;
   width: 42px;
   height: 42px;
-  top: 31px;
-  left: 758px;
+  top: 20px;
+  right: 20px;
   border-radius: 60px;
   border: 1px solid #e9e9e9;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .close-button {
+    top: 31px;
+    left: 758px;
+  }
 }
 
 .form-label {
@@ -79,30 +163,59 @@
 }
 
 .edit-user-button {
-  position: absolute;
-  width: 375px;
+  width: 100%;
   height: 38px;
-  top: 400px;
-  left: 422px;
   border-radius: 6px;
   color: white;
+  font-family: 'Inter Tight';
   font-weight: 500;
+  font-size: 16px;
+  line-height: 18px;
+  letter-spacing: 0.43px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Inter Tight';
+  background-color: #2892CE;
+}
+
+@media (min-width: 768px) {
+  .edit-user-button {
+    width: 375px;
+  }
+}
+
+@media (max-width: 480px) {
+  .edit-user-button {
+    max-width: calc(100vw - 35px);
+  }
 }
 
 .reset-button {
+  width: 100%;
+  height: 38px;
+  border-radius: 6px;
+  border: 1px solid #1458A2;
+  margin-top: 30px;
+  font-family: 'Inter Tight';
+  font-size: 15px;
+  font-weight: 400;
+  color: #1458A2;
+  background-color: #ffffff;
+  outline: none;
+}
+
+@media (min-width: 768px) {
+  .reset-button {
     width: 375px;
-    height: 38px;
-    border-radius: 6px;
-    border: 1px solid #1458A2;
-    margin-top: 30px;
-    font-family: 'Inter Tight';
-    font-size: 15px;
-    font-weight: 400;
-    color: #1458A2;
-    background-color: #ffffff;
-    outline: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .reset-button {
+    max-width: calc(100vw - 35px);
+  }
+
+  .close-button{
+    display: none;
+  }
 }
