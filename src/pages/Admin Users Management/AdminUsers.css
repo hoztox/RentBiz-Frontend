@@ -1,3 +1,4 @@
+/* Base styles from your original CSS */
 .users-head {
   font-family: "Inter Tight";
   font-size: 21px;
@@ -8,6 +9,14 @@
 }
 
 .user-search {
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+.user-search::placeholder {
   font-family: "Inter Tight";
   font-size: 15px;
   font-style: normal;
@@ -34,9 +43,6 @@
   line-height: 18px;
   letter-spacing: 0.43px;
 }
-.create-user:hover {
-  background-color: #076094;
-}
 
 .download-btn {
   background-color: #f0f0f0;
@@ -49,11 +55,12 @@
   color: #4d4e4d;
 }
 
-.download-btn:hover {
+.download-btn {
   background-color: #201d1e;
   color: white;
 }
-.download-btn:hover .download-img {
+
+.download-btn .download-img {
   filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%)
     hue-rotate(47deg) brightness(118%) contrast(100%);
 }
@@ -83,33 +90,267 @@
 }
 
 .toggle-switch {
-    position: relative;
-    width: 46px;
-    height: 22px;
-    background-color: #ffffff;
-    border: 1px solid #e9e9e9;
-    border-radius: 20px;
+  position: relative;
+  width: 46px;
+  height: 22px;
+  background-color: #ffffff;
+  border: 1px solid #e9e9e9;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.toggle-switch.active {
+  background-color: #ff725e;
+}
+
+.toggle-circle {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background-color: #ff725e;
+  border-radius: 50%;
+  transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+.toggle-switch.active .toggle-circle {
+  transform: translateX(24px);
+  background-color: #ffffff;
+}
+
+.collection-list-pagination {
+  font-family: "Inter Tight";
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  color: #4b465c80;
+}
+
+.pagination-btn {
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+  color: #8a94a3;
+}
+
+.page-no-btns {
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+}
+
+/* Responsive Styles */
+@media (min-width: 481px) {
+  .user-dropdown-field,
+  .user-dropdown-content {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-table {
+    max-width: calc(100vw - 40px);
+  }
+
+  .user-table-header {
+    flex-direction: column;
+    border-bottom: none;
+    align-items: flex-start;
+  }
+
+  .users-head {
+    display: none;
+  }
+
+  .user-inputs-container {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+    margin-bottom: 5px;
+  }
+
+  .user-inputs-container > div:first-child {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .user-search {
+    width: 169px; 
+  }
+
+  .user-selection {
+    width: 122px;
+    margin-left: 0px; 
+  }
+
+  .action-buttons-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 10px;
+    margin-top: 5px;
+  }
+
+  .create-user {
+    width: 169px; 
+    font-size: 14px;
+  }
+
+  .download-btn {
+    width: 122px; 
+  }
+
+  .desktop-only {
+    display: none;
+  }
+
+  .pagination-container {
+    flex-direction: column;
+    height: 97.53px;
+    justify-content: center;
+    gap: 16px;
+    align-items: center; /* Center the contents horizontally */
+  }
+
+  .collection-list-pagination {
+    text-align: center; /* Center the "Showing X to Y of Z entries" text */
+  }
+
+  .pagination-buttons {
+    display: flex;
+    justify-content: center; /* Center the pagination buttons */
+    width: 100%;
+  }
+
+  .user-dropdown-field {
+    background-color: #dedede;
+    border-radius: 100%;
+    width: 20px;
+    height: 20px;
+    margin-right: 15px;
     display: flex;
     align-items: center;
-    padding: 3px;
-    cursor: pointer;
-    transition: background-color 0.3s ease-in-out;
+    justify-content: center;
   }
-  
-  .toggle-switch.active {
-    background-color: #FF725E; /* Matches the circle's original color */
+
+  .user-dropdown-field.active {
+    background-color: #254396;
   }
-  
-  .toggle-circle {
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    background-color: #FF725E; /* Circle's original color when inactive */
-    border-radius: 50%;
-    transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+
+  .user-dropdown-img {
+    width: 10px;
   }
-  
-  .toggle-switch.active .toggle-circle {
-    transform: translateX(24px);
-    background-color: #ffffff; /* Circle turns white when active */
+
+  .user-table-row-head {
+    height: auto;
+    background-color: #f7f7f7;
+    border-bottom: none;
   }
+
+  .user-thead {
+    padding-right: 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .user-id-column {
+    padding-right: 10px;
+  }
+
+  .dropdown-label {
+    font-family: "Inter Tight";
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    letter-spacing: 1px;
+    color: #818da0;
+    margin-bottom: 4px;
+  }
+
+  .dropdown-value {
+    font-family: "Inter Tight";
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 22px;
+    color: #201d1e;
+  }
+
+  .user-status {
+    padding: 0px 9px;
+    border-radius: 3px;
+    margin-top: 5px;
+    display: inline-block;
+  }
+
+  .user-dropdown-content {
+    width: 100%;
+  }
+
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .dropdown-value {
+    word-break: break-word;
+    padding-right: 5px;
+  }
+
+  .flex.items-center.gap-2 {
+    gap: 10px; 
+  }
+
+  .mobile-no-border {
+    border-bottom: none !important;
+  }
+
+  .mobile-with-border {
+    border-bottom: 1px solid #e9e9e9;
+  }
+
+  .pagination-btn {
+    font-size: 13px;
+    padding: 0px 10px;
+    height: 28px;
+  }
+
+  .page-no-btns {
+    font-size: 13px;
+    padding: 0px 10px;
+    height: 28px;
+  }
+
+  .users-head {
+    display: none;
+  }
+}
+
+@media (max-width: 414px) {
+  .user-thead {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 394px) {
+  .user-thead {
+    font-size: 12px;
+  }
+
+  .user-data {
+    font-size: 13px;
+  }
+}
