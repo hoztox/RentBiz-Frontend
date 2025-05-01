@@ -3,10 +3,12 @@ import "./AdminCreateUserModal.css";
 import cancelIcon from "../../assets/Images/Admin Create Modal/cancelIcon.svg";
 import addImageIcon from "../../assets/Images/Admin Create Modal/addImageIcon.svg";
 import { ChevronDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const AdminCreateUserModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
   const [isSelectOpen, setIsSelectOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 modal-overlay">
@@ -125,10 +127,13 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
         </div>
 
         {/* Button */}
-        <div className="px-4 md:px-6 mt-6 md:mt-8 mb-48 md:mb-6 flex justify-center">
+        <div className="px-4 md:px-6 mt-6 md:mt-6 mb-48 md:mb-6 flex justify-end md:mr-[10px]">
           <button
             className="bg-[#2892CE] hover:bg-[#076094] duration-200 create-user-button"
-            onClick={onClose}
+            onClick={() => {
+              onClose();         
+              navigate("/admin/users-manage"); 
+            }}
           >
             Create User
           </button>

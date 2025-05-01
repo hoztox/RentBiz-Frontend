@@ -3,10 +3,13 @@ import "./EditUserModal.css";
 import closeicon from "../../../assets/Images/Admin Users Management/close-icon.svg";
 import addImageIcon from "../../../assets/Images/Admin Users Management/addImageIcon.svg";
 import { ChevronDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const EditUserModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
   const [isSelectOpen, setIsSelectOpen] = useState(false);
+  const navigate = useNavigate();
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 modal-overlay">
       <div className="edit-modal-container relative bg-white rounded-[6px] overflow-hidden shadow-lg w-full max-w-[830px] h-auto md:h-[464px] flex flex-col">
@@ -107,7 +110,10 @@ const EditUserModal = ({ isOpen, onClose }) => {
         <div className="px-4 md:px-6 mt-6 md:mt-8 md:mr-[8px] mb-6 md:mb-6 flex justify-end">
           <button
             className="bg-[#2892CE] hover:bg-[#076094] duration-200 edit-user-button"
-            onClick={onClose}
+            onClick={()=>{
+              onClose();
+              navigate("/admin/users-manage")
+            }}
           >
             Edit User
           </button>

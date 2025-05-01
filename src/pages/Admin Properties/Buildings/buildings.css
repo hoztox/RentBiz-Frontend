@@ -164,11 +164,11 @@
   }
 
   .building-search {
-    width: 169px; /* Set to 169px per Figma */
+    width: 169px; 
   }
 
   .building-selection {
-    width: 122px; /* Set to 122px per Figma */
+    width: 122px; 
     margin-left: 0px;
   }
 
@@ -181,12 +181,12 @@
   }
 
   .add-new-building {
-    width: 169px; /* Set to 169px per Figma */
+    width: 169px; 
     font-size: 14px;
   }
 
   .download-btn {
-    width: 122px; /* Set to 122px per Figma */
+    width: 122px; 
   }
 
   .desktop-only {
