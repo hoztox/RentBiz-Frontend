@@ -121,7 +121,11 @@ const TenantsMaster = () => {
               // onClick={openTenantModal}
             >
               Add New Tenant
-              <img src={plusicon} alt="plus icon" className="w-[15px] h-[15px]" />
+              <img
+                src={plusicon}
+                alt="plus icon"
+                className="w-[15px] h-[15px]"
+              />
             </button>
             <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 download-btn">
               Download
@@ -143,7 +147,9 @@ const TenantsMaster = () => {
               <th className="pl-5 text-left tenant-thead w-[15%]">NAME</th>
               <th className="pl-5 text-left tenant-thead w-[20%]">CONTACTS</th>
               <th className="px-5 text-left tenant-thead w-[12%]">STATUS</th>
-              <th className="pl-12 pr-5 text-left tenant-thead w-[15%]">ID TYPE</th>
+              <th className="pl-12 pr-5 text-left tenant-thead w-[15%]">
+                ID TYPE
+              </th>
               <th className="px-5 pr-6 text-right tenant-thead">ACTION</th>
             </tr>
           </thead>
@@ -168,7 +174,9 @@ const TenantsMaster = () => {
                     {tenant.status}
                   </span>
                 </td>
-                <td className="pl-12 pr-5 text-left tenant-data">{tenant.type}</td>
+                <td className="pl-12 pr-5 text-left tenant-data">
+                  {tenant.type}
+                </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
                   <button>
                     <img
@@ -194,7 +202,9 @@ const TenantsMaster = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="tenant-table-row-head">
-              <th className="px-5 w-[74px] text-left tenant-thead tenant-id-column">ID</th>
+              <th className="px-5 w-[74px] text-left tenant-thead tenant-id-column">
+                ID
+              </th>
               <th className="px-3 text-left tenant-thead date-column">DATE</th>
               <th className="px-5 text-right tenant-thead"></th>
             </tr>
@@ -210,7 +220,9 @@ const TenantsMaster = () => {
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left tenant-data">{tenant.id}</td>
-                  <td className="px-3 text-left tenant-data date-column">{tenant.date}</td>
+                  <td className="px-3 text-left tenant-data date-column">
+                    {tenant.date}
+                  </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`tenant-dropdown-field ${
@@ -232,36 +244,44 @@ const TenantsMaster = () => {
                   <tr className="mobile-with-border border-b border-[#E9E9E9]">
                     <td colSpan={3} className="px-5">
                       <div className="tenant-dropdown-content">
-                        <div className="grid grid-cols-2 gap-9 mb-6">
+                        <div className="grid grid-cols-3 gap-9 mb-6">
                           <div>
                             <div className="dropdown-label">NAME</div>
                             <div className="dropdown-value">{tenant.name}</div>
                           </div>
-                          <div className="ml-[-40px]">
+                          <div>
                             <div className="dropdown-label">CONTACTS</div>
-                            <div className="dropdown-value">{tenant.contact}</div>
+                            <div className="dropdown-value">
+                              {tenant.contact}
+                            </div>
                           </div>
                         </div>
-                        <div className="grid grid-cols-3 gap-9 mb-6" style={{display: "flex", justifyContent: "space-between"}}>
+                        <div
+                          className="grid grid-cols-3 gap-9 mb-6"
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
                           <div>
                             <div className="dropdown-label">STATUS</div>
                             <div className="dropdown-value">
                               <span
-                                className={`px-[10px] py-[5px] w-[53px] h-[24px] rounded-[4px] tenant-status ${
+                                className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] tenant-status ${
                                   tenant.status === "Active"
                                     ? "bg-[#e1ffea] text-[#28C76F]"
-                                    : "bg-[#FFE1E1] text-[#C72828] !w-[65px]" 
+                                    : "bg-[#FFE1E1] text-[#C72828]"
                                 }`}
                               >
                                 {tenant.status}
                               </span>
                             </div>
                           </div>
-                          <div className="ml-[15px]">
+                          <div>
                             <div className="dropdown-label">ID TYPE</div>
                             <div className="dropdown-value">{tenant.type}</div>
                           </div>
-                          <div className="ml-[-7px] w-[49px]">
+                          <div className="w-[49px]">
                             <div className="dropdown-label">ACTION</div>
                             <div className="dropdown-value flex items-center gap-2 mt-[10px]">
                               <button>
@@ -313,9 +333,7 @@ const TenantsMaster = () => {
               1
             </button>
           )}
-          {startPage > 2 && (
-            <span className="px-2 flex items-center">...</span>
-          )}
+          {startPage > 2 && <span className="px-2 flex items-center">...</span>}
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
