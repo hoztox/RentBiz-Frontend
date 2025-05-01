@@ -1,81 +1,350 @@
 .buildings-head {
-    font-family: 'Inter Tight';
-    font-size: 21px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 24px;
-    color: #201D1E;
+  font-family: "Inter Tight";
+  font-size: 21px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+  color: #201d1e;
 }
 
 .building-search {
-    font-family: 'Inter Tight';
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 24px;
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  box-sizing: border-box; /* Ensure padding/border included in width */
+}
+
+.building-search::placeholder {
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
 }
 
 .building-selection {
-      font-family: "Public Sans", sans-serif;
-      font-size: 15px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 24px;
-      color: #201D1E;
+  font-family: "Public Sans", sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  color: #201d1e;
+  box-sizing: border-box; /* Ensure padding/border included in width */
 }
 
 .add-new-building {
-    background-color: #2892CE;
-    color: white;
-    font-family: 'Inter Tight';
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 18px;
-    letter-spacing: 0.43px;
+  background-color: #2892ce;
+  color: white;
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+  box-sizing: border-box; /* Ensure padding/border included in width */
 }
+
 .add-new-building:hover {
-    background-color: #076094;
+  background-color: #076094;
 }
 
 .download-btn {
-    background-color: #F0F0F0;
-    font-family: 'Inter Tight';
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 18px;
-    letter-spacing: 0.43px;
-    color: #4D4E4D;
+  background-color: #f0f0f0;
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+  color: #4d4e4d;
+  box-sizing: border-box; /* Ensure padding/border included in width */
 }
 
 .download-btn:hover {
-    background-color: #201D1E;
-    color: white;
+  background-color: #201d1e;
+  color: white;
 }
+
 .download-btn:hover .download-img {
-    filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%) hue-rotate(47deg) brightness(118%) contrast(100%);
+  filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%)
+    hue-rotate(47deg) brightness(118%) contrast(100%);
 }
 
 .building-thead {
-    font-family: 'Inter Tight';
-    font-size: 13px;
+  font-family: "Inter Tight";
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 1px;
+  color: #818da0;
+}
+
+.building-data {
+  font-family: "Inter Tight";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 22px;
+  color: #201d1e;
+}
+
+.action-btn:hover {
+  filter: brightness(0) saturate(100%) invert(8%) sepia(7%) saturate(582%)
+    hue-rotate(289deg) brightness(100%) contrast(91%);
+}
+
+.collection-list-pagination {
+  font-family: "Inter Tight";
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  color: #4b465c80;
+}
+
+.pagination-btn {
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+  color: #8a94a3;
+}
+
+.page-no-btns {
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+}
+
+/* Responsive Styles */
+@media (min-width: 481px) {
+  .building-dropdown-field,
+  .building-dropdown-content {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .building-table {
+    max-width: calc(100vw - 40px);
+    margin-bottom: 50px;
+  }
+
+  .building-table-header {
+    flex-direction: column;
+    border-bottom: none;
+    align-items: flex-start;
+  }
+
+  .buildings-head {
+    display: none;
+  }
+
+  .building-inputs-container {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+    margin-bottom: 5px;
+  }
+
+  .building-inputs-container > div:first-child {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+    flex-wrap: nowrap; /* Prevent wrapping to avoid misalignment */
+  }
+
+  .building-search {
+    width: 169px; /* Set to 169px per Figma */
+  }
+
+  .building-selection {
+    width: 122px; /* Set to 122px per Figma */
+    margin-left: 0px;
+  }
+
+  .action-buttons-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 10px;
+    margin-top: 5px;
+  }
+
+  .add-new-building {
+    width: 169px; /* Set to 169px per Figma */
+    font-size: 14px;
+  }
+
+  .download-btn {
+    width: 122px; /* Set to 122px per Figma */
+  }
+
+  .desktop-only {
+    display: none;
+  }
+
+  .pagination-container {
+    flex-direction: column;
+    height: 97.53px;
+    justify-content: center;
+    gap: 16px;
+    align-items: center;
+  }
+
+  .collection-list-pagination {
+    text-align: center;
+  }
+
+  .pagination-buttons {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    overflow-y: hidden;
+  }
+
+  .building-dropdown-field {
+    background-color: #dedede;
+    border-radius: 100%;
+    width: 20px;
+    height: 20px;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .building-dropdown-field.active {
+    background-color: #254396;
+  }
+
+  .building-dropdown-img {
+    width: 10px;
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .building-dropdown-field.active .building-dropdown-img {
+    transform: rotate(180deg);
+  }
+
+  .building-table-row-head {
+    height: auto;
+    background-color: #f7f7f7;
+    border-bottom: none;
+  }
+
+  .building-thead {
+    padding-right: 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .building-id-column {
+    padding-right: 10px;
+  }
+
+  .dropdown-label {
+    font-family: "Inter Tight";
+    font-size: 12px;
     font-style: normal;
     font-weight: 500;
     line-height: normal;
     letter-spacing: 1px;
     color: #818da0;
-}
+    margin-bottom: 4px;
+  }
 
-.building-data {
-    font-family: 'Inter Tight';
-    font-size: 14px;
+  .dropdown-value {
+    font-family: "Inter Tight";
+    font-size: 13px;
     font-style: normal;
     font-weight: 400;
     line-height: 22px;
-    color: #201D1E;
+    color: #201d1e;
+  }
+
+  .building-status {
+    padding: 0px 9px;
+    border-radius: 3px;
+    margin-top: 5px;
+    display: inline-block;
+  }
+
+  .building-dropdown-content {
+    width: 100%;
+  }
+
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .dropdown-value {
+    word-break: break-word;
+    padding-right: 5px;
+  }
+
+  .flex.items-center.gap-2 {
+    gap: 10px;
+  }
+
+  .mobile-no-border {
+    border-bottom: none !important;
+  }
+
+  .mobile-with-border {
+    border-bottom: 1px solid #e9e9e9;
+  }
+
+  .pagination-btn {
+    font-size: 13px;
+    padding: 0px 10px;
+    height: 28px;
+  }
+
+  .page-no-btns {
+    font-size: 13px;
+    padding: 0px 10px;
+    height: 28px;
+  }
 }
 
-.action-btn:hover {
-    filter: brightness(0) saturate(100%) invert(8%) sepia(7%) saturate(582%) hue-rotate(289deg) brightness(100%) contrast(91%);
+@media (max-width: 414px) {
+  .building-thead {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 394px) {
+  .building-thead {
+    font-size: 12px;
+  }
+
+  .building-data {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 360px) {
+  .building-search {
+    width: 150px; /* Slightly smaller for very small screens */
+  }
+
+  .building-table {
+    margin-bottom: 50px;
+  }
 }
