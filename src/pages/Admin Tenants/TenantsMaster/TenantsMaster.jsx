@@ -247,11 +247,11 @@ const TenantsMaster = () => {
                         <div className="grid grid-cols-3 gap-9 mb-6">
                           <div>
                             <div className="dropdown-label">NAME</div>
-                            <div className="dropdown-value">{tenant.name}</div>
+                            <div className="dropdown-value w-[95px]">{tenant.name}</div>
                           </div>
                           <div>
                             <div className="dropdown-label">CONTACTS</div>
-                            <div className="dropdown-value">
+                            <div className="dropdown-value w-[113px]">
                               {tenant.contact}
                             </div>
                           </div>
