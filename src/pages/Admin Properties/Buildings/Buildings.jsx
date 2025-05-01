@@ -6,16 +6,14 @@ import editicon from "../../../assets/Images/Admin Buildings/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Buildings/delete-icon.svg";
 import "./buildings.css";
 import AddBuildingModal from "./Add Building Modal/AddBuildingModal";
-import downarrow from '../../../assets/Images/Admin Buildings/downarrow.svg'
+import downarrow from "../../../assets/Images/Admin Buildings/downarrow.svg";
 
 const Buildings = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-
   const [buildingModalOpen, setBuildingModalOpen] = useState(false);
-  const [expandedRows, setExpandedRows] = useState({})
+  const [expandedRows, setExpandedRows] = useState({});
 
   const openBuildingModal = () => {
     setBuildingModalOpen(true);
@@ -84,10 +82,10 @@ const Buildings = () => {
       building.status.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredData.length / 10);
   const paginatedData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    (currentPage - 1) * 10,
+    currentPage * 10
   );
 
   const maxPageButtons = 5;
@@ -131,7 +129,11 @@ const Buildings = () => {
               onClick={openBuildingModal}
             >
               Add New Building
-              <img src={plusicon} alt="plus icon" className="w-[15px] h-[15px]" />
+              <img
+                src={plusicon}
+                alt="plus icon"
+                className="w-[15px] h-[15px]"
+              />
             </button>
             <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 download-btn">
               Download
@@ -166,8 +168,12 @@ const Buildings = () => {
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
                 <td className="px-5 text-left building-data">{building.id}</td>
-                <td className="px-5 text-left building-data">{building.date}</td>
-                <td className="pl-5 text-left building-data">{building.name}</td>
+                <td className="px-5 text-left building-data">
+                  {building.date}
+                </td>
+                <td className="pl-5 text-left building-data">
+                  {building.name}
+                </td>
                 <td className="px-5 text-left building-data">
                   {building.address}
                 </td>
@@ -213,7 +219,9 @@ const Buildings = () => {
               <th className="px-5 text-left building-thead building-id-column">
                 ID
               </th>
-              <th className="px-5 text-left building-thead">DATE</th>
+              <th className="px-5 text-left building-thead date-column">
+                DATE
+              </th>
               <th className="px-5 text-right building-thead"></th>
             </tr>
           </thead>
@@ -227,8 +235,10 @@ const Buildings = () => {
                       : "mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left building-data">{building.id}</td>
                   <td className="px-5 text-left building-data">
+                    {building.id}
+                  </td>
+                  <td className="px-5 text-left building-data date-column">
                     {building.date}
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
@@ -255,37 +265,45 @@ const Buildings = () => {
                         <div className="grid grid-cols-2 gap-9 mb-6">
                           <div>
                             <div className="dropdown-label">NAME</div>
-                            <div className="dropdown-value">{building.name}</div>
+                            <div className="dropdown-value">
+                              {building.name}
+                            </div>
                           </div>
-                          <div className="ml-[-15px]">
+                          <div>
                             <div className="dropdown-label">ADDRESS</div>
                             <div className="dropdown-value">
                               {building.address}
                             </div>
                           </div>
                         </div>
-                        <div className="grid grid-cols-3 gap-9 mb-5">
-                          <div className=" w-[90px]">
+                        <div
+                          className="grid grid-cols-3 gap-9 mb-6"
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <div>
                             <div className="dropdown-label">NO. OF UNITS</div>
                             <div className="dropdown-value">
                               {building.units}
                             </div>
                           </div>
-                          <div className="ml-[29px]">
+                          <div>
                             <div className="dropdown-label">STATUS</div>
                             <div className="dropdown-value">
                               <span
-                                className={`px-[10px] py-[5px] w-[53px] h-[24px] rounded-[4px] building-status ${
+                                className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] building-status ${
                                   building.status === "Active"
                                     ? "bg-[#e1ffea] text-[#28C76F]"
-                                    : "bg-[#FFE1E1] text-[#C72828] !pr-[0px] !pl-[5px]"
+                                    : "bg-[#FFE1E1] text-[#C72828]"
                                 }`}
                               >
                                 {building.status}
                               </span>
                             </div>
                           </div>
-                          <div className="ml-[30px]">
+                          <div className="w-[49px]">
                             <div className="dropdown-label">ACTION</div>
                             <div className="dropdown-value flex items-center gap-2 mt-[10px]">
                               <button>
@@ -316,9 +334,8 @@ const Buildings = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-3 md:p-5 pagination-container">
         <span className="collection-list-pagination pagination-text">
-          Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+          Showing {Math.min((currentPage - 1) * 10 + 1, filteredData.length)} to{" "}
+          {Math.min(currentPage * 10, filteredData.length)} of{" "}
           {filteredData.length} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto pagination-buttons">
@@ -337,9 +354,7 @@ const Buildings = () => {
               1
             </button>
           )}
-          {startPage > 2 && (
-            <span className="px-2 flex items-center">...</span>
-          )}
+          {startPage > 2 && <span className="px-2 flex items-center">...</span>}
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
