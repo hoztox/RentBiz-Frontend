@@ -321,7 +321,7 @@
   }
   .tenancy-data.tenant-column {
     white-space: nowrap;
-    padding-left: 14px;
+    padding-left: 5px;
     padding-right: 0;
   }
   .dropdown-label {
