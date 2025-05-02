@@ -91,7 +91,7 @@ const TenancyViewModal = ({ isOpen, onClose }) => {
         </div>
 
         {/* Additional Charges Table */}
-        <div className="mt-[32px]">
+        <div className="mt-[32px] mb-[50px]">
           <h3 className="text-[#2892CE] additional-charges-heading">
             Additional Charges
           </h3>
