@@ -3,18 +3,16 @@ import "./TenancyViewModal.css";
 import closeicon from "../../../assets/Images/Admin Tenancy/close-icon.svg";
 
 const TenancyViewModal = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+
   return (
     <div
       onClick={onClose}
-      className={`fixed inset-0 flex items-center justify-center transition-colors z-50 ${
-        isOpen ? "visible bg-black/70" : "invisible"
-      }`}
+      className="modal-overlay fixed inset-0 flex items-center justify-center transition-colors z-50"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`bg-white rounded-md w-[1006px] h-[862px] p-6 transition-all ${
-          isOpen ? "scale-100 opacity-100" : "scale-125 opacity-0"
-        }`}
+        className="modal-container bg-white rounded-md p-6 transition-all"
       >
         <div className="flex justify-between items-center mt-[5px] mb-[30px]">
           <h2 className="tenancy-view-modal-head">Tenancy View</h2>
@@ -27,9 +25,9 @@ const TenancyViewModal = ({ isOpen, onClose }) => {
         </div>
 
         {/* Tenancy Details */}
-        <div className="border border-[#E9E9E9] rounded-md p-6 mb-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="pr-4 border-r border-[#E9E9E9]">
+        <div className="border border-[#E9E9E9] rounded-md p-6 mb-6 mt-[-28px] md:mt-[28px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="pr-0 md:pr-4 border-r-0 md:border-r border-[#E9E9E9]">
               <div className="tenancy-view-modal-label mb-1">Tenant Name</div>
               <div className="tenancy-view-modal-data">User 1</div>
 
@@ -62,7 +60,7 @@ const TenancyViewModal = ({ isOpen, onClose }) => {
               </div>
             </div>
 
-            <div className="pl-4">
+            <div className="pl-0 md:pl-4">
               <div className="tenancy-view-modal-label mb-1">Building</div>
               <div className="tenancy-view-modal-data">DANAT ALZAHIA</div>
 
@@ -98,7 +96,7 @@ const TenancyViewModal = ({ isOpen, onClose }) => {
             Additional Charges
           </h3>
           <div className="mt-5 overflow-x-auto border border-[#E9E9E9] rounded-md">
-            <table className="w-full border-collapse">
+            <table className="w-full border-collapse desktop-table">
               <thead>
                 <tr className="border-b border-[#E9E9E9] h-[57px]">
                   <th className="px-[10px] text-left text-gray-700 uppercase w-[20px] view-tenancy-charges-thead">
@@ -138,19 +136,19 @@ const TenancyViewModal = ({ isOpen, onClose }) => {
                   <td className="px-[10px] py-[5px] w-[163px] view-tenancy-charges-tdata">
                     Lorem ipsum dolor sit amet
                   </td>
-                  <td className="px-[10px] py-[5px] w-[120px] view-tenancy-charges-tdata">
+                  <td className="px-[10px] py-[5px] w-[75px] view-tenancy-charges-tdata">
                     300.20
                   </td>
-                  <td className="px-[10px] py-[5px] w-[60px] text-left text-[14px] view-tenancy-charges-tdata">
+                  <td className="px-[10px] py-[5px] w-[52px] text-left text-[14px] view-tenancy-charges-tdata">
                     Pending
                   </td>
-                  <td className="px-[10px] py-[5px] w-[60px] text-left text-[14px] view-tenancy-charges-tdata">
+                  <td className="px-[10px] py-[5px] w-[61px] text-left text-[14px] view-tenancy-charges-tdata">
                     300.20
                   </td>
-                  <td className="px-[10px] py-[5px] w-[60px] text-left text-[14px] view-tenancy-charges-tdata">
+                  <td className="px-[10px] py-[5px] w-[30px] text-left text-[14px] view-tenancy-charges-tdata">
                     3.20
                   </td>
-                  <td className="px-[10px] py-[5px] w-[60px] text-left text-[14px] view-tenancy-charges-tdata">
+                  <td className="px-[10px] py-[5px] w-[44px] text-left text-[14px] view-tenancy-charges-tdata">
                     303.40
                   </td>
                 </tr>
@@ -164,24 +162,54 @@ const TenancyViewModal = ({ isOpen, onClose }) => {
                   <td className="px-[10px] py-[5px] w-[163px] view-tenancy-charges-tdata">
                     Lorem ipsum dolor sit amet
                   </td>
-                  <td className="px-[10px] py-[5px] w-[120px] view-tenancy-charges-tdata">
+                  <td className="px-[10px] py-[5px] w-[75px] view-tenancy-charges-tdata">
                     300.20
                   </td>
-                  <td className="px-[10px] py-[5px] w-[60px] text-left text-[14px] view-tenancy-charges-tdata">
+                  <td className="px-[10px] py-[5px] w-[52px] text-left text-[14px] view-tenancy-charges-tdata">
                     Pending
                   </td>
-                  <td className="px-[10px] py-[5px] w-[60px] text-left text-[14px] view-tenancy-charges-tdata">
+                  <td className="px-[10px] py-[5px] w-[61px] text-left text-[14px] view-tenancy-charges-tdata">
                     300.20
                   </td>
-                  <td className="px-[10px] py-[5px] w-[60px] text-left text-[14px] view-tenancy-charges-tdata">
+                  <td className="px-[10px] py-[5px] w-[30px] text-left text-[14px] view-tenancy-charges-tdata">
                     3.20
                   </td>
-                  <td className="px-[10px] py-[5px] w-[60px] text-left text-[14px] view-tenancy-charges-tdata">
+                  <td className="px-[10px] py-[5px] w-[44px] text-left text-[14px] view-tenancy-charges-tdata">
                     303.40
                   </td>
                 </tr>
               </tbody>
             </table>
+            <div className="mobile-table hidden">
+              <div className="border-b border-[#E9E9E9] bg-[#F7F7F7] h-[57px] grid grid-cols-3 gap-2 px-[10px]">
+                <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">No</div>
+                <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead w-[96px]">Charge Type</div>
+                <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">Reason</div>
+              </div>
+              <div className="h-[57px] grid grid-cols-3 gap-2 px-[10px] hover:bg-gray-100">
+                <div className="view-tenancy-charges-tdata">01</div>
+                <div className="view-tenancy-charges-tdata">Test</div>
+                <div className="view-tenancy-charges-tdata">Lorem ipsum dolor sit amet</div>
+              </div>
+              <div className="border-b border-[#E9E9E9] bg-[#F7F7F7] h-[57px] grid grid-cols-3 gap-2 px-[10px]">
+                <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">Due Date</div>
+                <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">Status</div>
+                <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">Amount</div>
+              </div>
+              <div className="h-[57px] grid grid-cols-3 gap-2 px-[10px] hover:bg-gray-100">
+                <div className="view-tenancy-charges-tdata">300.20</div>
+                <div className="view-tenancy-charges-tdata">Pending</div>
+                <div className="view-tenancy-charges-tdata">300.20</div>
+              </div>
+              <div className="border-b border-[#E9E9E9] bg-[#F7F7F7] h-[57px] grid grid-cols-2 gap-2 px-[10px]">
+                <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">VAT</div>
+                <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">Total</div>
+              </div>
+              <div className="h-[57px] grid grid-cols-2 gap-2 px-[10px] hover:bg-gray-100 !border-none">
+                <div className="view-tenancy-charges-tdata">3.20</div>
+                <div className="view-tenancy-charges-tdata">303.40</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

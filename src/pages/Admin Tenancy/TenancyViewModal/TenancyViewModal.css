@@ -1,9 +1,69 @@
+.modal-container {
+  width: 100%;
+  max-width: 1006px;
+  height: 862px;
+  border-radius: 6px;
+  background-color: #ffffff;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .modal-container {
+    width: 1006px;
+    max-width: 1006px;
+    height: 862px;
+    border-radius: 6px;
+    background-color: #ffffff;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-container {
+    position: absolute;
+    top: 90px;
+    z-index: 100;
+    width: calc(100vw - 20px);
+    margin: 0 10px;
+    left: 0;
+    right: 0;
+    max-height: calc(100vh - 90px);
+    overflow-y: auto;
+    border-radius: 0;
+    background-color: #F8F9FA;
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    position: static;
+    inset: auto;
+    display: block;
+    background-color: transparent;
+    opacity: 1;
+  }
+}
+
 .tenancy-view-modal-head {
   font-family: "Inter Tight";
   font-weight: 500;
   font-size: 21px;
   line-height: 24px;
   letter-spacing: 0px;
+}
+
+@media (max-width: 480px) {
+  .tenancy-view-modal-head {
+    display: none;
+  }
 }
 
 .tenancy-view-modal-close-btn {
@@ -14,6 +74,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+@media (max-width: 480px) {
+  .tenancy-view-modal-close-btn {
+    display: none;
+  }
 }
 
 .tenancy-view-modal-label {
@@ -41,6 +107,7 @@
   line-height: 24px;
   letter-spacing: 0px;
   color: #7f8898;
+  margin-top: 5px;
 }
 
 .view-tenancy-charges-tdata {
@@ -53,9 +120,57 @@
 }
 
 .additional-charges-heading {
-    font-family: 'Public Sans';
-    font-weight: 600;
-    font-size: 15px;
-    line-height: 24px;
-    letter-spacing: 0px;
+  font-family: 'Public Sans';
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 24px;
+  letter-spacing: 0px;
+}
+
+.desktop-table {
+  display: table;
+}
+
+@media (max-width: 480px) {
+  .desktop-table {
+    display: none;
+  }
+}
+
+.mobile-table {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .mobile-table {
+    display: block;
+  }
+
+  .mobile-table > div {
+    border-bottom: 1px solid #E9E9E9;
+    padding: 10px;
+  }
+
+  .mobile-table > div > .header-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+    padding: 10px 0;
+  }
+
+  .mobile-table .data-row {
+    background-color: #FFFFFF;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+    padding: 10px 0;
+  }
+
+  .mobile-table .header-row > div {
+    text-align: left;
+  }
+
+  .mobile-table .data-row > div {
+    text-align: left;
+  }
 }
