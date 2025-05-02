@@ -326,9 +326,9 @@ const Units = () => {
                             <div className="dropdown-label">STATUS</div>
                             <div className="dropdown-value">
                               <span
-                                className={`px-[10px] py-[5px] w-[53px] h-[24px] rounded-[4px] unit-status ${
+                                className={`px-[10px] py-[5px] h-[24px] rounded-[4px] unit-status ${
                                   unit.status === "Vacant"
-                                    ? "bg-[#E6F5EC] text-[#1C7D4D] !w-[55px]"
+                                    ? "bg-[#E6F5EC] text-[#1C7D4D] !w-[60px]"
                                     : "bg-[#E8EFF6] text-[#1458A2]"
                                 }`}
                               >
