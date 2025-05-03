@@ -42,7 +42,7 @@ const CreateUnitTypeModal = ({ isOpen, onClose }) => {
         <div className="flex justify-end">
           <button
             onClick={handleSave}
-            className="bg-[#2892CE] hover:bg-[#2276a7] text-white rounded w-[150px] h-[38px] modal-save-btn"
+            className="bg-[#2892CE] hover:bg-[#2276a7] text-white rounded w-[150px] h-[38px] modal-save-btn duration-200"
           >
             Save
           </button>

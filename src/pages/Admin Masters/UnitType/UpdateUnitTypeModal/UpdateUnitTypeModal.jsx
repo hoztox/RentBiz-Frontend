@@ -47,7 +47,7 @@ const UpdateUnitTypeModal = ({ isOpen, onClose, unit }) => {
         <div className="flex justify-end">
           <button
             onClick={handleUpdate}
-            className="bg-[#2892CE] hover:bg-[#2276a7] text-white rounded w-[150px] h-[38px] update-modal-save-btn"
+            className="bg-[#2892CE] hover:bg-[#2276a7] text-white rounded w-[150px] h-[38px] update-modal-save-btn duration-200"
           >
             Save
           </button>
