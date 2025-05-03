@@ -24,7 +24,7 @@ const CreateUnitTypeModal = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
       <div className="create-unit-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[262px] p-6">
         <h2 className="modal-head mt-4 mb-6">Create New Unit Type Master</h2>
-        <button onClick={onClose} className="absolute top-6 right-6 close-btn">
+        <button onClick={onClose} className="absolute top-6 right-6 close-btn duration-200">
           <img src={closeicon} alt="close" className="w-4 h-4" />
         </button>
 
