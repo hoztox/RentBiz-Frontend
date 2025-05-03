@@ -272,7 +272,7 @@ const Currency = () => {
                   <tr className="mobile-with-border border-b border-[#E9E9E9]">
                     <td colSpan={3} className="px-5">
                       <div className="currency-dropdown-content">
-                        <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div className="grid currency-grid-cols-2 gap-4 mb-6">
                           <div>
                             <div className="dropdown-label">CURRENCY</div>
                             <div className="dropdown-value">{currency.currency}</div>
@@ -282,7 +282,7 @@ const Currency = () => {
                             <div className="dropdown-value">{currency.code}</div>
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div className="grid currency-grid-cols-2 gap-4 mb-6">
                           <div>
                             <div className="dropdown-label">MINOR UNIT</div>
                             <div className="dropdown-value">{currency.minorUnit}</div>

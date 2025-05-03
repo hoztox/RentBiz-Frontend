@@ -343,7 +343,7 @@
     .currency-dropdown-content {
         width: 100%;
     }
-    .grid-cols-2 {
+    .currency-grid-cols-2 {
         grid-template-columns: repeat(3, 1fr);
         gap: 20px;
     }
