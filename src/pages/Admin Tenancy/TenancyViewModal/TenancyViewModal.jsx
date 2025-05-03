@@ -8,11 +8,11 @@ const TenancyViewModal = ({ isOpen, onClose }) => {
   return (
     <div
       onClick={onClose}
-      className="modal-overlay fixed inset-0 flex items-center justify-center transition-colors z-50"
+      className="view-modal-overlay fixed inset-0 flex items-center justify-center transition-colors z-50"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="modal-container bg-white rounded-md p-6 transition-all"
+        className="view-modal-container bg-white rounded-md p-6 transition-all"
       >
         <div className="flex justify-between items-center mt-[5px] mb-[30px]">
           <h2 className="tenancy-view-modal-head">Tenancy View</h2>
