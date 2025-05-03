@@ -31,23 +31,15 @@ const AddCurrencyModal = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
+  if (!isOpen) return null;
+
   return (
-    <div
-      onClick={onClose}
-      className={`fixed inset-0 flex items-center justify-center transition-colors z-50 ${
-        isOpen ? "visible bg-black/70" : "invisible"
-      }`}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        className={`bg-white rounded-md w-[523px] h-[514px] p-6 relative transition-all ${
-          isOpen ? "scale-100 opacity-100" : "scale-125 opacity-0"
-        }`}
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
+      <div className="add-document-modal-container relative bg-white rounded-md w-full max-w-[523px] h-auto md:h-[514px] p-6">
         <h2 className="currency-modal-head mt-4 mb-6">Create New Currency</h2>
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 mt-[9px] currency-modal-close-btn hover:bg-gray-100 duration-200"
+          className="absolute top-6 right-6 currency-modal-close-btn hover:bg-gray-100 duration-200"
         >
           <img src={closeicon} alt="close" className="w-4 h-4" />
         </button>
@@ -67,7 +59,7 @@ const AddCurrencyModal = ({ isOpen, onClose }) => {
                   e.target.classList.remove("choose-selected");
                 }
               }}
-              className={`w-full border border-[#E9E9E9] rounded-md mt-1 mb-2 px-3 py-2 appearance-none bg-transparent cursor-pointer focus:border-gray-300 duration-200 create-charges-selection ${
+              className={`w-full border border-[#E9E9E9] rounded-md mt-1 mb-2 px-3 py-2 appearance-none bg-transparent cursor-pointer focus:border-gray-300 duration-200 create-charges-selection input-style ${
                 country === "" ? "choose-selected" : ""
               }`}
               onFocus={() => setIsSelectOpen(true)}
@@ -95,29 +87,29 @@ const AddCurrencyModal = ({ isOpen, onClose }) => {
           </label>
           <input
             type="text"
-            className="w-full border border-[#E9E9E9] rounded-md mt-1 mb-2 px-3 py-2 focus:border-gray-300 duration-200"
+            className="w-full border border-[#E9E9E9] rounded-md mt-1 mb-2 px-3 py-2 focus:border-gray-300 duration-200 input-style"
             placeholder="Enter Currency"
             value={currency}
             onChange={(e) => setCurrency(e.target.value)}
           />
 
-          <label className="block pt-2 mb-2 text-[#201D1E] create-charges-label">
+          <label className="block pt-2 mb-2 text-[#201D1E] currency-modal-label">
             Code
           </label>
           <input
             type="text"
-            className="w-full border border-[#E9E9E9] rounded-md mt-1 px-3 py-2 focus:border-gray-300 duration-200"
+            className="w-full border border-[#E9E9E9] rounded-md mt-1 px-3 py-2 focus:border-gray-300 duration-200 input-style"
             placeholder="Enter Currency Code"
             value={currencyCode}
             onChange={(e) => setCurrencyCode(e.target.value)}
           />
 
-          <label className="block pt-2 mt-2 mb-2 text-[#201D1E] create-charges-label">
+          <label className="block pt-2 mt-2 mb-2 text-[#201D1E] currency-modal-label">
             Minor Unit
           </label>
           <input
             type="text"
-            className="w-full border border-[#E9E9E9] rounded-md mt-1 px-3 py-2 focus:border-gray-300 duration-200"
+            className="w-full border border-[#E9E9E9] rounded-md mt-1 px-3 py-2 focus:border-gray-300 duration-200 input-style"
             placeholder="Enter Minor Unit"
             value={minorUnit}
             onChange={(e) => setMinorUnit(e.target.value)}
@@ -127,7 +119,7 @@ const AddCurrencyModal = ({ isOpen, onClose }) => {
         <div className="flex justify-end">
           <button
             onClick={handleSave}
-            className="bg-[#2892CE] hover:bg-[#2276a7] text-white rounded w-[150px] h-[38px] create-charges-save-btn"
+            className="bg-[#2892CE] hover:bg-[#2276a7] text-white rounded w-[150px] h-[38px] modal-save-btn"
           >
             Save
           </button>
