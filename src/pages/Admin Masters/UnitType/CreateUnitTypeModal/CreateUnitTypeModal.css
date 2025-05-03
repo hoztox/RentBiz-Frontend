@@ -1,38 +1,150 @@
+/* Base styles */
 .modal-head {
-    font-family: "Inter Tight";
-    font-weight: 500;
-    font-size: 21px;
-    line-height: 24px;
-    letter-spacing: 0px;
+  font-family: "Inter Tight";
+  font-weight: 500;
+  font-size: 21px;
+  line-height: 24px;
+  letter-spacing: 0px;
+  color: #201d1e;
+}
+
+.close-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 60px;
+  border: 1px solid #e9e9e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+}
+
+.close-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.modal-label {
+  font-family: "Inter Tight";
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 100%;
+  letter-spacing: 0px;
+  color: #201d1e;
+}
+
+.input-style {
+  width: 100%;
+  height: 38px;
+  border-radius: 6px;
+  border: 1px solid #e9e9e9;
+  padding: 0 12px;
+  font-size: 14px;
+  color: #111827;
+  background-color: #ffffff;
+  outline: none;
+}
+
+input::placeholder {
+  font-family: "Inter Tight";
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 24px;
+  letter-spacing: 0;
+  color: #9ca3af;
+}
+
+.modal-save-btn {
+  font-family: "Inter Tight";
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive Styles */
+.create-unit-modal-container {
+  width: 100%;
+  max-width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  background-color: #f8f9fa;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .create-unit-modal-container {
+    width: 522px;
+    max-width: 522px;
+    height: 262px;
+    border-radius: 6px;
+    background-color: #ffffff;
   }
-  
+}
+
+@media (max-width: 480px) {
+  .create-unit-modal-container {
+    position: absolute;
+    top: 90px;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    margin: 0;
+    height: 100vh;
+    background-color: #f8f9fa;
+    padding: 20px;
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    position: static;
+    inset: auto;
+    display: block;
+    background-color: transparent;
+    opacity: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-head {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
   .close-btn {
-    width: 42px;
-    height: 42px;
-    border-radius: 60px;
-    border: 1px solid #e9e9e9;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: none !important;
   }
-  
-  .modal-label {
-    font-family: "Inter Tight";
-    font-weight: 400;
-    font-size: 13px;
-    line-height: 100%;
-    letter-spacing: 0px;
+}
+
+@media (min-width: 768px) {
+  .input-style {
+    width: 100%;
   }
-  
-  input::placeholder {
-    font-family: "Inter Tight";
-    color: #9ca3af;
+}
+
+@media (max-width: 480px) {
+  .input-style {
+    max-width: calc(100vw - 40px);
+    background-color: #f8f9fa;
   }
-  
+}
+
+@media (max-width: 480px) {
   .modal-save-btn {
-    font-family: "Inter Tight";
-    font-size: 16px;
-    line-height: 18px;
-    letter-spacing: 0.43px;
+    max-width: calc(100vw - 40px);
+    width: 100%;
   }
-  
+}
