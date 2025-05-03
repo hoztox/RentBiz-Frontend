@@ -21,15 +21,16 @@
   .view-modal-container {
     position: absolute;
     top: 90px;
-    z-index: 100;
-    width: calc(100vw - 20px);
-    margin: 0 10px;
     left: 0;
     right: 0;
+    width: 100vw;
+    margin: 0;
+    height: 100vh;
+    border-radius: 0;
+    z-index: 100;
+    background-color: #F8F9FA;
     max-height: calc(100vh - 90px);
     overflow-y: auto;
-    border-radius: 0;
-    background-color: #F8F9FA;
   }
 }
 
