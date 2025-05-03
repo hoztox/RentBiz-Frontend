@@ -1,13 +1,23 @@
+/* Base styles */
 .charges-head {
   font-family: "Inter Tight";
   font-size: 21px;
   font-style: normal;
   font-weight: 500;
   line-height: 24px;
-  color: #201d1e;
+  color: #201D1E;
 }
 
 .charges-search {
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  box-sizing: border-box;
+}
+
+.charges-search::placeholder {
   font-family: "Inter Tight";
   font-size: 15px;
   font-style: normal;
@@ -21,11 +31,12 @@
   font-style: normal;
   font-weight: 400;
   line-height: 24px;
-  color: #201d1e;
+  color: #201D1E;
+  box-sizing: border-box;
 }
 
 .add-new-master {
-  background-color: #2892ce;
+  background-color: #2892CE;
   color: white;
   font-family: "Inter Tight";
   font-size: 15px;
@@ -33,26 +44,30 @@
   font-weight: 400;
   line-height: 18px;
   letter-spacing: 0.43px;
+  box-sizing: border-box;
 }
+
 .add-new-master:hover {
   background-color: #076094;
 }
 
 .download-btn {
-  background-color: #f0f0f0;
+  background-color: #F0F0F0;
   font-family: "Inter Tight";
   font-size: 15px;
   font-style: normal;
   font-weight: 400;
   line-height: 18px;
   letter-spacing: 0.43px;
-  color: #4d4e4d;
+  color: #4D4E4D;
+  box-sizing: border-box;
 }
 
 .download-btn:hover {
-  background-color: #201d1e;
+  background-color: #201D1E;
   color: white;
 }
+
 .download-btn:hover .download-img {
   filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%)
     hue-rotate(47deg) brightness(118%) contrast(100%);
@@ -65,7 +80,7 @@
   font-weight: 500;
   line-height: normal;
   letter-spacing: 1px;
-  color: #818da0;
+  color: #818DA0;
 }
 
 .charges-data {
@@ -74,7 +89,7 @@
   font-style: normal;
   font-weight: 400;
   line-height: 22px;
-  color: #201d1e;
+  color: #201D1E;
 }
 
 .action-btn:hover {
@@ -88,6 +103,7 @@
   font-size: 21px;
   line-height: 21px;
   letter-spacing: 0px;
+  color: #201D1E;
 }
 
 .tax-section-thead {
@@ -97,7 +113,7 @@
   font-weight: 500;
   line-height: normal;
   letter-spacing: 1px;
-  color: #818da0;
+  color: #818DA0;
 }
 
 .tax-section-tdata {
@@ -106,7 +122,7 @@
   font-style: normal;
   font-weight: 400;
   line-height: 22px;
-  color: #201d1e;
+  color: #201D1E;
 }
 
 .tax-form-head {
@@ -115,13 +131,14 @@
   font-size: 18px;
   line-height: 27px;
   letter-spacing: 0.43px;
+  color: #201D1E;
 }
 
 .tax-form-close-btn {
   width: 32px;
   height: 32px;
   border-radius: 60px;
-  border: 1px solid #e9e9e9;
+  border: 1px solid #E9E9E9;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -133,11 +150,12 @@
   font-size: 13px;
   line-height: 100%;
   letter-spacing: 0px;
+  color: #201D1E;
 }
 
 input::placeholder {
   font-family: "Inter Tight";
-  color: #9ca3af;
+  color: #9CA3AF;
 }
 
 .tax-toggle-caption {
@@ -146,61 +164,347 @@ input::placeholder {
   font-size: 13px;
   line-height: 100%;
   letter-spacing: 0px;
+  color: #201D1E;
 }
 
 .tax-toggle-switch {
-    position: relative;
-    width: 46px;
-    height: 22px;
-    background-color: #ffffff;
-    border: 1px solid #e9e9e9;
-    border-radius: 20px;
+  position: relative;
+  width: 46px;
+  height: 22px;
+  background-color: #FFFFFF;
+  border: 1px solid #E9E9E9;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.tax-toggle-switch.active {
+  background-color: #074DB6;
+}
+
+.tax-toggle-circle {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background-color: #92BBF9;
+  border-radius: 50%;
+  transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+.tax-toggle-switch.active .tax-toggle-circle {
+  transform: translateX(24px);
+  background-color: #FFFFFF;
+}
+
+.tax-form-save-btn {
+  width: 150px;
+  height: 38px;
+  border-radius: 6px;
+  font-family: "Inter Tight";
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+  color: white;
+}
+
+.tax-form-add-btn {
+  width: 150px;
+  height: 38px;
+  border-radius: 6px;
+  border: 1px solid #2892CE;
+  font-family: "Inter Tight";
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+  color: #2892CE;
+}
+
+.collection-list-pagination {
+  font-family: "Inter Tight";
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  color: #4B465C80;
+}
+
+.pagination-btn {
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+  color: #8A94A3;
+}
+
+.page-no-btns {
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+}
+
+/* Responsive Styles (ordered from smallest to largest max-width) */
+@media (max-width: 360px) {
+  .charges-table {
+    margin-bottom: 50px;
+  }
+  .charges-search {
+    width: 150px; /* Adjusted for smaller screens */
+  }
+  .charges-selection {
+    width: 120px;
+  }
+  .download-btn {
+    width: 120px;
+  }
+  .charges-thead.charges-date-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+  .charges-data.charges-date-column {
+    padding-left: 14px;
+    padding-right: 0;
+    white-space: nowrap;
+  }
+  .pagination-btn {
+    font-size: 13px;
+    padding: 0px 10px;
+    height: 28px;
+  }
+  .page-no-btns {
+    font-size: 13px;
+    padding: 0px 10px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 375px) {
+  .charges-thead.charges-date-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+  .charges-data.charges-date-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 390px) {
+  .charges-thead.charges-date-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+  .charges-data.charges-date-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+  .charges-selection {
+    width: 120px;
+  }
+  .download-btn {
+    width: 120px;
+  }
+}
+
+@media (max-width: 414px) {
+  .charges-thead {
+    font-size: 11px;
+  }
+  .charges-thead.charges-date-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+  .charges-data.charges-date-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+  .charges-selection {
+    width: 120px;
+  }
+  .download-btn {
+    width: 120px;
+  }
+}
+
+@media (max-width: 428px) {
+  .charges-thead.charges-date-column {
+    padding-left: 51px;
+    padding-right: 0;
+  }
+  .charges-data.charges-date-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .charges-table {
+    max-width: calc(100vw - 40px);
+    margin-bottom: 50px;
+  }
+  .charges-table-header {
+    flex-direction: column;
+    border-bottom: none;
+    align-items: flex-start;
+  }
+  .charges-head {
+    display: none;
+  }
+  .charges-inputs-container {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .charges-inputs-container > div:first-child {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+    flex-wrap: nowrap;
+  }
+  .charges-search {
+    width: 100%;
+  }
+  .charges-selection {
+    width: 100%;
+    margin-left: 0px;
+  }
+  .action-buttons-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 10px;
+    margin-top: 5px;
+  }
+  .add-new-master {
+    width: 169px;
+    font-size: 14px;
+  }
+  .download-btn {
+    width: 122px;
+  }
+  .desktop-only {
+    display: none;
+  }
+  .pagination-container {
+    flex-direction: column;
+    height: 97.53px;
+    justify-content: center;
+    gap: 16px;
+    align-items: center;
+  }
+  .collection-list-pagination {
+    text-align: center;
+  }
+  .pagination-buttons {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    overflow-y: hidden;
+  }
+  .charges-dropdown-field {
+    background-color: #DEDEDE;
+    border-radius: 100%;
+    width: 20px;
+    height: 20px;
+    margin-right: 15px;
     display: flex;
     align-items: center;
-    padding: 3px;
-    cursor: pointer;
-    transition: background-color 0.3s ease-in-out;
+    justify-content: center;
+    transition: background-color 0.3s ease;
   }
-  
-  .tax-toggle-switch.active {
-    background-color: #074db6; /* Matches the circle's original color */
+  .charges-dropdown-field.active {
+    background-color: #254396;
   }
-  
-  .tax-toggle-circle {
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    background-color: #92BBF9; /* Circle's original color when inactive */
-    border-radius: 50%;
-    transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
+  .charges-dropdown-img {
+    width: 10px;
+    transition: transform 0.3s ease;
   }
-  
-  .tax-toggle-switch.active .tax-toggle-circle {
-    transform: translateX(24px);
-    background-color: #ffffff; /* Circle turns white when active */
+  .charges-dropdown-field.active .charges-dropdown-img {
+    transform: rotate(180deg);
   }
-
-  .tax-form-save-btn {
-    width: 150px;
-    height: 38px;
-    border-radius: 6px;
-    font-family: 'Inter Tight';
+  .charges-table-row-head {
+    height: auto;
+    background-color: #F7F7F7;
+    border-bottom: none;
+  }
+  .charges-thead {
+    padding-right: 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .charges-id-column {
+    padding-right: 10px;
+  }
+  .charges-data.charges-date-column {
+    white-space: nowrap;
+    padding-left: 68px;
+    padding-right: 0;
+  }
+  .dropdown-label {
+    font-family: "Inter Tight";
+    font-size: 12px;
+    font-style: normal;
     font-weight: 500;
-    font-size: 16px;
-    line-height: 18px;
-    letter-spacing: 0.43px;
-    color: white;
+    line-height: normal;
+    letter-spacing: 1px;
+    color: #818DA0;
+    margin-bottom: 4px;
+    padding-left: 0;
   }
-
-  .tax-form-add-btn {
-    width: 150px;
-    height: 38px;
-    border-radius: 6px;
-    border: 1px solid #2892CE;
-    font-family: 'Inter Tight';
+  .dropdown-value {
+    font-family: "Inter Tight";
+    font-size: 13px;
+    font-style: normal;
     font-weight: 400;
-    font-size: 15px;
-    line-height: 18px;
-    letter-spacing: 0.43px;
-    color: #2892CE;
+    line-height: 22px;
+    color: #201D1E;
   }
+  .charges-dropdown-content {
+    width: 100%;
+  }
+  .charges-dropdown-content .grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 9px 16px; /* 9px vertical, 16px horizontal */
+    margin-bottom: 16px;
+  }
+  .dropdown-value {
+    word-break: break-word;
+    padding-right: 0px;
+  }
+  .flex.items-center.gap-2 {
+    gap: 10px;
+  }
+  .mobile-no-border {
+    border-bottom: none !important;
+  }
+  .mobile-with-border {
+    border-bottom: 1px solid #E9E9E9;
+  }
+}
+
+@media (min-width: 481px) {
+  .charges-dropdown-field,
+  .charges-dropdown-content {
+    display: none;
+  }
+}
+
+@media (max-width: 394px) {
+  .charges-thead {
+    font-size: 13px;
+  }
+  .charges-data {
+    font-size: 13px;
+  }
+}

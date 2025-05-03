@@ -1,51 +1,156 @@
-.update-charges-head {
-    font-family: "Inter Tight";
-    font-weight: 500;
-    font-size: 21px;
-    line-height: 24px;
-    letter-spacing: 0px;
+/* Base styles */
+.modal-head {
+  font-family: "Inter Tight";
+  font-weight: 500;
+  font-size: 21px;
+  line-height: 24px;
+  letter-spacing: 0px;
+  color: #201D1E;
+}
+
+.close-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 60px;
+  border: 1px solid #E9E9E9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #FFFFFF;
+}
+
+.close-btn:hover {
+  background-color: #F0F0F0;
+}
+
+.modal-label {
+  font-family: "Inter Tight";
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 100%;
+  letter-spacing: 0px;
+  color: #201D1E;
+}
+
+.input-style {
+  width: 100%;
+  height: 38px;
+  border-radius: 6px;
+  border: 1px solid #E9E9E9;
+  padding: 0 12px;
+  font-size: 14px;
+  color: #111827;
+  background-color: #FFFFFF;
+  outline: none;
+}
+
+input::placeholder,
+select.choose-selected {
+  font-family: "Inter Tight";
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 24px;
+  letter-spacing: 0;
+  color: #9CA3AF;
+}
+
+.modal-save-btn {
+  font-family: "Inter Tight";
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.choose-selected {
+  color: #9CA3AF;
+  font-family: "Inter Tight";
+}
+
+/* Responsive Styles */
+.update-charges-modal-container {
+  width: 100%;
+  max-width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  background-color: #F8F9FA;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .update-charges-modal-container {
+    width: 522px;
+    max-width: 522px;
+    height: 427px;
+    border-radius: 6px;
+    background-color: #FFFFFF;
   }
-  
-  .update-charges-close-btn {
-    width: 42px;
-    height: 42px;
-    border-radius: 60px;
-    border: 1px solid #e9e9e9;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+}
+
+@media (max-width: 480px) {
+  .update-charges-modal-container {
+    position: absolute;
+    top: 90px;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    margin: 0;
+    height: 100vh;
+    background-color: #F8F9FA;
+    padding: 20px;
   }
-  
-  .update-charges-label {
-    font-family: "Inter Tight";
-    font-weight: 400;
-    font-size: 13px;
-    line-height: 100%;
-    letter-spacing: 0px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    position: static;
+    inset: auto;
+    display: block;
+    background-color: transparent;
+    opacity: 1;
   }
-  
-  input::placeholder {
-      font-family: "Inter Tight";
-      color: #9CA3AF;
+}
+
+@media (max-width: 480px) {
+  .modal-head {
+    display: none;
   }
-  
-  .update-charges-selection {
-      font-family: "Inter Tight";
-      font-size: 15px;
-      font-style: normal;
-      font-weight: 400;
-      line-height: 24px;
-      color: #201D1E;
+}
+
+@media (max-width: 480px) {
+  .close-btn {
+    display: none;
   }
-  
-  .update-charges-save-btn {
-      font-family: "Inter Tight";
-      font-size: 16px;
-      line-height: 18px;
-      letter-spacing: 0.43px;
+}
+
+@media (min-width: 768px) {
+  .input-style {
+    width: 100%;
   }
-  
-  .choose-selected {
-      color: #9CA3AF;
-        font-family: 'Inter Tight';
+}
+
+@media (max-width: 480px) {
+  .input-style {
+    max-width: calc(100vw - 40px);
+    background-color: #F8F9FA;
   }
+}
+
+@media (max-width: 480px) {
+  .modal-save-btn {
+    max-width: calc(100vw - 40px);
+    width: 100%;
+  }
+}

@@ -31,68 +31,67 @@ const CreateChargesModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white rounded-md w-[522px] h-[427px] p-6 relative">
-        <h2 className="create-charges-head mt-4 mb-6">
-          Create New Charges Master
-        </h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
+      <div className="create-charges-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[427px] p-6">
+        <h2 className="modal-head mt-4 mb-6">Create New Charges Master</h2>
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 mt-[9px] create-charges-close-btn"
+          className="absolute top-6 right-6 close-btn duration-200"
         >
           <img src={closeicon} alt="close" className="w-4 h-4" />
         </button>
 
         <div className="mb-6">
-          <label className="block pt-2 mb-2 text-[#201D1E] create-charges-label">
+          <label className="block pt-2 mb-2 text-[#201D1E] modal-label">
             Name
           </label>
           <input
             type="text"
-            className="w-full border border-[#E9E9E9] rounded-md mt-1 mb-2 px-3 py-2 focus:border-gray-300 duration-200"
+            className="w-full border border-[#E9E9E9] rounded-md mt-1 mb-2 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500 input-style"
             placeholder="Enter Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
 
-          <label className="block pt-2 mb-2 text-[#201D1E] create-charges-label">
+          <label className="block pt-2 mb-2 text-[#201D1E] modal-label">
             Charge Code Type
           </label>
-          <select
-            value={chargeType}
-            onChange={(e) => {
-              setChargeType(e.target.value);
-              // Add or remove a class based on the value
-              if (e.target.value === "") {
-                e.target.classList.add("choose-seleted");
-              } else {
-                e.target.classList.remove("choose-selected");
-              }
-            }}
-            className={`w-full border border-[#E9E9E9] rounded-md mt-1 mb-2 px-3 py-2 appearance-none bg-transparent cursor-pointer focus:border-gray-300 duration-200 create-charges-selection ${
-              chargeType === "" ? "choose-selected" : ""
-            }`}
-            onFocus={() => setIsSelectOpen(true)}
-            onBlur={() => setIsSelectOpen(false)}
-          >
-            <option value="" disabled hidden>
-              Choose
-            </option>
-            <option value="all">All</option>
-            <option value="deposit">Deposit</option>
-          </select>
-          <ChevronDown
-            className={`absolute right-[2.25rem] top-[216px] w-[20px] h-[20px] transition-transform duration-300 ${
-              isSelectOpen ? "rotate-180" : "rotate-0"
-            }`}
-          />
+          <div className="relative">
+            <select
+              value={chargeType}
+              onChange={(e) => {
+                setChargeType(e.target.value);
+                if (e.target.value === "") {
+                  e.target.classList.add("choose-selected");
+                } else {
+                  e.target.classList.remove("choose-selected");
+                }
+              }}
+              className={`w-full border border-[#E9E9E9] rounded-md mt-1 mb-2 px-3 py-2 appearance-none bg-transparent cursor-pointer focus:outline-none focus:ring-2 focus:ring-gray-500 input-style ${
+                chargeType === "" ? "choose-selected" : ""
+              }`}
+              onFocus={() => setIsSelectOpen(true)}
+              onBlur={() => setIsSelectOpen(false)}
+            >
+              <option value="" disabled hidden>
+                Choose
+              </option>
+              <option value="all">All</option>
+              <option value="deposit">Deposit</option>
+            </select>
+            <ChevronDown
+              className={`absolute right-3 top-3 w-[18px] h-[18px] md:w-[20px] md:h-[20px] transition-transform duration-300 ${
+                isSelectOpen ? "rotate-180" : "rotate-0"
+              }`}
+            />
+          </div>
 
-          <label className="block pt-2 mb-2 text-[#201D1E] create-charges-label">
+          <label className="block pt-2 mb-2 text-[#201D1E] modal-label">
             Vat Percentage
           </label>
           <input
             type="number"
-            className="w-full border border-[#E9E9E9] rounded-md mt-1 mb-2 px-3 py-2 focus:outline-non focus:border-gray-300 duration-200"
+            className="w-full border border-[#E9E9E9] rounded-md mt-1 mb-2 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500 input-style"
             placeholder="0"
             value={percentage}
             onChange={(e) => setPercentage(e.target.value)}
@@ -102,7 +101,7 @@ const CreateChargesModal = ({ isOpen, onClose }) => {
         <div className="flex justify-end">
           <button
             onClick={handleSave}
-            className="bg-[#2892CE] hover:bg-[#2276a7] text-white rounded w-[150px] h-[38px] create-charges-save-btn"
+            className="bg-[#2892CE] hover:bg-[#2276a7] text-white rounded w-[150px] h-[38px] modal-save-btn duration-200"
           >
             Save
           </button>
