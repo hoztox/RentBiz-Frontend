@@ -13,7 +13,6 @@ const Units = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-
   const [unitModalOpen, setUnitModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
 
@@ -143,6 +142,7 @@ const Units = () => {
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
   return (
     <div className="border border-[#E9E9E9] rounded-md unit-table">
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] unit-table-header">
@@ -174,9 +174,9 @@ const Units = () => {
               />
             </div>
           </div>
-          <div className="flex gap-[10px] action-buttons-container">
+          <div className="flex gap-[10px] unit-action-buttons-container">
             <button
-              className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md add-new-unit duration-200"
+              className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md unit-add-new-unit duration-200"
               onClick={openUnitModal}
             >
               Add New Unit
@@ -186,18 +186,18 @@ const Units = () => {
                 className="w-[15px] h-[15px]"
               />
             </button>
-            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 download-btn">
+            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 unit-download-btn">
               Download
               <img
                 src={downloadicon}
                 alt="Download Icon"
-                className="w-[15px] h-[15px] download-img"
+                className="w-[15px] h-[15px] unit-download-img"
               />
             </button>
           </div>
         </div>
       </div>
-      <div className="desktop-only">
+      <div className="unit-desktop-only">
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-[#E9E9E9] h-[57px]">
@@ -225,7 +225,7 @@ const Units = () => {
                 <td className="pl-12 pr-5 text-left unit-data">{unit.type}</td>
                 <td className="px-5 text-left unit-data">
                   <span
-                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
+                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] unit-status ${
                       unit.status === "Vacant"
                         ? "bg-[#E6F5EC] text-[#1C7D4D]"
                         : "bg-[#E8EFF6] text-[#1458A2]"
@@ -239,14 +239,14 @@ const Units = () => {
                     <img
                       src={editicon}
                       alt="Edit"
-                      className="w-[18px] h-[18px] action-btn duration-200"
+                      className="w-[18px] h-[18px] unit-action-btn duration-200"
                     />
                   </button>
                   <button>
                     <img
                       src={deletesicon}
-                      alt="Deletes"
-                      className="w-[18px] h-[18px] action-btn duration-200"
+                      alt="Delete"
+                      className="w-[18px] h-[18px] unit-action-btn duration-200"
                     />
                   </button>
                 </td>
@@ -260,7 +260,7 @@ const Units = () => {
           <thead>
             <tr className="unit-table-row-head">
               <th className="px-5 text-left unit-thead unit-id-column">ID</th>
-              <th className="px-5 text-left unit-thead">DATE</th>
+              <th className="px-5 text-left unit-thead unit-date-column">DATE</th>
               <th className="px-5 text-right unit-thead"></th>
             </tr>
           </thead>
@@ -270,14 +270,12 @@ const Units = () => {
                 <tr
                   className={`${
                     expandedRows[unit.id]
-                      ? "mobile-no-border"
-                      : "mobile-with-border"
+                      ? "unit-mobile-no-border"
+                      : "unit-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left unit-data">{unit.id}</td>
-                  <td className="px-5 text-left unit-data date-column">
-                    {unit.date}
-                  </td>
+                  <td className="px-5 text-left unit-data unit-id-column">{unit.id}</td>
+                  <td className="px-5 text-left unit-data unit-date-column">{unit.date}</td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`unit-dropdown-field ${
@@ -296,61 +294,59 @@ const Units = () => {
                   </td>
                 </tr>
                 {expandedRows[unit.id] && (
-                  <tr className="mobile-with-border border-b border-[#E9E9E9]">
+                  <tr className="unit-mobile-with-border border-b border-[#E9E9E9]">
                     <td colSpan={3} className="px-5">
                       <div className="unit-dropdown-content">
-                        <div className="grid grid-cols-2 gap-9 mb-6">
-                          <div>
-                            <div className="dropdown-label">NAME</div>
-                            <div className="dropdown-value">{unit.name}</div>
+                        <div className="unit-grid unit-grid-cols-2">
+                          <div className="unit-grid-item">
+                            <div className="unit-dropdown-label">NAME</div>
+                            <div className="unit-dropdown-value">{unit.name}</div>
                           </div>
-                          <div className="ml-[5px]">
-                            <div className="dropdown-label">BUILDING</div>
-                            <div className="dropdown-value">
-                              {unit.building}
-                            </div>
+                          <div className="unit-grid-item">
+                            <div className="unit-dropdown-label">BUILDING</div>
+                            <div className="unit-dropdown-value">{unit.building}</div>
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-9 mb-6">
-                          <div>
-                            <div className="dropdown-label">ADDRESS</div>
-                            <div className="dropdown-value">{unit.address}</div>
+                        <div className="unit-grid unit-grid-cols-2">
+                          <div className="unit-grid-item">
+                            <div className="unit-dropdown-label">ADDRESS</div>
+                            <div className="unit-dropdown-value">{unit.address}</div>
                           </div>
-                          <div className="ml-[5px]">
-                            <div className="dropdown-label">TYPE</div>
-                            <div className="dropdown-value">{unit.type}</div>
+                          <div className="unit-grid-item">
+                            <div className="unit-dropdown-label">TYPE</div>
+                            <div className="unit-dropdown-value">{unit.type}</div>
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-9 mb-5">
-                          <div>
-                            <div className="dropdown-label">STATUS</div>
-                            <div className="dropdown-value">
+                        <div className="unit-grid unit-grid-cols-2">
+                          <div className="unit-grid-item">
+                            <div className="unit-dropdown-label">STATUS</div>
+                            <div className="unit-dropdown-value">
                               <span
                                 className={`px-[10px] py-[5px] h-[24px] rounded-[4px] unit-status ${
                                   unit.status === "Vacant"
                                     ? "bg-[#E6F5EC] text-[#1C7D4D] !w-[60px]"
-                                    : "bg-[#E8EFF6] text-[#1458A2]"
+                                    : "bg-[#E8EFF6] text-[#1458A2] !w-[75px]"
                                 }`}
                               >
                                 {unit.status}
                               </span>
                             </div>
                           </div>
-                          <div className="ml-[5px]">
-                            <div className="dropdown-label">ACTION</div>
-                            <div className="dropdown-value flex items-center gap-2 mt-[10px]">
+                          <div className="unit-grid-item unit-action-column">
+                            <div className="unit-dropdown-label">ACTION</div>
+                            <div className="unit-dropdown-value unit-flex unit-items-center unit-gap-2">
                               <button>
                                 <img
                                   src={editicon}
                                   alt="Edit"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
+                                  className="w-[18px] h-[18px] unit-action-btn duration-200"
                                 />
                               </button>
                               <button>
                                 <img
                                   src={deletesicon}
-                                  alt="Deletes"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
+                                  alt="Delete"
+                                  className="w-[18px] h-[18px] unit-action-btn duration-200 ml-3"
                                 />
                               </button>
                             </div>
@@ -365,16 +361,14 @@ const Units = () => {
           </tbody>
         </table>
       </div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-3 md:px-5 pagination-container">
-        <span className="collection-list-pagination pagination-text">
-          Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-          {filteredData.length} entries
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-3 md:px-5 unit-pagination-container">
+        <span className="unit-collection-list-pagination unit-pagination-text">
+          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
+          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
         </span>
-        <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto pagination-buttons">
+        <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto unit-pagination-buttons">
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer unit-pagination-btn"
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
@@ -382,7 +376,7 @@ const Units = () => {
           </button>
           {startPage > 1 && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 unit-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(1)}
             >
               1
@@ -392,7 +386,7 @@ const Units = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 unit-page-no-btns ${
                 currentPage === startPage + i
                   ? "bg-[#1458A2] text-white"
                   : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
@@ -402,19 +396,17 @@ const Units = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && (
-            <span className="px-2 flex items-center">...</span>
-          )}
+          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
           {endPage < totalPages && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 unit-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(totalPages)}
             >
               {totalPages}
             </button>
           )}
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer unit-pagination-btn"
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(currentPage + 1)}
           >
@@ -425,7 +417,7 @@ const Units = () => {
       <AddUnitModal
         open={unitModalOpen}
         onClose={closeUnitModal}
-        title="Create Building"
+        title="Create Unit"
       />
     </div>
   );

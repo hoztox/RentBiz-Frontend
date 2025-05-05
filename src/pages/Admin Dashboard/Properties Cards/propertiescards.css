@@ -1,38 +1,42 @@
 .properties-head {
-    font-family: 'Inter Tight';
-    font-size: 21px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: normal;
-    color: #201D1E;
+  font-family: "Inter Tight";
+  font-size: 21px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  color: #201d1e;
 }
 
-.cards-title{
-    font-family: 'Inter Tight';
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    color: #677487;
+.cards-title {
+  font-family: "Inter Tight";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  color: #677487;
 }
 
 .cards-count {
-    font-family: 'Inter Tight';
-    font-size: 21px;
-    font-style: normal;
-    font-weight: 600;
-    line-height: normal;
-    color: #1458A2;
+  font-family: "Inter Tight";
+  font-size: 21px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  color: #1458a2;
 }
 
-@media(max-width:480px) {
-    .properties-cards {
-        width: 100%;
-    }
+@media (max-width: 480px) {
+  .properties-cards {
+    width: 100%;
+  }
+
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
 }
 
-@media(max-width:370px) {
-    .properties-head {
-        font-size: 20px;
-    }
+@media (max-width: 370px) {
+  .properties-head {
+    font-size: 20px;
+  }
 }

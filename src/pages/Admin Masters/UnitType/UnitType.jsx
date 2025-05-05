@@ -106,7 +106,7 @@ const UnitType = () => {
               />
             </div>
           </div>
-          <div className="flex gap-[10px] action-buttons-container">
+          <div className="flex gap-[10px] utype-action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md add-new-master duration-200"
               onClick={openCreateModal}
@@ -114,12 +114,12 @@ const UnitType = () => {
               Add New Master
               <img src={plusicon} alt="plus icon" className="w-[15px] h-[15px]" />
             </button>
-            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 download-btn">
+            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 utype-download-btn">
               Download
               <img
                 src={downloadicon}
                 alt="Download Icon"
-                className="w-[15px] h-[15px] download-img"
+                className="w-[15px] h-[15px] utype-download-img"
               />
             </button>
           </div>
@@ -127,7 +127,7 @@ const UnitType = () => {
       </div>
 
       {/* Content Section */}
-      <div className="desktop-only">
+      <div className="utype-desktop-only">
         <div className="flex gap-4 p-5">
           {/* Table Section */}
           <div className="w-[60%] border border-gray-200 rounded-md">
@@ -156,19 +156,19 @@ const UnitType = () => {
                       <td className="px-5 text-left unit-data">{unit.id}</td>
                       <td className="px-5 text-left unit-data">{unit.entriDate}</td>
                       <td className="pl-5 text-left unit-data w-[22%]">{unit.name}</td>
-                      <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
+                      <td className="px-5 utype-flex-gap-23 h-[57px]">
                         <button onClick={() => openUpdateModal(unit)}>
                           <img
                             src={editicon}
                             alt="Edit"
-                            className="w-[18px] h-[18px] action-btn duration-200"
+                            className="w-[18px] h-[18px] utype-action-btn duration-200"
                           />
                         </button>
                         <button>
                           <img
                             src={deleteicon}
                             alt="Delete"
-                            className="w-[18px] h-[18px] action-btn duration-200"
+                            className="w-[18px] h-[18px] utype-delete-btn duration-200"
                           />
                         </button>
                       </td>
@@ -243,8 +243,8 @@ const UnitType = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="unit-table-row-head">
-              <th className="px-5 w-[74px] text-left unit-thead unit-id-column">ID</th>
-              <th className="px-3 text-center unit-thead unit-entry-date-column">ENTRY DATE</th>
+              <th className="px-5 w-[74px] text-left unit-thead utype-id-column">ID</th>
+              <th className="px-3 text-center unit-thead utype-entry-date-column">ENTRY DATE</th>
               <th className="px-5 text-right unit-thead"></th>
             </tr>
           </thead>
@@ -253,11 +253,11 @@ const UnitType = () => {
               <React.Fragment key={unit.id}>
                 <tr
                   className={`${
-                    expandedRows[unit.id] ? "mobile-no-border" : "mobile-with-border"
+                    expandedRows[unit.id] ? "utype-mobile-no-border" : "utype-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left unit-data">{unit.id}</td>
-                  <td className="px-3 text-center unit-data unit-entry-date-column">{unit.entriDate}</td>
+                  <td className="px-3 text-center unit-data utype-entry-date-column">{unit.entriDate}</td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`unit-dropdown-field ${
@@ -276,29 +276,29 @@ const UnitType = () => {
                   </td>
                 </tr>
                 {expandedRows[unit.id] && (
-                  <tr className="mobile-with-border border-b border-[#E9E9E9]">
+                  <tr className="utype-mobile-with-border border-b border-[#E9E9E9]">
                     <td colSpan={3} className="px-5">
                       <div className="unit-dropdown-content">
-                        <div className="grid grid-cols-2 gap-4 mb-6">
+                        <div className="grid utype-grid-cols-2 gap-4 mb-6">
                           <div>
-                            <div className="dropdown-label">NAME</div>
-                            <div className="dropdown-value">{unit.name}</div>
+                            <div className="utype-dropdown-label">NAME</div>
+                            <div className="utype-dropdown-value">{unit.name}</div>
                           </div>
                           <div>
-                            <div className="dropdown-label">ACTION</div>
-                            <div className="dropdown-value flex items-center gap-2">
+                            <div className="utype-dropdown-label">ACTION</div>
+                            <div className="utype-dropdown-value utype-flex-items-center-gap-2">
                               <button onClick={() => openUpdateModal(unit)}>
                                 <img
                                   src={editicon}
                                   alt="Edit"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
+                                  className="w-[18px] h-[18px] utype-action-btn duration-200"
                                 />
                               </button>
                               <button>
                                 <img
                                   src={deleteicon}
                                   alt="Delete"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
+                                  className="w-[18px] h-[18px] utype-delete-btn duration-200"
                                 />
                               </button>
                             </div>
@@ -315,16 +315,16 @@ const UnitType = () => {
       </div>
 
       {/* Pagination */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-2 md:px-5 pagination-container">
-        <span className="collection-list-pagination">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-2 md:px-5 utype-pagination-container">
+        <span className="utype-collection-list-pagination">
           Showing{" "}
           {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
           to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
           {filteredData.length} entries
         </span>
-        <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto pagination-buttons">
+        <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto utype-pagination-buttons">
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer utype-pagination-btn"
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
@@ -332,7 +332,7 @@ const UnitType = () => {
           </button>
           {startPage > 1 && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 utype-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(1)}
             >
               1
@@ -342,7 +342,7 @@ const UnitType = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 utype-page-no-btns ${
                 currentPage === startPage + i
                   ? "bg-[#1458A2] text-white"
                   : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
@@ -357,14 +357,14 @@ const UnitType = () => {
           )}
           {endPage < totalPages && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 utype-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(totalPages)}
             >
               {totalPages}
             </button>
           )}
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer utype-pagination-btn"
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(currentPage + 1)}
           >

@@ -1,465 +1,459 @@
-.additional-charges-head {
-  font-family: "Inter Tight";
-  font-size: 21px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 24px;
-  color: #201d1e;
-}
-
-.additional-charges-search {
-  font-family: "Inter Tight";
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 24px;
-  box-sizing: border-box;
-}
-
-.additional-charges-search::placeholder {
-  font-family: "Inter Tight";
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 24px;
-}
-
-.additional-charges-selection {
-  font-family: "Public Sans", sans-serif;
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 24px;
-  color: #201d1e;
-  box-sizing: border-box;
-}
-
-.add-charges {
-  background-color: #2892ce;
-  color: white;
-  font-family: "Inter Tight";
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 18px;
-  letter-spacing: 0.43px;
-  box-sizing: border-box;
-}
-
-.add-charges:hover {
-  background-color: #076094;
-}
-
-.download-btn {
-  background-color: #f0f0f0;
-  font-family: "Inter Tight";
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 18px;
-  letter-spacing: 0.43px;
-  color: #4d4e4d;
-  box-sizing: border-box;
-}
-
-.download-btn:hover {
-  background-color: #201d1e;
-  color: white;
-}
-
-.download-btn:hover .download-img {
-  filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%)
-    hue-rotate(47deg) brightness(118%) contrast(100%);
-}
-
-.additional-charges-thead {
-  font-family: "Inter Tight";
-  font-size: 13px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: normal;
-  letter-spacing: 1px;
-  color: #818da0;
-}
-
-.additional-charges-data {
-  font-family: "Inter Tight";
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 22px;
-  color: #201d1e;
-}
-
-.action-btn:hover {
-  filter: brightness(0) saturate(100%) invert(8%) sepia(7%) saturate(582%)
-    hue-rotate(289deg) brightness(100%) contrast(91%);
-}
-
-.collection-list-pagination {
-  font-family: "Inter Tight";
-  font-size: 13px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 20px;
-  color: #4b465c80;
-}
-
-.pagination-btn {
-  font-family: "Inter Tight";
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 18px;
-  letter-spacing: 0.43px;
-  color: #8a94a3;
-}
-
-.page-no-btns {
-  font-family: "Inter Tight";
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 18px;
-  letter-spacing: 0.43px;
-}
-
-.action-buttons-container {
-  display: flex;
-  gap: 10px;
-}
-
-/* Responsive Styles (ordered from smallest to largest max-width) */
-@media (max-width: 360px) {
-  .additional-charges-table {
-    margin-bottom: 50px;
-  }
-  .additional-charges-table-header {
-    padding: 16px;
-  }
-  .additional-charges-search {
-    width: 150px;
-  }
-  .additional-charges-selection {
-    width: 120px;
-  }
-  .action-buttons-container .add-charges {
-    width: calc(58% - 5px);
-  }
-  .action-buttons-container .download-btn {
-    width: calc(42% - 5px);
-  }
-  .additional-charges-thead.charge-id-column,
-  .additional-charges-thead.date-column {
-    padding-left: 14px;
-    padding-right: 0;
-  }
-  .additional-charges-data.charge-id-column,
-  .additional-charges-data.date-column {
-    padding-left: 14px;
-    padding-right: 0;
-    white-space: nowrap;
-  }
-  .pagination-btn {
-    font-size: 13px;
-    padding: 0px 10px;
-    height: 28px;
-  }
-  .page-no-btns {
-    font-size: 13px;
-    padding: 0px 10px;
-    height: 28px;
-  }
-  .additional-charges-dropdown-content .dropdown-content-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 375px) {
-  .additional-charges-thead.charge-id-column,
-  .additional-charges-thead.date-column {
-    padding-left: 14px;
-    padding-right: 0;
-  }
-  .additional-charges-data.charge-id-column,
-  .additional-charges-data.date-column {
-    padding-left: 14px;
-    padding-right: 0;
-  }
-}
-
-@media (max-width: 390px) {
-  .additional-charges-thead.charge-id-column,
-  .additional-charges-thead.date-column {
-    padding-left: 14px;
-    padding-right: 0;
-  }
-  .additional-charges-data.charge-id-column,
-  .additional-charges-data.date-column {
-    padding-left: 14px;
-    padding-right: 0;
-  }
-  .additional-charges-selection {
-    width: 120px;
-  }
-  .download-btn {
-    width: 120px;
-  }
-}
-
-@media (max-width: 414px) {
-  .additional-charges-thead {
-    font-size: 11px;
-  }
-  .additional-charges-thead.charge-id-column,
-  .additional-charges-thead.date-column {
-    padding-left: 14px;
-    padding-right: 0;
-  }
-  .additional-charges-data.charge-id-column,
-  .additional-charges-data.date-column {
-    padding-left: 14px;
-    padding-right: 0;
-  }
-  .additional-charges-selection {
-    width: 120px;
-  }
-  .download-btn {
-    width: 120px;
-  }
-}
-
-@media (max-width: 428px) {
-  .additional-charges-thead.charge-id-column,
-  .additional-charges-thead.date-column {
-    padding-left: 30px;
-    padding-right: 0;
-  }
-  .additional-charges-data.charge-id-column,
-  .additional-charges-data.date-column {
-    padding-left: 14px;
-    padding-right: 0;
-  }
-}
-
-@media (max-width: 480px) {
-  .additional-charges-table {
-    max-width: calc(100vw - 40px);
-    margin-bottom: 50px;
-  }
-  .additional-charges-table-header {
-    flex-direction: column;
-    border-bottom: none;
-    align-items: flex-start;
-    padding: 20px;
-  }
-  .additional-charges-head {
-    display: none;
-  }
-  .additional-charges-inputs-container {
-    flex-direction: column;
-    width: 100%;
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-  .additional-charges-inputs-container > div:first-child {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    width: 100%;
-    flex-wrap: nowrap;
-  }
-  .additional-charges-search {
-    width: 100%;
-  }
-  .additional-charges-selection {
-    width: 100%;
-  }
-  .action-buttons-container {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    gap: 10px;
-    margin-top: 5px;
-  }
-  .add-charges {
-    width: 169px;
-    font-size: 14px;
-  }
-  .download-btn {
-    width: 122px;
-  }
-  .desktop-only {
-    display: none;
-  }
-  .pagination-container {
-    flex-direction: column;
-    height: 97.53px;
-    justify-content: center;
-    gap: 16px;
-    align-items: center;
-  }
-  .collection-list-pagination {
-    text-align: center;
-  }
-  .pagination-buttons {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    overflow-y: hidden;
-  }
-  .additional-charges-dropdown-field {
-    background-color: #dedede;
-    border-radius: 100%;
-    width: 20px;
-    height: 20px;
-    margin-right: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.3s ease;
-  }
-  .additional-charges-dropdown-field.active {
-    background-color: #254396;
-  }
-  .additional-charges-dropdown-img {
-    width: 10px;
-    transition: transform 0.3s ease;
-  }
-  .additional-charges-dropdown-field.active .additional-charges-dropdown-img {
-    transform: rotate(180deg);
-  }
-  .additional-charges-table-row-head {
-    height: auto;
-    background-color: #f7f7f7;
-    border-bottom: none;
-  }
-  .additional-charges-thead {
-    padding-right: 0px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-  }
-  .additional-charges-id-column {
-    padding-right: 10px;
-    width: 24%;
-  }
-  .charge-id-column {
-    width: 40%;
-  }
-  .date-column {
-    width: 36%;
-    padding-right: 0;
-  }
-  .additional-charges-data.charge-id-column,
-  .additional-charges-data.date-column {
-    white-space: nowrap;
-    padding-left: 30px;
-    padding-right: 0;
-  }
-  .dropdown-label {
+.admin-add-charges-head {
     font-family: "Inter Tight";
-    font-size: 12px;
+    font-size: 21px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    color: #201d1e;
+  }
+  
+  .admin-add-charges-search {
+    font-family: "Inter Tight";
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+    box-sizing: border-box;
+  }
+  
+  .admin-add-charges-search::placeholder {
+    font-family: "Inter Tight";
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+  }
+  
+  .admin-add-charges-selection {
+    font-family: "Public Sans", sans-serif;
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+    color: #201d1e;
+    box-sizing: border-box;
+  }
+  
+  .admin-add-charges-btn {
+    background-color: #2892ce;
+    color: white;
+    font-family: "Inter Tight";
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0.43px;
+    box-sizing: border-box;
+  }
+  
+  .admin-add-charges-btn:hover {
+    background-color: #076094;
+  }
+  
+  .admin-add-charges-download-btn {
+    background-color: #f0f0f0;
+    font-family: "Inter Tight";
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0.43px;
+    color: #4d4e4d;
+    box-sizing: border-box;
+  }
+  
+  .admin-add-charges-download-btn:hover {
+    background-color: #201d1e;
+    color: white;
+  }
+  
+  .admin-add-charges-download-btn:hover .admin-add-charges-download-img {
+    filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%)
+      hue-rotate(47deg) brightness(118%) contrast(100%);
+  }
+  
+  .admin-add-charges-thead {
+    font-family: "Inter Tight";
+    font-size: 13px;
     font-style: normal;
     font-weight: 500;
     line-height: normal;
     letter-spacing: 1px;
     color: #818da0;
-    margin-bottom: 4px;
-    padding-left: 0;
   }
-  .dropdown-value {
+  
+  .admin-add-charges-data {
     font-family: "Inter Tight";
-    font-size: 13px;
+    font-size: 14px;
     font-style: normal;
     font-weight: 400;
     line-height: 22px;
     color: #201d1e;
   }
-  .additional-charges-status {
-    padding: 0px 9px;
-    border-radius: 3px;
-    margin-top: 5px;
-    display: inline-block;
-    width: 65px;
-    height: 24px;
-    text-align: center;
-    line-height: 24px;
+  
+  .admin-add-charges-action-btn:hover {
+    filter: brightness(0) saturate(100%) invert(8%) sepia(7%) saturate(582%)
+      hue-rotate(289deg) brightness(100%) contrast(91%);
   }
-  .additional-charges-dropdown-content {
-    width: 100%;
-    padding: 15px 0;
+  
+  .admin-add-charges-pagination {
+    font-family: "Inter Tight";
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+    color: #4b465c80;
   }
-  /* Replace grid with flexbox for better alignment */
-  .dropdown-content-grid {
+  
+  .admin-add-charges-pagination-btn {
+    font-family: "Inter Tight";
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 18px;
+    letter-spacing: 0.43px;
+    color: #8a94a3;
+  }
+  
+  .admin-add-charges-page-no-btns {
+    font-family: "Inter Tight";
+    font-size: 15px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 18px;
+    letter-spacing: 0.43px;
+  }
+  
+  .admin-add-charges-action-buttons {
     display: flex;
-    width: 100%;
-    flex-wrap: wrap;
+    gap: 10px;
   }
-  .dropdown-content-item {
-    width: 33.33%;
-    padding-right: 10px;
-    box-sizing: border-box;
-    margin-bottom: 15px;
+  
+  /* Responsive Styles (ordered from smallest to largest max-width) */
+  @media (max-width: 360px) {
+    .admin-add-charges-table {
+      margin-bottom: 50px;
+    }
+    .admin-add-charges-table-header {
+      padding: 16px;
+    }
+    .admin-add-charges-search {
+      width: 150px;
+    }
+    .admin-add-charges-selection {
+      width: 120px;
+    }
+    .admin-add-charges-action-buttons .admin-add-charges-btn {
+      width: calc(58% - 5px);
+    }
+    .admin-add-charges-action-buttons .admin-add-charges-download-btn {
+      width: calc(42% - 5px);
+    }
+    .admin-add-charges-thead.admin-add-charges-charge-id-column,
+    .admin-add-charges-thead.admin-add-charges-date-column {
+      padding-left: 14px;
+      padding-right: 0;
+    }
+    .admin-add-charges-data.admin-add-charges-charge-id-column,
+    .admin-add-charges-data.admin-add-charges-date-column {
+      padding-left: 14px;
+      padding-right: 0;
+      white-space: nowrap;
+    }
+    .admin-add-charges-pagination-btn {
+      font-size: 13px;
+      padding: 0px 10px;
+      height: 28px;
+    }
+    .admin-add-charges-page-no-btns {
+      font-size: 13px;
+      padding: 0px 10px;
+      height: 28px;
+    }
+    .admin-add-charges-dropdown-content .admin-add-charges-dropdown-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
-  /* Align each column to match the headers */
-  .dropdown-content-item.amount-due-column {
-    width: 24%;
+  
+  @media (max-width: 375px) {
+    .admin-add-charges-thead.admin-add-charges-charge-id-column,
+    .admin-add-charges-thead.admin-add-charges-date-column {
+      padding-left: 14px;
+      padding-right: 0;
+    }
+    .admin-add-charges-data.admin-add-charges-charge-id-column,
+    .admin-add-charges-data.admin-add-charges-date-column {
+      padding-left: 14px;
+      padding-right: 0;
+    }
   }
-  .dropdown-content-item.reason-column {
-    width: 40%;
+  
+  @media (max-width: 390px) {
+    .admin-add-charges-thead.admin-add-charges-charge-id-column,
+    .admin-add-charges-thead.admin-add-charges-date-column {
+      padding-left: 14px;
+      padding-right: 0;
+    }
+    .admin-add-charges-data.admin-add-charges-charge-id-column,
+    .admin-add-charges-data.admin-add-charges-date-column {
+      padding-left: 14px;
+      padding-right: 0;
+    }
+    .admin-add-charges-selection {
+      width: 120px;
+    }
+    .admin-add-charges-download-btn {
+      width: 120px;
+    }
   }
-  .dropdown-content-item.due-date-column {
-    width: 36%;
-    padding-right: 0;
+  
+  @media (max-width: 414px) {
+    .admin-add-charges-thead {
+      font-size: 11px;
+    }
+    .admin-add-charges-thead.admin-add-charges-charge-id-column,
+    .admin-add-charges-thead.admin-add-charges-date-column {
+      padding-left: 14px;
+      padding-right: 0;
+    }
+    .admin-add-charges-data.admin-add-charges-charge-id-column,
+    .admin-add-charges-data.admin-add-charges-date-column {
+      padding-left: 14px;
+      padding-right: 0;
+    }
+    .admin-add-charges-selection {
+      width: 120px;
+    }
+    .admin-add-charges-download-btn {
+      width: 120px;
+    }
   }
-  .dropdown-content-item.status-column {
-    width: 24%;
+  
+  @media (max-width: 428px) {
+    .admin-add-charges-thead.admin-add-charges-charge-id-column,
+    .admin-add-charges-thead.admin-add-charges-date-column {
+      padding-left: 30px;
+      padding-right: 0;
+    }
+    .admin-add-charges-data.admin-add-charges-charge-id-column,
+    .admin-add-charges-data.admin-add-charges-date-column {
+      padding-left: 14px;
+      padding-right: 0;
+    }
   }
-  .dropdown-content-item.action-column {
-    width: 40%;
+  
+  @media (max-width: 480px) {
+    .admin-add-charges-table {
+      max-width: calc(100vw - 40px);
+      margin-bottom: 50px;
+    }
+    .admin-add-charges-table-header {
+      flex-direction: column;
+      border-bottom: none;
+      align-items: flex-start;
+      padding: 20px;
+    }
+    .admin-add-charges-head {
+      display: none;
+    }
+    .admin-add-charges-inputs-container {
+      flex-direction: column;
+      width: 100%;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .admin-add-charges-inputs-container > div:first-child {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      width: 100%;
+      flex-wrap: nowrap;
+    }
+    .admin-add-charges-search {
+      width: 100%;
+    }
+    .admin-add-charges-selection {
+      width: 100%;
+    }
+    .admin-add-charges-action-buttons {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      gap: 10px;
+      margin-top: 5px;
+    }
+    .admin-add-charges-btn {
+      width: 169px;
+      font-size: 14px;
+    }
+    .admin-add-charges-download-btn {
+      width: 122px;
+    }
+    .admin-add-charges-desktop-only {
+      display: none;
+    }
+    .admin-add-charges-pagination-container {
+      flex-direction: column;
+      height: 97.53px;
+      justify-content: center;
+      gap: 16px;
+      align-items: center;
+    }
+    .admin-add-charges-pagination {
+      text-align: center;
+    }
+    .admin-add-charges-pagination-buttons {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      overflow-y: hidden;
+    }
+    .admin-add-charges-dropdown-field {
+      background-color: #dedede;
+      border-radius: 100%;
+      width: 20px;
+      height: 20px;
+      margin-right: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease;
+    }
+    .admin-add-charges-dropdown-field.active {
+      background-color: #254396;
+    }
+    .admin-add-charges-dropdown-img {
+      width: 10px;
+      transition: transform 0.3s ease;
+    }
+    .admin-add-charges-dropdown-field.active .admin-add-charges-dropdown-img {
+      transform: rotate(180deg);
+    }
+    .admin-add-charges-table-row-head {
+      height: auto;
+      background-color: #f7f7f7;
+      border-bottom: none;
+    }
+    .admin-add-charges-thead {
+      padding-right: 0px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+    .admin-add-charges-id-column {
+      padding-right: 10px;
+      width: 24%;
+    }
+    .admin-add-charges-charge-id-column {
+      width: 40%;
+    }
+    .admin-add-charges-date-column {
+      width: 36%;
+      padding-right: 0;
+    }
+    .admin-add-charges-data.admin-add-charges-charge-id-column,
+    .admin-add-charges-data.admin-add-charges-date-column {
+      white-space: nowrap;
+      padding-left: 30px;
+      padding-right: 0;
+    }
+    .admin-add-charges-dropdown-label {
+      font-family: "Inter Tight";
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: normal;
+      letter-spacing: 1px;
+      color: #818da0;
+      margin-bottom: 4px;
+      padding-left: 0;
+    }
+    .admin-add-charges-dropdown-value {
+      font-family: "Inter Tight";
+      font-size: 13px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 22px;
+      color: #201d1e;
+    }
+    .admin-add-charges-status {
+      padding: 0px 9px;
+      border-radius: 3px;
+      margin-top: 5px;
+      display: inline-block;
+      width: 65px;
+      height: 24px;
+      text-align: center;
+      line-height: 24px;
+    }
+    .admin-add-charges-dropdown-content {
+      width: 100%;
+      padding: 15px 0;
+    }
+    .admin-add-charges-dropdown-grid {
+      display: flex;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .admin-add-charges-dropdown-item {
+      width: 33.33%;
+      padding-right: 10px;
+      box-sizing: border-box;
+      margin-bottom: 15px;
+    }
+    .admin-add-charges-dropdown-item.admin-add-charges-amount-due-column {
+      width: 24%;
+    }
+    .admin-add-charges-dropdown-item.admin-add-charges-reason-column {
+      width: 40%;
+    }
+    .admin-add-charges-dropdown-item.admin-add-charges-due-date-column {
+      width: 36%;
+      padding-right: 0;
+    }
+    .admin-add-charges-dropdown-item.admin-add-charges-status-column {
+      width: 24%;
+    }
+    .admin-add-charges-dropdown-item.admin-add-charges-action-column {
+      width: 40%;
+    }
+    .admin-add-charges-mobile-no-border {
+      border-bottom: none !important;
+    }
+    .admin-add-charges-mobile-with-border {
+      border-bottom: 1px solid #e9e9e9;
+    }
   }
-  .mobile-no-border {
-    border-bottom: none !important;
+  
+  @media (min-width: 481px) {
+    .admin-add-charges-dropdown-field,
+    .admin-add-charges-dropdown-content {
+      display: none;
+    }
   }
-  .mobile-with-border {
-    border-bottom: 1px solid #e9e9e9;
+  
+  @media (max-width: 394px) {
+    .admin-add-charges-thead {
+      font-size: 13px;
+    }
+    .admin-add-charges-data {
+      font-size: 13px;
+    }
   }
-}
-
-@media (min-width: 481px) {
-  .additional-charges-dropdown-field,
-  .additional-charges-dropdown-content {
-    display: none;
+  
+  @media (max-width: 767px) {
+    .admin-add-charges-action-buttons {
+      width: 100%;
+      justify-content: start;
+    }
+    .admin-add-charges-action-buttons .admin-add-charges-btn,
+    .admin-add-charges-action-buttons .admin-add-charges-download-btn {
+      min-width: auto;
+      max-width: none;
+    }
+    .admin-add-charges-action-buttons .admin-add-charges-btn {
+      width: 169px;
+    }
+    .admin-add-charges-action-buttons .admin-add-charges-download-btn {
+      width: 50%;
+    }
   }
-}
-
-@media (max-width: 394px) {
-  .additional-charges-thead {
-    font-size: 13px;
-  }
-  .additional-charges-data {
-    font-size: 13px;
-  }
-}
-
-@media (max-width: 767px) {
-  .action-buttons-container {
-    width: 100%;
-    justify-content: start;
-  }
-
-  .action-buttons-container .add-charges,
-  .action-buttons-container .download-btn {
-    /* Fixed widths but allow slight adjustments on very small screens */
-    min-width: auto;
-    max-width: none;
-  }
-
-  .action-buttons-container .add-charges {
-    width: 169px;
-  }
-
-  .action-buttons-container .download-btn {
-    width: 50%;
-  }
-}

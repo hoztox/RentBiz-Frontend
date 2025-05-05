@@ -151,26 +151,26 @@ const TenancyMaster = () => {
               />
             </div>
           </div>
-          <div className="flex gap-[10px] action-buttons-container">
+          <div className="flex gap-[10px] tenancy-action-buttons-container">
             <button
-              className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md add-new-tenancy duration-200"
+              className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md tenancy-add-new-tenancy duration-200"
               onClick={openCreateTenancyModal}
             >
               Add New Tenancy
               <img src={plusicon} alt="plus icon" className="w-[15px] h-[15px]" />
             </button>
-            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 download-btn">
+            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 tenancy-download-btn">
               Download
               <img
                 src={downloadicon}
                 alt="Download Icon"
-                className="w-[15px] h-[15px] download-img"
+                className="w-[15px] h-[15px] tenancy-download-img"
               />
             </button>
           </div>
         </div>
       </div>
-      <div className="desktop-only">
+      <div className="tenancy-desktop-only">
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-[#E9E9E9] h-[57px]">
@@ -199,7 +199,7 @@ const TenancyMaster = () => {
                 </td>
                 <td className="px-5 text-left tenancy-data">
                   <span
-                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
+                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] tenancy-status ${
                       tenancy.status === "Occupied"
                         ? "bg-[#E8EFF6] text-[#1458A2]"
                         : "bg-[#E8EFF6] text-[#1458A2]"
@@ -213,7 +213,7 @@ const TenancyMaster = () => {
                     <img
                       src={tenancy.view}
                       alt="View"
-                      className="w-[30px] h-[24px] action-btn duration-200"
+                      className="w-[30px] h-[24px] tenancy-action-btn duration-200"
                     />
                   </button>
                 </td>
@@ -222,14 +222,14 @@ const TenancyMaster = () => {
                     <img
                       src={editicon}
                       alt="Edit"
-                      className="w-[18px] h-[18px] action-btn duration-200"
+                      className="w-[18px] h-[18px] tenancy-action-btn duration-200"
                     />
                   </button>
                   <button>
                     <img
                       src={deletesicon}
-                      alt="Deletes"
-                      className="w-[18px] h-[18px] action-btn duration-200"
+                      alt="Delete"
+                      className="w-[18px] h-[18px] tenancy-action-btn duration-200"
                     />
                   </button>
                 </td>
@@ -243,7 +243,7 @@ const TenancyMaster = () => {
           <thead>
             <tr className="tenancy-table-row-head">
               <th className="px-5 w-[74px] text-left tenancy-thead tenancy-id-column">ID</th>
-              <th className="px-3 text-center tenancy-thead tenant-column">TENANT NAME</th>
+              <th className="px-3 text-center tenancy-thead tenancy-tenant-column">TENANT NAME</th>
               <th className="px-5 text-right tenancy-thead"></th>
             </tr>
           </thead>
@@ -253,12 +253,12 @@ const TenancyMaster = () => {
                 <tr
                   className={`${
                     expandedRows[tenancy.id]
-                      ? "mobile-no-border"
-                      : "mobile-with-border"
+                      ? "tenancy-mobile-no-border"
+                      : "tenancy-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left tenancy-data">{tenancy.id}</td>
-                  <td className="px-3 text-center tenancy-data tenant-column">{tenancy.tenant}</td>
+                  <td className="px-5 text-left tenancy-data tenancy-id-column">{tenancy.id}</td>
+                  <td className="px-3 text-center tenancy-data tenancy-tenant-column">{tenancy.tenant}</td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`tenancy-dropdown-field ${
@@ -277,27 +277,27 @@ const TenancyMaster = () => {
                   </td>
                 </tr>
                 {expandedRows[tenancy.id] && (
-                  <tr className="mobile-with-border border-b border-[#E9E9E9]">
+                  <tr className="tenancy-mobile-with-border border-b border-[#E9E9E9]">
                     <td colSpan={3} className="px-5">
                       <div className="tenancy-dropdown-content">
-                        <div className="grid grid-cols-2 gap-4 mb-6">
-                          <div>
-                            <div className="dropdown-label">BUILDING NAME</div>
-                            <div className="dropdown-value">{tenancy.building}</div>
+                        <div className="tenancy-grid tenancy-grid-cols-2">
+                          <div className="tenancy-grid-item">
+                            <div className="tenancy-dropdown-label">BUILDING NAME</div>
+                            <div className="tenancy-dropdown-value">{tenancy.building}</div>
                           </div>
-                          <div>
-                            <div className="dropdown-label">UNIT NAME</div>
-                            <div className="dropdown-value">{tenancy.unit}</div>
+                          <div className="tenancy-grid-item">
+                            <div className="tenancy-dropdown-label">UNIT NAME</div>
+                            <div className="tenancy-dropdown-value">{tenancy.unit}</div>
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4 mb-6">
-                          <div>
-                            <div className="dropdown-label">RENTAL MONTHS</div>
-                            <div className="dropdown-value">{tenancy.months}</div>
+                        <div className="tenancy-grid tenancy-grid-cols-2">
+                          <div className="tenancy-grid-item">
+                            <div className="tenancy-dropdown-label">RENTAL MONTHS</div>
+                            <div className="tenancy-dropdown-value">{tenancy.months}</div>
                           </div>
-                          <div>
-                            <div className="dropdown-label">STATUS</div>
-                            <div className="dropdown-value">
+                          <div className="tenancy-grid-item">
+                            <div className="tenancy-dropdown-label">STATUS</div>
+                            <div className="tenancy-dropdown-value">
                               <span
                                 className={`px-[10px] py-[5px] h-[24px] rounded-[4px] tenancy-status ${
                                   tenancy.status === "Occupied"
@@ -310,34 +310,34 @@ const TenancyMaster = () => {
                             </div>
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4 mb-6">
-                          <div>
-                            <div className="dropdown-label">VIEW</div>
-                            <div className="dropdown-value">
+                        <div className="tenancy-grid tenancy-grid-cols-2">
+                          <div className="tenancy-grid-item">
+                            <div className="tenancy-dropdown-label">VIEW</div>
+                            <div className="tenancy-dropdown-value">
                               <button onClick={openViewTenancyModal}>
                                 <img
                                   src={tenancy.view}
                                   alt="View"
-                                  className="w-[30px] h-[24px] action-btn duration-200"
+                                  className="w-[30px] h-[24px] tenancy-action-btn duration-200"
                                 />
                               </button>
                             </div>
                           </div>
-                          <div>
-                            <div className="dropdown-label">ACTION</div>
-                            <div className="dropdown-value flex items-center gap-2">
+                          <div className="tenancy-grid-item tenancy-action-column">
+                            <div className="tenancy-dropdown-label">ACTION</div>
+                            <div className="tenancy-dropdown-value tenancy-flex tenancy-items-center tenancy-gap-2">
                               <button onClick={openUpdateTenancyModal}>
                                 <img
                                   src={editicon}
                                   alt="Edit"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
+                                  className="w-[18px] h-[18px] tenancy-action-btn duration-200"
                                 />
                               </button>
                               <button>
                                 <img
                                   src={deletesicon}
-                                  alt="Deletes"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
+                                  alt="Delete"
+                                  className="w-[18px] h-[18px] tenancy-action-btn duration-200 ml-4"
                                 />
                               </button>
                             </div>
@@ -352,16 +352,14 @@ const TenancyMaster = () => {
           </tbody>
         </table>
       </div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-3 md:px-5 pagination-container">
-        <span className="collection-list-pagination pagination-text">
-          Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-          {filteredData.length} entries
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-3 md:px-5 tenancy-pagination-container">
+        <span className="tenancy-collection-list-pagination tenancy-pagination-text">
+          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
+          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
         </span>
-        <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto pagination-buttons">
+        <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto tenancy-pagination-buttons">
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer tenancy-pagination-btn"
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
@@ -369,7 +367,7 @@ const TenancyMaster = () => {
           </button>
           {startPage > 1 && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 tenancy-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(1)}
             >
               1
@@ -379,7 +377,7 @@ const TenancyMaster = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 tenancy-page-no-btns ${
                 currentPage === startPage + i
                   ? "bg-[#1458A2] text-white"
                   : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
@@ -389,19 +387,17 @@ const TenancyMaster = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && (
-            <span className="px-2 flex items-center">...</span>
-          )}
+          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
           {endPage < totalPages && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 tenancy-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(totalPages)}
             >
               {totalPages}
             </button>
           )}
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer tenancy-pagination-btn"
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(currentPage + 1)}
           >

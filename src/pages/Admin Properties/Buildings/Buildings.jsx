@@ -1,10 +1,10 @@
 import React, { useState } from "react";
+import "./buildings.css";
 import { ChevronDown } from "lucide-react";
 import plusicon from "../../../assets/Images/Admin Buildings/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Buildings/download-icon.svg";
 import editicon from "../../../assets/Images/Admin Buildings/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Buildings/delete-icon.svg";
-import "./buildings.css";
 import AddBuildingModal from "./Add Building Modal/AddBuildingModal";
 import downarrow from "../../../assets/Images/Admin Buildings/downarrow.svg";
 
@@ -93,23 +93,23 @@ const Buildings = () => {
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
   return (
-    <div className="border border-[#E9E9E9] rounded-md building-table">
-      <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] building-table-header">
-        <h1 className="buildings-head">Buildings</h1>
-        <div className="flex flex-col md:flex-row gap-[10px] building-inputs-container">
+    <div className="border border-[#E9E9E9] rounded-md bldg-table">
+      <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] bldg-table-header">
+        <h1 className="bldg-head">Buildings</h1>
+        <div className="flex flex-col md:flex-row gap-[10px] bldg-inputs-container">
           <div className="flex flex-col md:flex-row gap-[10px] w-full">
             <input
               type="text"
               placeholder="Search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 building-search"
+              className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 bldg-search"
             />
             <div className="relative w-full md:w-auto">
               <select
                 name="select"
                 id=""
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 building-selection"
+                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 bldg-selection"
                 onFocus={() => setIsSelectOpen(true)}
                 onBlur={() => setIsSelectOpen(false)}
               >
@@ -123,9 +123,9 @@ const Buildings = () => {
               />
             </div>
           </div>
-          <div className="flex gap-[10px] action-buttons-container">
+          <div className="flex gap-[10px] bldg-action-buttons-container">
             <button
-              className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md add-new-building duration-200"
+              className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md bldg-add-new-building duration-200"
               onClick={openBuildingModal}
             >
               Add New Building
@@ -135,30 +135,30 @@ const Buildings = () => {
                 className="w-[15px] h-[15px]"
               />
             </button>
-            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 download-btn">
+            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 bldg-download-btn">
               Download
               <img
                 src={downloadicon}
                 alt="Download Icon"
-                className="w-[15px] h-[15px] download-img"
+                className="w-[15px] h-[15px] bldg-download-img"
               />
             </button>
           </div>
         </div>
       </div>
-      <div className="desktop-only">
+      <div className="bldg-desktop-only">
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-[#E9E9E9] h-[57px]">
-              <th className="px-5 text-left building-thead">ID</th>
-              <th className="px-5 text-left building-thead w-[12%]">DATE</th>
-              <th className="pl-5 text-left building-thead w-[15%]">NAME</th>
-              <th className="px-5 text-left building-thead">ADDRESS</th>
-              <th className="pl-12 pr-5 text-left building-thead w-[18%]">
+              <th className="px-5 text-left bldg-thead">ID</th>
+              <th className="px-5 text-left bldg-thead w-[12%]">DATE</th>
+              <th className="pl-5 text-left bldg-thead w-[15%]">NAME</th>
+              <th className="px-5 text-left bldg-thead">ADDRESS</th>
+              <th className="pl-12 pr-5 text-left bldg-thead w-[18%]">
                 NO. OF UNITS
               </th>
-              <th className="px-5 text-left building-thead w-[12%]">STATUS</th>
-              <th className="px-5 pr-6 text-right building-thead">ACTION</th>
+              <th className="px-5 text-left bldg-thead w-[12%]">STATUS</th>
+              <th className="px-5 pr-6 text-right bldg-thead">ACTION</th>
             </tr>
           </thead>
           <tbody>
@@ -167,20 +167,20 @@ const Buildings = () => {
                 key={index}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-5 text-left building-data">{building.id}</td>
-                <td className="px-5 text-left building-data">
+                <td className="px-5 text-left bldg-data">{building.id}</td>
+                <td className="px-5 text-left bldg-data">
                   {building.date}
                 </td>
-                <td className="pl-5 text-left building-data">
+                <td className="pl-5 text-left bldg-data">
                   {building.name}
                 </td>
-                <td className="px-5 text-left building-data">
+                <td className="px-5 text-left bldg-data">
                   {building.address}
                 </td>
-                <td className="pl-12 pr-5 text-left building-data">
+                <td className="pl-12 pr-5 text-left bldg-data">
                   {building.units}
                 </td>
-                <td className="px-5 text-left building-data">
+                <td className="px-5 text-left bldg-data">
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
                       building.status === "Active"
@@ -196,14 +196,14 @@ const Buildings = () => {
                     <img
                       src={editicon}
                       alt="Edit"
-                      className="w-[18px] h-[18px] action-btn duration-200"
+                      className="w-[18px] h-[18px] bldg-action-btn duration-200"
                     />
                   </button>
                   <button>
                     <img
                       src={deletesicon}
                       alt="Deletes"
-                      className="w-[18px] h-[18px] action-btn duration-200"
+                      className="w-[18px] h-[18px] bldg-action-btn duration-200"
                     />
                   </button>
                 </td>
@@ -215,14 +215,14 @@ const Buildings = () => {
       <div className="block md:hidden">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="building-table-row-head">
-              <th className="px-5 text-left building-thead building-id-column">
+            <tr className="bldg-table-row-head">
+              <th className="px-5 text-left bldg-thead bldg-id-column">
                 ID
               </th>
-              <th className="px-5 text-left building-thead date-column">
+              <th className="px-5 text-left bldg-thead bldg-date-column">
                 DATE
               </th>
-              <th className="px-5 text-right building-thead"></th>
+              <th className="px-5 text-right bldg-thead"></th>
             </tr>
           </thead>
           <tbody>
@@ -231,19 +231,19 @@ const Buildings = () => {
                 <tr
                   className={`${
                     expandedRows[building.id]
-                      ? "mobile-no-border"
-                      : "mobile-with-border"
+                      ? "bldg-mobile-no-border"
+                      : "bldg-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left building-data">
+                  <td className="px-5 text-left bldg-data bldg-id-column">
                     {building.id}
                   </td>
-                  <td className="px-5 text-left building-data date-column">
+                  <td className="px-5 text-left bldg-data bldg-date-column">
                     {building.date}
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
-                      className={`building-dropdown-field ${
+                      className={`bldg-dropdown-field ${
                         expandedRows[building.id] ? "active" : ""
                       }`}
                       onClick={() => toggleRowExpand(building.id)}
@@ -251,7 +251,7 @@ const Buildings = () => {
                       <img
                         src={downarrow}
                         alt="drop-down-arrow"
-                        className={`building-dropdown-img ${
+                        className={`bldg-dropdown-img ${
                           expandedRows[building.id] ? "text-white" : ""
                         }`}
                       />
@@ -259,41 +259,35 @@ const Buildings = () => {
                   </td>
                 </tr>
                 {expandedRows[building.id] && (
-                  <tr className="mobile-with-border border-b border-[#E9E9E9]">
+                  <tr className="bldg-mobile-with-border border-b border-[#E9E9E9]">
                     <td colSpan={3} className="px-5">
-                      <div className="building-dropdown-content">
-                        <div className="grid grid-cols-2 gap-9 mb-6">
-                          <div>
-                            <div className="dropdown-label">NAME</div>
-                            <div className="dropdown-value">
+                      <div className="bldg-dropdown-content">
+                        <div className="bldg-grid bldg-grid-cols-2">
+                          <div className="bldg-grid-item">
+                            <div className="bldg-dropdown-label">NAME</div>
+                            <div className="bldg-dropdown-value">
                               {building.name}
                             </div>
                           </div>
-                          <div>
-                            <div className="dropdown-label">ADDRESS</div>
-                            <div className="dropdown-value">
+                          <div className="bldg-grid-item">
+                            <div className="bldg-dropdown-label">ADDRESS</div>
+                            <div className="bldg-dropdown-value">
                               {building.address}
                             </div>
                           </div>
                         </div>
-                        <div
-                          className="grid grid-cols-3 gap-9 mb-6"
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                          }}
-                        >
-                          <div>
-                            <div className="dropdown-label">NO. OF UNITS</div>
-                            <div className="dropdown-value">
+                        <div className="bldg-grid bldg-grid-cols-3">
+                          <div className="bldg-grid-item">
+                            <div className="bldg-dropdown-label">NO. OF UNITS</div>
+                            <div className="bldg-dropdown-value">
                               {building.units}
                             </div>
                           </div>
-                          <div>
-                            <div className="dropdown-label">STATUS</div>
-                            <div className="dropdown-value">
+                          <div className="bldg-grid-item">
+                            <div className="bldg-dropdown-label">STATUS</div>
+                            <div className="bldg-dropdown-value">
                               <span
-                                className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] building-status ${
+                                className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] bldg-status ${
                                   building.status === "Active"
                                     ? "bg-[#e1ffea] text-[#28C76F]"
                                     : "bg-[#FFE1E1] text-[#C72828]"
@@ -303,21 +297,21 @@ const Buildings = () => {
                               </span>
                             </div>
                           </div>
-                          <div className="w-[49px]">
-                            <div className="dropdown-label">ACTION</div>
-                            <div className="dropdown-value flex items-center gap-2 mt-[10px]">
+                          <div className="bldg-grid-item bldg-action-column">
+                            <div className="bldg-dropdown-label">ACTION</div>
+                            <div className="bldg-dropdown-value bldg-flex bldg-items-center bldg-gap-2">
                               <button>
                                 <img
                                   src={editicon}
                                   alt="Edit"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
+                                  className="w-[18px] h-[18px] bldg-action-btn duration-200"
                                 />
                               </button>
                               <button>
                                 <img
                                   src={deletesicon}
                                   alt="Deletes"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
+                                  className="w-[18px] h-[18px] bldg-action-btn duration-200 ml-3"
                                 />
                               </button>
                             </div>
@@ -332,15 +326,15 @@ const Buildings = () => {
           </tbody>
         </table>
       </div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-3 md:px-5 pagination-container">
-        <span className="collection-list-pagination pagination-text">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-3 md:px-5 bldg-pagination-container">
+        <span className="bldg-collection-list-pagination bldg-pagination-text">
           Showing {Math.min((currentPage - 1) * 10 + 1, filteredData.length)} to{" "}
           {Math.min(currentPage * 10, filteredData.length)} of{" "}
           {filteredData.length} entries
         </span>
-        <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto pagination-buttons">
+        <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto bldg-pagination-buttons">
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer bldg-pagination-btn"
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
@@ -348,7 +342,7 @@ const Buildings = () => {
           </button>
           {startPage > 1 && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 bldg-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(1)}
             >
               1
@@ -358,7 +352,7 @@ const Buildings = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 bldg-page-no-btns ${
                 currentPage === startPage + i
                   ? "bg-[#1458A2] text-white"
                   : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
@@ -373,17 +367,17 @@ const Buildings = () => {
           )}
           {endPage < totalPages && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 bldg-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(totalPages)}
             >
               {totalPages}
             </button>
           )}
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer bldg-pagination-btn"
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(currentPage + 1)}
-          >
+            >
             Next
           </button>
         </div>

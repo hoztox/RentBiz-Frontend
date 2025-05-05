@@ -19,14 +19,11 @@ const TenancyConfirm = () => {
   const [expandedRows, setExpandedRows] = useState({});
   const itemsPerPage = 10;
 
-  // State for the Create Tenancy Modal
   const [createTenancyModal, setCreateTenancyModal] = useState(false);
-
-  // State for tenancy Update Modal
   const [updateTenancyModal, setUpdateTenancyModal] = useState(false);
-
-  // State for tenancy View Modal
-  const [tenancyViewModal, setTenencyViewModal] = useState(false);
+  const [tenancyViewModal, setTenancyViewModal] = useState(false);
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [selectedTenancy, setSelectedTenancy] = useState(null);
 
   const openCreateTenancyModal = () => {
     setCreateTenancyModal(true);
@@ -45,28 +42,20 @@ const TenancyConfirm = () => {
   };
 
   const openTenancyViewModal = () => {
-    setTenencyViewModal(true);
+    setTenancyViewModal(true);
   };
 
   const closeViewTenancyModal = () => {
-    setTenencyViewModal(false);
+    setTenancyViewModal(false);
   };
 
-  // State for the confirm modal
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [selectedTenancy, setSelectedTenancy] = useState(null);
-
-  // Function to open confirm modal
   const openConfirmModal = (tenancy) => {
     setSelectedTenancy(tenancy);
     setConfirmModalOpen(true);
   };
 
-  // Function to handle confirmation action
   const handleConfirmAction = () => {
-    // Implement your confirmation logic here
     console.log("Confirmed action for tenancy:", selectedTenancy);
-    // Close the modal after confirming
     setConfirmModalOpen(false);
   };
 
@@ -175,9 +164,9 @@ const TenancyConfirm = () => {
               />
             </div>
           </div>
-          <div className="flex gap-[10px] action-buttons-container">
+          <div className="flex gap-[10px] tconfirm-action-buttons-container">
             <button
-              className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md add-new-tenancy duration-200"
+              className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md tconfirm-add-new-tenancy duration-200"
               onClick={openCreateTenancyModal}
             >
               Add New Tenancy
@@ -187,18 +176,18 @@ const TenancyConfirm = () => {
                 className="w-[15px] h-[15px]"
               />
             </button>
-            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 download-btn">
+            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 tconfirm-download-btn">
               Download
               <img
                 src={downloadicon}
                 alt="Download Icon"
-                className="w-[15px] h-[15px] download-img"
+                className="w-[15px] h-[15px] tconfirm-download-img"
               />
             </button>
           </div>
         </div>
       </div>
-      <div className="desktop-only">
+      <div className="tconfirm-desktop-only">
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-[#E9E9E9] h-[57px]">
@@ -241,7 +230,7 @@ const TenancyConfirm = () => {
                 </td>
                 <td className="px-5 text-left tenancy-data">
                   <span
-                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
+                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] tenancy-status ${
                       tenancy.status === "Pending"
                         ? "bg-[#E8EFF6] text-[#1458A2]"
                         : "bg-[#E8EFF6] text-[#1458A2]"
@@ -255,7 +244,7 @@ const TenancyConfirm = () => {
                     <img
                       src={tenancy.view}
                       alt="View"
-                      className="w-[30px] h-[24px] action-btn duration-200"
+                      className="w-[30px] h-[24px] tconfirm-action-btn duration-200"
                     />
                   </button>
                 </td>
@@ -264,14 +253,14 @@ const TenancyConfirm = () => {
                     <img
                       src={editicon}
                       alt="Edit"
-                      className="w-[18px] h-[18px] action-btn duration-200"
+                      className="w-[18px] h-[18px] tconfirm-action-btn duration-200"
                     />
                   </button>
                   <button onClick={() => openConfirmModal(tenancy)}>
                     <img
                       src={confirmicon}
                       alt="Confirm"
-                      className="w-[24px] h-[20px] confirm-btn duration-200"
+                      className="w-[24px] h-[20px] tconfirm-confirm-btn duration-200"
                     />
                   </button>
                 </td>
@@ -284,10 +273,10 @@ const TenancyConfirm = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="tenancy-table-row-head">
-              <th className="px-5 w-[74px] text-left tenancy-thead tenancy-id-column">
+              <th className="px-5 w-[74px] text-left tenancy-thead tconfirm-id-column">
                 ID
               </th>
-              <th className="px-3 text-center tenancy-thead tenant-column">
+              <th className="px-3 text-center tenancy-thead tconfirm-tenant-column">
                 TENANT NAME
               </th>
               <th className="px-5 text-right tenancy-thead"></th>
@@ -299,12 +288,12 @@ const TenancyConfirm = () => {
                 <tr
                   className={`${
                     expandedRows[tenancy.id]
-                      ? "mobile-no-border"
-                      : "mobile-with-border"
+                      ? "tconfirm-mobile-no-border"
+                      : "tconfirm-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left tenancy-data">{tenancy.id}</td>
-                  <td className="px-3 text-center tenancy-data tenant-column">
+                  <td className="px-5 text-left tenancy-data tconfirm-id-column">{tenancy.id}</td>
+                  <td className="px-3 text-center tenancy-data tconfirm-tenant-column">
                     {tenancy.tenant}
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
@@ -325,31 +314,31 @@ const TenancyConfirm = () => {
                   </td>
                 </tr>
                 {expandedRows[tenancy.id] && (
-                  <tr className="mobile-with-border border-b border-[#E9E9E9]">
+                  <tr className="tconfirm-mobile-with-border border-b border-[#E9E9E9]">
                     <td colSpan={3} className="px-5">
                       <div className="tenancy-dropdown-content">
-                        <div className="grid grid-cols-2 gap-4 mb-6">
-                          <div>
-                            <div className="dropdown-label">BUILDING NAME</div>
-                            <div className="dropdown-value">
+                        <div className="tconfirm-grid tconfirm-grid-cols-2">
+                          <div className="tconfirm-grid-item">
+                            <div className="tconfirm-dropdown-label">BUILDING NAME</div>
+                            <div className="tconfirm-dropdown-value">
                               {tenancy.building}
                             </div>
                           </div>
-                          <div>
-                            <div className="dropdown-label">UNIT NAME</div>
-                            <div className="dropdown-value">{tenancy.unit}</div>
+                          <div className="tconfirm-grid-item">
+                            <div className="tconfirm-dropdown-label">UNIT NAME</div>
+                            <div className="tconfirm-dropdown-value">{tenancy.unit}</div>
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4 mb-6">
-                          <div>
-                            <div className="dropdown-label">RENTAL MONTHS</div>
-                            <div className="dropdown-value">
+                        <div className="tconfirm-grid tconfirm-grid-cols-2">
+                          <div className="tconfirm-grid-item">
+                            <div className="tconfirm-dropdown-label">RENTAL MONTHS</div>
+                            <div className="tconfirm-dropdown-value">
                               {tenancy.months}
                             </div>
                           </div>
-                          <div>
-                            <div className="dropdown-label">STATUS</div>
-                            <div className="dropdown-value">
+                          <div className="tconfirm-grid-item">
+                            <div className="tconfirm-dropdown-label">STATUS</div>
+                            <div className="tconfirm-dropdown-value">
                               <span
                                 className={`px-[10px] py-[5px] h-[24px] rounded-[4px] tenancy-status ${
                                   tenancy.status === "Pending"
@@ -362,34 +351,34 @@ const TenancyConfirm = () => {
                             </div>
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4 mb-6">
-                          <div>
-                            <div className="dropdown-label">VIEW</div>
-                            <div className="dropdown-value">
+                        <div className="tconfirm-grid tconfirm-grid-cols-2">
+                          <div className="tconfirm-grid-item">
+                            <div className="tconfirm-dropdown-label">VIEW</div>
+                            <div className="tconfirm-dropdown-value">
                               <button onClick={openTenancyViewModal}>
                                 <img
                                   src={tenancy.view}
                                   alt="View"
-                                  className="w-[30px] h-[24px] action-btn duration-200"
+                                  className="w-[30px] h-[24px] tconfirm-action-btn duration-200"
                                 />
                               </button>
                             </div>
                           </div>
-                          <div>
-                            <div className="dropdown-label">ACTION</div>
-                            <div className="dropdown-value flex items-center gap-2">
+                          <div className="tconfirm-grid-item tconfirm-action-column">
+                            <div className="tconfirm-dropdown-label">ACTION</div>
+                            <div className="tconfirm-dropdown-value tconfirm-flex tconfirm-items-center tconfirm-gap-2">
                               <button onClick={openUpdateTenancyModal}>
                                 <img
                                   src={editicon}
                                   alt="Edit"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
+                                  className="w-[18px] h-[18px] tconfirm-action-btn duration-200"
                                 />
                               </button>
                               <button onClick={() => openConfirmModal(tenancy)}>
                                 <img
                                   src={confirmicon}
                                   alt="Confirm"
-                                  className="w-[24px] h-[20px] confirm-btn duration-200"
+                                  className="w-[24px] h-[20px] tconfirm-confirm-btn duration-200 ml-2"
                                 />
                               </button>
                             </div>
@@ -404,16 +393,14 @@ const TenancyConfirm = () => {
           </tbody>
         </table>
       </div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-3 md:px-5 pagination-container">
-        <span className="collection-list-pagination pagination-text">
-          Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-          {filteredData.length} entries
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-3 md:px-5 tconfirm-pagination-container">
+        <span className="tconfirm-collection-list-pagination tconfirm-pagination-text">
+          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
+          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
         </span>
-        <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto pagination-buttons">
+        <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto tconfirm-pagination-buttons">
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer tconfirm-pagination-btn"
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
@@ -421,7 +408,7 @@ const TenancyConfirm = () => {
           </button>
           {startPage > 1 && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 tconfirm-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(1)}
             >
               1
@@ -431,7 +418,7 @@ const TenancyConfirm = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 tconfirm-page-no-btns ${
                 currentPage === startPage + i
                   ? "bg-[#1458A2] text-white"
                   : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
@@ -441,19 +428,17 @@ const TenancyConfirm = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && (
-            <span className="px-2 flex items-center">...</span>
-          )}
+          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
           {endPage < totalPages && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 tconfirm-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(totalPages)}
             >
               {totalPages}
             </button>
           )}
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer tconfirm-pagination-btn"
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(currentPage + 1)}
           >

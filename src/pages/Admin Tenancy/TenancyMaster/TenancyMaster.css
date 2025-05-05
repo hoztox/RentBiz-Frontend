@@ -35,7 +35,7 @@
   box-sizing: border-box;
 }
 
-.add-new-tenancy {
+.tenancy-add-new-tenancy {
   background-color: #2892ce;
   color: white;
   font-family: "Inter Tight";
@@ -47,11 +47,11 @@
   box-sizing: border-box;
 }
 
-.add-new-tenancy:hover {
+.tenancy-add-new-tenancy:hover {
   background-color: #076094;
 }
 
-.download-btn {
+.tenancy-download-btn {
   background-color: #f0f0f0;
   font-family: "Inter Tight";
   font-size: 15px;
@@ -63,12 +63,12 @@
   box-sizing: border-box;
 }
 
-.download-btn:hover {
+.tenancy-download-btn:hover {
   background-color: #201d1e;
   color: white;
 }
 
-.download-btn:hover .download-img {
+.tenancy-download-btn:hover .tenancy-download-img {
   filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%)
     hue-rotate(47deg) brightness(118%) contrast(100%);
 }
@@ -92,12 +92,12 @@
   color: #201d1e;
 }
 
-.action-btn:hover {
+.tenancy-action-btn:hover {
   filter: brightness(0) saturate(100%) invert(8%) sepia(7%) saturate(582%)
     hue-rotate(289deg) brightness(100%) contrast(91%);
 }
 
-.collection-list-pagination {
+.tenancy-collection-list-pagination {
   font-family: "Inter Tight";
   font-size: 13px;
   font-style: normal;
@@ -106,7 +106,7 @@
   color: #4b465c80;
 }
 
-.pagination-btn {
+.tenancy-pagination-btn {
   font-family: "Inter Tight";
   font-size: 15px;
   font-style: normal;
@@ -116,7 +116,7 @@
   color: #8a94a3;
 }
 
-.page-no-btns {
+.tenancy-page-no-btns {
   font-family: "Inter Tight";
   font-size: 15px;
   font-style: normal;
@@ -125,35 +125,42 @@
   letter-spacing: 0.43px;
 }
 
+.tenancy-action-buttons-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 10px;
+}
+
 /* Responsive Styles (ordered from smallest to largest max-width) */
 @media (max-width: 360px) {
   .tenancy-table {
     margin-bottom: 50px;
   }
   .tenancy-search {
-    width: 150px; /* Adjusted for smaller screens */
+    width: 150px;
   }
   .tenancy-selection {
     width: 120px;
   }
-  .download-btn {
+  .tenancy-download-btn {
     width: 120px;
   }
-  .tenancy-thead.tenant-column {
+  .tenancy-thead.tenancy-tenant-column {
     padding-left: 14px;
     padding-right: 0;
   }
-  .tenancy-data.tenant-column {
+  .tenancy-data.tenancy-tenant-column {
     padding-left: 14px;
     padding-right: 0;
     white-space: nowrap;
   }
-  .pagination-btn {
+  .tenancy-pagination-btn {
     font-size: 13px;
     padding: 0px 10px;
     height: 28px;
   }
-  .page-no-btns {
+  .tenancy-page-no-btns {
     font-size: 13px;
     padding: 0px 10px;
     height: 28px;
@@ -161,29 +168,29 @@
 }
 
 @media (max-width: 375px) {
-  .tenancy-thead.tenant-column {
+  .tenancy-thead.tenancy-tenant-column {
     padding-left: 14px;
     padding-right: 0;
   }
-  .tenancy-data.tenant-column {
+  .tenancy-data.tenancy-tenant-column {
     padding-left: 14px;
     padding-right: 0;
   }
 }
 
 @media (max-width: 390px) {
-  .tenancy-thead.tenant-column {
+  .tenancy-thead.tenancy-tenant-column {
     padding-left: 14px;
     padding-right: 0;
   }
-  .tenancy-data.tenant-column {
+  .tenancy-data.tenancy-tenant-column {
     padding-left: 14px;
     padding-right: 0;
   }
   .tenancy-selection {
     width: 120px;
   }
-  .download-btn {
+  .tenancy-download-btn {
     width: 120px;
   }
 }
@@ -192,28 +199,28 @@
   .tenancy-thead {
     font-size: 11px;
   }
-  .tenancy-thead.tenant-column {
+  .tenancy-thead.tenancy-tenant-column {
     padding-left: 14px;
     padding-right: 0;
   }
-  .tenancy-data.tenant-column {
+  .tenancy-data.tenancy-tenant-column {
     padding-left: 14px;
     padding-right: 0;
   }
   .tenancy-selection {
     width: 120px;
   }
-  .download-btn {
+  .tenancy-download-btn {
     width: 120px;
   }
 }
 
 @media (max-width: 428px) {
-  .tenancy-thead.tenant-column {
+  .tenancy-thead.tenancy-tenant-column {
     padding-left: 14px;
     padding-right: 0;
   }
-  .tenancy-data.tenant-column {
+  .tenancy-data.tenancy-tenant-column {
     padding-left: 14px;
     padding-right: 0;
   }
@@ -236,7 +243,7 @@
     flex-direction: column;
     width: 100%;
     gap: 10px;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
   }
   .tenancy-inputs-container > div:first-child {
     display: flex;
@@ -252,34 +259,30 @@
     width: 100%;
     margin-left: 0px;
   }
-  .action-buttons-container {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    gap: 10px;
+  .tenancy-action-buttons-container {
     margin-top: 5px;
   }
-  .add-new-tenancy {
+  .tenancy-add-new-tenancy {
     width: 169px;
     font-size: 14px;
   }
-  .download-btn {
+  .tenancy-download-btn {
     width: 122px;
   }
-  .desktop-only {
+  .tenancy-desktop-only {
     display: none;
   }
-  .pagination-container {
+  .tenancy-pagination-container {
     flex-direction: column;
     height: 97.53px;
     justify-content: center;
     gap: 16px;
     align-items: center;
   }
-  .collection-list-pagination {
+  .tenancy-collection-list-pagination {
     text-align: center;
   }
-  .pagination-buttons {
+  .tenancy-pagination-buttons {
     display: flex;
     justify-content: center;
     width: 100%;
@@ -319,12 +322,12 @@
   .tenancy-id-column {
     padding-right: 10px;
   }
-  .tenancy-data.tenant-column {
+  .tenancy-data.tenancy-tenant-column {
     white-space: nowrap;
     padding-left: 5px;
     padding-right: 0;
   }
-  .dropdown-label {
+  .tenancy-dropdown-label {
     font-family: "Inter Tight";
     font-size: 12px;
     font-style: normal;
@@ -335,13 +338,15 @@
     margin-bottom: 4px;
     padding-left: 0;
   }
-  .dropdown-value {
+  .tenancy-dropdown-value {
     font-family: "Inter Tight";
     font-size: 13px;
     font-style: normal;
     font-weight: 400;
     line-height: 22px;
     color: #201d1e;
+    word-break: break-word;
+    padding-right: 0px;
   }
   .tenancy-status {
     padding: 0px 9px;
@@ -354,22 +359,26 @@
   }
   .tenancy-dropdown-content {
     width: 100%;
+    padding: 15px 0;
   }
-  .grid-cols-3 {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 9px;
+  .tenancy-grid {
+    display: grid;
+    gap: 4px;
+    margin-bottom: 24px;
   }
-  .dropdown-value {
-    word-break: break-word;
-    padding-right: 0px;
+  .tenancy-grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
   }
-  .flex.items-center.gap-2 {
+  .tenancy-grid-item {
+    padding-right: 10px;
+  }
+  .tenancy-flex.tenancy-items-center.tenancy-gap-2 {
     gap: 10px;
   }
-  .mobile-no-border {
+  .tenancy-mobile-no-border {
     border-bottom: none !important;
   }
-  .mobile-with-border {
+  .tenancy-mobile-with-border {
     border-bottom: 1px solid #e9e9e9;
   }
 }
