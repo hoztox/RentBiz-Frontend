@@ -62,3 +62,100 @@
 .update-charges-save-btn:hover {
   background-color: #076094;
 }
+
+/* Responsive Styles */
+.update-charges-modal-container {
+  width: 100%;
+  max-width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  background-color: #f8f9fa;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .update-charges-modal-container {
+    width: 1006px;
+    max-width: 1006px;
+    height: auto;
+    border-radius: 6px;
+    background-color: #ffffff;
+  }
+}
+
+@media (max-width: 480px) {
+  .update-charges-modal-container {
+    position: absolute;
+    top: 90px;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    margin: 0;
+    height: 100vh;
+    border-radius: 0;
+    background-color: #f8f9fa;
+    padding: 20px;
+    max-height: calc(100vh - 90px);
+    overflow-y: auto;
+  }
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    position: static;
+    inset: auto;
+    display: block;
+    background-color: transparent;
+    opacity: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .update-charges-head {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .update-charges-close-btn {
+    display: none !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .update-charges-input,
+  .update-charges-selection {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .update-charges-input,
+  .update-charges-selection {
+    max-width: calc(100vw - 40px);
+    background-color: #f8f9fa;
+  }
+}
+
+@media (max-width: 480px) {
+  .update-charges-save-btn {
+    max-width: calc(100vw - 40px);
+    margin-bottom: 50px;
+  }
+}
+
+/* Adjust grid layout for mobile */
+@media (max-width: 480px) {
+  .grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}

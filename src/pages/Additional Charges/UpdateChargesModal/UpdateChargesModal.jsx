@@ -5,7 +5,7 @@ import closeicon from "../../../assets/Images/Additional Charges/close-icon.svg"
 import calendaricon from "../../../assets/Images/Additional Charges/calendar-icon.svg";
 import plusicon from "../../../assets/Images/Additional Charges/input-plus-icon.svg";
 
-const UpdateChargesModal = ({ isOpen, onClose, chargeData}) => {
+const UpdateChargesModal = ({ isOpen, onClose, chargeData }) => {
   const [tenancyContract, setTenancyContract] = useState("");
   const [id, setId] = useState("");
   const [date, setDate] = useState("");
@@ -23,44 +23,44 @@ const UpdateChargesModal = ({ isOpen, onClose, chargeData}) => {
 
   const handleUpdate = () => {
     const updatedData = {
-        id,
-        tenancyContract,
-        date,
-        chargeCode,
-        reason,
-        amountDue,
-        vatAmount,
-        totalAmount,
-        dueDate,
-        status,
-        remarks,
-      };
-      console.log("Updated Data:", updatedData);
-      onClose();
+      id,
+      tenancyContract,
+      date,
+      chargeCode,
+      reason,
+      amountDue,
+      vatAmount,
+      totalAmount,
+      dueDate,
+      status,
+      remarks,
+    };
+    console.log("Updated Data:", updatedData);
+    onClose();
   };
 
   useEffect(() => {
-    if(chargeData) {
-        setId(chargeData.id || '');
-        setTenancyContract(chargeData.tenancyContract || '');
-        setDate(chargeData.date || '');
-        setChargeCode(chargeData.chargeCode || '');
-        setReason(chargeData.reason || '');
-        setAmountDue(chargeData.amountDue || '');
-        setVatAmount(chargeData.vatAmount || '');
-        setTotalAmount(chargeData.totalAmount || '');
-        setDueDate(chargeData.dueDate || '');
-        setStatus(chargeData.status || '');
-        setRemarks(chargeData.remarks || '');
+    if (chargeData) {
+      setId(chargeData.id || '');
+      setTenancyContract(chargeData.tenancyContract || '');
+      setDate(chargeData.date || '');
+      setChargeCode(chargeData.chargeCode || '');
+      setReason(chargeData.reason || '');
+      setAmountDue(chargeData.amountDue || '');
+      setVatAmount(chargeData.vatAmount || '');
+      setTotalAmount(chargeData.totalAmount || '');
+      setDueDate(chargeData.dueDate || '');
+      setStatus(chargeData.status || '');
+      setRemarks(chargeData.remarks || '');
     }
-  }, [chargeData])
+  }, [chargeData]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-md w-[1006px] shadow-lg p-1">
-        <div className="flex justify-between items-center p-6 mt-2">
+    <div className="modal-overlay">
+      <div className="update-charges-modal-container bg-white rounded-md w-[1006px] shadow-lg p-1">
+        <div className="flex justify-between items-center md:p-6 mt-2">
           <h2 className="text-[#201D1E] update-charges-head">
             Update Additional Charge
           </h2>
@@ -72,7 +72,7 @@ const UpdateChargesModal = ({ isOpen, onClose, chargeData}) => {
           </button>
         </div>
 
-        <div className="p-6 mt-[-15px]">
+        <div className="md:p-6 mt-[-15px]">
           <div className="grid grid-cols-2 gap-6">
             {/* First row */}
             <div className="space-y-2">
@@ -84,7 +84,6 @@ const UpdateChargesModal = ({ isOpen, onClose, chargeData}) => {
                   value={tenancyContract}
                   onChange={(e) => {
                     setTenancyContract(e.target.value);
-                    // Add or remove a class based on the value
                     if (e.target.value === "") {
                       e.target.classList.add("update-charges-selected");
                     } else {
@@ -149,7 +148,6 @@ const UpdateChargesModal = ({ isOpen, onClose, chargeData}) => {
                   value={chargeCode}
                   onChange={(e) => {
                     setChargeCode(e.target.value);
-                    // Add or remove a class based on the value
                     if (e.target.value === "") {
                       e.target.classList.add("update-charges-selected");
                     } else {
@@ -158,7 +156,7 @@ const UpdateChargesModal = ({ isOpen, onClose, chargeData}) => {
                   }}
                   onFocus={() => setIsSelectOpenChargeCode(true)}
                   onBlur={() => setIsSelectOpenChargeCode(false)}
-                  className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-charges-selection ${
+                  className={`block w-full pl-3 Pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-charges-selection ${
                     chargeCode === "" ? "update-charges-selected" : ""
                   }`}
                 >
@@ -254,7 +252,6 @@ const UpdateChargesModal = ({ isOpen, onClose, chargeData}) => {
                   value={status}
                   onChange={(e) => {
                     setStatus(e.target.value);
-                    // Add or remove a class based on the value
                     if (e.target.value === "") {
                       e.target.classList.add("update-charges-selected");
                     } else {
