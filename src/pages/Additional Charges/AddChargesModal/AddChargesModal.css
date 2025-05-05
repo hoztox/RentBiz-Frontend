@@ -149,7 +149,7 @@
 @media (max-width: 480px) {
   .add-charges-save-btn {
     max-width: calc(100vw - 40px);
-    width: 100%;
+    margin-bottom: 31px;
   }
 }
 
