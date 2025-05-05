@@ -81,7 +81,7 @@ const AddChargesModal = ({ isOpen, onClose }) => {
         </div>
 
         <div className="md:p-6 mt-[-15px]">
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid ac-grid-cols-2 gap-6">
             {/* First row */}
             <div className="space-y-2">
               <label className="block add-charges-label">

@@ -73,7 +73,7 @@ const UpdateChargesModal = ({ isOpen, onClose, chargeData }) => {
         </div>
 
         <div className="md:p-6 mt-[-15px]">
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid uc-grid-cols-2 gap-6">
             {/* First row */}
             <div className="space-y-2">
               <label className="block update-charges-label">
@@ -156,7 +156,7 @@ const UpdateChargesModal = ({ isOpen, onClose, chargeData }) => {
                   }}
                   onFocus={() => setIsSelectOpenChargeCode(true)}
                   onBlur={() => setIsSelectOpenChargeCode(false)}
-                  className={`block w-full pl-3 Pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-charges-selection ${
+                  className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-charges-selection ${
                     chargeCode === "" ? "update-charges-selected" : ""
                   }`}
                 >
