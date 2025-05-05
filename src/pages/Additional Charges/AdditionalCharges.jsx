@@ -5,6 +5,7 @@ import plusicon from "../../assets/Images/Additional Charges/plus-icon.svg";
 import downloadicon from "../../assets/Images/Additional Charges/download-icon.svg";
 import editicon from "../../assets/Images/Additional Charges/edit-icon.svg";
 import deleteicon from "../../assets/Images/Additional Charges/delete-icon.svg";
+import downarrow from "../../assets/Images/Additional Charges/downarrow.svg";
 import AddChargesModal from "./AddChargesModal/AddChargesModal";
 import UpdateChargesModal from "./UpdateChargesModal/UpdateChargesModal";
 
@@ -13,8 +14,9 @@ const AdditionalCharges = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false)
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [selectedCharge, setSelectedCharge] = useState(null);
+  const [expandedRows, setExpandedRows] = useState(false);
   const itemsPerPage = 10;
 
   const demoData = [
@@ -28,7 +30,7 @@ const AdditionalCharges = () => {
       status: "Paid",
     },
     {
-      id: "#834",
+      id: "#835",
       chargeId: "Rent",
       date: "24 Nov 2024",
       amountDue: "300.00",
@@ -37,7 +39,7 @@ const AdditionalCharges = () => {
       status: "Paid",
     },
     {
-      id: "#834",
+      id: "#836",
       chargeId: "Rent",
       date: "24 Nov 2024",
       amountDue: "300.00",
@@ -46,7 +48,7 @@ const AdditionalCharges = () => {
       status: "Paid",
     },
     {
-      id: "#834",
+      id: "#837",
       chargeId: "Rent",
       date: "24 Nov 2024",
       amountDue: "300.00",
@@ -55,7 +57,7 @@ const AdditionalCharges = () => {
       status: "Paid",
     },
     {
-      id: "#834",
+      id: "#838",
       chargeId: "Rent",
       date: "24 Nov 2024",
       amountDue: "300.00",
@@ -95,147 +97,241 @@ const AdditionalCharges = () => {
   };
 
   const openUpdateModal = (charge) => {
-    setSelectedCharge(charge)
-    setIsUpdateModalOpen(true)
-  }
+    setSelectedCharge(charge);
+    setIsUpdateModalOpen(true);
+  };
 
   const closeUdapteModal = () => {
-    setIsUpdateModalOpen(false)
-  }
+    setIsUpdateModalOpen(false);
+  };
+
+  const toggleRowExpand = (id) => {
+    setExpandedRows((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
 
   return (
-    <div className="border border-[#E9E9E9]  rounded-md">
-      <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9]">
+    <div className="border border-[#E9E9E9] rounded-md additional-charges-table">
+      <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] additional-charges-table-header">
         <h1 className="additional-charges-head">Additional Charges</h1>
-        <div className="flex gap-[10px]">
-          <input
-            type="text"
-            placeholder="Search"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-[302px] focus:border-gray-300 duration-200 additional-charges-search"
-          />
-
-          <div className="relative">
-            <select
-              name="select"
-              id=""
-              className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[121px] cursor-pointer focus:border-gray-300 duration-200 additional-charges-selection"
-              onFocus={() => setIsSelectOpen(true)}
-              onBlur={() => setIsSelectOpen(false)}
-            >
-              <option value="showing">Showing</option>
-              <option value="all">All</option>
-            </select>
-            <ChevronDown
-              className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                isSelectOpen ? "rotate-180" : "rotate-0"
-              }`}
+        <div className="flex flex-col md:flex-row gap-[10px] additional-charges-inputs-container">
+          <div className="flex flex-col md:flex-row gap-[10px] w-full">
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 additional-charges-search"
             />
+            <div className="relative w-full md:w-auto">
+              <select
+                name="select"
+                id=""
+                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 additional-charges-selection"
+                onFocus={() => setIsSelectOpen(true)}
+                onBlur={() => setIsSelectOpen(false)}
+              >
+                <option value="showing">Showing</option>
+                <option value="all">All</option>
+              </select>
+              <ChevronDown
+                className={`absolute md:right-2 right-4 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
+                  isSelectOpen ? "rotate-180" : "rotate-0"
+                }`}
+              />
+            </div>
           </div>
-          <button
-            className="flex items-center justify-center gap-2 w-[176px] h-[38px] rounded-md add-charges duration-200"
-            onClick={openAddModal}
-          >
-            Add Charges
-            <img src={plusicon} alt="plus icon" className="w-[15px] h-[15px]" />
-          </button>
-          <button className="flex items-center justify-center gap-2 w-[122px] h-[38px] rounded-md duration-200 download-btn">
-            Download
-            <img
-              src={downloadicon}
-              alt="Download Icon"
-              className="w-[15px] h-[15px] download-img"
-            />
-          </button>
+          {/* Modified the action buttons container for better mobile layout */}
+          <div className="flex gap-[10px] action-buttons-container w-full md:w-auto justify-start">
+            <button
+              className="flex items-center justify-center gap-2 h-[38px] rounded-md add-charges duration-200 w-[169px]"
+              onClick={openAddModal}
+            >
+              Add Charges
+              <img src={plusicon} alt="plus icon" className="w-[15px] h-[15px]" />
+            </button>
+            <button className="flex items-center justify-center gap-2 h-[38px] rounded-md duration-200 download-btn w-[122px]">
+              Download
+              <img
+                src={downloadicon}
+                alt="Download Icon"
+                className="w-[15px] h-[15px] download-img"
+              />
+            </button>
+          </div>
         </div>
       </div>
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="border-b border-[#E9E9E9] h-[57px]">
-            <th className="px-5 text-left additional-charges-thead">ID</th>
-            <th className="px-5 text-left additional-charges-thead">
-              CHARGE ID
-            </th>
-            <th className="pl-5 text-left additional-charges-thead">DATE</th>
-            <th className="pl-5 text-left additional-charges-thead">
-              AMOUNT DUE
-            </th>
-            <th className="px-5 text-left additional-charges-thead">REASON</th>
-            <th className="px-5 text-left additional-charges-thead">
-              DUE DATE
-            </th>
-            <th className="px-5 text-left additional-charges-thead w-[68px]">
-              STATUS
-            </th>
-            <th className="px-5 pr-6 text-right additional-charges-thead">
-              ACTION
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {paginatedData.map((charges, index) => (
-            <tr
-              key={index}
-              className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
-            >
-              <td className="px-5 text-left additional-charges-data">
-                {charges.id}
-              </td>
-              <td className="px-5 text-left additional-charges-data">
-                {charges.chargeId}
-              </td>
-              <td className="pl-5 text-left additional-charges-data">
-                {charges.date}
-              </td>
-              <td className="pl-5 text-left additional-charges-data">
-                {charges.amountDue}
-              </td>
-              <td className="px-5 text-left tenancy-data">{charges.reason}</td>
-              <td className="px-5 text-left additional-charges-data">
-                {charges.dueDate}
-              </td>
-
-              <td className="px-5 text-left additional-charges-data">
-                <span
-                  className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
-                    charges.status === "Paid"
-                      ? "bg-[#28C76F29] text-[#28C76F]"
-                      : "bg-[#FFE1E1] text-[#C72828]"
-                  }`}
-                >
-                  {charges.status}
-                </span>
-              </td>
-
-              <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                <button onClick={() => openUpdateModal(charges)}>
-                  <img
-                    src={editicon}
-                    alt="Edit"
-                    className="w-[18px] h-[18px] action-btn duration-200"
-                  />
-                </button>
-                <button>
-                  <img
-                    src={deleteicon}
-                    alt="Deletes"
-                    className="w-[18px] h-[18px] action-btn duration-200"
-                  />
-                </button>
-              </td>
+      <div className="desktop-only">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="border-b border-[#E9E9E9] h-[57px]">
+              <th className="px-5 text-left additional-charges-thead">ID</th>
+              <th className="px-5 text-left additional-charges-thead">CHARGE ID</th>
+              <th className="pl-5 text-left additional-charges-thead">DATE</th>
+              <th className="pl-5 text-left additional-charges-thead">AMOUNT DUE</th>
+              <th className="px-5 text-left additional-charges-thead">REASON</th>
+              <th className="px-5 text-left additional-charges-thead">DUE DATE</th>
+              <th className="px-5 text-left additional-charges-thead w-[68px]">STATUS</th>
+              <th className="px-5 pr-6 text-right additional-charges-thead">ACTION</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="flex justify-between items-center h-[77.5px] px-5">
-        <span className="collection-list-pagination">
-          Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-          {filteredData.length} entries
+          </thead>
+          <tbody>
+            {paginatedData.map((charges, index) => (
+              <tr
+                key={index}
+                className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
+              >
+                <td className="px-5 text-left additional-charges-data">{charges.id}</td>
+                <td className="px-5 text-left additional-charges-data">{charges.chargeId}</td>
+                <td className="pl-5 text-left additional-charges-data">{charges.date}</td>
+                <td className="pl-5 text-left additional-charges-data">{charges.amountDue}</td>
+                <td className="px-5 text-left additional-charges-data">{charges.reason}</td>
+                <td className="px-5 text-left additional-charges-data">{charges.dueDate}</td>
+                <td className="px-5 text-left additional-charges-data">
+                  <span
+                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
+                      charges.status === "Paid"
+                        ? "bg-[#28C76F29] text-[#28C76F]"
+                        : "bg-[#FFE1E1] text-[#C72828]"
+                    }`}
+                  >
+                    {charges.status}
+                  </span>
+                </td>
+                <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
+                  <button onClick={() => openUpdateModal(charges)}>
+                    <img
+                      src={editicon}
+                      alt="Edit"
+                      className="w-[18px] h-[18px] action-btn duration-200"
+                    />
+                  </button>
+                  <button>
+                    <img
+                      src={deleteicon}
+                      alt="Delete"
+                      className="w-[18px] h-[18px] action-btn duration-200"
+                    />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="block md:hidden">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="additional-charges-table-row-head">
+              <th className="px-5 text-left additional-charges-thead additional-charges-id-column">ID</th>
+              <th className="px-5 text-left additional-charges-thead charge-id-column">CHARGE ID</th>
+              <th className="px-5 text-left additional-charges-thead date-column">DATE</th>
+              <th className="px-5 text-right additional-charges-thead"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedData.map((charges, index) => (
+              <React.Fragment key={index}>
+                <tr
+                  className={`${
+                    expandedRows[charges.id + index]
+                      ? "mobile-no-border"
+                      : "mobile-with-border"
+                  } border-b border-[#E9E9E9] h-[57px]`}
+                >
+                  <td className="px-5 text-left additional-charges-data additional-charges-id-column">{charges.id}</td>
+                  <td className="px-5 text-left additional-charges-data charge-id-column">{charges.chargeId}</td>
+                  <td className="px-5 text-left additional-charges-data date-column">{charges.date}</td>
+                  <td className="py-4 flex items-center justify-end h-[57px]">
+                    <div
+                      className={`additional-charges-dropdown-field ${
+                        expandedRows[charges.id + index] ? "active" : ""
+                      }`}
+                      onClick={() => toggleRowExpand(charges.id + index)}
+                    >
+                      <img
+                        src={downarrow}
+                        alt="drop-down-arrow"
+                        className={`additional-charges-dropdown-img ${
+                          expandedRows[charges.id + index] ? "text-white" : ""
+                        }`}
+                      />
+                    </div>
+                  </td>
+                </tr>
+                {expandedRows[charges.id + index] && (
+                  <tr className="mobile-with-border border-b border-[#E9E9E9]">
+                    <td colSpan={4} className="px-5">
+                      <div className="additional-charges-dropdown-content">
+                        {/* First row of dropdown content - aligned with headers */}
+                        <div className="dropdown-content-grid">
+                          <div className="dropdown-content-item amount-due-column">
+                            <div className="dropdown-label">AMOUNT DUE</div>
+                            <div className="dropdown-value">{charges.amountDue}</div>
+                          </div>
+                          <div className="dropdown-content-item reason-column pl-[12px]">
+                            <div className="dropdown-label">REASON</div>
+                            <div className="dropdown-value">{charges.reason}</div>
+                          </div>
+                          <div className="dropdown-content-item due-date-column pl-[5px]">
+                            <div className="dropdown-label">DUE DATE</div>
+                            <div className="dropdown-value">{charges.dueDate}</div>
+                          </div>
+                        </div>
+                        
+                        {/* Second row of dropdown content */}
+                        <div className="dropdown-content-grid">
+                          <div className="dropdown-content-item status-column">
+                            <div className="dropdown-label">STATUS</div>
+                            <div className="dropdown-value">
+                              <span
+                                className={`additional-charges-status ${
+                                  charges.status === "Paid"
+                                    ? "bg-[#28C76F29] text-[#28C76F]"
+                                    : "bg-[#FFE1E1] text-[#C72828]"
+                                }`}
+                              >
+                                {charges.status}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="dropdown-content-item action-column pl-[12px]">
+                            <div className="dropdown-label">ACTION</div>
+                            <div className="dropdown-value flex items-center gap-4">
+                              <button onClick={() => openUpdateModal(charges)}>
+                                <img
+                                  src={editicon}
+                                  alt="Edit"
+                                  className="w-[18px] h-[18px] action-btn duration-200"
+                                />
+                              </button>
+                              <button>
+                                <img
+                                  src={deleteicon}
+                                  alt="Delete"
+                                  className="w-[18px] h-[18px] action-btn duration-200"
+                                />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-3 md:px-5 pagination-container">
+        <span className="collection-list-pagination pagination-text">
+          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
+          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
         </span>
-        <div className="flex gap-[4px]">
+        <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto pagination-buttons">
           <button
             className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
             disabled={currentPage === 1}
@@ -251,7 +347,7 @@ const AdditionalCharges = () => {
               1
             </button>
           )}
-          {startPage > 2 && <span className="px-2">...</span>}
+          {startPage > 2 && <span className="px-2 flex items-center">...</span>}
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
@@ -265,7 +361,7 @@ const AdditionalCharges = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && <span className="px-2">...</span>}
+          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
@@ -283,10 +379,7 @@ const AdditionalCharges = () => {
           </button>
         </div>
       </div>
-      {/* Add Charges Modal */}
       <AddChargesModal isOpen={isAddModalOpen} onClose={closeAddModal} />
-
-      {/* Update Charges Modal */}
       <UpdateChargesModal isOpen={isUpdateModalOpen} onClose={closeUdapteModal} chargeData={selectedCharge} />
     </div>
   );
