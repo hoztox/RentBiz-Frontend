@@ -289,12 +289,12 @@ const Invoice = () => {
           </tbody>
         </table>
       </div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-3 md:px-5 inv-pagination-container">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 inv-pagination-container">
         <span className="inv-collection-list-pagination inv-pagination-text">
           Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
           {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
         </span>
-        <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto inv-pagination-buttons">
+        <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto inv-pagination-buttons">
           <button
             className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer inv-pagination-btn"
             disabled={currentPage === 1}

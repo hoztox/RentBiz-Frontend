@@ -310,7 +310,7 @@
       background-color: #254396;
     }
     .inv-dropdown-img {
-      width: 10px;
+      width: 11px;
       transition: transform 0.3s ease;
     }
     .inv-dropdown-field.active .inv-dropdown-img {
