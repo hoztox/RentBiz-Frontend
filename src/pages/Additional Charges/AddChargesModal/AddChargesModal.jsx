@@ -66,9 +66,9 @@ const AddChargesModal = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-md w-[1006px] shadow-lg p-1">
-        <div className="flex justify-between items-center p-6 mt-2">
+    <div className="modal-overlay">
+      <div className="add-charges-modal-container bg-white rounded-md w-[1006px] shadow-lg p-1">
+        <div className="flex justify-between items-center md:p-6 mt-2">
           <h2 className="text-[#201D1E] add-charges-head">
             Create New Additional Charge
           </h2>
@@ -80,7 +80,7 @@ const AddChargesModal = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <div className="p-6 mt-[-15px]">
+        <div className="md:p-6 mt-[-15px]">
           <div className="grid grid-cols-2 gap-6">
             {/* First row */}
             <div className="space-y-2">
@@ -92,7 +92,6 @@ const AddChargesModal = ({ isOpen, onClose }) => {
                   value={tenancyContract}
                   onChange={(e) => {
                     setTenancyContract(e.target.value);
-                    // Add or remove a class based on the value
                     if (e.target.value === "") {
                       e.target.classList.add("add-charges-selected");
                     } else {
@@ -157,7 +156,6 @@ const AddChargesModal = ({ isOpen, onClose }) => {
                   value={chargeCode}
                   onChange={(e) => {
                     setChargeCode(e.target.value);
-                    // Add or remove a class based on the value
                     if (e.target.value === "") {
                       e.target.classList.add("add-charges-selected");
                     } else {
@@ -170,7 +168,7 @@ const AddChargesModal = ({ isOpen, onClose }) => {
                     chargeCode === "" ? "add-charges-selected" : ""
                   }`}
                 >
-                  <option value="" diabled hidden>
+                  <option value="" disabled hidden>
                     Choose
                   </option>
                   <option value="rent">Rent</option>
@@ -262,7 +260,6 @@ const AddChargesModal = ({ isOpen, onClose }) => {
                   value={status}
                   onChange={(e) => {
                     setStatus(e.target.value);
-                    // Add or remove a class based on the value
                     if (e.target.value === "") {
                       e.target.classList.add("add-charges-selected");
                     } else {
