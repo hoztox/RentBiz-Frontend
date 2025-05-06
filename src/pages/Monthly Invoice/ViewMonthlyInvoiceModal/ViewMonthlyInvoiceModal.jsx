@@ -34,7 +34,7 @@ const ViewMonthlyInvoiceModal = ({ isOpen, onClose }) => {
         </div>
 
         {/* Invoice Charges Table */}
-        <div className="mt-6 view-monthly-invoice-modal-overflow-x-auto border border-[#E9E9E9] rounded-md mb-[50px]">
+        <div className="mt-6 view-monthly-invoice-modal-overflow-x-auto border border-[#E9E9E9] rounded-md mb-[80px]">
           <div className="view-monthly-invoice-modal-desktop-table">
             <table className="w-full border-collapse view-monthly-invoice-modal-table">
               <thead>
