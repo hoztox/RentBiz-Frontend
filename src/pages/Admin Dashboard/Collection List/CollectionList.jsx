@@ -161,7 +161,7 @@ const CollectionList = () => {
     };
 
     return (
-        <div className="w-full rounded-md border border-[#E9E9E9] collection-list-table">
+        <div className="w-full rounded-md border border-[#E9E9E9] collection-list-table mb-[80px] md:mb-0">
             <h1 className="collection-list-head px-5 pt-5 pb-[18px]">Collection List</h1>
 
             {/* Filter tabs */}

@@ -451,7 +451,7 @@
     .collection-dropdown-item.collection-status-column,
     .collection-dropdown-item.collection-action-column {
         width: 33.33%; /* Override previous widths */
-        padding-right: 10px; /* Consistent padding */
+        padding-right: 5px; /* Consistent padding */
     }
     .collection-dropdown-item.collection-status-column .collection-dropdown-value {
         text-align: left; /* Center the status value */
