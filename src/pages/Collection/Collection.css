@@ -284,7 +284,7 @@
     .collection-table {
         max-width: calc(100vw - 40px);
         margin-bottom: 50px;
-        overflow-x: auto; /* Allow horizontal scrolling for table */
+        overflow-x: auto; 
     }
     .collection-table-header {
         flex-direction: column;
@@ -380,23 +380,23 @@
     }
     .collection-id-column {
         padding-right: 10px;
-        width: 28%; /* Adjusted for better fit */
+        width: 28%; 
     }
     .collection-date-column {
-        width: 34%; /* Adjusted for balance */
+        width: 34%; 
     }
     .collection-tenancy-id-column {
-        width: 38%; /* Adjusted for longer text */
+        width: 38%; 
         padding-right: 0;
     }
     .collection-data.collection-id-column,
     .collection-data.collection-date-column,
     .collection-data.collection-tenancy-id-column {
         white-space: nowrap;
-        padding-left: 10px; /* Reduced padding */
+        padding-left: 10px;
         padding-right: 0;
         overflow: hidden;
-        text-overflow: ellipsis; /* Truncate long text */
+        text-overflow: ellipsis;
     }
     .collection-dropdown-label {
         font-family: "Inter Tight";
@@ -408,7 +408,7 @@
         color: #818da0;
         margin-bottom: 4px;
         padding-left: 0;
-        text-align: left; /* Ensure left alignment */
+        text-align: left; 
     }
     .collection-dropdown-value {
         font-family: "Inter Tight";
@@ -417,7 +417,7 @@
         font-weight: 400;
         line-height: 22px;
         color: #201D1E;
-        text-align: left; /* Ensure left alignment */
+        text-align: left; 
     }
     .collection-status {
         padding: 0px 9px;
@@ -439,7 +439,7 @@
         flex-wrap: wrap;
     }
     .collection-dropdown-item {
-        width: 33.33%; /* Uniform width for all items */
+        width: 33.33%; 
         padding-right: 10px;
         box-sizing: border-box;
         margin-bottom: 15px;
@@ -450,11 +450,11 @@
     .collection-dropdown-item.collection-payment-column,
     .collection-dropdown-item.collection-status-column,
     .collection-dropdown-item.collection-action-column {
-        width: 33.33%; /* Override previous widths */
-        padding-right: 5px; /* Consistent padding */
+        width: 33.33%; 
+        padding-right: 5px; 
     }
     .collection-dropdown-item.collection-status-column .collection-dropdown-value {
-        text-align: left; /* Center the status value */
+        text-align: left; 
     }
     .collection-dropdown-item.collection-action-column .collection-dropdown-value {
         justify-content: flex-center; 
