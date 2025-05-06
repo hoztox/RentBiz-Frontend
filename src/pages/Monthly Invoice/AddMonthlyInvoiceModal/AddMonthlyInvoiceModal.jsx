@@ -22,7 +22,6 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
     ],
   });
 
-  // State to track which dropdowns are open
   const [openDropdowns, setOpenDropdowns] = useState({
     tenancy: false,
     tenant: false,
@@ -30,15 +29,11 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
     select: false,
   });
 
-  // Reset formData when modal opens
   useEffect(() => {
     if (isOpen) {
       setFormData({
-        tenancy: "",
-        inDate: "",
-        buildingName: "",
-        unitName: "",
-        endDate: "",
+        dueDate: "",
+        invoiceDate: "",
         invoiceItems: [
           {
             tenancy: "",
@@ -80,32 +75,29 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
   };
 
   const handleSave = () => {
-    // Handle saving the monthly invoice
     onClose();
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div
-      className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ${
-        isOpen ? "block" : "hidden"
-      }`}
-    >
-      <div className="bg-white rounded-md w-[1006px] p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-[#201D1E] invoice-modal-head">
+    <div className="modal-overlay">
+      <div className="bg-white rounded-md w-[1006px] p-6 monthly-invoice-modal-container">
+        <div className="flex justify-between items-center md:mb-6">
+          <h2 className="text-[#201D1E] monthly-invoice-modal-head">
             Create New Monthly Invoice
           </h2>
           <button
             onClick={onClose}
-            className="invoice-modal-close-btn hover:bg-gray-100 duration-200"
+            className="monthly-invoice-modal-close-btn hover:bg-gray-100 duration-200"
           >
             <img src={closeicon} alt="close" className="w-[15px] h-[15px]" />
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
+        <div className="monthly-invoice-modal-grid gap-6">
           <div>
-            <label className="block mb-3 invoice-modal-label">Due Date</label>
+            <label className="block mb-3 monthly-invoice-modal-label">Due Date</label>
             <div className="relative">
               <input
                 type="date"
@@ -113,7 +105,7 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
                 placeholder="dd/mm/yyyy"
                 value={formData.dueDate}
                 onChange={handleChange}
-                className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-input"
+                className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 monthly-invoice-modal-input"
               />
               <div className="absolute inset-y-0 right-1 flex items-center pr-3 pointer-events-none">
                 {/* <img src={calendaricon} alt="Calendar" className="w-5 h-5" /> */}
@@ -122,17 +114,17 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block mb-3 invoice-modal-label">
+            <label className="block mb-3 monthly-invoice-modal-label">
               Invoice Date*
             </label>
             <div className="relative">
               <input
                 type="date"
-                name="inoviceDate"
+                name="invoiceDate"
                 placeholder="mm/dd/yyyy"
                 value={formData.invoiceDate}
                 onChange={handleChange}
-                className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-input appearance-none"
+                className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 monthly-invoice-modal-input appearance-none"
               />
               <div className="absolute inset-y-0 right-1 flex items-center pr-3 pointer-events-none">
                 {/* <img src={calendaricon} alt="Calendar" className="w-5 h-5" /> */}
@@ -141,41 +133,172 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        <div className="mt-6 overflow-x-auto border border-[#E9E9E9] rounded-md">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="border-b border-[#E9E9E9] h-[50px]">
-                <th className="px-[10px] text-left invoice-modal-thead uppercase w-[105px]">
-                  Tenancy
-                </th>
-                <th className="px-[10px] text-left invoice-modal-thead uppercase w-[105px]">
-                  Tenant
-                </th>
-                <th className="px-[10px] text-left invoice-modal-thead uppercase w-[106px]">
-                  Charges
-                </th>
-                <th className="px-[10px] text-left invoice-modal-thead uppercase w-[123px]">
-                  Description
-                </th>
-                <th className="px-[10px] text-left invoice-modal-thead uppercase w-[136px]">
-                  Date
-                </th>
-                <th className="px-[10px] text-left invoice-modal-thead uppercase w-[118px]">
-                  Amount
-                </th>
-                <th className="px-[10px] text-left invoice-modal-thead uppercase w-[105px]">
-                  Select
-                </th>
-                <th className="px-[10px] text-left invoice-modal-thead uppercase w-[44px]">
-                  Total
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {formData.invoiceItems.map((item, index) => (
-                <tr key={index}>
-                  {/* TENANCY */}
-                  <td className="px-[10px] py-[5px] w-[105px] h-[57px] relative">
+        <div className="mt-6 monthly-invoice-modal-overflow-x-auto border border-[#E9E9E9] rounded-md">
+          <div className="monthly-invoice-modal-desktop-table">
+            <table className="w-full border-collapse monthly-invoice-modal-table">
+              <thead>
+                <tr className="border-b border-[#E9E9E9] h-[50px]">
+                  <th className="px-[10px] text-left monthly-invoice-modal-thead uppercase w-[105px]">
+                    Tenancy
+                  </th>
+                  <th className="px-[10px] text-left monthly-invoice-modal-thead uppercase w-[105px]">
+                    Tenant
+                  </th>
+                  <th className="px-[10px] text-left monthly-invoice-modal-thead uppercase w-[106px]">
+                    Charges
+                  </th>
+                  <th className="px-[10px] text-left monthly-invoice-modal-thead uppercase w-[123px]">
+                    Description
+                  </th>
+                  <th className="px-[10px] text-left monthly-invoice-modal-thead uppercase w-[136px]">
+                    Date
+                  </th>
+                  <th className="px-[10px] text-left monthly-invoice-modal-thead uppercase w-[118px]">
+                    Amount
+                  </th>
+                  <th className="px-[10px] text-left monthly-invoice-modal-thead uppercase w-[105px]">
+                    Select
+                  </th>
+                  <th className="px-[10px] text-left monthly-invoice-modal-thead uppercase w-[44px]">
+                    Total
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {formData.invoiceItems.map((item, index) => (
+                  <tr key={index}>
+                    <td className="px-[10px] py-[5px] w-[105px] h-[57px] relative">
+                      <select
+                        value={item.tenancy}
+                        onChange={(e) =>
+                          handleItemChange(index, "tenancy", e.target.value)
+                        }
+                        onFocus={() => toggleDropdown("tenancy")}
+                        onBlur={() => toggleDropdown("tenancy")}
+                        className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white monthly-invoice-modal-table-select"
+                      >
+                        <option value="">Choose</option>
+                      </select>
+                      <ChevronDown
+                        className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
+                          openDropdowns.tenancy ? "rotate-180" : ""
+                        }`}
+                      />
+                    </td>
+                    <td className="px-[10px] py-[5px] w-[105px] h-[57px] relative">
+                      <select
+                        value={item.tenant}
+                        onChange={(e) =>
+                          handleItemChange(index, "tenant", e.target.value)
+                        }
+                        onFocus={() => toggleDropdown("tenant")}
+                        onBlur={() => toggleDropdown("tenant")}
+                        className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white monthly-invoice-modal-table-select"
+                      >
+                        <option value="">Choose</option>
+                      </select>
+                      <ChevronDown
+                        className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
+                          openDropdowns.tenant ? "rotate-180" : ""
+                        }`}
+                      />
+                    </td>
+                    <td className="px-[10px] py-[5px] w-[106px] h-[57px] relative">
+                      <select
+                        value={item.charges}
+                        onChange={(e) =>
+                          handleItemChange(index, "charges", e.target.value)
+                        }
+                        onFocus={() => toggleDropdown("charges")}
+                        onBlur={() => toggleDropdown("charges")}
+                        className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white monthly-invoice-modal-table-select"
+                      >
+                        <option value="">Choose</option>
+                      </select>
+                      <ChevronDown
+                        className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
+                          openDropdowns.charges ? "rotate-180" : ""
+                        }`}
+                      />
+                    </td>
+                    <td className="px-[10px] py-[5px] w-[123px]">
+                      <input
+                        type="text"
+                        placeholder="Enter Reason"
+                        value={item.description}
+                        onChange={(e) =>
+                          handleItemChange(index, "description", e.target.value)
+                        }
+                        className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 monthly-invoice-modal-table-input"
+                      />
+                    </td>
+                    <td className="px-[10px] py-[5px] w-[136px] relative">
+                      <input
+                        type="text"
+                        placeholder="mm/dd/yyyy"
+                        value={item.date}
+                        onChange={(e) =>
+                          handleItemChange(index, "date", e.target.value)
+                        }
+                        className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 monthly-invoice-modal-table-input"
+                      />
+                      <img
+                        src={calendaricon}
+                        alt="Calendar"
+                        className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
+                      />
+                    </td>
+                    <td className="px-[10px] py-[5px] w-[118px]">
+                      <input
+                        type="text"
+                        placeholder="Enter Amount"
+                        value={item.amount}
+                        onChange={(e) =>
+                          handleItemChange(index, "amount", e.target.value)
+                        }
+                        className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 monthly-invoice-modal-table-input"
+                      />
+                    </td>
+                    <td className="px-[10px] py-[5px] w-[105px] relative">
+                      <select
+                        value={item.select}
+                        onChange={(e) =>
+                          handleItemChange(index, "select", e.target.value)
+                        }
+                        onFocus={() => toggleDropdown("select")}
+                        onBlur={() => toggleDropdown("select")}
+                        className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white monthly-invoice-modal-table-select"
+                      >
+                        <option value="">Choose</option>
+                      </select>
+                      <ChevronDown
+                        className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
+                          openDropdowns.select ? "rotate-180" : ""
+                        }`}
+                      />
+                    </td>
+                    <td className="px-[10px] py-[5px] w-[44px] text-left text-[14px] font-normal text-[#201D1E]">
+                      {Number(item.total).toFixed(4)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="monthly-invoice-modal-mobile-table">
+            {formData.invoiceItems.map((item, index) => (
+              <div key={index} className="monthly-invoice-modal-mobile-section">
+                <div className="monthly-invoice-modal-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-2">
+                  <div className="px-[10px] flex items-center monthly-invoice-modal-thead uppercase">
+                    Tenancy
+                  </div>
+                  <div className="px-[10px] flex items-center monthly-invoice-modal-thead uppercase">
+                    Tenant
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 border-b border-[#E9E9E9]">
+                  <div className="px-[10px] py-[10px] h-[57px] relative">
                     <select
                       value={item.tenancy}
                       onChange={(e) =>
@@ -183,7 +306,7 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
                       }
                       onFocus={() => toggleDropdown("tenancy")}
                       onBlur={() => toggleDropdown("tenancy")}
-                      className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white invoice-modal-table-select"
+                      className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white monthly-invoice-modal-table-select"
                     >
                       <option value="">Choose</option>
                     </select>
@@ -192,10 +315,8 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
                         openDropdowns.tenancy ? "rotate-180" : ""
                       }`}
                     />
-                  </td>
-
-                  {/* TENANT */}
-                  <td className="px-[10px] py-[5px] w-[105px] h-[57px] relative">
+                  </div>
+                  <div className="px-[10px] py-[10px] h-[57px] relative">
                     <select
                       value={item.tenant}
                       onChange={(e) =>
@@ -203,7 +324,7 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
                       }
                       onFocus={() => toggleDropdown("tenant")}
                       onBlur={() => toggleDropdown("tenant")}
-                      className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white invoice-modal-table-select"
+                      className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white monthly-invoice-modal-table-select"
                     >
                       <option value="">Choose</option>
                     </select>
@@ -212,10 +333,19 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
                         openDropdowns.tenant ? "rotate-180" : ""
                       }`}
                     />
-                  </td>
+                  </div>
+                </div>
 
-                  {/* CHARGES */}
-                  <td className="px-[10px] py-[5px] w-[105px] h-[57px] relative">
+                <div className="monthly-invoice-modal-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-2">
+                  <div className="px-[10px] flex items-center monthly-invoice-modal-thead uppercase">
+                    Charges
+                  </div>
+                  <div className="px-[10px] flex items-center monthly-invoice-modal-thead uppercase">
+                    Description
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 border-b border-[#E9E9E9]">
+                  <div className="px-[10px] py-[10px] h-[57px] relative">
                     <select
                       value={item.charges}
                       onChange={(e) =>
@@ -223,7 +353,7 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
                       }
                       onFocus={() => toggleDropdown("charges")}
                       onBlur={() => toggleDropdown("charges")}
-                      className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white invoice-modal-table-select"
+                      className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white monthly-invoice-modal-table-select"
                     >
                       <option value="">Choose</option>
                     </select>
@@ -232,10 +362,8 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
                         openDropdowns.charges ? "rotate-180" : ""
                       }`}
                     />
-                  </td>
-
-                  {/* DESCRIPTION */}
-                  <td className="px-[10px] py-[5px] w-[122px]">
+                  </div>
+                  <div className="px-[10px] py-[10px]">
                     <input
                       type="text"
                       placeholder="Enter Reason"
@@ -243,12 +371,21 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
                       onChange={(e) =>
                         handleItemChange(index, "description", e.target.value)
                       }
-                      className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
+                      className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 monthly-invoice-modal-table-input"
                     />
-                  </td>
+                  </div>
+                </div>
 
-                  {/* DATE */}
-                  <td className="px-[10px] py-[5px] w-[132px] relative">
+                <div className="monthly-invoice-modal-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-2">
+                  <div className="px-[10px] flex items-center monthly-invoice-modal-thead uppercase">
+                    Date
+                  </div>
+                  <div className="px-[10px] flex items-center monthly-invoice-modal-thead uppercase">
+                    Amount
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 border-b border-[#E9E9E9]">
+                  <div className="px-[10px] py-[10px] relative">
                     <input
                       type="text"
                       placeholder="mm/dd/yyyy"
@@ -256,17 +393,15 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
                       onChange={(e) =>
                         handleItemChange(index, "date", e.target.value)
                       }
-                      className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
+                      className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 monthly-invoice-modal-table-input"
                     />
                     <img
                       src={calendaricon}
                       alt="Calendar"
                       className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
                     />
-                  </td>
-
-                  {/* AMOUNT */}
-                  <td className="px-[10px] py-[5px] w-[117px]">
+                  </div>
+                  <div className="px-[10px] py-[10px]">
                     <input
                       type="text"
                       placeholder="Enter Amount"
@@ -274,12 +409,21 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
                       onChange={(e) =>
                         handleItemChange(index, "amount", e.target.value)
                       }
-                      className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
+                      className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 monthly-invoice-modal-table-input"
                     />
-                  </td>
+                  </div>
+                </div>
 
-                  {/* SELECT */}
-                  <td className="px-[10px] py-[5px] w-[105px] relative">
+                <div className="monthly-invoice-modal-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-2">
+                  <div className="px-[10px] flex items-center monthly-invoice-modal-thead uppercase">
+                    Select
+                  </div>
+                  <div className="px-[10px] flex items-center monthly-invoice-modal-thead uppercase ml-[70px]">
+                    Total
+                  </div>
+                </div>
+                <div className="grid grid-cols-2">
+                  <div className="px-[10px] py-[10px] relative">
                     <select
                       value={item.select}
                       onChange={(e) =>
@@ -287,7 +431,7 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
                       }
                       onFocus={() => toggleDropdown("select")}
                       onBlur={() => toggleDropdown("select")}
-                      className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white invoice-modal-table-select"
+                      className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white monthly-invoice-modal-table-select"
                     >
                       <option value="">Choose</option>
                     </select>
@@ -296,23 +440,21 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
                         openDropdowns.select ? "rotate-180" : ""
                       }`}
                     />
-                  </td>
-
-                  {/* TOTAL */}
-                  <td className="px-[10px] py-[5px] w-[44px] text-left text-[14px] font-normal text-[#201D1E]">
+                  </div>
+                  <div className="px-[10px] py-[10px] text-left text-[14px] font-normal text-[#201D1E] ml-[70px]">
                     {Number(item.total).toFixed(4)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="mt-8 flex justify-end">
           <button
             type="button"
             onClick={handleSave}
-            className="bg-[#2892CE] hover:bg-[#076094] duration-200 text-white py-2 px-6 invoice-modal-save-btn"
+            className="bg-[#2892CE] hover:bg-[#076094] duration-200 text-white py-2 px-6 monthly-invoice-modal-save-btn"
           >
             Save
           </button>

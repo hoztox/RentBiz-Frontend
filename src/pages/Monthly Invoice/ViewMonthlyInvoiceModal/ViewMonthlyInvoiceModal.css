@@ -1,54 +1,238 @@
-.invoice-view-modal-head {
-    font-family: "Inter Tight";
-    font-weight: 500;
-    font-size: 21px;
-    line-height: 24px;
-    letter-spacing: 0px;
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.view-monthly-invoice-modal-head {
+  font-family: "Inter Tight";
+  font-weight: 500;
+  font-size: 21px;
+  line-height: 24px;
+  letter-spacing: 0px;
+}
+
+.view-monthly-invoice-modal-close-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 60px;
+  border: 1px solid #e9e9e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.view-monthly-invoice-modal-label {
+  font-family: "Inter Tight";
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 100%;
+  letter-spacing: 0px;
+  color: #b7b5be;
+}
+
+.view-monthly-invoice-modal-data {
+  font-family: "Inter Tight";
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 24px;
+  letter-spacing: 0px;
+  color: #4b465c;
+}
+
+.view-monthly-invoice-charges-thead {
+  font-family: "Inter Tight";
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 24px;
+  letter-spacing: 0px;
+  color: #7f8898;
+}
+
+.view-monthly-invoice-charges-tdata {
+  font-family: "Inter Tight";
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 22px;
+  letter-spacing: 0px;
+  color: #201D1E;
+}
+
+/* Base table styles (applied to desktop) */
+.view-monthly-invoice-modal-table {
+  min-width: 0;
+  width: 100%;
+}
+
+.view-monthly-invoice-modal-table thead {
+  background-color: transparent;
+}
+
+.view-monthly-invoice-modal-table th {
+  padding: 10px;
+  font-size: 13px;
+  color: #7f8898;
+}
+
+.view-monthly-invoice-modal-table td {
+  padding: 5px 10px;
+  height: 57px;
+}
+
+.view-monthly-invoice-modal-table th:nth-child(1),
+.view-monthly-invoice-modal-table td:nth-child(1) {
+  width: 66px;
+}
+
+.view-monthly-invoice-modal-table th:nth-child(2),
+.view-monthly-invoice-modal-table td:nth-child(2) {
+  width: 56px;
+}
+
+.view-monthly-invoice-modal-table th:nth-child(3),
+.view-monthly-invoice-modal-table td:nth-child(3) {
+  width: 65px;
+}
+
+.view-monthly-invoice-modal-table th:nth-child(4),
+.view-monthly-invoice-modal-table td:nth-child(4) {
+  width: 163px;
+}
+
+.view-monthly-invoice-modal-table th:nth-child(5),
+.view-monthly-invoice-modal-table td:nth-child(5) {
+  width: 75px;
+}
+
+.view-monthly-invoice-modal-table th:nth-child(6),
+.view-monthly-invoice-modal-table td:nth-child(6) {
+  width: 80px;
+}
+
+.view-monthly-invoice-modal-table th:nth-child(7),
+.view-monthly-invoice-modal-table td:nth-child(7) {
+  width: 52px;
+}
+
+.view-monthly-invoice-modal-table th:nth-child(8),
+.view-monthly-invoice-modal-table td:nth-child(8) {
+  width: 44px;
+}
+
+.view-monthly-invoice-modal-table tbody tr {
+  background-color: transparent;
+}
+
+.view-monthly-invoice-modal-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* General modal styles */
+.view-monthly-invoice-modal-container {
+  width: 100%;
+  max-width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  background-color: #f8f9fa;
+  box-sizing: border-box;
+}
+
+.view-monthly-invoice-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 768px) {
+  .view-monthly-invoice-modal-container {
+    width: 1006px;
+    max-width: 1006px;
+    height: 356px;
+    border-radius: 6px;
+    background-color: #ffffff;
   }
-  
-  .invoice-view-modal-close-btn {
-    width: 42px;
-    height: 42px;
-    border-radius: 60px;
-    border: 1px solid #e9e9e9;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+}
+
+@media (min-width: 481px) {
+  .view-monthly-invoice-modal-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
-  
-  .invoice-view-modal-label {
-    font-family: "Inter Tight";
-    font-weight: 400;
-    font-size: 13px;
-    line-height: 100%;
-    letter-spacing: 0px;
-    color: #b7b5be;
+
+  .view-monthly-invoice-modal-mobile-table {
+    display: none;
   }
-  
-  .invoice-view-modal-data {
-    font-family: "Inter Tight";
-    font-weight: 400;
-    font-size: 15px;
-    line-height: 24px;
-    letter-spacing: 0px;
-    color: #4b465c;
+
+  .view-monthly-invoice-modal-desktop-table {
+    display: block;
   }
-  
-  .view-invoice-charges-thead {
-    font-family: "Inter Tight";
-    font-weight: 500;
-    font-size: 13px;
-    line-height: 24px;
-    letter-spacing: 0px;
-    color: #7f8898;
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    position: static;
+    inset: auto;
+    display: block;
+    background-color: transparent;
+    opacity: 1;
   }
-  
-  .view-invoice-charges-tdata {
-    font-family: "Inter Tight";
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 22px;
-    letter-spacing: 0px;
-    color: #201D1E;
+
+  .view-monthly-invoice-modal-container {
+    position: absolute;
+    top: 90px;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    margin: 0;
+    height: 100vh;
+    border-radius: 0;
+    background-color: #f8f9fa;
+    padding: 20px;
+    max-height: calc(100vh - 90px);
+    overflow-y: auto;
   }
-  
+
+  .view-monthly-invoice-modal-head {
+    display: none;
+  }
+
+  .view-monthly-invoice-modal-close-btn {
+    display: none !important;
+  }
+
+  .view-monthly-invoice-modal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .view-monthly-invoice-modal-grid > div {
+    padding: 0 !important;
+    border: none !important;
+  }
+
+  .view-monthly-invoice-modal-desktop-table {
+    display: none;
+  }
+
+  .view-monthly-invoice-modal-mobile-table {
+    display: block;
+  }
+
+  .view-monthly-invoice-modal-overflow-x-auto {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .view-monthly-invoice-modal-mobile-section {
+    width: 100%;
+  }
+
+  .view-monthly-invoice-modal-mobile-header {
+    background-color: #F2F2F2;
+  }
+
+  .view-monthly-invoice-modal-mobile-table .view-monthly-invoice-charges-tdata {
+    width: 100%;
+    max-width: none;
+  }
+}

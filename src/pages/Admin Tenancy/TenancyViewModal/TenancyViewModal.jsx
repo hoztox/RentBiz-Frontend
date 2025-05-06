@@ -181,7 +181,7 @@ const TenancyViewModal = ({ isOpen, onClose }) => {
               </tbody>
             </table>
             <div className="mobile-table hidden">
-              <div className="border-b border-[#E9E9E9] bg-[#F7F7F7] h-[57px] grid grid-cols-3 gap-2 px-[10px]">
+              <div className="border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px] grid grid-cols-3 gap-2 px-[10px]">
                 <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">No</div>
                 <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead w-[96px]">Charge Type</div>
                 <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">Reason</div>
@@ -191,7 +191,7 @@ const TenancyViewModal = ({ isOpen, onClose }) => {
                 <div className="view-tenancy-charges-tdata">Test</div>
                 <div className="view-tenancy-charges-tdata">Lorem ipsum dolor sit amet</div>
               </div>
-              <div className="border-b border-[#E9E9E9] bg-[#F7F7F7] h-[57px] grid grid-cols-3 gap-2 px-[10px]">
+              <div className="border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px] grid grid-cols-3 gap-2 px-[10px]">
                 <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">Due Date</div>
                 <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">Status</div>
                 <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">Amount</div>
@@ -201,7 +201,7 @@ const TenancyViewModal = ({ isOpen, onClose }) => {
                 <div className="view-tenancy-charges-tdata">Pending</div>
                 <div className="view-tenancy-charges-tdata">300.20</div>
               </div>
-              <div className="border-b border-[#E9E9E9] bg-[#F7F7F7] h-[57px] grid grid-cols-2 gap-2 px-[10px]">
+              <div className="border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px] grid grid-cols-2 gap-2 px-[10px]">
                 <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">VAT</div>
                 <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">Total</div>
               </div>
