@@ -235,4 +235,11 @@
     width: 100%;
     max-width: none;
   }
+
+  
+  .view-monthly-invoice-modal-thead,
+  .view-monthly-invoice-modal-mobile-header,
+  .view-monthly-invoice-modal-mobile-table th {
+    font-size: 12px !important;
+  }
 }
