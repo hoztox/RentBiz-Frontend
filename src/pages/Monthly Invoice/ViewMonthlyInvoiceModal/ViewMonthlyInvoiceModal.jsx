@@ -157,7 +157,7 @@ const ViewMonthlyInvoiceModal = ({ isOpen, onClose }) => {
                 <div className="px-[10px] flex items-center view-monthly-invoice-charges-thead uppercase">
                   Select
                 </div>
-                <div className="px-[10px] flex items-center view-monthly-invoice-charges-thead uppercase">
+                <div className="px-[10px] flex items-center view-monthly-invoice-charges-thead uppercase ml-[70px]">
                   Total
                 </div>
               </div>
@@ -165,7 +165,7 @@ const ViewMonthlyInvoiceModal = ({ isOpen, onClose }) => {
                 <div className="px-[10px] py-[10px] view-monthly-invoice-charges-tdata">
                   Test
                 </div>
-                <div className="px-[10px] py-[10px] view-monthly-invoice-charges-tdata">
+                <div className="px-[10px] py-[10px] view-monthly-invoice-charges-tdata ml-[70px]">
                   300.20
                 </div>
               </div>
