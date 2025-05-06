@@ -347,7 +347,7 @@ const Charges = () => {
                       />
                     </div>
                   </div>
-                  <div className="ml-[30px] w-[110px]">
+                  <div className="w-[110px]">
                     <label className="block mb-[10px] text-[#201D1E] tax-form-label">
                       Percentage (%)
                     </label>

@@ -71,7 +71,7 @@ select.choose-selected {
 }
 
 /* Responsive Styles */
-.update-charges-modal-container {
+.update-masters-charges-modal-container {
   width: 100%;
   max-width: 100vw;
   height: 100vh;
@@ -81,7 +81,7 @@ select.choose-selected {
 }
 
 @media (min-width: 768px) {
-  .update-charges-modal-container {
+  .update-masters-charges-modal-container {
     width: 522px;
     max-width: 522px;
     height: 427px;
@@ -91,7 +91,7 @@ select.choose-selected {
 }
 
 @media (max-width: 480px) {
-  .update-charges-modal-container {
+  .update-masters-charges-modal-container {
     position: absolute;
     top: 90px;
     left: 0;

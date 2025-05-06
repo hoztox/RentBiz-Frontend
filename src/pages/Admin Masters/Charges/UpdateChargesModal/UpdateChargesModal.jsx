@@ -31,7 +31,7 @@ const UpdateChargesModal = ({ isOpen, onClose, charge }) => {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
-      <div className="update-charges-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[427px] p-6">
+      <div className="update-masters-charges-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[427px] p-6">
         <h2 className="modal-head mt-4 mb-6">Update Charges Master</h2>
         <button
           onClick={onClose}
