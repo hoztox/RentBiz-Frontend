@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import "./TenancyReport.css";
 import { ChevronDown } from "lucide-react";
+import downarrow from "../../assets/Images/Tenancy Report/downarrow.svg";
 
 const TenancyReport = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [expandedRows, setExpandedRows] = useState({});
   const itemsPerPage = 10;
 
   const demoData = [
@@ -24,7 +26,7 @@ const TenancyReport = () => {
       status: "Occupied",
     },
     {
-      id: "TC0018-1",
+      id: "TC0018-2",
       name: "Shoes shop",
       description: "عبدالعزيز بن",
       building: "DANAT ALZAHIA",
@@ -38,7 +40,7 @@ const TenancyReport = () => {
       status: "Occupied",
     },
     {
-      id: "TC0018-1",
+      id: "TC0018-3",
       name: "Shoes shop",
       description: "عبدالعزيز بن",
       building: "DANAT ALZAHIA",
@@ -52,7 +54,7 @@ const TenancyReport = () => {
       status: "Occupied",
     },
     {
-      id: "TC0018-1",
+      id: "TC0018-4",
       name: "Shoes shop",
       description: "عبدالعزيز بن",
       building: "DANAT ALZAHIA",
@@ -66,7 +68,7 @@ const TenancyReport = () => {
       status: "Occupied",
     },
     {
-      id: "TC0018-1",
+      id: "TC0018-5",
       name: "Shoes shop",
       description: "عبدالعزيز بن",
       building: "DANAT ALZAHIA",
@@ -107,11 +109,18 @@ const TenancyReport = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
+  const toggleRowExpand = (id) => {
+    setExpandedRows((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
   return (
-    <div className="border border-[#E9E9E9]  rounded-md">
-      <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9]">
+    <div className="border border-[#E9E9E9] rounded-md tenancy-report-table">
+      <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] tenancy-report-header">
         <h1 className="tenancy-report-head">Tenant Report</h1>
-        <div className="flex gap-[10px]">
+        <div className="flex flex-col md:flex-row gap-[10px] tenancy-report-inputs-container">
           <input
             type="text"
             placeholder="Search"
@@ -119,130 +128,198 @@ const TenancyReport = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-[302px] focus:border-gray-300 duration-200 tenancy-report-search"
           />
-
-          <div className="relative">
-            <select
-              name="select"
-              id=""
-              className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[121px] cursor-pointer focus:border-gray-300 duration-200 tenancy-reporttenancy-reporttenancy-report-selection"
-              onFocus={() => setIsSelectOpen(true)}
-              onBlur={() => setIsSelectOpen(false)}
-            >
-              <option value="showing">Showing</option>
-              <option value="all">All</option>
-            </select>
-            <ChevronDown
-              className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
+          <div className="flex gap-[10px] tenancy-report-secondary-inputs">
+            <div className="relative">
+              <select
+                name="select"
+                id=""
+                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[121px] cursor-pointer focus:border-gray-300 duration-200 tenancy-report-selection"
+                onFocus={() => setIsSelectOpen(true)}
+                onBlur={() => setIsSelectOpen(false)}
+              >
+                <option value="showing">Showing</option>
+                <option value="all">All</option>
+              </select>
+              <ChevronDown
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
+                  isSelectOpen ? "rotate-180" : "rotate-0"
                 }`}
-            />
+              />
+            </div>
+            <button className="flex items-center justify-center gap-2 w-[132px] h-[38px] rounded-md duration-200 export-btn">
+              Export To Excel
+            </button>
           </div>
-          <button className="flex items-center justify-center gap-2 w-[132px] h-[38px] rounded-md duration-200 export-btn">
-            Export To Excel
-          </button>
         </div>
       </div>
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="border-b border-[#E9E9E9] h-[57px]">
-            <th className="px-5 text-left tenancy-report-thead W-[58px]">
-              ID
-            </th>
-            <th className="px-5 text-left tenancy-report-thead w-[86px]">
-              NAME
-            </th>
-            <th className="pl-5 text-left tenancy-report-thead w-[87px]">
-              DESCRIPTION
-            </th>
-            <th className="pl-5 text-left tenancy-report-thead w-[102px]">
-              BUILDING
-            </th>
-            <th className="px-5 text-left tenancy-report-thead w-[54px]">
-              UNIT
-            </th>
-            <th className="px-5 text-left tenancy-report-thead w-[84px]">
-              CREATED DATE
-            </th>
-            <th className="px-5 text-left tenancy-report-thead w-[94px]">
-              HIRE START DATE
-            </th>
-            <th className="px-5 text-left tenancy-report-thead w-[94px]">
-              HIRE END DATE
-            </th>
-            <th className="px-5 text-left tenancy-report-thead w-[60px]">
-              RENTAL MONTHS
-            </th>
-            <th className="px-5 text-left tenancy-report-thead w-[53px]">
-              RENT/MONTH
-            </th>
-            <th className="px-5 text-left tenancy-report-thead w-[74px]">
-              NO.OF PAYMENTS
-            </th>
-            <th className="px-5 pr-6 text-center tenancy-report-thead w-[69px]">
-              STATUS
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {paginatedData.map((report, index) => (
-            <tr
-              key={index}
-              className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
-            >
-              <td className="px-5 text-left tenancy-report-data w-[58px]">
-                {report.id}
-              </td>
-              <td className="px-5 text-left tenancy-report-data w-[86px]">
-                {report.name}
-              </td>
-              <td className="pl-5 text-left tenancy-report-data w-[67px]">
-                {report.description}
-              </td>
-              <td className="pl-5 text-left tenancy-report-data w-[102px]">
-                {report.building}
-              </td>
-              <td className="px-5 text-left tenancy-report-data w-[54px]">
-                {report.unit}
-              </td>
-              <td className="px-5 text-left tenancy-report-data w-[84px]">
-                {report.createdDate}
-              </td>
-              <td className="px-5 text-left tenancy-report-data w-[95px]">
-                {report.hireStart}
-              </td>
-              <td className="px-5 text-left tenancy-report-data w-[95px]">
-                {report.hireEnd}
-              </td>
-              <td className="px-5 text-left tenancy-report-data w-[60px]">
-                {report.rental}
-              </td>
-              <td className="px-5 text-left tenancy-report-data w-[40px]">
-                {report.rent}
-              </td>
-              <td className="px-5 text-left tenancy-report-data w-[74px]">
-                {report.payment}
-              </td>
-              <td className="px-5 text-center tenancy-report-data">
-                <span
-                  className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${report.status === "Pending"
-                      ? "bg-[#E8EFF6] text-[#1458A2]"
-                      : "bg-[#E8EFF6] text-[#1458A2]"
-                    }`}
-                >
-                  {report.status}
-                </span>
-              </td>
+      <div className="tenancy-report-desktop-only">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="border-b border-[#E9E9E9] h-[57px]">
+              <th className="px-5 text-left tenancy-report-thead w-[58px]">ID</th>
+              <th className="px-5 text-left tenancy-report-thead w-[86px]">NAME</th>
+              <th className="pl-5 text-left tenancy-report-thead w-[87px]">DESCRIPTION</th>
+              <th className="pl-5 text-left tenancy-report-thead w-[102px]">BUILDING</th>
+              <th className="px-5 text-left tenancy-report-thead w-[54px]">UNIT</th>
+              <th className="px-5 text-left tenancy-report-thead w-[84px]">CREATED DATE</th>
+              <th className="px-5 text-left tenancy-report-thead w-[94px]">HIRE START DATE</th>
+              <th className="px-5 text-left tenancy-report-thead w-[94px]">HIRE END DATE</th>
+              <th className="px-5 text-left tenancy-report-thead w-[60px]">RENTAL MONTHS</th>
+              <th className="px-5 text-left tenancy-report-thead w-[53px]">RENT/MONTH</th>
+              <th className="px-5 text-left tenancy-report-thead w-[74px]">NO.OF PAYMENTS</th>
+              <th className="px-5 pr-6 text-center tenancy-report-thead w-[69px]">STATUS</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="flex justify-between items-center h-[77.5px] px-5">
-        <span className="collection-list-pagination">
-          Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-          {filteredData.length} entries
+          </thead>
+          <tbody>
+            {paginatedData.map((report, index) => (
+              <tr
+                key={index}
+                className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
+              >
+                <td className="px-5 text-left tenancy-report-data w-[58px]">{report.id}</td>
+                <td className="px-5 text-left tenancy-report-data w-[86px]">{report.name}</td>
+                <td className="pl-5 text-left tenancy-report-data w-[67px]">{report.description}</td>
+                <td className="pl-5 text-left tenancy-report-data w-[102px]">{report.building}</td>
+                <td className="px-5 text-left tenancy-report-data w-[54px]">{report.unit}</td>
+                <td className="px-5 text-left tenancy-report-data w-[84px]">{report.createdDate}</td>
+                <td className="px-5 text-left tenancy-report-data w-[95px]">{report.hireStart}</td>
+                <td className="px-5 text-left tenancy-report-data w-[95px]">{report.hireEnd}</td>
+                <td className="px-5 text-left tenancy-report-data w-[60px]">{report.rental}</td>
+                <td className="px-5 text-left tenancy-report-data w-[40px]">{report.rent}</td>
+                <td className="px-5 text-left tenancy-report-data w-[74px]">{report.payment}</td>
+                <td className="px-5 text-center tenancy-report-data">
+                  <span
+                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] tenancy-report-status ${
+                      report.status === "Pending"
+                        ? "bg-[#E8EFF6] text-[#1458A2]"
+                        : "bg-[#E8EFF6] text-[#1458A2]"
+                    }`}
+                  >
+                    {report.status}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="block md:hidden">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="tenancy-report-table-row-head">
+              <th className="px-5 w-[74px] text-left tenancy-report-thead tenancy-report-id-column">ID</th>
+              <th className="px-3 text-center tenancy-report-thead tenancy-report-name-column">NAME</th>
+              <th className="px-5 text-right tenancy-report-thead"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedData.map((report) => (
+              <React.Fragment key={report.id}>
+                <tr
+                  className={`${
+                    expandedRows[report.id]
+                      ? "tenancy-report-mobile-no-border"
+                      : "tenancy-report-mobile-with-border"
+                  } border-b border-[#E9E9E9] h-[57px]`}
+                >
+                  <td className="px-5 text-left tenancy-report-data tenancy-report-id-column">{report.id}</td>
+                  <td className="px-3 text-center tenancy-report-data tenancy-report-name-column">{report.name}</td>
+                  <td className="py-4 flex items-center justify-end h-[57px]">
+                    <div
+                      className={`tenancy-report-dropdown-field ${
+                        expandedRows[report.id] ? "active" : ""
+                      }`}
+                      onClick={() => toggleRowExpand(report.id)}
+                    >
+                      <img
+                        src={downarrow}
+                        alt="drop-down-arrow"
+                        className={`tenancy-report-dropdown-img ${
+                          expandedRows[report.id] ? "text-white" : ""
+                        }`}
+                      />
+                    </div>
+                  </td>
+                </tr>
+                {expandedRows[report.id] && (
+                  <tr className="tenancy-report-mobile-with-border border-b border-[#E9E9E9]">
+                    <td colSpan={3} className="px-5">
+                      <div className="tenancy-report-dropdown-content">
+                        <div className="tenancy-report-grid tenancy-report-grid-cols-2">
+                          <div className="tenancy-report-grid-item">
+                            <div className="tenancy-report-dropdown-label">DESCRIPTION</div>
+                            <div className="tenancy-report-dropdown-value">{report.description}</div>
+                          </div>
+                          <div className="tenancy-report-grid-item">
+                            <div className="tenancy-report-dropdown-label">BUILDING</div>
+                            <div className="tenancy-report-dropdown-value">{report.building}</div>
+                          </div>
+                        </div>
+                        <div className="tenancy-report-grid tenancy-report-grid-cols-2">
+                          <div className="tenancy-report-grid-item">
+                            <div className="tenancy-report-dropdown-label">UNIT</div>
+                            <div className="tenancy-report-dropdown-value">{report.unit}</div>
+                          </div>
+                          <div className="tenancy-report-grid-item">
+                            <div className="tenancy-report-dropdown-label">CREATED DATE</div>
+                            <div className="tenancy-report-dropdown-value">{report.createdDate}</div>
+                          </div>
+                        </div>
+                        <div className="tenancy-report-grid tenancy-report-grid-cols-2">
+                          <div className="tenancy-report-grid-item">
+                            <div className="tenancy-report-dropdown-label">HIRE START DATE</div>
+                            <div className="tenancy-report-dropdown-value">{report.hireStart}</div>
+                          </div>
+                          <div className="tenancy-report-grid-item">
+                            <div className="tenancy-report-dropdown-label">HIRE END DATE</div>
+                            <div className="tenancy-report-dropdown-value">{report.hireEnd}</div>
+                          </div>
+                        </div>
+                        <div className="tenancy-report-grid tenancy-report-grid-cols-2">
+                          <div className="tenancy-report-grid-item">
+                            <div className="tenancy-report-dropdown-label">RENTAL MONTHS</div>
+                            <div className="tenancy-report-dropdown-value">{report.rental}</div>
+                          </div>
+                          <div className="tenancy-report-grid-item">
+                            <div className="tenancy-report-dropdown-label">RENT/MONTH</div>
+                            <div className="tenancy-report-dropdown-value">{report.rent}</div>
+                          </div>
+                        </div>
+                        <div className="tenancy-report-grid tenancy-report-grid-cols-2">
+                          <div className="tenancy-report-grid-item">
+                            <div className="tenancy-report-dropdown-label">NO.OF PAYMENTS</div>
+                            <div className="tenancy-report-dropdown-value">{report.payment}</div>
+                          </div>
+                          <div className="tenancy-report-grid-item">
+                            <div className="tenancy-report-dropdown-label">STATUS</div>
+                            <div className="tenancy-report-dropdown-value">
+                              <span
+                                className={`px-[10px] py-[5px] h-[24px] rounded-[4px] tenancy-report-status ${
+                                  report.status === "Pending"
+                                    ? "bg-[#E8EFF6] text-[#1458A2]"
+                                    : "bg-[#E8EFF6] text-[#1458A2]"
+                                }`}
+                              >
+                                {report.status}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center h-[77.5px] px-5 tenancy-report-pagination-container">
+        <span className="collection-list-pagination tenancy-report-pagination-text">
+          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
+          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
         </span>
-        <div className="flex gap-[4px]">
+        <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto tenancy-report-pagination-buttons">
           <button
             className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
             disabled={currentPage === 1}
@@ -258,20 +335,21 @@ const TenancyReport = () => {
               1
             </button>
           )}
-          {startPage > 2 && <span className="px-2">...</span>}
+          {startPage > 2 && <span className="px-2 flex items-center">...</span>}
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${currentPage === startPage + i
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+                currentPage === startPage + i
                   ? "bg-[#1458A2] text-white"
                   : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-                }`}
+              }`}
               onClick={() => setCurrentPage(startPage + i)}
             >
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && <span className="px-2">...</span>}
+          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
@@ -289,7 +367,6 @@ const TenancyReport = () => {
           </button>
         </div>
       </div>
-      {/* Create Tenancy Modal */}
     </div>
   );
 };
