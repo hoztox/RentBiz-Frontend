@@ -46,13 +46,16 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
       id: "03",
       chargeType: "Rent",
       reason: "Monthly Rent",
-      dueDate: "",
+      dueDate: "01-07-2025",
       status: "Pending",
-      amount: "",
+      amount: "0.000",
       vat: "0",
       total: "0.000",
     },
   ]);
+  const [expandedStates, setExpandedStates] = useState(
+    paymentSchedule.reduce((acc, item) => ({ ...acc, [item.id]: false }), {})
+  );
 
   const toggleSelectOpen = (selectId) => {
     setSelectOpenStates((prev) => ({
@@ -88,6 +91,13 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
     setShowPaymentSchedule(!showPaymentSchedule);
   };
 
+  const toggleExpand = (id) => {
+    setExpandedStates((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -97,7 +107,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
         className="tenancy-modal-container"
       >
         <div className="md:p-8 md:pt-8">
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex justify-between items-center md:mb-8">
             <h2 className="tenancy-modal-head">Create New Tenancy</h2>
             <button
               onClick={onClose}
@@ -171,7 +181,9 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                 </div>
               </div>
               <div className="w-1/2">
-                <label className="block tenancy-modal-label">Rental Months*</label>
+                <label className="block tenancy-modal-label">
+                  Rental Months*
+                </label>
                 <input
                   type="text"
                   placeholder="Enter Rental Months"
@@ -210,7 +222,9 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
 
             <div className="flex gap-4">
               <div className="w-1/2">
-                <label className="block tenancy-modal-label">No. Of Payments*</label>
+                <label className="block tenancy-modal-label">
+                  No. Of Payments*
+                </label>
                 <input
                   type="text"
                   placeholder="Enter No. Of Payments"
@@ -218,7 +232,9 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                 />
               </div>
               <div className="w-1/2">
-                <label className="block tenancy-modal-label">First Rent Due On*</label>
+                <label className="block tenancy-modal-label">
+                  First Rent Due On*
+                </label>
                 <div className="relative">
                   <input
                     type="text"
@@ -232,7 +248,9 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               </div>
             </div>
             <div>
-              <label className="block tenancy-modal-label">Rent Per Frequency</label>
+              <label className="block tenancy-modal-label">
+                Rent Per Frequency
+              </label>
               <input
                 type="text"
                 placeholder="Enter Rent Per Frequency"
@@ -241,7 +259,9 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
             </div>
 
             <div>
-              <label className="block tenancy-modal-label">Total Rent Receivable</label>
+              <label className="block tenancy-modal-label">
+                Total Rent Receivable
+              </label>
               <input
                 type="text"
                 placeholder="Enter Total Rent Receivable"
@@ -249,7 +269,9 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               />
             </div>
             <div>
-              <label className="block tenancy-modal-label">Deposit (If Any)</label>
+              <label className="block tenancy-modal-label">
+                Deposit (If Any)
+              </label>
               <input
                 type="text"
                 placeholder="Enter Deposit"
@@ -258,7 +280,9 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
             </div>
 
             <div>
-              <label className="block tenancy-modal-label">Commission (If Any)</label>
+              <label className="block tenancy-modal-label">
+                Commission (If Any)
+              </label>
               <input
                 type="text"
                 placeholder="Enter Commission"
@@ -286,7 +310,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
             >
               Additional Charges
             </h3>
-            <div className="mt-6 tenancy-overflow-x-auto border border-[#E9E9E9] rounded-md">
+            <div className="mt-6 tenancy-overflow-x-auto tenancy-additional-charges-container border border-[#E9E9E9] rounded-md">
               <div className="tenancy-desktop-table">
                 <table className="w-full border-collapse">
                   <thead>
@@ -332,7 +356,9 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                             onFocus={() =>
                               toggleSelectOpen(`charge-${charge.id}`)
                             }
-                            onBlur={() => toggleSelectOpen(`charge-${charge.id}`)}
+                            onBlur={() =>
+                              toggleSelectOpen(`charge-${charge.id}`)
+                            }
                           >
                             <option value="">Choose</option>
                           </select>
@@ -393,22 +419,30 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                   </tbody>
                 </table>
               </div>
+              {/* Mobile Table */}
               <div className="tenancy-mobile-table">
                 {additionalCharges.map((charge) => (
-                  <div key={charge.id} className="tenancy-mobile-section">
-                    <div className="tenancy-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-2">
+                  <div
+                    key={charge.id}
+                    className="border-b border-[#E9E9E9] last:border-b-0"
+                  >
+                    {/* First Row - 3 columns */}
+                    <div className="flex justify-start border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
                       <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
                         NO
                       </div>
-                      <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
+                      <div className="px-[10px] flex items-center tenancy-modal-thead uppercase w-[44%]">
                         CHARGE TYPE
                       </div>
+                      <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
+                        REASON
+                      </div>
                     </div>
-                    <div className="grid grid-cols-2 border-b border-[#E9E9E9]">
-                      <div className="px-[10px] py-[10px] text-[14px] text-[#201D1E]">
+                    <div className="flex justify-start h-[67px] border-b border-[#E9E9E9]">
+                      <div className="px-[13px] py-[13px] text-[14px] text-[#201D1E]">
                         {charge.id}
                       </div>
-                      <div className="px-[10px] py-[10px] relative">
+                      <div className="px-[10px] py-[13px] relative w-full">
                         <select
                           className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-700 focus:border-gray-700 bg-white tenancy-modal-table-select"
                           onFocus={() =>
@@ -426,25 +460,29 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                           }`}
                         />
                       </div>
-                    </div>
-
-                    <div className="tenancy-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-2">
-                      <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
-                        REASON
-                      </div>
-                      <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
-                        DUE DATE
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 border-b border-[#E9E9E9]">
-                      <div className="px-[10px] py-[10px]">
+                      <div className="px-[10px] py-[13px] w-full">
                         <input
                           type="text"
                           placeholder="Enter Reason"
                           className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
                         />
                       </div>
-                      <div className="px-[10px] py-[10px] relative">
+                    </div>
+
+                    {/* Second Row - 3 columns */}
+                    <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
+                      <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
+                        DUE DATE
+                      </div>
+                      <div className="px-[10px] flex items-center tenancy-modal-thead w-[7%] uppercase">
+                        STATUS
+                      </div>
+                      <div className="px-[10px] flex items-center tenancy-modal-thead w-[41.5%] uppercase">
+                        AMOUNT
+                      </div>
+                    </div>
+                    <div className="flex justify-start border-b border-[#E9E9E9] h-[67px]">
+                      <div className="px-[9px] py-[13px] relative w-full">
                         <input
                           type="text"
                           placeholder="mm/dd/yyyy"
@@ -456,21 +494,10 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                           className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
                         />
                       </div>
-                    </div>
-
-                    <div className="tenancy-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-2">
-                      <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
-                        STATUS
-                      </div>
-                      <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
-                        AMOUNT
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 border-b border-[#E9E9E9]">
-                      <div className="px-[10px] py-[10px] text-[14px] text-[#201D1E]">
+                      <div className="py-[10px] text-[14px] text-[#201D1E]">
                         Pending
                       </div>
-                      <div className="px-[10px] py-[10px]">
+                      <div className="px-[10px] py-[13px] w-full">
                         <input
                           type="text"
                           placeholder="Enter Amount"
@@ -479,30 +506,26 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                       </div>
                     </div>
 
-                    <div className="tenancy-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-2">
-                      <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
+                    {/* Third Row - 3 columns */}
+                    <div className="flex justify-between bg-[#F2F2F2] h-[57px] border-b border-[#E9E9E9]">
+                      <div className="px-[10px] flex items-center tenancy-modal-thead w-[20%] uppercase">
                         VAT
                       </div>
                       <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
                         TOTAL
                       </div>
-                    </div>
-                    <div className="grid grid-cols-2 border-b border-[#E9E9E9]">
-                      <div className="px-[10px] py-[10px] text-[14px] text-[#201D1E] text-center">
-                        {charge.vat}
-                      </div>
-                      <div className="px-[10px] py-[10px] text-[14px] text-[#201D1E]">
-                        {Number(charge.total || 0).toFixed(4)}
-                      </div>
-                    </div>
-
-                    <div className="tenancy-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-1">
                       <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
                         REMOVE
                       </div>
                     </div>
-                    <div className="grid grid-cols-1">
-                      <div className="px-[10px] py-[10px]">
+                    <div className="flex justify-between h-[57px]">
+                      <div className="px-[13px] py-[13px] text-[14px] text-[#201D1E] text-center">
+                        {charge.vat}
+                      </div>
+                      <div className="px-[13px] py-[13px] text-[14px] w-[5%] text-[#201D1E]">
+                        {Number(charge.total || 0).toFixed(4)}
+                      </div>
+                      <div className="px-[10px] py-[3px] flex justify-center">
                         <button onClick={() => removeRow(charge.id)}>
                           <img
                             src={deleteicon}
@@ -540,7 +563,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
             </button>
 
             {showPaymentSchedule && (
-              <div className="mt-6 tenancy-overflow-x-auto border border-[#E9E9E9] rounded-md">
+              <div className="mt-6 tenancy-overflow-x-auto">
                 <div className="tenancy-desktop-table">
                   <table className="w-full border-collapse">
                     <thead>
@@ -635,104 +658,131 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                 </div>
                 <div className="tenancy-mobile-table">
                   {paymentSchedule.map((item) => (
-                    <div key={item.id} className="tenancy-mobile-section">
-                      <div className="tenancy-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-2">
+                    <div
+                      key={item.id}
+                      className="tenancy-mobile-payment-section"
+                    >
+                      {/* First Row - Header */}
+                      <div
+                        className={`flex justify-between border-b border-[#E9E9E9] h-[57px] rounded-t ${
+                          expandedStates[item.id] ? "bg-[#F2F2F2]" : "bg-white"
+                        }`}
+                      >
                         <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
                           NO
                         </div>
                         <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
                           CHARGE TYPE
                         </div>
-                      </div>
-                      <div className="grid grid-cols-2 border-b border-[#E9E9E9]">
-                        <div className="px-[10px] py-[10px] text-[14px] text-[#201D1E]">
-                          {item.id}
-                        </div>
-                        <div className="px-[10px] py-[10px] text-[14px] text-[#201D1E]">
-                          {item.chargeType}
-                        </div>
-                      </div>
-
-                      <div className="tenancy-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-2">
-                        <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
+                        <div className="px-[10px] w-[30%] flex items-center tenancy-modal-thead uppercase">
                           REASON
                         </div>
-                        <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
-                          DUE DATE
-                        </div>
                       </div>
-                      <div className="grid grid-cols-2 border-b border-[#E9E9E9]">
-                        <div className="px-[10px] py-[10px] text-[14px] text-[#201D1E]">
+                      {/* First Row - Content (Clickable) */}
+                      <div
+                        className={`flex justify-between h-[67px] cursor-pointer ${
+                          expandedStates[item.id]
+                            ? "border-b border-[#E9E9E9]"
+                            : ""
+                        }`}
+                        onClick={() => toggleExpand(item.id)}
+                      >
+                        <div className="px-[13px] py-[13px] text-[14px] text-[#201D1E]">
+                          {item.id}
+                        </div>
+                        <div className="px-[10px] py-[13px] w-[35%] text-[14px] text-[#201D1E]">
+                          {item.chargeType}
+                        </div>
+                        <div className="px-[10px] py-[13px] w-[30%] text-[14px] text-[#201D1E]">
                           {item.reason}
                         </div>
-                        <div className="px-[10px] py-[10px] relative">
-                          {item.id === "03" ? (
-                            <>
-                              <input
-                                type="text"
-                                placeholder="mm/dd/yyyy"
-                                className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
-                              />
-                              <img
-                                src={calendaricon}
-                                alt="Calendar"
-                                className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                              />
-                            </>
-                          ) : (
-                            <span className="text-[14px] text-[#201D1E]">
-                              {item.dueDate}
-                            </span>
-                          )}
-                        </div>
                       </div>
 
-                      <div className="tenancy-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-2">
-                        <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
-                          STATUS
-                        </div>
-                        <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
-                          AMOUNT
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 border-b border-[#E9E9E9]">
-                        <div className="px-[10px] py-[10px] text-[14px] text-[#201D1E]">
-                          {item.status}
-                        </div>
-                        <div className="px-[10px] py-[10px]">
-                          {item.id === "03" ? (
-                            <input
-                              type="text"
-                              placeholder="Enter Amount"
-                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
-                            />
-                          ) : (
-                            <span className="text-[14px] text-[#201D1E]">
-                              {item.amount}
-                            </span>
-                          )}
-                        </div>
-                      </div>
+                      {expandedStates[item.id] && (
+                        <>
+                          {/* Second Row - Header */}
+                          <div
+                        className={`flex justify-between border-b border-[#E9E9E9] h-[57px] rounded-t ${
+                          expandedStates[item.id] ? "bg-[#F2F2F2]" : "bg-white"
+                        }`}
+                      >
+                            <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
+                              DUE DATE
+                            </div>
+                            <div className="px-[10px] flex items-center w-[7%] tenancy-modal-thead uppercase">
+                              STATUS
+                            </div>
+                            <div className="px-[10px] flex items-center w-[41.5%] tenancy-modal-thead uppercase">
+                              AMOUNT
+                            </div>
+                          </div>
+                          {/* Second Row - Content */}
+                          <div className="flex justify-between border-b border-[#E9E9E9] h-[67px]">
+                            <div className="px-[9px] py-[13px] relative w-full">
+                              {item.id === "03" ? (
+                                <>
+                                  <input
+                                    type="text"
+                                    placeholder="mm/dd/yyyy"
+                                    className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
+                                  />
+                                  <img
+                                    src={calendaricon}
+                                    alt="Calendar"
+                                    className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
+                                  />
+                                </>
+                              ) : (
+                                <span className="text-[14px] text-[#201D1E] w-full">
+                                  {item.dueDate}
+                                </span>
+                              )}
+                            </div>
+                            <div className="py-[10px] text-[14px] text-[#201D1E]">
+                              {item.status}
+                            </div>
+                            <div className="px-[10px] py-[13px] w-full">
+                              {item.id === "03" ? (
+                                <input
+                                  type="text"
+                                  placeholder="Enter Amount"
+                                  className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
+                                />
+                              ) : (
+                                <span className="text-[14px] text-[#201D1E]">
+                                  {item.amount}
+                                </span>
+                              )}
+                            </div>
+                          </div>
 
-                      <div className="tenancy-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-2">
-                        <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
-                          VAT
-                        </div>
-                        <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
-                          TOTAL
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2">
-                        <div className="px-[10px] py-[10px] text-[14px] text-[#201D1E] text-center">
-                          {item.vat}
-                        </div>
-                        <div className="px-[10px] py-[10px] text-[14px] text-[#201D1E]">
-                          {Number(item.total || 0).toFixed(4)}
-                        </div>
-                      </div>
+                          {/* Third Row - Header */}
+                          <div
+                        className={`flex justify-between border-b border-[#E9E9E9] h-[57px] rounded-t ${
+                          expandedStates[item.id] ? "bg-[#F2F2F2]" : "bg-white"
+                        }`}
+                      >
+                            <div className="px-[10px] flex items-center tenancy-modal-thead uppercase w-[50%]">
+                              VAT
+                            </div>
+                            <div className="px-[10px] flex items-center tenancy-modal-thead uppercase w-[50%]">
+                              TOTAL
+                            </div>
+                          </div>
+                          {/* Third Row - Content */}
+                          <div className="flex justify-between h-[57px]">
+                            <div className="px-[13px] py-[13px] text-[14px] text-[#201D1E] text-center">
+                              {item.vat}
+                            </div>
+                            <div className="px-[13px] py-[13px] text-[14px] text-[#201D1E] w-[51%]">
+                              {Number(item.total || 0).toFixed(4)}
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </div>
                   ))}
-                </div>
+                </div>  
               </div>
             )}
           </div>

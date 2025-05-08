@@ -166,12 +166,13 @@
 
 .tenancy-modal-table-input:focus,
 .tenancy-modal-table-select:focus {
-  border-color: #e9e9e9;
+  border-color: #4b5563; /* gray-700 */
   box-shadow: none;
 }
 
 .tenancy-modal-table-input::placeholder {
   color: #b7b5be;
+  font-size: 14px;
 }
 
 .tenancy-modal-grid {
@@ -186,6 +187,11 @@
 
   .tenancy-desktop-table {
     display: block;
+  }
+
+  .tenancy-overflow-x-auto {
+    border: 1px solid #E9E9E9;
+    border-radius: 6px;
   }
 }
 
@@ -229,10 +235,13 @@
   }
 
   .tenancy-addrow-btn,
-  .tenancy-save-btn,
-  .tenancy-hidepayement-btn {
+  .tenancy-save-btn {
     max-width: calc(100vw - 40px);
     margin-bottom: 50px;
+  }
+
+  .tenancy-hidepayement-btn {
+    max-width: calc(100vw - 40px);
   }
 
   .tenancy-modal-grid {
@@ -250,28 +259,60 @@
   .tenancy-overflow-x-auto {
     width: 100%;
     overflow-x: hidden;
+    border: none;
+    border-radius: 0;
+  }
+
+  .tenancy-additional-charges-container {
     border: 1px solid #E9E9E9;
     border-radius: 6px;
+  }
+
+  .tenancy-mobile-payment-section {
+    border: 1px solid #E9E9E9;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    background-color: #fff;
+  }
+
+  .tenancy-mobile-payment-section:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Ensure clickable header has a pointer cursor */
+  .tenancy-mobile-payment-section .cursor-pointer {
+    cursor: pointer;
   }
 
   .tenancy-mobile-section {
     width: 100%;
   }
 
-  .tenancy-mobile-header {
-    background-color: #F2F2F2;
-    border-bottom: 1px solid #E9E9E9;
+  .tenancy-mobile-section-container {
+    border: 1px solid #E9E9E9;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    background-color: #fff;
+  }
+
+  .tenancy-mobile-section-container:last-child {
+    margin-bottom: 0;
   }
 
   .tenancy-mobile-table .tenancy-modal-table-input,
   .tenancy-mobile-table .tenancy-modal-table-select {
     width: 100%;
     max-width: none;
+    background-color: #fff;
   }
 
-  .tenancy-modal-thead,
-  .tenancy-mobile-header {
+  .tenancy-modal-thead {
     font-size: 12px !important;
+  }
+
+  .tenancy-modal-table-input::placeholder {
+    color: #b7b5be;
+    font-size: 13px;
   }
 
   .flex.gap-4 {
