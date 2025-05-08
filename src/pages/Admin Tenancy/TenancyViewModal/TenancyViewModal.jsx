@@ -1,9 +1,44 @@
-import React from "react";
+import React, { useState } from "react";
 import "./TenancyViewModal.css";
 import closeicon from "../../../assets/Images/Admin Tenancy/close-icon.svg";
 
 const TenancyViewModal = ({ isOpen, onClose }) => {
+  const [expandedStates, setExpandedStates] = useState({
+    "01": false,
+    "02": false,
+  });
+
+  const toggleExpand = (id) => {
+    setExpandedStates((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
   if (!isOpen) return null;
+
+  const additionalCharges = [
+    {
+      id: "01",
+      chargeType: "Test",
+      reason: "Deposit",
+      dueDate: "20-04-2025",
+      status: "Pending",
+      amount: "300.20",
+      vat: "3.20",
+      total: "303.40",
+    },
+    {
+      id: "02",
+      chargeType: "Test",
+      reason: "Deposit",
+      dueDate: "20-04-2025",
+      status: "Pending",
+      amount: "300.20",
+      vat: "3.20",
+      total: "303.40",
+    },
+  ];
 
   return (
     <div
@@ -102,13 +137,13 @@ const TenancyViewModal = ({ isOpen, onClose }) => {
                   <th className="px-[10px] text-left text-gray-700 uppercase w-[20px] view-tenancy-charges-thead">
                     No
                   </th>
-                  <th className="px-[10px] text-left text-gray-700 uppercase w-[96px] view-tenancy-charges-thead">
+                  <th className="px-[10px] text-left text-gray-700 uppercase w-[110px] view-tenancy-charges-thead">
                     Charge Type
                   </th>
-                  <th className="px-[10px] text-left text-gray-700 uppercase w-[163px] view-tenancy-charges-thead">
+                  <th className="px-[10px] text-left text-gray-700 uppercase w-[110px] view-tenancy-charges-thead">
                     Reason
                   </th>
-                  <th className="px-[10px] text-left text-gray-700 uppercase w-[75px] view-tenancy-charges-thead">
+                  <th className="px-[10px] text-left text-gray-700 uppercase w-[120px] view-tenancy-charges-thead">
                     Due Date
                   </th>
                   <th className="px-[10px] text-left text-gray-700 uppercase w-[52px] view-tenancy-charges-thead">
@@ -126,89 +161,122 @@ const TenancyViewModal = ({ isOpen, onClose }) => {
                 </tr>
               </thead>
               <tbody>
-                <tr className="h-[57px] border-b border-[#E9E9E9] hover:bg-gray-100">
-                  <td className="px-[10px] py-[5px] w-[20px] view-tenancy-charges-tdata">
-                    01
-                  </td>
-                  <td className="px-[10px] py-[5px] w-[96px] view-tenancy-charges-tdata">
-                    Test
-                  </td>
-                  <td className="px-[10px] py-[5px] w-[163px] view-tenancy-charges-tdata">
-                    Lorem ipsum dolor sit amet
-                  </td>
-                  <td className="px-[10px] py-[5px] w-[75px] view-tenancy-charges-tdata">
-                    300.20
-                  </td>
-                  <td className="px-[10px] py-[5px] w-[52px] text-left text-[14px] view-tenancy-charges-tdata">
-                    Pending
-                  </td>
-                  <td className="px-[10px] py-[5px] w-[61px] text-left text-[14px] view-tenancy-charges-tdata">
-                    300.20
-                  </td>
-                  <td className="px-[10px] py-[5px] w-[30px] text-left text-[14px] view-tenancy-charges-tdata">
-                    3.20
-                  </td>
-                  <td className="px-[10px] py-[5px] w-[44px] text-left text-[14px] view-tenancy-charges-tdata">
-                    303.40
-                  </td>
-                </tr>
-                <tr className="h-[57px] hover:bg-gray-100">
-                  <td className="px-[10px] py-[5px] w-[20px] view-tenancy-charges-tdata">
-                    02
-                  </td>
-                  <td className="px-[10px] py-[5px] w-[96px] view-tenancy-charges-tdata">
-                    Test
-                  </td>
-                  <td className="px-[10px] py-[5px] w-[163px] view-tenancy-charges-tdata">
-                    Lorem ipsum dolor sit amet
-                  </td>
-                  <td className="px-[10px] py-[5px] w-[75px] view-tenancy-charges-tdata">
-                    300.20
-                  </td>
-                  <td className="px-[10px] py-[5px] w-[52px] text-left text-[14px] view-tenancy-charges-tdata">
-                    Pending
-                  </td>
-                  <td className="px-[10px] py-[5px] w-[61px] text-left text-[14px] view-tenancy-charges-tdata">
-                    300.20
-                  </td>
-                  <td className="px-[10px] py-[5px] w-[30px] text-left text-[14px] view-tenancy-charges-tdata">
-                    3.20
-                  </td>
-                  <td className="px-[10px] py-[5px] w-[44px] text-left text-[14px] view-tenancy-charges-tdata">
-                    303.40
-                  </td>
-                </tr>
+                {additionalCharges.map((charge) => (
+                  <tr
+                    key={charge.id}
+                    className="h-[57px] border-b border-[#E9E9E9] hover:bg-gray-100"
+                  >
+                    <td className="px-[10px] py-[5px] w-[20px] view-tenancy-charges-tdata">
+                      {charge.id}
+                    </td>
+                    <td className="px-[10px] py-[5px] w-[110px] view-tenancy-charges-tdata">
+                      {charge.chargeType}
+                    </td>
+                    <td className="px-[10px] py-[5px] w-[110px] view-tenancy-charges-tdata">
+                      {charge.reason}
+                    </td>
+                    <td className="px-[10px] py-[5px] w-[120px] view-tenancy-charges-tdata">
+                      {charge.dueDate}
+                    </td>
+                    <td className="px-[10px] py-[5px] w-[52px] text-left text-[14px] view-tenancy-charges-tdata">
+                      {charge.status}
+                    </td>
+                    <td className="px-[10px] py-[5px] w-[61px] text-left text-[14px] view-tenancy-charges-tdata">
+                      {charge.amount}
+                    </td>
+                    <td className="px-[10px] py-[5px] w-[30px] text-left text-[14px] view-tenancy-charges-tdata">
+                      {charge.vat}
+                    </td>
+                    <td className="px-[10px] py-[5px] w-[44px] text-left text-[14px] view-tenancy-charges-tdata">
+                      {charge.total}
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
-            <div className="mobile-table hidden">
-              <div className="border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px] grid grid-cols-3 gap-2 px-[10px]">
-                <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">No</div>
-                <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead w-[96px]">Charge Type</div>
-                <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">Reason</div>
-              </div>
-              <div className="h-[57px] grid grid-cols-3 gap-2 px-[10px] hover:bg-gray-100">
-                <div className="view-tenancy-charges-tdata">01</div>
-                <div className="view-tenancy-charges-tdata">Test</div>
-                <div className="view-tenancy-charges-tdata">Lorem ipsum dolor sit amet</div>
-              </div>
-              <div className="border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px] grid grid-cols-3 gap-2 px-[10px]">
-                <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">Due Date</div>
-                <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">Status</div>
-                <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">Amount</div>
-              </div>
-              <div className="h-[57px] grid grid-cols-3 gap-2 px-[10px] hover:bg-gray-100">
-                <div className="view-tenancy-charges-tdata">300.20</div>
-                <div className="view-tenancy-charges-tdata">Pending</div>
-                <div className="view-tenancy-charges-tdata">300.20</div>
-              </div>
-              <div className="border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px] grid grid-cols-2 gap-2 px-[10px]">
-                <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">VAT</div>
-                <div className="text-left text-gray-700 uppercase view-tenancy-charges-thead">Total</div>
-              </div>
-              <div className="h-[57px] grid grid-cols-2 gap-2 px-[10px] hover:bg-gray-100 !border-none">
-                <div className="view-tenancy-charges-tdata">3.20</div>
-                <div className="view-tenancy-charges-tdata">303.40</div>
-              </div>
+            <div className="mobile-table">
+              {additionalCharges.map((charge) => (
+                <div
+                  key={charge.id}
+                  className="view-tenancy-mobile-section-container"
+                >
+                  <div
+                    className={`flex justify-between border-b border-[#E9E9E9] h-[57px] rounded-t ${
+                      expandedStates[charge.id] ? "bg-[#F2F2F2]" : "bg-white"
+                    }`}
+                  >
+                    <div className="px-[10px] flex items-center view-tenancy-charges-thead uppercase">
+                      NO
+                    </div>
+                    <div className="px-[10px] w-[40%] flex items-center view-tenancy-charges-thead uppercase">
+                      CHARGE TYPE
+                    </div>
+                    <div className="px-[10px] w-[35%] flex items-center view-tenancy-charges-thead uppercase">
+                      REASON
+                    </div>
+                  </div>
+                  <div
+                    className={`flex justify-between h-[57px] cursor-pointer ${
+                      expandedStates[charge.id] ? "border-b border-[#E9E9E9]" : ""
+                    }`}
+                    onClick={() => toggleExpand(charge.id)}
+                  >
+                    <div className="px-[13px] py-[13px] text-[14px] view-tenancy-charges-tdata">
+                      {charge.id}
+                    </div>
+                    <div className="px-[10px] py-[13px] w-[40%] text-[14px] view-tenancy-charges-tdata">
+                      {charge.chargeType}
+                    </div>
+                    <div className="px-[10px] py-[13px] w-[35%] text-[14px] view-tenancy-charges-tdata">
+                      {charge.reason}
+                    </div>
+                  </div>
+
+                  {expandedStates[charge.id] && (
+                    <>
+                      <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
+                        <div className="px-[10px] flex items-center view-tenancy-charges-thead uppercase">
+                          DUE DATE
+                        </div>
+                        <div className="px-[10px] flex items-center w-[15%] view-tenancy-charges-thead uppercase">
+                          STATUS
+                        </div>
+                        <div className="px-[10px] flex items-center w-[28.5%] view-tenancy-charges-thead uppercase">
+                          AMOUNT
+                        </div>
+                      </div>
+                      <div className="flex justify-between border-b border-[#E9E9E9] h-[57px]">
+                        <div className="px-[9px] py-[13px] w-[90%] text-[14px] view-tenancy-charges-tdata">
+                          {charge.dueDate}
+                        </div>
+                        <div className="py-[10px] w-[65%] text-[14px] view-tenancy-charges-tdata">
+                          {charge.status}
+                        </div>
+                        <div className="px-[10px] py-[13px] w-[58%] text-[14px] view-tenancy-charges-tdata">
+                          {charge.amount}
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between bg-[#F2F2F2] h-[57px] border-b border-[#E9E9E9]">
+                        <div className="px-[10px] flex items-center view-tenancy-charges-thead uppercase w-[50%]">
+                          VAT
+                        </div>
+                        <div className="px-[10px] flex items-center view-tenancy-charges-thead uppercase w-[50%]">
+                          TOTAL
+                        </div>
+                      </div>
+                      <div className="flex justify-between h-[57px]">
+                        <div className="px-[13px] py-[13px] text-[14px] view-tenancy-charges-tdata text-center">
+                          {charge.vat}
+                        </div>
+                        <div className="px-[13px] py-[13px] text-[14px] view-tenancy-charges-tdata w-[51%]">
+                          {charge.total}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         </div>

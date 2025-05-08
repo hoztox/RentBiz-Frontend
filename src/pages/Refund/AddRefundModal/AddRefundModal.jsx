@@ -228,7 +228,7 @@ const AddRefundModal = ({ isOpen, onClose }) => {
                           <th className="px-[10px] text-left refund-modal-thead uppercase w-[130px]">
                             Description
                           </th>
-                          <th className="pxSKK-[10px] text-left refund-modal-thead uppercase w-[136px]">
+                          <th className="px-[10px] text-left refund-modal-thead uppercase w-[136px]">
                             Date
                           </th>
                           <th className="px-[10px] text-left refund-modal-thead uppercase w-[113px]">
@@ -378,28 +378,28 @@ const AddRefundModal = ({ isOpen, onClose }) => {
                         className="add-refund-modal-mobile-section"
                       >
                         {/* First Header: Charge and Description */}
-                        <div className="add-refund-modal-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-2">
-                          <div className="px-[10px] flex items-center refund-modal-thead uppercase">
+                        <div className="add-refund-modal-mobile-header flex justify-start border-b border-[#E9E9E9] h-[50px]">
+                          <div className="px-[10px] flex w-[51%] items-center add-refund-modal-mobile-thead uppercase">
                             Charge
                           </div>
-                          <div className="px-[10px] flex items-center refund-modal-thead uppercase">
+                          <div className="px-[10px] flex items-center add-refund-modal-mobile-thead uppercase">
                             Description
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 border-b border-[#E9E9E9]">
-                          <div className="px-[10px] py-[10px] h-[57px] relative">
+                        <div className="flex justify-between border-b border-[#E9E9E9]">
+                          <div className="px-[10px] py-[10px] w-full h-[57px] relative">
                             <select
                               value={item.charge}
                               onChange={(e) =>
                                 handleItemChange(
                                   index,
                                   "charge",
-                                  eophyte.target.value
+                                  e.target.value
                                 )
                               }
                               onFocus={() => toggleDropdown("charge")}
                               onBlur={() => toggleDropdown("charge")}
-                              className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white refund-modal-table-select"
+                              className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white add-refund-modal-mobile-table-select"
                             >
                               <option value="">Choose</option>
                               <option value="rent">Rent</option>
@@ -411,7 +411,7 @@ const AddRefundModal = ({ isOpen, onClose }) => {
                               }`}
                             />
                           </div>
-                          <div className="px-[10px] py-[10px]">
+                          <div className="px-[10px] py-[10px] w-full">
                             <input
                               type="text"
                               placeholder="Enter Description"
@@ -423,25 +423,25 @@ const AddRefundModal = ({ isOpen, onClose }) => {
                                   e.target.value
                                 )
                               }
-                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 refund-modal-table-input"
+                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-modal-mobile-table-input"
                             />
                           </div>
                         </div>
 
                         {/* Second Header: Date, Amount, VAT */}
-                        <div className="add-refund-modal-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-3">
-                          <div className="px-[10px] flex items-center refund-modal-thead uppercase">
+                        <div className="add-refund-modal-mobile-header flex justify-between border-b border-[#E9E9E9] h-[50px]">
+                          <div className="px-[10px] w-[20%] flex items-center add-refund-modal-mobile-thead uppercase">
                             Date
                           </div>
-                          <div className="px-[10px] flex items-center refund-modal-thead uppercase">
+                          <div className="px-[10px] flex items-center add-refund-modal-mobile-thead uppercase">
                             Amount
                           </div>
-                          <div className="px-[10px] flex items-center refund-modal-thead uppercase">
+                          <div className="px-[10px] w-[15%] flex items-center add-refund-modal-mobile-thead uppercase">
                             VAT
                           </div>
                         </div>
-                        <div className="grid grid-cols-3 border-b border-[#E9E9E9]">
-                          <div className="px-[10px] py-[10px] relative">
+                        <div className="flex justify-between border-b border-[#E9E9E9]">
+                          <div className="px-[10px] py-[10px] relative w-full">
                             <input
                               type="text"
                               placeholder="mm/dd/yyyy"
@@ -449,7 +449,7 @@ const AddRefundModal = ({ isOpen, onClose }) => {
                               onChange={(e) =>
                                 handleItemChange(index, "date", e.target.value)
                               }
-                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 refund-modal-table-input"
+                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-modal-mobile-table-input"
                             />
                             <img
                               src={calendaricon}
@@ -457,7 +457,7 @@ const AddRefundModal = ({ isOpen, onClose }) => {
                               className="absolute right-[15px] top-[52%] transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
                             />
                           </div>
-                          <div className="px-[10px] py-[10px]">
+                          <div className="px-[10px] py-[10px] w-full">
                             <input
                               type="text"
                               placeholder="Enter Amount"
@@ -465,34 +465,34 @@ const AddRefundModal = ({ isOpen, onClose }) => {
                               onChange={(e) =>
                                 handleItemChange(index, "amount", e.target.value)
                               }
-                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 refund-modal-table-input"
+                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-modal-mobile-table-input"
                             />
                           </div>
-                          <div className="px-[10px] py-[5px] flex items-center text-[14px] font-normal text-[#677487]">
+                          <div className="px-[10px] py-[5px] w-[20%] flex items-center text-[14px] font-normal text-[#677487]">
                             {Number(item.vat).toFixed(4)}
                           </div>
                         </div>
 
                         {/* Third Header: Total, Paid Amount, Amount Refund, Total */}
-                        <div className="add-refund-modal-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-4">
-                          <div className="px-[10px] flex items-center refund-modal-thead uppercase">
+                        <div className="add-refund-modal-mobile-header flex justify-between border-b border-[#E9E9E9] h-[50px]">
+                          <div className="px-[10px] w-[16%] flex items-center add-refund-modal-mobile-thead uppercase">
                             Total
                           </div>
-                          <div className="px-[10px] flex items-center refund-modal-thead uppercase">
-                            Paid Amount
+                          <div className="px-[10px] w-[22%] flex items-center add-refund-modal-mobile-thead uppercase">
+                            Balance
                           </div>
-                          <div className="px-[10px] flex items-center refund-modal-thead uppercase">
+                          <div className="px-[10px] w-[42%] flex items-center add-refund-modal-mobile-thead uppercase">
                             Amount Refund
                           </div>
-                          <div className="px-[10px] flex items-center refund-modal-thead uppercase">
+                          <div className="px-[10px] w-[19%] flex items-center add-refund-modal-mobile-thead uppercase">
                             Total
                           </div>
                         </div>
-                        <div className="grid grid-cols-4">
-                          <div className="px-[10px] py-[5px] flex items-center text-[14px] font-normal text-[#201D1E]">
+                        <div className="flex justify-between">
+                          <div className="px-[10px] py-[5px] w-[18%] flex items-center text-[14px] font-normal text-[#201D1E]">
                             {Number(item.total).toFixed(4)}
                           </div>
-                          <div className="px-[10px] py-[5px] flex items-center text-[14px] font-normal text-[#201D1E]">
+                          <div className="px-[10px] py-[5px] w-[20%] flex items-center text-[14px] font-normal text-[#201D1E]">
                             {Number(item.paidAmount).toFixed(4)}
                           </div>
                           <div className="px-[10px] py-[10px]">
@@ -507,7 +507,7 @@ const AddRefundModal = ({ isOpen, onClose }) => {
                                   e.target.value
                                 )
                               }
-                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 refund-modal-table-input"
+                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-modal-mobile-table-input"
                             />
                           </div>
                           <div className="px-[10px] py-[5px] flex items-center text-[14px] font-normal text-[#201D1E]">

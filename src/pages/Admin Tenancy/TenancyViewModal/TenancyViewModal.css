@@ -7,33 +7,6 @@
   box-sizing: border-box;
 }
 
-@media (min-width: 768px) {
-  .view-modal-container {
-    width: 1006px;
-    max-width: 1006px;
-    height: 862px;
-    border-radius: 6px;
-    background-color: #ffffff;
-  }
-}
-
-@media (max-width: 480px) {
-  .view-modal-container {
-    position: absolute;
-    top: 90px;
-    left: 0;
-    right: 0;
-    width: 100vw;
-    margin: 0;
-    height: 100vh;
-    border-radius: 0;
-    z-index: 100;
-    background-color: #F8F9FA;
-    max-height: calc(100vh - 90px);
-    overflow-y: auto;
-  }
-}
-
 .view-modal-overlay {
   position: fixed;
   inset: 0;
@@ -41,16 +14,7 @@
   align-items: center;
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.7);
-}
-
-@media (max-width: 480px) {
-  .view-modal-overlay {
-    position: static;
-    inset: auto;
-    display: block;
-    background-color: transparent;
-    opacity: 1;
-  }
+  z-index: 50;
 }
 
 .tenancy-view-modal-head {
@@ -61,12 +25,6 @@
   letter-spacing: 0px;
 }
 
-@media (max-width: 480px) {
-  .tenancy-view-modal-head {
-    display: none;
-  }
-}
-
 .tenancy-view-modal-close-btn {
   width: 42px;
   height: 42px;
@@ -75,12 +33,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-@media (max-width: 480px) {
-  .tenancy-view-modal-close-btn {
-    display: none;
-  }
 }
 
 .tenancy-view-modal-label {
@@ -121,7 +73,7 @@
 }
 
 .additional-charges-heading {
-  font-family: 'Public Sans';
+  font-family: "Public Sans";
   font-weight: 600;
   font-size: 15px;
   line-height: 24px;
@@ -132,46 +84,90 @@
   display: table;
 }
 
-@media (max-width: 480px) {
-  .desktop-table {
+@media (min-width: 481px) {
+  .mobile-table {
     display: none;
+  }
+  .desktop-table {
+    display: table;
+  }
+  .view-modal-container {
+    width: 100%;
+    max-width: 1006px;
+    height: 862px;
+    border-radius: 6px;
+    background-color: #ffffff;
   }
 }
 
-.mobile-table {
-  display: none;
-}
-
 @media (max-width: 480px) {
+  .view-modal-container {
+    position: absolute;
+    top: 90px;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    margin: 0;
+    height: 100vh;
+    border-radius: 0;
+    background-color: #F8F9FA;
+    max-height: calc(100vh - 90px);
+    overflow-y: auto;
+    padding: 20px;
+  }
+
+  .view-modal-overlay {
+    position: static;
+    inset: auto;
+    display: block;
+    background-color: transparent;
+    opacity: 1;
+  }
+
+  .tenancy-view-modal-head,
+  .tenancy-view-modal-close-btn {
+    display: none !important;
+  }
+
+  .grid-cols-1.md\\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .desktop-table {
+    display: none;
+  }
+
   .mobile-table {
     display: block;
   }
 
-  .mobile-table > div {
-    border-bottom: 1px solid #E9E9E9;
-    padding: 10px;
+  .overflow-x-auto {
+    width: 100%;
+    overflow-x: hidden;
+    border: none;
+    border-radius: 0;
   }
 
-  .mobile-table > div > .header-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 10px;
-    padding: 10px 0;
+  .view-tenancy-mobile-section-container {
+    border: 1px solid #E9E9E9;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    background-color: #fff;
   }
 
-  .mobile-table .data-row {
-    background-color: #FFFFFF;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 10px;
-    padding: 10px 0;
+  .view-tenancy-mobile-section-container:last-child {
+    margin-bottom: 0;
   }
 
-  .mobile-table .header-row > div {
-    text-align: left;
+  .view-tenancy-mobile-section-container .cursor-pointer {
+    cursor: pointer;
   }
 
-  .mobile-table .data-row > div {
-    text-align: left;
+  .view-tenancy-charges-thead {
+    font-size: 12px !important;
+  }
+
+  .view-tenancy-charges-tdata {
+    font-size: 13px;
   }
 }

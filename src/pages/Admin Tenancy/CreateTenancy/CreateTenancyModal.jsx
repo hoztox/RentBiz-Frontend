@@ -782,7 +782,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                       )}
                     </div>
                   ))}
-                </div>  
+                </div>
               </div>
             )}
           </div>

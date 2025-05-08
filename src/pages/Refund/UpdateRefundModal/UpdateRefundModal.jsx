@@ -388,10 +388,10 @@ const UpdateRefundModal = ({ isOpen, onClose, selectedRow }) => {
                       >
                         {/* First Header: Charge and Description */}
                         <div className="update-refund-modal-mobile-header border-b border-[#E9E9E9] h-[57px] grid grid-cols-2">
-                          <div className="px-[10px] flex items-center refund-modal-thead uppercase">
+                          <div className="px-[10px] flex items-center update-refund-modal-mobile-thead uppercase">
                             Charge
                           </div>
-                          <div className="px-[10px] flex items-center refund-modal-thead uppercase">
+                          <div className="px-[10px] flex items-center update-refund-modal-mobile-thead uppercase">
                             Description
                           </div>
                         </div>
@@ -408,7 +408,7 @@ const UpdateRefundModal = ({ isOpen, onClose, selectedRow }) => {
                               }
                               onFocus={() => toggleDropdown("charge")}
                               onBlur={() => toggleDropdown("charge")}
-                              className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white refund-modal-table-select"
+                              className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white update-refund-modal-mobile-table-select"
                             >
                               <option value="">Choose</option>
                               <option value="rent">Rent</option>
@@ -432,20 +432,20 @@ const UpdateRefundModal = ({ isOpen, onClose, selectedRow }) => {
                                   e.target.value
                                 )
                               }
-                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 refund-modal-table-input"
+                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-refund-modal-mobile-table-input"
                             />
                           </div>
                         </div>
 
                         {/* Second Header: Date, Amount, VAT */}
                         <div className="update-refund-modal-mobile-header border-b border-[#E9E9E9] h-[57px] grid grid-cols-3">
-                          <div className="px-[10px] flex items-center refund-modal-thead uppercase">
+                          <div className="px-[10px] flex items-center update-refund-modal-mobile-thead uppercase">
                             Date
                           </div>
-                          <div className="px-[10px] flex items-center refund-modal-thead uppercase">
+                          <div className="px-[10px] flex items-center update-refund-modal-mobile-thead uppercase">
                             Amount
                           </div>
-                          <div className="px-[10px] flex items-center refund-modal-thead uppercase">
+                          <div className="px-[10px] flex items-center update-refund-modal-mobile-thead uppercase">
                             VAT
                           </div>
                         </div>
@@ -458,12 +458,12 @@ const UpdateRefundModal = ({ isOpen, onClose, selectedRow }) => {
                               onChange={(e) =>
                                 handleItemChange(index, "date", e.target.value)
                               }
-                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 refund-modal-table-input"
+                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-refund-modal-mobile-table-input"
                             />
                             <img
                               src={calendaricon}
                               alt="Calendar"
-                              className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
+                              className="absolute right-[10px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
                             />
                           </div>
                           <div className="px-[10px] py-[10px]">
@@ -474,7 +474,7 @@ const UpdateRefundModal = ({ isOpen, onClose, selectedRow }) => {
                               onChange={(e) =>
                                 handleItemChange(index, "amount", e.target.value)
                               }
-                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 refund-modal-table-input"
+                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-refund-modal-mobile-table-input"
                             />
                           </div>
                           <div className="px-[10px] py-[10px] flex items-center text-[14px] font-normal text-[#677487]">
@@ -484,16 +484,16 @@ const UpdateRefundModal = ({ isOpen, onClose, selectedRow }) => {
 
                         {/* Third Header: Total, Paid Amount, Amount Refund, Total */}
                         <div className="update-refund-modal-mobile-header border-b border-[#E9E9E9] h-[57px] grid grid-cols-4">
-                          <div className="px-[10px] flex items-center refund-modal-thead uppercase">
+                          <div className="px-[10px] flex items-center update-refund-modal-mobile-thead uppercase">
                             Total
                           </div>
-                          <div className="px-[10px] flex items-center refund-modal-thead uppercase">
+                          <div className="px-[10px] flex items-center update-refund-modal-mobile-thead uppercase">
                             Paid Amount
                           </div>
-                          <div className="px-[10px] flex items-center refund-modal-thead uppercase">
+                          <div className="px-[10px] flex items-center update-refund-modal-mobile-thead uppercase">
                             Amount Refund
                           </div>
-                          <div className="px-[10px] flex items-center refund-modal-thead uppercase">
+                          <div className="px-[10px] flex items-center update-refund-modal-mobile-thead uppercase">
                             Total
                           </div>
                         </div>
@@ -516,7 +516,7 @@ const UpdateRefundModal = ({ isOpen, onClose, selectedRow }) => {
                                   e.target.value
                                 )
                               }
-                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 refund-modal-table-input"
+                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-refund-modal-mobile-table-input"
                             />
                           </div>
                           <div className="px-[10px] py-[10px] flex items-center text-[14px] font-normal text-[#201D1E]">
