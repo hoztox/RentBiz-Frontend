@@ -50,11 +50,11 @@ const UpcomingCollection = () => {
 
   const demoData = [
     {
-      id: "TC0019-1",
+      id: "B24090001",
       invoice_no: "457893",
       invoice_date: "2024-09-09",
       tenant: "Coffee",
-      building: "Down Town",
+      building: "Emaar Square Area",
       unit: "SHOP10",
       charge: "Rent",
       amount: "120.00",
@@ -62,7 +62,7 @@ const UpcomingCollection = () => {
       status: "Paid",
     },
     {
-      id: "TC0020-1",
+      id: "B24090002",
       invoice_no: "457894",
       invoice_date: "2024-09-10",
       tenant: "Shoes shop",
@@ -74,7 +74,7 @@ const UpcomingCollection = () => {
       status: "Unpaid",
     },
     {
-      id: "TC0021-1",
+      id: "B24090003",
       invoice_no: "457894",
       invoice_date: "2024-09-10",
       tenant: "Shoes shop",
@@ -86,7 +86,7 @@ const UpcomingCollection = () => {
       status: "Unpaid",
     },
     {
-      id: "TC0022-1",
+      id: "B24090004",
       invoice_no: "457893",
       invoice_date: "2024-09-09",
       tenant: "Coffee",
@@ -383,7 +383,7 @@ const UpcomingCollection = () => {
           <thead>
             <tr className="upcoming-collection-table-row-head">
               <th className="px-5 w-[74px] text-left upcoming-collection-thead upcoming-collection-id-column">ID</th>
-              <th className="px-3 text-left upcoming-collection-thead upcoming-collection-tenant-column">TENANT</th>
+              <th className="px-3 text-left upcoming-collection-thead upcoming-collection-tenant-column">INVOICE NO</th>
               <th className="px-5 text-right upcoming-collection-thead"></th>
             </tr>
           </thead>
@@ -398,7 +398,7 @@ const UpcomingCollection = () => {
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 w-[50%] text-left upcoming-collection-data upcoming-collection-id-column">{report.id}</td>
-                  <td className="px-3 w-[41%] text-left upcoming-collection-data upcoming-collection-tenant-column">{report.tenant}</td>
+                  <td className="px-3 w-[41%] text-left upcoming-collection-data upcoming-collection-tenant-column">{report.invoice_no}</td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`upcoming-collection-dropdown-field ${
@@ -422,12 +422,12 @@ const UpcomingCollection = () => {
                       <div className="upcoming-collection-dropdown-content">
                         <div className="upcoming-collection-grid">
                           <div className="upcoming-collection-grid-item">
-                            <div className="upcoming-collection-dropdown-label">INVOICE NO</div>
-                            <div className="upcoming-collection-dropdown-value">{report.invoice_no}</div>
-                          </div>
-                          <div className="upcoming-collection-grid-item">
                             <div className="upcoming-collection-dropdown-label">INVOICE DATE</div>
                             <div className="upcoming-collection-dropdown-value">{report.invoice_date}</div>
+                          </div>
+                          <div className="upcoming-collection-grid-item">
+                            <div className="upcoming-collection-dropdown-label">TENANT</div>
+                            <div className="upcoming-collection-dropdown-value">{report.tenant}</div>
                           </div>
                         </div>
                         <div className="upcoming-collection-grid">

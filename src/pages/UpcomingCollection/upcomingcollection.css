@@ -249,7 +249,7 @@
   }
   .upcoming-collection-pagination-container {
     flex-direction: column;
-    height: costum97.53px;
+    /* height: 97.53px; */
     justify-content: center;
     gap: 16px;
     align-items: center;
@@ -280,13 +280,9 @@
   .upcoming-collection-dropdown-img {
     width: 10px;
     transition: transform 0.3s ease;
-    filter: brightness(0) saturate(100%) invert(0%) sepia(0%) saturate(0%)
-      hue-rotate(0deg) brightness(100%) contrast(100%);
   }
   .upcoming-collection-dropdown-field.active .upcoming-collection-dropdown-img {
     transform: rotate(180deg);
-    filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%)
-      hue-rotate(0deg) brightness(100%) contrast(100%);
   }
   .upcoming-collection-table-row-head {
     height: auto;
@@ -336,7 +332,7 @@
   }
   .upcoming-collection-dropdown-content {
     width: 100%;
-    padding: 15px 0;
+    padding: 10px 0;
   }
   .upcoming-collection-grid {
     display: flex;

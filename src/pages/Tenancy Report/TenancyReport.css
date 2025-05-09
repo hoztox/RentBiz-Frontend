@@ -116,7 +116,7 @@
       width: 100%;
     }
     .tenancy-report-thead.tenancy-report-name-column {
-      padding-left: 14px;
+      padding-left: 18px;
       padding-right: 0;
     }
     .tenancy-report-data.tenancy-report-name-column {
@@ -138,7 +138,7 @@
   
   @media (max-width: 375px) {
     .tenancy-report-thead.tenancy-report-name-column {
-      padding-left: 14px;
+      padding-left: 18px;
       padding-right: 0;
     }
     .tenancy-report-data.tenancy-report-name-column {
@@ -149,7 +149,7 @@
   
   @media (max-width: 390px) {
     .tenancy-report-thead.tenancy-report-name-column {
-      padding-left: 14px;
+      padding-left: 18px;
       padding-right: 0;
     }
     .tenancy-report-data.tenancy-report-name-column {
@@ -169,7 +169,7 @@
       font-size: 11px;
     }
     .tenancy-report-thead.tenancy-report-name-column {
-      padding-left: 14px;
+      padding-left: 18px;
       padding-right: 0;
     }
     .tenancy-report-data.tenancy-report-name-column {
@@ -186,7 +186,7 @@
   
   @media (max-width: 428px) {
     .tenancy-report-thead.tenancy-report-name-column {
-      padding-left: 14px;
+      padding-left: 18px;
       padding-right: 0;
     }
     .tenancy-report-data.tenancy-report-name-column {
@@ -290,7 +290,7 @@
     }
     .tenancy-report-data.tenancy-report-name-column {
       white-space: nowrap;
-      padding-left: 40px;
+      padding-left: 18px;
       padding-right: 0;
     }
     .tenancy-report-dropdown-label {
@@ -328,14 +328,15 @@
       padding: 5px 0;
     }
     .tenancy-report-grid {
-      display: grid;
-      gap: 4px;
+    display: flex;
+    justify-content: space-between;
       margin-bottom: 24px;
     }
     .tenancy-report-grid-cols-2 {
       grid-template-columns: repeat(2, 1fr);
     }
     .tenancy-report-grid-item {
+      width: 50%;
       padding-right: 10px;
     }
     .tenancy-report-mobile-no-border {
