@@ -237,7 +237,7 @@
     flex-direction: column;
     width: 100%;
     gap: 10px;
-    margin-bottom: 5px;
+    margin-bottom: 5px !important;
   }
   .tenancy-inputs-container > div:first-child {
     display: flex;
@@ -258,6 +258,7 @@
   }
   .tenancy-add-new-tenancy {
     font-size: 13px;
+    padding-left: 5px;
   }
  
   .tenancy-desktop-only {
@@ -362,7 +363,7 @@
     padding-right: 10px;
   }
   .tenancy-flex.tenancy-items-center.tenancy-gap-2 {
-    gap: 10px;
+    gap: 7px;
   }
   .tenancy-mobile-no-border {
     border-bottom: none !important;
