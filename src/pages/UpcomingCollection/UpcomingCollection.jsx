@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import "./UpcomingCollection.css";
+import "./upcomingCollection.css";
 import { ChevronDown } from "lucide-react";
 import downarrow from "../../assets/Images/UpcomingCollection/downarrow.svg";
 

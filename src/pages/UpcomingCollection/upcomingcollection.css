@@ -224,7 +224,7 @@
     flex-direction: column;
     width: 100%;
     gap: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
   }
   .upcoming-collection-inputs-container > div:first-child {
     display: flex;
