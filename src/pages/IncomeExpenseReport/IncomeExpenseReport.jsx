@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./IncomeExpenseReport.css";
 import { ChevronDown } from "lucide-react";
+import downarrow from "../../assets/Images/IncomeExpenseReport/downarrow.svg"
 
 const IncomeExpenseReport = () => {
   const [openSelectKey, setOpenSelectKey] = useState(null);
@@ -24,10 +25,10 @@ const IncomeExpenseReport = () => {
     start_date: "",
     end_date: "",
   });
+  const [expandedRows, setExpandedRows] = useState({});
 
   const dateRangeRef = useRef(null);
 
-  // Close dropdowns when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (
@@ -49,6 +50,7 @@ const IncomeExpenseReport = () => {
 
   const demoData = [
     {
+      id: "1",
       date: "09 Sept 2024",
       building: "Emaar Square Area",
       unit: "SHOP10",
@@ -56,13 +58,14 @@ const IncomeExpenseReport = () => {
       charge: "Deposit",
       invoice_no: "INV2410009",
       income_amount: "120.50",
-      income_vat: "120.50",
-      income_total: "120.50",
+      income_vat: "1.50",
+      income_total: "122.00",
       expense_amount: "120.50",
-      expense_vat: "120.50",
-      expense_total: "120.50",
+      expense_vat: "1.50",
+      expense_total: "122.00",
     },
     {
+      id: "2",
       date: "09 Sept 2024",
       building: "Emaar Square Area",
       unit: "SHOP10",
@@ -70,13 +73,14 @@ const IncomeExpenseReport = () => {
       charge: "Deposit",
       invoice_no: "INV2410009",
       income_amount: "120.50",
-      income_vat: "120.50",
-      income_total: "120.50",
+      income_vat: "1.50",
+      income_total: "122.00",
       expense_amount: "120.50",
-      expense_vat: "120.50",
-      expense_total: "120.50",
+      expense_vat: "1.50",
+      expense_total: "122.00",
     },
     {
+      id: "3",
       date: "09 Sept 2024",
       building: "Emaar Square Area",
       unit: "SHOP10",
@@ -84,27 +88,27 @@ const IncomeExpenseReport = () => {
       charge: "Deposit",
       invoice_no: "INV2410009",
       income_amount: "120.50",
-      income_vat: "120.50",
-      income_total: "120.50",
+      income_vat: "1.50",
+      income_total: "122.00",
       expense_amount: "120.50",
-      expense_vat: "120.50",
-      expense_total: "120.50",
+      expense_vat: "1.50",
+      expense_total: "122.00",
     },
   ];
 
   const getUnique = (key) => [...new Set(demoData.map((item) => item[key]))];
-  
+
   const uniqueTenants = getUnique("tenant");
   const uniqueBuildings = getUnique("building");
   const uniqueUnits = getUnique("unit");
-  
 
   const clearFilters = () => {
     const cleared = {
-      date: "",
+      id: "",
       tenant: "",
       building: "",
       unit: "",
+      status: "",
       start_date: "",
       end_date: "",
     };
@@ -120,16 +124,13 @@ const IncomeExpenseReport = () => {
     );
 
     const matchesFilters =
-      (!filters.date || report.date === filters.date) &&
+      (!filters.tenant || report.tenant === filters.tenant) &&
       (!filters.building || report.building === filters.building) &&
       (!filters.unit || report.unit === filters.unit) &&
-      (!filters.tenant || report.tenant === filters.tenant) &&
-      (!filters.charge || report.charge === filters.charge) &&
-      (!filters.invoice_no || report.invoice_no === filters.invoice_no) &&
       (!filters.start_date ||
-        new Date(report.invoice_date) >= new Date(filters.start_date)) &&
+        new Date(report.date) >= new Date(filters.start_date)) &&
       (!filters.end_date ||
-        new Date(report.due_date) <= new Date(filters.end_date));
+        new Date(report.date) <= new Date(filters.end_date));
 
     return matchesSearch && matchesFilters;
   });
@@ -144,27 +145,33 @@ const IncomeExpenseReport = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  // Toggle date range dropdown
   const toggleDateRange = () => {
     setOpenSelectKey(openSelectKey === "date_range" ? null : "date_range");
   };
 
+  const toggleRowExpand = (id) => {
+    setExpandedRows((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
   return (
-    <div className="border border-[#E9E9E9] rounded-md">
-      <div className="p-5 border-b border-[#E9E9E9]">
-        <div className="flex justify-between items-center pb-5">
-          <h1 className="income-expense-head">Income-Expense Report</h1>
-          <div className="flex gap-[10px]">
+    <div className="border border-[#E9E9E9] rounded-md income-expense-table">
+      <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] income-expense-table-header">
+        <h1 className="income-expense-head">Income-Expense Report</h1>
+        <div className="flex flex-col md:flex-row gap-[10px] income-expense-inputs-container">
+          <div className="flex flex-col md:flex-row gap-[10px] w-full">
             <input
               type="text"
               placeholder="Search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-[302px] focus:border-gray-300 duration-200 income-expense-search"
+              className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 income-expense-search"
             />
-            <div className="relative">
+            <div className="relative w-full md:w-auto">
               <select
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[121px] cursor-pointer focus:border-gray-300 duration-200 income-expense-selection"
+                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 income-expense-selection"
                 onFocus={() => setOpenSelectKey("showing")}
                 onBlur={() => setOpenSelectKey(null)}
               >
@@ -177,12 +184,31 @@ const IncomeExpenseReport = () => {
                 }`}
               />
             </div>
-            <button className="flex items-center justify-center gap-2 w-[132px] h-[38px] rounded-md duration-200 export-btn">
+          </div>
+          <div className="flex gap-[10px] income-expense-action-buttons-container">
+            <div className="relative w-full md:w-auto">
+              <select
+                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 income-expense-selection"
+                onFocus={() => setOpenSelectKey("filter")}
+                onBlur={() => setOpenSelectKey(null)}
+              >
+                <option value="filter">Filter</option>
+                <option value="all">All</option>
+              </select>
+              <ChevronDown
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
+                  openSelectKey === "filter" ? "rotate-180" : "rotate-0"
+                }`}
+              />
+            </div>
+            <button className="flex items-center justify-center gap-2 w-[89%] md:w-[132px] rounded-md duration-200 income-expense-export-btn">
               Export To Excel
             </button>
           </div>
         </div>
+      </div>
 
+      <div className="p-5 border-b border-[#E9E9E9] income-expense-desktop-only">
         <div className="flex items-center justify-between">
           <div className="flex gap-[10px] flex-wrap">
             <div className="relative">
@@ -263,13 +289,12 @@ const IncomeExpenseReport = () => {
                 ))}
               </select>
               <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 income-expense-selection ${
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
                   openSelectKey === "unit" ? "rotate-180" : "rotate-0"
                 }`}
               />
             </div>
 
-            {/* Date Range Filter */}
             <div className="relative" ref={dateRangeRef}>
               <div
                 className="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer flex items-center justify-between income-expense-selection"
@@ -277,7 +302,7 @@ const IncomeExpenseReport = () => {
               >
                 Date Range
                 <ChevronDown
-                  className={`absolute right-2 top-[10px] w-[20px] h-[20px] duration-300 ${
+                  className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
                     openSelectKey === "date_range" ? "rotate-180" : "rotate-0"
                   }`}
                 />
@@ -336,11 +361,10 @@ const IncomeExpenseReport = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="income-expense-desktop-only overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
             <tr className="h-[57px]">
-              {/* First row with section headers */}
               <th
                 colSpan="6"
                 className="border-b border-[#E9E9E9] income-expense-header"
@@ -368,8 +392,6 @@ const IncomeExpenseReport = () => {
                 INVOICE NO/ <br />
                 EXPENSE NO
               </th>
-
-              {/* Income columns */}
               <th className="px-5 text-center income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">
                 AMOUNT
               </th>
@@ -379,8 +401,6 @@ const IncomeExpenseReport = () => {
               <th className="px-5 text-center income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">
                 TOTAL
               </th>
-
-              {/* Expense columns */}
               <th className="px-5 text-center income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
                 AMOUNT
               </th>
@@ -393,9 +413,9 @@ const IncomeExpenseReport = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedData.map((income, index) => (
+            {paginatedData.map((income) => (
               <tr
-                key={index}
+                key={income.id}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
                 <td className="px-5 income-expense-data">{income.date}</td>
@@ -403,11 +423,7 @@ const IncomeExpenseReport = () => {
                 <td className="px-5 income-expense-data">{income.unit}</td>
                 <td className="px-5 income-expense-data">{income.tenant}</td>
                 <td className="px-5 income-expense-data">{income.charge}</td>
-                <td className="px-5 income-expense-data">
-                  {income.invoice_no}
-                </td>
-
-                {/* Income data */}
+                <td className="px-5 income-expense-data">{income.invoice_no}</td>
                 <td className="px-5 text-center income-expense-data bg-[#F2FCF7] !text-[#28C76F]">
                   {income.income_amount}
                 </td>
@@ -417,8 +433,6 @@ const IncomeExpenseReport = () => {
                 <td className="px-5 text-center income-expense-data bg-[#F2FCF7] !text-[#28C76F]">
                   {income.income_total}
                 </td>
-
-                {/* Expense data */}
                 <td className="px-5 text-center income-expense-data bg-[#FFF7F6] !text-[#FE7062]">
                   {income.expense_amount}
                 </td>
@@ -434,41 +448,158 @@ const IncomeExpenseReport = () => {
         </table>
       </div>
 
-      <div className="flex justify-between items-center h-[77.5px] px-5">
-        <span className="collection-list-pagination">
-          Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-          {filteredData.length} entries
+      <div className="block md:hidden">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="income-expense-table-row-head">
+              <th className="px-5 w-[45%] text-left income-expense-thead income-expense-date-column">DATE</th>
+              <th className="px-3 w-[30%] text-left income-expense-thead income-expense-tenant-column">TENANT</th>
+              <th className="px-5 text-right income-expense-thead"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedData.map((report) => (
+              <React.Fragment key={report.id}>
+                <tr
+                  className={`${
+                    expandedRows[report.id]
+                      ? "income-expense-mobile-no-border"
+                      : "income-expense-mobile-with-border"
+                  } border-b border-[#E9E9E9] h-[57px]`}
+                >
+                  <td className="px-5 text-left income-expense-data income-expense-date-column w-[35%] pl-[16px]">{report.date}</td>
+                  <td className="px-3 text-left income-expense-data income-expense-tenant-column w-[30%]">{report.tenant}</td>
+                  <td className="py-4 flex items-center justify-end h-[57px]">
+                    <div
+                      className={`income-expense-dropdown-field ${
+                        expandedRows[report.id] ? "active" : ""
+                      }`}
+                      onClick={() => toggleRowExpand(report.id)}
+                    >
+                      <img
+                        src={downarrow}
+                        alt="drop-down-arrow"
+                        className={`income-expense-dropdown-img ${
+                          expandedRows[report.id] ? "text-white" : ""
+                        }`}
+                      />
+                    </div>
+                  </td>
+                </tr>
+                {expandedRows[report.id] && (
+                  <tr className="income-expense-mobile-with-border border-b border-[#E9E9E9]">
+                    <td colSpan={3} className="p-0">
+                      <div className="income-expense-grid-container">
+                        <div className="income-expense-grid">
+                          <div className="income-expense-grid-item">
+                            <div className="income-expense-dropdown-label">BUILDING</div>
+                            <div className="income-expense-dropdown-value">{report.building}</div>
+                          </div>
+                          <div className="income-expense-grid-item w-[56%]">
+                            <div className="income-expense-dropdown-label">UNIT</div>
+                            <div className="income-expense-dropdown-value">{report.unit}</div>
+                          </div>
+                        </div>
+                        <div className="income-expense-grid">
+                          <div className="income-expense-grid-item w-[44%]">
+                            <div className="income-expense-dropdown-label">CHARGE</div>
+                            <div className="income-expense-dropdown-value">{report.charge}</div>
+                          </div>
+                          <div className="income-expense-grid-item w-[56%]">
+                            <div className="income-expense-dropdown-label">INVOICE NO/EXPENSE NO</div>
+                            <div className="income-expense-dropdown-value">{report.invoice_no}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="income-expense-table-container">
+                        <table className="income-expense-dropdown-table">
+                          <thead>
+                            <tr className="income-expense-dropdown-table-header">
+                              <th colSpan="3" className="income-expense-income-header">
+                                INCOME
+                              </th>
+                              <th colSpan="3" className="income-expense-expense-header">
+                                EXPENSE
+                              </th>
+                            </tr>
+                            <tr className="income-expense-dropdown-table-subheader">
+                              <th className="income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">AMOUNT</th>
+                              <th className="income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">VAT</th>
+                              <th className="income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">TOTAL</th>
+                              <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">AMOUNT</th>
+                              <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">VAT</th>
+                              <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">TOTAL</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr className="income-expense-dropdown-table-row">
+                              <td className="income-expense-data bg-[#F2FCF7] !text-[#28C76F]">{report.income_amount}</td>
+                              <td className="income-expense-data bg-[#F2FCF7] !text-[#28C76F]">{report.income_vat}</td>
+                              <td className="income-expense-data bg-[#F2FCF7] !text-[#28C76F]">{report.income_total}</td>
+                              <td className="income-expense-data bg-[#FFF7F6] !text-[#FE7062]">{report.expense_amount}</td>
+                              <td className="income-expense-data bg-[#FFF7F6] !text-[#FE7062]">{report.expense_vat}</td>
+                              <td className="income-expense-data bg-[#FFF7F6] !text-[#FE7062]">{report.expense_total}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 income-expense-pagination-container">
+        <span className="income-expense-pagination collection-list-pagination">
+          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
+          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
         </span>
-        <div className="flex gap-[4px]">
+        <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto income-expense-pagination-buttons">
           <button
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
             disabled={currentPage === 1}
-            onClick={() => setCurrentPage((prev) => prev - 1)}
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 pagination-btn"
+            onClick={() => setCurrentPage(currentPage - 1)}
           >
             Previous
           </button>
-          {[...Array(endPage - startPage + 1)].map((_, i) => {
-            const page = startPage + i;
-            return (
-              <button
-                key={page}
-                className={`px-4 h-[38px] rounded-md duration-200 ${
-                  page === currentPage
-                    ? "bg-[#1458A2] text-white"
-                    : "bg-[#F4F4F4] text-[#8a94a3] hover:bg-[#e6e6e6]"
-                }`}
-                onClick={() => setCurrentPage(page)}
-              >
-                {page}
-              </button>
-            );
-          })}
+          {startPage > 1 && (
+            <button
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              onClick={() => setCurrentPage(1)}
+            >
+              1
+            </button>
+          )}
+          {startPage > 2 && <span className="px-2 flex items-center">...</span>}
+          {[...Array(endPage - startPage + 1)].map((_, i) => (
+            <button
+              key={startPage + i}
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+                currentPage === startPage + i
+                  ? "bg-[#1458A2] text-white"
+                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+              }`}
+              onClick={() => setCurrentPage(startPage + i)}
+            >
+              {startPage + i}
+            </button>
+          ))}
+          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
+          {endPage < totalPages && (
+            <button
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              onClick={() => setCurrentPage(totalPages)}
+            >
+              {totalPages}
+            </button>
+          )}
           <button
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
             disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 pagination-btn"
+            onClick={() => setCurrentPage(currentPage + 1)}
           >
             Next
           </button>
