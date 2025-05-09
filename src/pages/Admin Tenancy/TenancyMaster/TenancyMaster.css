@@ -143,9 +143,7 @@
   .tenancy-selection {
     width: 120px;
   }
-  .tenancy-download-btn {
-    width: 120px;
-  }
+
   .tenancy-thead.tenancy-tenant-column {
     padding-left: 14px;
     padding-right: 0;
@@ -190,9 +188,7 @@
   .tenancy-selection {
     width: 120px;
   }
-  .tenancy-download-btn {
-    width: 120px;
-  }
+
 }
 
 @media (max-width: 414px) {
@@ -210,14 +206,12 @@
   .tenancy-selection {
     width: 120px;
   }
-  .tenancy-download-btn {
-    width: 120px;
-  }
+
 }
 
 @media (max-width: 428px) {
   .tenancy-thead.tenancy-tenant-column {
-    padding-left: 14px;
+    padding-left: 24px;
     padding-right: 0;
   }
   .tenancy-data.tenancy-tenant-column {
@@ -243,7 +237,7 @@
     flex-direction: column;
     width: 100%;
     gap: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
   }
   .tenancy-inputs-container > div:first-child {
     display: flex;
@@ -263,12 +257,9 @@
     margin-top: 5px;
   }
   .tenancy-add-new-tenancy {
-    width: 169px;
-    font-size: 14px;
+    font-size: 13px;
   }
-  .tenancy-download-btn {
-    width: 122px;
-  }
+ 
   .tenancy-desktop-only {
     display: none;
   }
@@ -324,7 +315,7 @@
   }
   .tenancy-data.tenancy-tenant-column {
     white-space: nowrap;
-    padding-left: 5px;
+    padding-left: 24px;
     padding-right: 0;
   }
   .tenancy-dropdown-label {
@@ -362,14 +353,12 @@
     padding: 15px 0;
   }
   .tenancy-grid {
-    display: grid;
-    gap: 4px;
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 24px;
   }
-  .tenancy-grid-cols-2 {
-    grid-template-columns: repeat(2, 1fr);
-  }
   .tenancy-grid-item {
+    width: 50%;
     padding-right: 10px;
   }
   .tenancy-flex.tenancy-items-center.tenancy-gap-2 {

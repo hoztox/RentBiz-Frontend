@@ -153,13 +153,13 @@ const TenancyMaster = () => {
           </div>
           <div className="flex gap-[10px] tenancy-action-buttons-container">
             <button
-              className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md tenancy-add-new-tenancy duration-200"
+              className="flex items-center justify-center gap-2 w-[51%] md:w-[176px] h-[38px] rounded-md tenancy-add-new-tenancy duration-200"
               onClick={openCreateTenancyModal}
             >
               Add New Tenancy
-              <img src={plusicon} alt="plus icon" className="w-[15px] h-[15px]" />
+              <img src={plusicon} alt="plus icon" className="w-[16px] h-[15px] relative right-[4px]" />
             </button>
-            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 tenancy-download-btn">
+            <button className="flex items-center justify-center gap-2 w-[45%] md:w-[122px] h-[38px] rounded-md duration-200 tenancy-download-btn">
               Download
               <img
                 src={downloadicon}
@@ -242,8 +242,8 @@ const TenancyMaster = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="tenancy-table-row-head">
-              <th className="px-5 w-[74px] text-left tenancy-thead tenancy-id-column">ID</th>
-              <th className="px-3 text-center tenancy-thead tenancy-tenant-column">TENANT NAME</th>
+              <th className="px-5 w-[50%] text-left tenancy-thead tenancy-id-column">ID</th>
+              <th className="px-3 w-[50%] text-left tenancy-thead tenancy-tenant-column">TENANT NAME</th>
               <th className="px-5 text-right tenancy-thead"></th>
             </tr>
           </thead>
@@ -258,7 +258,7 @@ const TenancyMaster = () => {
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left tenancy-data tenancy-id-column">{tenancy.id}</td>
-                  <td className="px-3 text-center tenancy-data tenancy-tenant-column">{tenancy.tenant}</td>
+                  <td className="px-3 text-left tenancy-data tenancy-tenant-column">{tenancy.tenant}</td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`tenancy-dropdown-field ${
@@ -280,7 +280,7 @@ const TenancyMaster = () => {
                   <tr className="tenancy-mobile-with-border border-b border-[#E9E9E9]">
                     <td colSpan={3} className="px-5">
                       <div className="tenancy-dropdown-content">
-                        <div className="tenancy-grid tenancy-grid-cols-2">
+                        <div className="tenancy-grid ">
                           <div className="tenancy-grid-item">
                             <div className="tenancy-dropdown-label">BUILDING NAME</div>
                             <div className="tenancy-dropdown-value">{tenancy.building}</div>
@@ -290,7 +290,7 @@ const TenancyMaster = () => {
                             <div className="tenancy-dropdown-value">{tenancy.unit}</div>
                           </div>
                         </div>
-                        <div className="tenancy-grid tenancy-grid-cols-2">
+                        <div className="tenancy-grid ">
                           <div className="tenancy-grid-item">
                             <div className="tenancy-dropdown-label">RENTAL MONTHS</div>
                             <div className="tenancy-dropdown-value">{tenancy.months}</div>
@@ -310,7 +310,7 @@ const TenancyMaster = () => {
                             </div>
                           </div>
                         </div>
-                        <div className="tenancy-grid tenancy-grid-cols-2">
+                        <div className="tenancy-grid">
                           <div className="tenancy-grid-item">
                             <div className="tenancy-dropdown-label">VIEW</div>
                             <div className="tenancy-dropdown-value">
