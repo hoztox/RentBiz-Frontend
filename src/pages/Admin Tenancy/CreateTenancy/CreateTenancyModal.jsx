@@ -159,7 +159,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               </div>
             </div>
 
-            <div className="flex gap-4">
+            <div className="md:flex tenancy-modal-column gap-4">
               <div className="w-1/2">
                 <label className="block tenancy-modal-label">Unit *</label>
                 <div className="relative">
@@ -191,7 +191,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                 />
               </div>
             </div>
-            <div className="flex gap-4">
+            <div className="md:flex tenancy-modal-column gap-4">
               <div className="w-1/2">
                 <label className="block tenancy-modal-label">Start Date*</label>
                 <div className="relative">
@@ -220,7 +220,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               </div>
             </div>
 
-            <div className="flex gap-4">
+            <div className="md:flex tenancy-modal-column gap-4">
               <div className="w-1/2">
                 <label className="block tenancy-modal-label">
                   No. Of Payments*
@@ -702,10 +702,12 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                         <>
                           {/* Second Row - Header */}
                           <div
-                        className={`flex justify-between border-b border-[#E9E9E9] h-[57px] rounded-t ${
-                          expandedStates[item.id] ? "bg-[#F2F2F2]" : "bg-white"
-                        }`}
-                      >
+                            className={`flex justify-between border-b border-[#E9E9E9] h-[57px] rounded-t ${
+                              expandedStates[item.id]
+                                ? "bg-[#F2F2F2]"
+                                : "bg-white"
+                            }`}
+                          >
                             <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
                               DUE DATE
                             </div>
@@ -758,10 +760,12 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
 
                           {/* Third Row - Header */}
                           <div
-                        className={`flex justify-between border-b border-[#E9E9E9] h-[57px] rounded-t ${
-                          expandedStates[item.id] ? "bg-[#F2F2F2]" : "bg-white"
-                        }`}
-                      >
+                            className={`flex justify-between border-b border-[#E9E9E9] h-[57px] rounded-t ${
+                              expandedStates[item.id]
+                                ? "bg-[#F2F2F2]"
+                                : "bg-white"
+                            }`}
+                          >
                             <div className="px-[10px] flex items-center tenancy-modal-thead uppercase w-[50%]">
                               VAT
                             </div>
