@@ -209,9 +209,9 @@ const AdminUsers = () => {
             </div>
           </div>
 
-          <div className="flex gap-[10px] action-buttons-container">
+          <div className="flex gap-[10px] user-action-buttons-container w-full md:w-auto justify-start">
             <button
-              className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md create-user hover:bg-[#076094] duration-200"
+              className="flex items-center justify-center gap-2 h-[38px] rounded-md user-create-btn duration-200 w-[176px]"
               onClick={openModal}
             >
               Create User
@@ -221,12 +221,14 @@ const AdminUsers = () => {
                 className="w-[15px] h-[15px]"
               />
             </button>
-            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 download-btn">
+            <button
+              className="flex items-center justify-center gap-2 h-[38px] rounded-md duration-200 user-download-btn w-[122px]"
+            >
               Download
               <img
                 src={downloadicon}
                 alt="Download Icon"
-                className="w-[15px] h-[15px] download-img"
+                className="w-[15px] h-[15px] user-download-icon"
               />
             </button>
           </div>

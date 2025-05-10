@@ -158,7 +158,7 @@ const IncomeExpenseReport = () => {
 
   return (
     <div className="border border-[#E9E9E9] rounded-md income-expense-table">
-      <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] income-expense-table-header">
+      <div className="flex justify-between items-center p-5 income-expense-table-header">
         <h1 className="income-expense-head">Income-Expense Report</h1>
         <div className="flex flex-col md:flex-row gap-[10px] income-expense-inputs-container">
           <div className="flex flex-col md:flex-row gap-[10px] w-full">
@@ -208,7 +208,7 @@ const IncomeExpenseReport = () => {
         </div>
       </div>
 
-      <div className="p-5 border-b border-[#E9E9E9] income-expense-desktop-only">
+      <div className="p-5 border-b border-[#E9E9E9] mt-[-20px] income-expense-desktop-only">
         <div className="flex items-center justify-between">
           <div className="flex gap-[10px] flex-wrap">
             <div className="relative">
