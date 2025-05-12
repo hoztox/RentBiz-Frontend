@@ -51,7 +51,7 @@
   background-color: #076094;
 }
 
-.download-btn {
+.tenant-download-btn {
   background-color: #f0f0f0;
   font-family: "Inter Tight";
   font-size: 15px;
@@ -63,12 +63,12 @@
   box-sizing: border-box;
 }
 
-.download-btn:hover {
+.tenant-download-btn:hover {
   background-color: #201d1e;
   color: white;
 }
 
-.download-btn:hover .download-img {
+.tenant-download-btn:hover .download-img {
   filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%)
     hue-rotate(47deg) brightness(118%) contrast(100%);
 }
@@ -131,20 +131,17 @@
     margin-bottom: 50px;
   }
   .tenant-search {
-    width: 150px; /* Adjusted for smaller screens */
+    width: 60%;
   }
-  .tenant-selection {
-    width: 120px;
-  }
-  .download-btn {
-    width: 120px;
+  .tenant-download-btn {
+    width: 40%;
   }
   .tenant-thead.date-column {
-    padding-left: 14px; 
+    padding-left: 14px;
     padding-right: 0;
   }
   .tenant-data.date-column {
-    padding-left: 14px; 
+    padding-left: 14px;
     padding-right: 0;
     white-space: nowrap;
   }
@@ -183,14 +180,14 @@
   .tenant-selection {
     width: 120px;
   }
-  .download-btn {
-    width: 120px;
+  .tenant-download-btn {
+    width: 40%;
   }
 }
 
 @media (max-width: 414px) {
   .tenant-thead {
-    font-size: 11px; 
+    font-size: 11px;
   }
   .tenant-thead.date-column {
     padding-left: 14px;
@@ -203,8 +200,8 @@
   .tenant-selection {
     width: 120px;
   }
-  .download-btn {
-    width: 120px;
+  .tenant-download-btn {
+    width: 40%;
   }
 }
 
@@ -236,7 +233,7 @@
     flex-direction: column;
     width: 100%;
     gap: 10px;
-    margin-bottom: 10px; 
+    margin-bottom: 10px;
   }
   .tenant-inputs-container > div:first-child {
     display: flex;
@@ -246,10 +243,10 @@
     flex-wrap: nowrap;
   }
   .tenant-search {
-    width: 100%; 
+    width: 60%;
   }
   .tenant-selection {
-    width: 100%; 
+    width: 100%;
     margin-left: 0px;
   }
   .action-buttons-container {
@@ -260,11 +257,11 @@
     margin-top: 5px;
   }
   .add-new-tenant {
-    width: 169px; 
-    font-size: 14px;
+    width: 60%;
+    font-size: 15px;
   }
-  .download-btn {
-    width: 122px;
+  .tenant-download-btn {
+    width: 40%;
   }
   .desktop-only {
     display: none;
@@ -290,19 +287,19 @@
     border-radius: 100%;
     width: 20px;
     height: 20px;
-    margin-right: 15px; 
-    
+    margin-right: 15px;
+
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.3s ease; 
+    transition: background-color 0.3s ease;
   }
   .tenant-dropdown-field.active {
     background-color: #254396;
   }
   .tenant-dropdown-img {
     width: 10px;
-    transition: transform 0.3s ease; 
+    transition: transform 0.3s ease;
   }
   .tenant-dropdown-field.active .tenant-dropdown-img {
     transform: rotate(180deg);
@@ -322,7 +319,7 @@
   }
   .tenant-data.date-column {
     white-space: nowrap;
-    padding-left: 14px; 
+    padding-left: 14px;
     padding-right: 0;
   }
   .dropdown-label {
@@ -332,7 +329,7 @@
     font-weight: 500;
     line-height: normal;
     letter-spacing: 1px;
-    color: #818da0; 
+    color: #818da0;
     margin-bottom: 4px;
     padding-left: 0;
   }
@@ -345,24 +342,24 @@
     color: #201d1e;
   }
   .tenant-status {
-    padding: 0px 9px; 
+    padding: 0px 9px;
     border-radius: 3px;
     margin-top: 5px;
     display: inline-block;
-    width: 65px; /* Fixed width for consistency */
+    width: 65px;
     height: 24px;
     text-align: center;
   }
   .tenant-dropdown-content {
     width: 100%;
   }
-  .grid-cols-2 {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 9px; 
+  .tenant-grid {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 24px;
   }
-  .grid-cols-3 {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 9px; 
+  .tenant-grid-item {
+    padding-right: 10px;
   }
   .dropdown-value {
     word-break: break-word;
@@ -388,7 +385,7 @@
 
 @media (max-width: 394px) {
   .tenant-thead {
-    font-size: 13px; 
+    font-size: 13px;
   }
   .tenant-data {
     font-size: 13px;

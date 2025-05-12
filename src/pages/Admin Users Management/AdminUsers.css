@@ -4,7 +4,7 @@
   font-style: normal;
   font-weight: 500;
   line-height: 24px;
-  color: #201D1E;
+  color: #201d1e;
 }
 
 .user-search {
@@ -30,7 +30,7 @@
   font-style: normal;
   font-weight: 400;
   line-height: 24px;
-  color: #201D1E;
+  color: #201d1e;
   box-sizing: border-box;
 }
 
@@ -50,7 +50,7 @@
   font-style: normal;
   font-weight: 400;
   line-height: 22px;
-  color: #201D1E;
+  color: #201d1e;
 }
 
 .action-btn:hover {
@@ -101,14 +101,14 @@
 }
 
 .toggle-switch.active {
-  background-color: #FF725E;
+  background-color: #ff725e;
 }
 
 .toggle-circle {
   position: absolute;
   width: 16px;
   height: 16px;
-  background-color: #FF725E;
+  background-color: #ff725e;
   border-radius: 50%;
   transition: transform 0.3s ease-in-out, background-color 0.3s ease-in-out;
 }
@@ -143,6 +143,10 @@
   transform: rotate(180deg);
 }
 
+.user-dropdown-content {
+  width: 100%;
+}
+
 .dropdown-label {
   font-family: "Inter Tight";
   font-size: 12px;
@@ -160,18 +164,19 @@
   font-style: normal;
   font-weight: 400;
   line-height: 22px;
-  color: #201D1E;
+  color: #201d1e;
+}
+
+.user-grid {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 24px;
 }
 
 .user-table-row-head {
   height: auto;
   background-color: #f7f7f7;
   border-bottom: none;
-}
-
-.user-id-column {
-  padding-right: 10px;
-  width: 34%;
 }
 
 .mobile-no-border {
@@ -189,7 +194,7 @@
 }
 
 .user-create-btn {
-  background-color: #2892CE;
+  background-color: #2892ce;
   color: white;
   font-family: "Inter Tight";
   font-size: 15px;
@@ -205,19 +210,19 @@
 }
 
 .user-download-btn {
-  background-color: #F0F0F0;
+  background-color: #f0f0f0;
   font-family: "Inter Tight";
   font-size: 15px;
   font-style: normal;
   font-weight: 400;
   line-height: 18px;
   letter-spacing: 0.43px;
-  color: #4D4E4D;
+  color: #4d4e4d;
   box-sizing: border-box;
 }
 
 .user-download-btn:hover {
-  background-color: #201D1E;
+  background-color: #201d1e;
   color: white;
 }
 
@@ -255,7 +260,7 @@
     flex-wrap: nowrap;
   }
   .user-search {
-    width: 100%;
+    width: 60%;
   }
   .user-selection {
     width: 100%;
@@ -268,8 +273,7 @@
     margin-top: 5px;
   }
   .user-create-btn {
-    width: 176px;
-    font-size: 14px;
+    font-size: 15px;
   }
   .user-download-btn {
     width: 122px;
@@ -354,9 +358,9 @@
     max-width: none;
   }
   .user-action-buttons-container .user-create-btn {
-    width: 176px;
+    width: 60%;
   }
   .user-action-buttons-container .user-download-btn {
-    width: 56%;
+    width: 40%;
   }
 }

@@ -133,7 +133,7 @@ const TenancyMaster = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 tenancy-search"
             />
-            <div className="relative w-full md:w-auto">
+            <div className="relative w-[40%] md:w-auto">
               <select
                 name="select"
                 id=""
@@ -157,7 +157,7 @@ const TenancyMaster = () => {
               onClick={openCreateTenancyModal}
             >
               Add New Tenancy
-              <img src={plusicon} alt="plus icon" className="w-[16px] h-[15px] relative right-[4px]" />
+              <img src={plusicon} alt="plus icon" className="relative right-[5px] w-[16px] h-[15px]" />
             </button>
             <button className="flex items-center justify-center gap-2 w-[45%] md:w-[122px] h-[38px] rounded-md duration-200 tenancy-download-btn">
               Download

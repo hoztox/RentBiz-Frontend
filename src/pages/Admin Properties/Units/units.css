@@ -7,7 +7,7 @@
   color: #201d1e;
 }
 
-.unit-search {
+.units-search {
   font-family: "Inter Tight";
   font-size: 15px;
   font-style: normal;
@@ -16,7 +16,7 @@
   box-sizing: border-box;
 }
 
-.unit-search::placeholder {
+.units-search::placeholder {
   font-family: "Inter Tight";
   font-size: 15px;
   font-style: normal;
@@ -139,14 +139,14 @@
   .unit-table-header {
     padding: 16px;
   }
-  .unit-search {
-    width: 150px;
+  .units-search {
+    width: 60%;
   }
   .unit-selection {
-    width: 120px;
+    width: 100%;
   }
   .unit-download-btn {
-    width: 120px;
+    width: 40%;
   }
   .unit-thead.unit-date-column {
     padding-left: 14px;
@@ -246,7 +246,7 @@
     flex-direction: column;
     width: 100%;
     gap: 10px;
-    margin-bottom: 10px !important;
+    margin-bottom: 5px !important;
   }
   .unit-inputs-container > div:first-child {
     display: flex;
@@ -255,8 +255,8 @@
     width: 100%;
     flex-wrap: nowrap;
   }
-  .unit-search {
-    width: 100%;
+  .units-search {
+    width: 60%;
   }
   .unit-selection {
     width: 100%;
@@ -266,11 +266,11 @@
     margin-top: 5px;
   }
   .unit-add-new-unit {
-    width: 169px;
-    font-size: 14px;
+    width: 60%;
+    font-size: 15px;
   }
   .unit-download-btn {
-    width: 122px;
+    width: 40%;
   }
   .unit-desktop-only {
     display: none;
@@ -366,18 +366,16 @@
   }
   .unit-dropdown-content {
     width: 100%;
-    padding: 15px 0;
+    padding: 10px 0;
   }
   .unit-grid {
-    display: grid;
-    gap: 9px;
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 24px;
   }
-  .unit-grid-cols-2 {
-    grid-template-columns: repeat(2, 1fr);
-  }
   .unit-grid-item {
-    padding-right: 10px;
+    padding-right: 5px;
+    width: 50%;
   }
   .unit-flex.unit-items-center.unit-gap-2 {
     gap: 10px;

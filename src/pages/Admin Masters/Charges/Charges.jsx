@@ -147,7 +147,7 @@ const Charges = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 charges-search"
             />
-            <div className="relative w-full md:w-auto">
+            <div className="relative w-[40%] md:w-auto">
               <select
                 name="select"
                 id=""
@@ -168,12 +168,16 @@ const Charges = () => {
           <div className="flex gap-[10px] action-buttons-container">
             <button
               onClick={openCreateChargeModal}
-              className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md add-new-master duration-200"
+              className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md charges-add-new-master duration-200"
             >
               Add New Master
-              <img src={plusicon} alt="plus icon" className="w-[15px] h-[15px]" />
+              <img
+                src={plusicon}
+                alt="plus icon"
+                className="w-[15px] h-[15px]"
+              />
             </button>
-            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 download-btn">
+            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 charges-download-btn">
               Download
               <img
                 src={downloadicon}
@@ -196,7 +200,9 @@ const Charges = () => {
                   <th className="px-4 py-3 text-left charges-thead">ID</th>
                   <th className="px-4 py-3 text-left charges-thead">DATE</th>
                   <th className="px-4 py-3 text-left charges-thead">NAME</th>
-                  <th className="px-4 py-3 text-left charges-thead">CHARGE TYPE</th>
+                  <th className="px-4 py-3 text-left charges-thead">
+                    CHARGE TYPE
+                  </th>
                   <th className="px-4 py-3 text-right charges-thead">ACTION</th>
                 </tr>
               </thead>
@@ -213,10 +219,18 @@ const Charges = () => {
                         shouldRemoveBorder ? "" : "border-b border-[#E9E9E9]"
                       }`}
                     >
-                      <td className="px-5 text-left charges-data">{charge.id}</td>
-                      <td className="px-5 text-left charges-data">{charge.date}</td>
-                      <td className="pl-5 text-left charges-data">{charge.name}</td>
-                      <td className="pl-5 text-left charges-data w-[15%]">{charge.chargeType}</td>
+                      <td className="px-5 text-left charges-data">
+                        {charge.id}
+                      </td>
+                      <td className="px-5 text-left charges-data">
+                        {charge.date}
+                      </td>
+                      <td className="pl-5 text-left charges-data">
+                        {charge.name}
+                      </td>
+                      <td className="pl-5 text-left charges-data w-[15%]">
+                        {charge.chargeType}
+                      </td>
                       <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
                         <button onClick={() => openUpdateModal(charge)}>
                           <img
@@ -250,17 +264,29 @@ const Charges = () => {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-[#E9E9E9] h-[57px]">
-                      <th className="px-4 py-3 text-left tax-section-thead">TAX NAME</th>
-                      <th className="px-4 py-3 text-left tax-section-thead">CHARGE TYPE</th>
-                      <th className="px-4 py-3 text-left tax-section-thead">PERCENTAGE</th>
-                      <th className="px-4 py-3 text-right tax-section-thead">ACTION</th>
+                      <th className="px-4 py-3 text-left tax-section-thead">
+                        TAX NAME
+                      </th>
+                      <th className="px-4 py-3 text-left tax-section-thead">
+                        CHARGE TYPE
+                      </th>
+                      <th className="px-4 py-3 text-left tax-section-thead">
+                        PERCENTAGE
+                      </th>
+                      <th className="px-4 py-3 text-right tax-section-thead">
+                        ACTION
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr className="h-[57px] hover:bg-gray-50 cursor-pointer">
                       <td className="px-5 text-left tax-section-tdata">Vat</td>
-                      <td className="px-5 text-left tax-section-tdata">Maintenance</td>
-                      <td className="pl-5 text-left tax-section-tdata w-[18%]">20%</td>
+                      <td className="px-5 text-left tax-section-tdata">
+                        Maintenance
+                      </td>
+                      <td className="pl-5 text-left tax-section-tdata w-[18%]">
+                        20%
+                      </td>
                       <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
                         <button>
                           <img
@@ -396,8 +422,12 @@ const Charges = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="charges-table-row-head">
-              <th className="px-5 w-[74px] text-left charges-thead charges-id-column">ID</th>
-              <th className="px-3 text-center charges-thead charges-date-column">DATE</th>
+              <th className="px-5 w-[52%] text-left charges-thead charges-id-column">
+                ID
+              </th>
+              <th className="px-5 w-[47%] text-left charges-thead charges-date-column">
+                DATE
+              </th>
               <th className="px-5 text-right charges-thead"></th>
             </tr>
           </thead>
@@ -406,11 +436,15 @@ const Charges = () => {
               <React.Fragment key={charge.id}>
                 <tr
                   className={`${
-                    expandedRows[charge.id] ? "mobile-no-border" : "mobile-with-border"
+                    expandedRows[charge.id]
+                      ? "mobile-no-border"
+                      : "mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left charges-data">{charge.id}</td>
-                  <td className="px-3 text-center charges-data charges-date-column">{charge.date}</td>
+                  <td className="px-5 text-left charges-data charges-date-column">
+                    {charge.date}
+                  </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`charges-dropdown-field ${
@@ -432,18 +466,22 @@ const Charges = () => {
                   <tr className="mobile-with-border border-b border-[#E9E9E9]">
                     <td colSpan={3} className="px-5">
                       <div className="charges-dropdown-content">
-                        <div className="grid grid-cols-2 gap-4 mb-6">
-                          <div className="mb-[10px]">
+                        <div className="charges-grid">
+                          <div className="charges-grid-items">
                             <div className="dropdown-label">NAME</div>
                             <div className="dropdown-value">{charge.name}</div>
                           </div>
-                          <div>
+                          <div className="charges-grid-items">
                             <div className="dropdown-label">CHARGE TYPE</div>
-                            <div className="dropdown-value">{charge.chargeType}</div>
+                            <div className="dropdown-value">
+                              {charge.chargeType}
+                            </div>
                           </div>
-                          <div>
+                        </div>
+                        <div className="charges-grid">
+                          <div className="charges-grid-items">
                             <div className="dropdown-label">ACTION</div>
-                            <div className="dropdown-value flex items-center gap-4 p-[5px]">
+                            <div className="dropdown-value flex items-center gap-4 p-1">
                               <button onClick={() => openUpdateModal(charge)}>
                                 <img
                                   src={editicon}
@@ -460,7 +498,6 @@ const Charges = () => {
                               </button>
                             </div>
                           </div>
-                          <div></div> {/* Empty cell for 2x2 grid */}
                         </div>
                       </div>
                     </td>

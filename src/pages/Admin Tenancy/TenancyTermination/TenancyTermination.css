@@ -8,7 +8,7 @@
   color: #201d1e;
 }
 
-.tenancy-search {
+.tterm-search {
   font-family: "Inter Tight";
   font-size: 15px;
   font-style: normal;
@@ -17,7 +17,7 @@
   box-sizing: border-box;
 }
 
-.tenancy-search::placeholder {
+.tterm-search::placeholder {
   font-family: "Inter Tight";
   font-size: 15px;
   font-style: normal;
@@ -122,21 +122,21 @@
   .tenancy-table {
     margin-bottom: 50px;
   }
-  .tenancy-search {
-    width: 150px;
+  .tterm-search {
+    width: 100%px;
   }
   .tenancy-selection {
     width: 120px;
   }
   .tterm-download-btn {
-    width: 120px;
+    width: 40%;
   }
   .tenancy-thead.tterm-end-date-column {
-    padding-left: 14px;
+    padding-left: 10px;
     padding-right: 0;
   }
   .tenancy-data.tterm-end-date-column {
-    padding-left: 14px;
+    padding-left: 10px;
     padding-right: 0;
     white-space: nowrap;
   }
@@ -154,29 +154,29 @@
 
 @media (max-width: 375px) {
   .tenancy-thead.tterm-end-date-column {
-    padding-left: 14px;
+    padding-left: 10px;
     padding-right: 0;
   }
   .tenancy-data.tterm-end-date-column {
-    padding-left: 14px;
+    padding-left: 10px;
     padding-right: 0;
   }
 }
 
 @media (max-width: 390px) {
   .tenancy-thead.tterm-end-date-column {
-    padding-left: 14px;
+    padding-left: 10px;
     padding-right: 0;
   }
   .tenancy-data.tterm-end-date-column {
-    padding-left: 14px;
+    padding-left: 10px;
     padding-right: 0;
   }
   .tenancy-selection {
     width: 120px;
   }
   .tterm-download-btn {
-    width: 120px;
+    width: 40%;
   }
 }
 
@@ -185,28 +185,28 @@
     font-size: 11px;
   }
   .tenancy-thead.tterm-end-date-column {
-    padding-left: 14px;
+    padding-left: 10px;
     padding-right: 0;
   }
   .tenancy-data.tterm-end-date-column {
-    padding-left: 14px;
+    padding-left: 10px;
     padding-right: 0;
   }
   .tenancy-selection {
     width: 120px;
   }
   .tterm-download-btn {
-    width: 120px;
+    width: 40%;
   }
 }
 
 @media (max-width: 428px) {
   .tenancy-thead.tterm-end-date-column {
-    padding-left: 55px;
+    padding-left: 10px;
     padding-right: 0;
   }
   .tenancy-data.tterm-end-date-column {
-    padding-left: 14px;
+    padding-left: 10px;
     padding-right: 0;
   }
 }
@@ -236,7 +236,7 @@
     width: 100%;
     gap: 10px;
   }
-  .tenancy-search {
+  .tterm-search {
     width: 100%;
   }
   .tenancy-selection {
@@ -244,7 +244,7 @@
     margin-left: 0px;
   }
   .tterm-download-btn {
-    width: 122px;
+    width: 40%;
   }
   .tterm-desktop-only {
     display: none;
@@ -301,7 +301,7 @@
   }
   .tenancy-data.tterm-end-date-column {
     white-space: nowrap;
-    padding-left: 55px;
+    padding-left: 10px;
     padding-right: 0;
   }
   .tterm-dropdown-label {
@@ -327,18 +327,14 @@
   }
   .tenancy-dropdown-content {
     width: 100%;
-    padding-bottom: 16px;
   }
   .tterm-grid {
-    display: grid;
-    gap: 9px;
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 24px;
   }
-  .tterm-grid-cols-2 {
-    grid-template-columns: repeat(2, 1fr);
-  }
   .tterm-grid-item {
-    padding-right: 10px;
+    width: 50%;
   }
   .tterm-flex.tterm-items-center.tterm-gap-2 {
     gap: 10px;

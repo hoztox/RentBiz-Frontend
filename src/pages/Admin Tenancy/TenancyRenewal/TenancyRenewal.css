@@ -8,7 +8,7 @@
   color: #201d1e;
 }
 
-.tenancy-search {
+.trenew-search {
   font-family: "Inter Tight";
   font-size: 15px;
   font-style: normal;
@@ -17,7 +17,7 @@
   box-sizing: border-box;
 }
 
-.tenancy-search::placeholder {
+.trenew-search::placeholder {
   font-family: "Inter Tight";
   font-size: 15px;
   font-style: normal;
@@ -115,21 +115,21 @@
   .tenancy-table {
     margin-bottom: 50px;
   }
-  .tenancy-search {
-    width: 150px;
+  .trenew-search {
+    width: 100%;
   }
   .tenancy-selection {
-    width: 120px;
+    width: 100%;
   }
   .trenew-download-btn {
-    width: 120px;
+    width: 40%;
   }
   .tenancy-thead.trenew-end-date-column {
     padding-left: 14px;
     padding-right: 0;
   }
   .tenancy-data.trenew-end-date-column {
-    padding-left: 14px;
+    padding-left: 10px;
     padding-right: 0;
     white-space: nowrap;
   }
@@ -151,7 +151,7 @@
     padding-right: 0;
   }
   .tenancy-data.trenew-end-date-column {
-    padding-left: 14px;
+    padding-left: 10px;
     padding-right: 0;
   }
 }
@@ -162,14 +162,14 @@
     padding-right: 0;
   }
   .tenancy-data.trenew-end-date-column {
-    padding-left: 14px;
+    padding-left: 10px;
     padding-right: 0;
   }
   .tenancy-selection {
     width: 120px;
   }
   .trenew-download-btn {
-    width: 120px;
+    width: 40%;
   }
 }
 
@@ -182,24 +182,24 @@
     padding-right: 0;
   }
   .tenancy-data.trenew-end-date-column {
-    padding-left: 14px;
+    padding-left: 10px;
     padding-right: 0;
   }
   .tenancy-selection {
-    width: 120px;
+    width: 100%;
   }
   .trenew-download-btn {
-    width: 120px;
+    width: 40%;
   }
 }
 
 @media (max-width: 428px) {
   .tenancy-thead.trenew-end-date-column {
-    padding-left: 55px;
+    padding-left: 10px;
     padding-right: 0;
   }
   .tenancy-data.trenew-end-date-column {
-    padding-left: 14px;
+    padding-left: 10px;
     padding-right: 0;
   }
 }
@@ -229,7 +229,7 @@
     width: 100%;
     gap: 10px;
   }
-  .tenancy-search {
+  .trenew-search {
     width: 100%;
   }
   .tenancy-selection {
@@ -237,7 +237,7 @@
     margin-left: 0px;
   }
   .trenew-download-btn {
-    width: 122px;
+    width: 40%;
   }
   .trenew-desktop-only {
     display: none;
@@ -248,9 +248,6 @@
     justify-content: center;
     gap: 16px;
     align-items: center;
-  }
-  .trenew-collection-list-pagination {
-    text-align: center;
   }
   .trenew-pagination-buttons {
     display: flex;
@@ -294,7 +291,7 @@
   }
   .tenancy-data.trenew-end-date-column {
     white-space: nowrap;
-    padding-left: 55px;
+    padding-left: 10px;
     padding-right: 0;
   }
   .trenew-dropdown-label {
@@ -320,21 +317,12 @@
   }
   .tenancy-dropdown-content {
     width: 100%;
-    padding-bottom: 16px;
+    padding-bottom: 5px;
   }
   .trenew-grid {
-    display: grid;
-    gap: 9px;
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 24px;
-  }
-  .trenew-grid-cols-2 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .trenew-grid-cols-3 {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  .trenew-grid-item {
-    padding-right: 10px;
   }
   .trenew-flex.trenew-items-center.trenew-gap-2 {
     gap: 10px;
@@ -344,12 +332,6 @@
   }
   .trenew-mobile-with-border {
     border-bottom: 1px solid #e9e9e9;
-  }
-  .trenew-view-column {
-    margin-left: 50px;
-  }
-  .trenew-action-column {
-    margin-left: 40px;
   }
 }
 

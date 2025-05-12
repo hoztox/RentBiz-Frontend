@@ -29,7 +29,7 @@ const CreateUnitTypeModal = ({ isOpen, onClose }) => {
         </button>
 
         <div className="mb-6">
-          <label className="block pt-2 modal-label">Name</label>
+          <label className="block pt-2">Name</label>
           <input
             type="text"
             className="w-full border border-[#E9E9E9] rounded-md mt-1 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500 input-style"

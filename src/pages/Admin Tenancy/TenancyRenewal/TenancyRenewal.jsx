@@ -14,7 +14,8 @@ const TenancyRenewal = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isTenancyViewModalOpen, setIsTenancyViewModalOpen] = useState(false);
-  const [isTenancyUpdateModalOpen, setIsTenancyUpdateModalOpen] = useState(false);
+  const [isTenancyUpdateModalOpen, setIsTenancyUpdateModalOpen] =
+    useState(false);
   const [expandedRows, setExpandedRows] = useState({});
   const itemsPerPage = 10;
 
@@ -129,10 +130,10 @@ const TenancyRenewal = () => {
             placeholder="Search"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="px-[14px] py-[7px] h-[38px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 tenancy-search"
+            className="px-[14px] py-[7px] h-[38px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 trenew-search"
           />
           <div className="flex flex-row gap-[10px] w-full md:w-auto trenew-second-row-container">
-            <div className="relative flex-1 md:flex-none">
+            <div className="relative flex-1 md:flex-none w-[60%] md:w-auto">
               <select
                 name="select"
                 id=""
@@ -166,12 +167,18 @@ const TenancyRenewal = () => {
             <tr className="border-b border-[#E9E9E9] h-[57px]">
               <th className="px-5 text-left tenancy-thead">ID</th>
               <th className="px-5 text-left tenancy-thead w-[12%]">NAME</th>
-              <th className="pl-5 text-left tenancy-thead w-[15%]">BUILDING NAME</th>
-              <th className="pl-5 text-left tenancy-thead w-[12%]">UNIT NAME</th>
+              <th className="pl-5 text-left tenancy-thead w-[15%]">
+                BUILDING NAME
+              </th>
+              <th className="pl-5 text-left tenancy-thead w-[12%]">
+                UNIT NAME
+              </th>
               <th className="px-5 text-left tenancy-thead">RENTAL MONTHS</th>
               <th className="px-5 text-left tenancy-thead w-[12%]">END DATE</th>
               <th className="px-5 text-center tenancy-thead w-[10%]">RENEW</th>
-              <th className="pl-12 pr-5 text-center tenancy-thead w-[10%]">VIEW</th>
+              <th className="pl-12 pr-5 text-center tenancy-thead w-[10%]">
+                VIEW
+              </th>
               <th className="px-5 pr-6 text-right tenancy-thead">ACTION</th>
             </tr>
           </thead>
@@ -182,15 +189,26 @@ const TenancyRenewal = () => {
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
                 <td className="px-5 text-left tenancy-data">{tenancy.id}</td>
-                <td className="px-5 text-left tenancy-data">{tenancy.tenant}</td>
-                <td className="pl-5 text-left tenancy-data">{tenancy.building}</td>
+                <td className="px-5 text-left tenancy-data">
+                  {tenancy.tenant}
+                </td>
+                <td className="pl-5 text-left tenancy-data">
+                  {tenancy.building}
+                </td>
                 <td className="pl-5 text-left tenancy-data">{tenancy.unit}</td>
                 <td className="px-5 tenancy-data">
-                  <div className="w-[63%] flex justify-center">{tenancy.months}</div>
+                  <div className="w-[63%] flex justify-center">
+                    {tenancy.months}
+                  </div>
                 </td>
-                <td className="pl-5 text-left tenancy-data">{tenancy.endDate}</td>
+                <td className="pl-5 text-left tenancy-data">
+                  {tenancy.endDate}
+                </td>
                 <td className="px-5 text-center !text-[#1458a2] tenancy-data">
-                  <button onClick={() => handleRenewClick(tenancy)} className="trenew-renew-btn">
+                  <button
+                    onClick={() => handleRenewClick(tenancy)}
+                    className="trenew-renew-btn"
+                  >
                     {tenancy.renew}
                   </button>
                 </td>
@@ -228,8 +246,12 @@ const TenancyRenewal = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="tenancy-table-row-head">
-              <th className="px-5 w-[74px] text-left tenancy-thead trenew-id-column">ID</th>
-              <th className="px-3 text-left tenancy-thead trenew-end-date-column">END DATE</th>
+              <th className="px-5 w-[50%] text-left tenancy-thead trenew-id-column">
+                ID
+              </th>
+              <th className="px-5 w-[50%] text-left tenancy-thead trenew-end-date-column">
+                NAME
+              </th>
               <th className="px-5 text-right tenancy-thead"></th>
             </tr>
           </thead>
@@ -238,14 +260,22 @@ const TenancyRenewal = () => {
               <React.Fragment key={tenancy.id}>
                 <tr
                   className={`${
-                    expandedRows[tenancy.id] ? "trenew-mobile-no-border" : "trenew-mobile-with-border"
+                    expandedRows[tenancy.id]
+                      ? "trenew-mobile-no-border"
+                      : "trenew-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left tenancy-data trenew-id-column">{tenancy.id}</td>
-                  <td className="px-3 text-left tenancy-data trenew-end-date-column">{tenancy.endDate}</td>
+                  <td className="px-5 text-left tenancy-data trenew-id-column">
+                    {tenancy.id}
+                  </td>
+                  <td className="px-3 text-left tenancy-data trenew-end-date-column">
+                    {tenancy.tenant}
+                  </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
-                      className={`tenancy-dropdown-field ${expandedRows[tenancy.id] ? "active" : ""}`}
+                      className={`tenancy-dropdown-field ${
+                        expandedRows[tenancy.id] ? "active" : ""
+                      }`}
                       onClick={() => toggleRowExpand(tenancy.id)}
                     >
                       <img
@@ -261,37 +291,56 @@ const TenancyRenewal = () => {
                 {expandedRows[tenancy.id] && (
                   <tr className="trenew-mobile-with-border border-b border-[#E9E9E9]">
                     <td colSpan={3} className="px-5">
-                      <div className="tenancy-dropdown-content mb-[16px]">
-                        <div className="trenew-grid trenew-grid-cols-2">
-                          <div className="trenew-grid-item">
-                            <div className="trenew-dropdown-label">NAME</div>
-                            <div className="trenew-dropdown-value">{tenancy.tenant}</div>
+                      <div className="tenancy-dropdown-content">
+                        <div className="trenew-grid">
+                          <div className="trenew-grid-item w-[40%]">
+                            <div className="trenew-dropdown-label">
+                              BUILDING NAME
+                            </div>
+                            <div className="trenew-dropdown-value">
+                              {tenancy.building}
+                            </div>
                           </div>
-                          <div className="trenew-grid-item">
-                            <div className="trenew-dropdown-label">BUILDING NAME</div>
-                            <div className="trenew-dropdown-value">{tenancy.building}</div>
-                          </div>
-                        </div>
-                        <div className="trenew-grid trenew-grid-cols-2">
-                          <div className="trenew-grid-item">
-                            <div className="trenew-dropdown-label">UNIT NAME</div>
-                            <div className="trenew-dropdown-value">{tenancy.unit}</div>
-                          </div>
-                          <div className="trenew-grid-item">
-                            <div className="trenew-dropdown-label">RENTAL MONTHS</div>
-                            <div className="trenew-dropdown-value">{tenancy.months}</div>
+                          <div className="trenew-grid-item w-[53%]">
+                            <div className="trenew-dropdown-label">
+                              UNIT NAME
+                            </div>
+                            <div className="trenew-dropdown-value">
+                              {tenancy.unit}
+                            </div>
                           </div>
                         </div>
-                        <div className="trenew-grid trenew-grid-cols-3">
-                          <div className="trenew-grid-item">
+                        <div className="trenew-grid">
+                          <div className="trenew-grid-item w-[40%]">
+                            <div className="trenew-dropdown-label">
+                              RENTAL MONTHS
+                            </div>
+                            <div className="trenew-dropdown-value">
+                              {tenancy.months}
+                            </div>
+                          </div>
+                          <div className="trenew-grid-item w-[53%]">
+                            <div className="trenew-dropdown-label">
+                              END DATE
+                            </div>
+                            <div className="trenew-dropdown-value">
+                              {tenancy.endDate}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="trenew-grid">
+                          <div className="trenew-grid-item w-[40%]">
                             <div className="trenew-dropdown-label">RENEW</div>
                             <div className="trenew-dropdown-value !text-[#1458a2]">
-                              <button onClick={() => handleRenewClick(tenancy)} className="trenew-renew-btn">
+                              <button
+                                onClick={() => handleRenewClick(tenancy)}
+                                className="trenew-renew-btn"
+                              >
                                 {tenancy.renew}
                               </button>
                             </div>
                           </div>
-                          <div className="trenew-grid-item trenew-view-column">
+                          <div className="trenew-grid-item w-[26%]">
                             <div className="trenew-dropdown-label">VIEW</div>
                             <div className="trenew-dropdown-value">
                               <button onClick={openTenancyViewModal}>
@@ -303,9 +352,9 @@ const TenancyRenewal = () => {
                               </button>
                             </div>
                           </div>
-                          <div className="trenew-grid-item trenew-action-column">
+                          <div className="trenew-grid-item w-[20%]">
                             <div className="trenew-dropdown-label">ACTION</div>
-                            <div className="trenew-dropdown-value trenew-flex trenew-items-center trenew-gap-2 mt-[10px]">
+                            <div className="trenew-dropdown-value trenew-flex trenew-items-center mt-[10px] ml-[7px]">
                               <button onClick={openTenancyUpdateModal}>
                                 <img
                                   src={editicon}
@@ -332,14 +381,16 @@ const TenancyRenewal = () => {
           </tbody>
         </table>
       </div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-3 md:px-5 trenew-pagination-container">
-        <span className="trenew-collection-list-pagination trenew-pagination-text">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 trenew-pagination-container">
+        <span className="trenew-pagination collection-list-pagination">
+          Showing{" "}
+          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+          {filteredData.length} entries
         </span>
-        <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto trenew-pagination-buttons">
+        <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto trenew-pagination-buttons">
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer trenew-pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
@@ -347,7 +398,7 @@ const TenancyRenewal = () => {
           </button>
           {startPage > 1 && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 trenew-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(1)}
             >
               1
@@ -357,7 +408,7 @@ const TenancyRenewal = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 trenew-page-no-btns ${
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
                 currentPage === startPage + i
                   ? "bg-[#1458A2] text-white"
                   : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
@@ -367,17 +418,19 @@ const TenancyRenewal = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
+          {endPage < totalPages - 1 && (
+            <span className="px-2 flex items-center">...</span>
+          )}
           {endPage < totalPages && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 trenew-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(totalPages)}
             >
               {totalPages}
             </button>
           )}
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer trenew-pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(currentPage + 1)}
           >

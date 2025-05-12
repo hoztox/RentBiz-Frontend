@@ -35,7 +35,7 @@
   box-sizing: border-box;
 }
 
-.add-new-master {
+.utype-add-new-master {
   background-color: #2892ce;
   color: white;
   font-family: "Inter Tight";
@@ -47,7 +47,7 @@
   box-sizing: border-box;
 }
 
-.add-new-master:hover {
+.utype-add-new-master:hover {
   background-color: #076094;
 }
 
@@ -193,13 +193,13 @@
     margin-bottom: 50px;
   }
   .unit-search {
-    width: 150px; /* Adjusted for smaller screens */
+    width: 60%;
   }
   .unit-selection {
-    width: 120px;
+    width: 100%;
   }
   .utype-download-btn {
-    width: 120px;
+    width: 40%;
   }
   .unit-thead.utype-entry-date-column {
     padding-left: 14px;
@@ -272,7 +272,7 @@
 
 @media (max-width: 428px) {
   .unit-thead.utype-entry-date-column {
-    padding-left: 68px;
+    padding-left: 14px;
     padding-right: 0;
   }
   .unit-data.utype-entry-date-column {
@@ -308,7 +308,7 @@
     flex-wrap: nowrap;
   }
   .unit-search {
-    width: 100%;
+    width: 60%;
   }
   .unit-selection {
     width: 100%;
@@ -321,12 +321,12 @@
     gap: 10px;
     margin-top: 5px;
   }
-  .add-new-master {
-    width: 169px;
-    font-size: 14px;
+  .utype-add-new-master {
+    width: 60%;
+    font-size: 15px;
   }
   .utype-download-btn {
-    width: 122px;
+    width: 40%;
   }
   .utype-desktop-only {
     display: none;
@@ -383,7 +383,7 @@
   }
   .unit-data.utype-entry-date-column {
     white-space: nowrap;
-    padding-left: 60px;
+    padding-left: 14px;
     padding-right: 0;
   }
   .utype-dropdown-label {
@@ -408,10 +408,13 @@
   .unit-dropdown-content {
     width: 100%;
   }
-  .unit-dropdown-content .utype-grid-cols-2 {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 9px;
-    margin-bottom: 26px;
+  .utype-grid {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .utype-grid-items {
+    width: 50%;
   }
   .utype-dropdown-value {
     word-break: break-word;
