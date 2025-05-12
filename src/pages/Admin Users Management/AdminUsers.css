@@ -255,7 +255,7 @@
     flex-wrap: nowrap;
   }
   .user-search {
-    width: 100%;
+    width: 60%;
   }
   .user-selection {
     width: 100%;
@@ -268,8 +268,7 @@
     margin-top: 5px;
   }
   .user-create-btn {
-    width: 176px;
-    font-size: 14px;
+    font-size: 15px;
   }
   .user-download-btn {
     width: 122px;
@@ -354,9 +353,9 @@
     max-width: none;
   }
   .user-action-buttons-container .user-create-btn {
-    width: 176px;
+    width: 60%;
   }
   .user-action-buttons-container .user-download-btn {
-    width: 56%;
+    width: 40%;
   }
 }

@@ -17,7 +17,7 @@
   box-sizing: border-box;
 }
 
-.tenancy-search::placeholder {
+.tconfirm-search::placeholder {
   font-family: "Inter Tight";
   font-size: 15px;
   font-style: normal;
@@ -25,7 +25,7 @@
   line-height: 24px;
 }
 
-.tenancy-selection {
+.tconfirm-selection {
   font-family: "Public Sans", sans-serif;
   font-size: 15px;
   font-style: normal;
@@ -138,17 +138,17 @@
   .tenancy-table {
     margin-bottom: 50px;
   }
-  .tenancy-search {
-    width: 150px;
+  .tconfirm-search {
+    width: 60%;
   }
   .tenancy-selection {
-    width: 120px;
+    width: 40%;
   }
   .tconfirm-download-btn {
-    width: 120px;
+    width: 40%;
   }
   .tenancy-thead.tconfirm-tenant-column {
-    padding-left: 14px;
+    padding-left: 5px;
     padding-right: 0;
   }
   .tenancy-data.tconfirm-tenant-column {
@@ -170,7 +170,7 @@
 
 @media (max-width: 375px) {
   .tenancy-thead.tconfirm-tenant-column {
-    padding-left: 14px;
+    padding-left: 5px;
     padding-right: 0;
   }
   .tenancy-data.tconfirm-tenant-column {
@@ -181,7 +181,7 @@
 
 @media (max-width: 390px) {
   .tenancy-thead.tconfirm-tenant-column {
-    padding-left: 14px;
+    padding-left: 5px;
     padding-right: 0;
   }
   .tenancy-data.tconfirm-tenant-column {
@@ -189,10 +189,10 @@
     padding-right: 0;
   }
   .tenancy-selection {
-    width: 120px;
+    width: 100%;
   }
   .tconfirm-download-btn {
-    width: 120px;
+    width: 40%;
   }
 }
 
@@ -201,7 +201,7 @@
     font-size: 11px;
   }
   .tenancy-thead.tconfirm-tenant-column {
-    padding-left: 14px;
+    padding-left: 5px;
     padding-right: 0;
   }
   .tenancy-data.tconfirm-tenant-column {
@@ -209,16 +209,16 @@
     padding-right: 0;
   }
   .tenancy-selection {
-    width: 120px;
+    width: 100%;
   }
   .tconfirm-download-btn {
-    width: 120px;
+    width: 40%;
   }
 }
 
 @media (max-width: 428px) {
   .tenancy-thead.tconfirm-tenant-column {
-    padding-left: 14px;
+    padding-left: 5px;
     padding-right: 0;
   }
   .tenancy-data.tconfirm-tenant-column {
@@ -253,8 +253,8 @@
     width: 100%;
     flex-wrap: nowrap;
   }
-  .tenancy-search {
-    width: 100%;
+  .tconfirm-search {
+    width: 60%;
   }
   .tenancy-selection {
     width: 100%;
@@ -264,11 +264,11 @@
     margin-top: 5px;
   }
   .tconfirm-add-new-tenancy {
-    width: 169px;
-    font-size: 14px;
+    width: 60%;
+    font-size: 15px;
   }
   .tconfirm-download-btn {
-    width: 122px;
+    width: 40%;
   }
   .tconfirm-desktop-only {
     display: none;
@@ -279,9 +279,6 @@
     justify-content: center;
     gap: 16px;
     align-items: center;
-  }
-  .tconfirm-collection-list-pagination {
-    text-align: center;
   }
   .tconfirm-pagination-buttons {
     display: flex;
@@ -360,17 +357,15 @@
   }
   .tenancy-dropdown-content {
     width: 100%;
-    padding: 15px 0;
+    padding: 10px 0;
   }
   .tconfirm-grid {
-    display: grid;
-    gap: 4px;
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 24px;
   }
-  .tconfirm-grid-cols-2 {
-    grid-template-columns: repeat(2, 1fr);
-  }
   .tconfirm-grid-item {
+    width: 50%;
     padding-right: 10px;
   }
   .tconfirm-flex.tconfirm-items-center.tconfirm-gap-2 {

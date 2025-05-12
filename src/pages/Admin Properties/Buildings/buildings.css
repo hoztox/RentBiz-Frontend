@@ -139,9 +139,6 @@
   .bldg-table-header {
     padding: 16px;
   }
-  .bldg-search {
-    width: 150px;
-  }
   .bldg-selection {
     width: 120px;
   }
@@ -256,7 +253,7 @@
     flex-wrap: nowrap;
   }
   .bldg-search {
-    width: 100%;
+    width: 60%;
   }
   .bldg-selection {
     width: 100%;
@@ -265,11 +262,11 @@
     margin-top: 5px;
   }
   .bldg-add-new-building {
-    width: 169px;
-    font-size: 14px;
+    width: 60%;
+    font-size: 15px;
   }
   .bldg-download-btn {
-    width: 122px;
+    width: 40%;
   }
   .bldg-desktop-only {
     display: none;
@@ -323,7 +320,7 @@
   }
   .bldg-id-column {
     padding-right: 10px;
-    width: 50%;
+    width: 40%;
   }
   .bldg-date-column {
     width: 50%;
@@ -365,24 +362,15 @@
   }
   .bldg-dropdown-content {
     width: 100%;
-    padding: 15px 0;
+    padding: 10px 0;
   }
   .bldg-grid {
-    display: grid;
-    gap: 9px;
-    margin-bottom: 24px;
-  }
-  .bldg-grid-cols-2 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .bldg-grid-cols-3 {
-    grid-template-columns: repeat(3, 1fr);
     display: flex;
     justify-content: space-between;
+    margin-bottom: 24px;
   }
   .bldg-grid-item {
     word-break: break-word;
-    padding-right: 10px;
   }
   .bldg-grid-item.bldg-action-column {
     width: 49px;

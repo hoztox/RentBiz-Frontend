@@ -138,10 +138,10 @@
     margin-bottom: 50px;
   }
   .tenancy-search {
-    width: 150px;
+    width: 60%;
   }
   .tenancy-selection {
-    width: 120px;
+    width: 100%;
   }
 
   .tenancy-thead.tenancy-tenant-column {
@@ -247,7 +247,7 @@
     flex-wrap: nowrap;
   }
   .tenancy-search {
-    width: 100%;
+    width: 60%;
   }
   .tenancy-selection {
     width: 100%;
@@ -257,8 +257,12 @@
     margin-top: 5px;
   }
   .tenancy-add-new-tenancy {
-    font-size: 13px;
-    padding-left: 5px;
+    width: 60%;
+    font-size: 15px;
+  }
+
+  .tenancy-download-btn {
+    width: 40%;
   }
  
   .tenancy-desktop-only {

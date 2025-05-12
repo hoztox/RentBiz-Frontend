@@ -190,7 +190,7 @@ const AdminUsers = () => {
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 user-search"
             />
 
-            <div className="relative w-full md:w-auto">
+            <div className="relative w-[40%] md:w-auto">
               <select
                 name="select"
                 id=""
@@ -218,7 +218,7 @@ const AdminUsers = () => {
               <img
                 src={plusicon}
                 alt="plus icon"
-                className="w-[15px] h-[15px]"
+                className="relative right-[5px] md:right-0 w-[15px] h-[15px]"
               />
             </button>
             <button
@@ -358,7 +358,7 @@ const AdminUsers = () => {
                         </div>
                         <div className="grid grid-cols-3 gap-9 mb-5">
                           <div>
-                            <div className="dropdown-label">STATUS</div>
+                            <div className="dropdown-label !mb-[10px]">STATUS</div>
                             <div className="dropdown-value">
                               <span
                                 className={`px-[10px] py-[5px] w-[53px] h-[24px] rounded-[4px] user-status ${
@@ -383,7 +383,7 @@ const AdminUsers = () => {
                           </div>
                           <div className="ml-[25px]">
                             <div className="dropdown-label">ACTION</div>
-                            <div className="dropdown-value flex items-center gap-2 mt-[10px]">
+                            <div className="dropdown-value flex items-center gap-[15px] ml-[5px] mt-[10px]">
                               <button onClick={openEditModal}>
                                 <img
                                   src={editicon}
@@ -411,20 +411,18 @@ const AdminUsers = () => {
         </table>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-3 md:px-5 pagination-container">
-        <span className="collection-list-pagination pagination-text">
-          Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-          {filteredData.length} entries
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
+        <span className="pagination collection-list-pagination">
+          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
+          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
         </span>
-        <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto pagination-buttons">
+        <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
           <button
             className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
-            Prev
+            Previous
           </button>
           {startPage > 1 && (
             <button
@@ -448,9 +446,7 @@ const AdminUsers = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && (
-            <span className="px-2 flex items-center">...</span>
-          )}
+          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"

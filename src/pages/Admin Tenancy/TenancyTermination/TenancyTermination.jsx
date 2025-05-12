@@ -113,7 +113,7 @@ const TenancyTermination = () => {
             className="px-[14px] py-[7px] h-[38px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 tenancy-search"
           />
           <div className="flex flex-row gap-[10px] w-full md:w-auto tterm-second-row-container">
-            <div className="relative flex-1 md:flex-none">
+            <div className="relative flex-1 md:flex-none w-[60%] md:w-auto">
               <select
                 name="select"
                 id=""
@@ -191,8 +191,8 @@ const TenancyTermination = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="tenancy-table-row-head">
-              <th className="px-5 w-[74px] text-left tenancy-thead tterm-id-column">ID</th>
-              <th className="px-3 text-left tenancy-thead tterm-end-date-column">END DATE</th>
+              <th className="px-5 w-[53%] text-left tenancy-thead tterm-id-column">ID</th>
+              <th className="px-5 w-[47%] text-left tenancy-thead tterm-end-date-column">NAME</th>
               <th className="px-5 text-right tenancy-thead"></th>
             </tr>
           </thead>
@@ -205,7 +205,7 @@ const TenancyTermination = () => {
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left tenancy-data tterm-id-column">{tenancy.id}</td>
-                  <td className="px-3 text-left tenancy-data tterm-end-date-column">{tenancy.endDate}</td>
+                  <td className="px-5 text-left tenancy-data tterm-end-date-column">{tenancy.tenant}</td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`tenancy-dropdown-field ${expandedRows[tenancy.id] ? "active" : ""}`}
@@ -224,25 +224,25 @@ const TenancyTermination = () => {
                 {expandedRows[tenancy.id] && (
                   <tr className="tterm-mobile-with-border border-b border-[#E9E9E9]">
                     <td colSpan={3} className="px-5">
-                      <div className="tenancy-dropdown-content mb-[16px]">
-                        <div className="tterm-grid tterm-grid-cols-2">
-                          <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">NAME</div>
-                            <div className="tterm-dropdown-value">{tenancy.tenant}</div>
-                          </div>
+                      <div className="tenancy-dropdown-content">
+                        <div className="tterm-grid">
                           <div className="tterm-grid-item">
                             <div className="tterm-dropdown-label">BUILDING NAME</div>
                             <div className="tterm-dropdown-value">{tenancy.building}</div>
                           </div>
-                        </div>
-                        <div className="tterm-grid tterm-grid-cols-2">
                           <div className="tterm-grid-item">
                             <div className="tterm-dropdown-label">UNIT NAME</div>
                             <div className="tterm-dropdown-value">{tenancy.unit}</div>
                           </div>
-                          <div className="tterm-grid-item tterm-action-column">
+                        </div>
+                        <div className="tterm-grid">
+                          <div className="tterm-grid-item">
+                            <div className="tterm-dropdown-label">END DATE</div>
+                            <div className="tterm-dropdown-value">{tenancy.endDate}</div>
+                          </div>
+                          <div className="tterm-grid-item">
                             <div className="tterm-dropdown-label">ACTION</div>
-                            <div className="tterm-dropdown-value tterm-flex tterm-items-center tterm-gap-2 mt-[10px]">
+                            <div className="tterm-dropdown-value tterm-flex tterm-items-center mt-[10px] ml-[5px]">
                               <button onClick={openUpdateModal}>
                                 <img
                                   src={editicon}
@@ -254,7 +254,7 @@ const TenancyTermination = () => {
                                 <img
                                   src={terminateicon}
                                   alt="Terminate"
-                                  className="w-[32px] h-[20px] tterm-terminate-btn duration-200"
+                                  className="w-[32px] h-[20px] ml-[10px] tterm-terminate-btn duration-200"
                                 />
                               </button>
                             </div>
@@ -269,14 +269,14 @@ const TenancyTermination = () => {
           </tbody>
         </table>
       </div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-3 md:px-5 tterm-pagination-container">
-        <span className="tterm-collection-list-pagination tterm-pagination-text">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 tterm-pagination-container">
+        <span className="tterm-pagination collection-list-pagination">
           Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
           {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
         </span>
-        <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto tterm-pagination-buttons">
+        <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto tterm-pagination-buttons">
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer tterm-pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
@@ -284,7 +284,7 @@ const TenancyTermination = () => {
           </button>
           {startPage > 1 && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 tterm-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(1)}
             >
               1
@@ -294,7 +294,7 @@ const TenancyTermination = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 tterm-page-no-btns ${
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
                 currentPage === startPage + i
                   ? "bg-[#1458A2] text-white"
                   : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
@@ -307,14 +307,14 @@ const TenancyTermination = () => {
           {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
           {endPage < totalPages && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 tterm-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(totalPages)}
             >
               {totalPages}
             </button>
           )}
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer tterm-pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(currentPage + 1)}
           >

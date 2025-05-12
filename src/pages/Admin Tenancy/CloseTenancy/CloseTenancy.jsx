@@ -126,7 +126,7 @@ const CloseTenancy = () => {
             className="px-[14px] py-[7px] h-[38px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 tenancy-search"
           />
           <div className="flex flex-row gap-[10px] w-full md:w-auto tclose-second-row-container">
-            <div className="relative flex-1 md:flex-none">
+            <div className="relative flex-1 md:flex-none W-[60%] md:w-auto">
               <select
                 name="select"
                 id=""
@@ -143,7 +143,7 @@ const CloseTenancy = () => {
                 }`}
               />
             </div>
-            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 tclose-download-btn">
+            <button className="flex items-center justify-center gap-2 md:w-[122px] h-[38px] rounded-md duration-200 tclose-download-btn">
               Download
               <img
                 src={downloadicon}
@@ -216,8 +216,8 @@ const CloseTenancy = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="tenancy-table-row-head">
-              <th className="px-5 w-[74px] text-left tenancy-thead tclose-id-column">ID</th>
-              <th className="px-3 text-left tenancy-thead tclose-end-date-column">END DATE</th>
+              <th className="px-5 w-[53%] text-left tenancy-thead tclose-id-column">ID</th>
+              <th className="px-5 w-[47%] text-left tenancy-thead tclose-end-date-column">NAME</th>
               <th className="px-5 text-right tenancy-thead"></th>
             </tr>
           </thead>
@@ -230,7 +230,7 @@ const CloseTenancy = () => {
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left tenancy-data">{tenancy.id}</td>
-                  <td className="px-3 text-left tenancy-data tclose-end-date-column">{tenancy.endDate}</td>
+                  <td className="px-5 text-left tenancy-data tclose-end-date-column">{tenancy.tenant}</td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`tenancy-dropdown-field ${expandedRows[tenancy.id] ? "active" : ""}`}
@@ -249,29 +249,29 @@ const CloseTenancy = () => {
                 {expandedRows[tenancy.id] && (
                   <tr className="tclose-mobile-with-border border-b border-[#E9E9E9]">
                     <td colSpan={3} className="px-5">
-                      <div className="tenancy-dropdown-content mb-[16px]">
-                        <div className="grid tclose-grid-cols-2 gap-9 mb-6">
-                          <div>
-                            <div className="tclose-dropdown-label">NAME</div>
-                            <div className="tclose-dropdown-value">{tenancy.tenant}</div>
-                          </div>
-                          <div>
-                            <div className="tclose-dropdown-label">BUILDING NAME</div>
+                      <div className="tenancy-dropdown-content">
+                        <div className="tclose-grid">
+                          <div className="tclose-grid-item">
+                            <div className="tclose-dropdown-label">BULDING NAME</div>
                             <div className="tclose-dropdown-value">{tenancy.building}</div>
                           </div>
-                        </div>
-                        <div className="grid tclose-grid-cols-2 gap-9 mb-6">
-                          <div>
+                          <div className="tclose-grid-item">
                             <div className="tclose-dropdown-label">UNIT NAME</div>
                             <div className="tclose-dropdown-value">{tenancy.unit}</div>
                           </div>
-                          <div>
+                        </div>
+                        <div className="tclose-grid">
+                          <div className="tclose-grid-item">
                             <div className="tclose-dropdown-label">RENTAL MONTHS</div>
                             <div className="tclose-dropdown-value">{tenancy.months}</div>
                           </div>
+                          <div className="tclose-grid-item">
+                            <div className="tclose-dropdown-label">END DATE</div>
+                            <div className="tclose-dropdown-value">{tenancy.endDate}</div>
+                          </div>
                         </div>
-                        <div className="grid tclose-grid-cols-2 gap-9">
-                          <div>
+                        <div className="tclose-grid">
+                          <div className="tclose-grid-item">
                             <div className="tclose-dropdown-label">VIEW</div>
                             <div className="tclose-dropdown-value">
                               <button onClick={openViewModal}>
@@ -283,9 +283,9 @@ const CloseTenancy = () => {
                               </button>
                             </div>
                           </div>
-                          <div>
+                          <div className="tclose-grid-item">
                             <div className="tclose-dropdown-label">ACTION</div>
-                            <div className="tclose-dropdown-value tclose-flex-items-center-gap-2 mt-[10px]">
+                            <div className="tclose-dropdown-value tclose-flex-items-center-gap-2 mt-[10px] ml-[5px]">
                               <button onClick={openUpdateModal}>
                                 <img
                                   src={editicon}
@@ -297,7 +297,7 @@ const CloseTenancy = () => {
                                 <img
                                   src={deleteicon}
                                   alt="Deletes"
-                                  className="w-[18px] h-[18px] tclose-delete-btn duration-200"
+                                  className="w-[18px] h-[18px] ml-[5px] tclose-delete-btn duration-200"
                                 />
                               </button>
                             </div>
@@ -312,15 +312,14 @@ const CloseTenancy = () => {
           </tbody>
         </table>
       </div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-3 md:px-5 tclose-pagination-container">
-        <span className="tclose-collection-list-pagination tclose-pagination-text">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 tclose-pagination-container">
+        <span className="tclose-pagination collection-list-pagination">
           Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length}{" "}
-          entries
+          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
         </span>
-        <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto tclose-pagination-buttons">
+        <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto tclose-pagination-buttons">
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer tclose-pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
@@ -328,7 +327,7 @@ const CloseTenancy = () => {
           </button>
           {startPage > 1 && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 tclose-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(1)}
             >
               1
@@ -338,7 +337,7 @@ const CloseTenancy = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 tclose-page-no-btns ${
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
                 currentPage === startPage + i
                   ? "bg-[#1458A2] text-white"
                   : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
@@ -351,14 +350,14 @@ const CloseTenancy = () => {
           {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
           {endPage < totalPages && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 tclose-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(totalPages)}
             >
               {totalPages}
             </button>
           )}
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer tclose-pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(currentPage + 1)}
           >
