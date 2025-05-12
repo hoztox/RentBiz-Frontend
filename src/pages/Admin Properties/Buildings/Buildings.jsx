@@ -128,14 +128,14 @@ const Buildings = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-<<<<<<< HEAD
-                className={`absolute md:right-2 right-4 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
-                  }`}
-=======
+ 
+                // className={`absolute md:right-2 right-4 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
+                //   }`}
+ 
                 className={`absolute md:right-2 right-[8px] top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
                   isSelectOpen ? "rotate-180" : "rotate-0"
                 }`}
->>>>>>> 348246bb797bf1db35c0697a1fba947ce5a1e47b
+ 
               />
             </div>
           </div>
@@ -365,18 +365,17 @@ const Buildings = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-<<<<<<< HEAD
               className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 bldg-page-no-btns ${currentPage === startPage + i
                 ? "bg-[#1458A2] text-white"
                 : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
                 }`}
-=======
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
-                currentPage === startPage + i
-                  ? "bg-[#1458A2] text-white"
-                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-              }`}
->>>>>>> 348246bb797bf1db35c0697a1fba947ce5a1e47b
+ 
+              // className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+              //   currentPage === startPage + i
+              //     ? "bg-[#1458A2] text-white"
+              //     : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+              // }`}
+ 
               onClick={() => setCurrentPage(startPage + i)}
             >
               {startPage + i}
