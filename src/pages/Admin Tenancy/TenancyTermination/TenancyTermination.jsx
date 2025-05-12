@@ -110,7 +110,7 @@ const TenancyTermination = () => {
             placeholder="Search"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="px-[14px] py-[7px] h-[38px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 tenancy-search"
+            className="px-[14px] py-[7px] h-[38px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 tterm-search"
           />
           <div className="flex flex-row gap-[10px] w-full md:w-auto tterm-second-row-container">
             <div className="relative flex-1 md:flex-none w-[60%] md:w-auto">

@@ -8,7 +8,7 @@
   color: #201d1e;
 }
 
-.tenancy-search {
+.tclose-search {
   font-family: "Inter Tight";
   font-size: 15px;
   font-style: normal;
@@ -17,7 +17,7 @@
   box-sizing: border-box;
 }
 
-.tenancy-search::placeholder {
+.tclose-search::placeholder {
   font-family: "Inter Tight";
   font-size: 15px;
   font-style: normal;
@@ -128,7 +128,7 @@
   .tenancy-table {
     margin-bottom: 50px;
   }
-  .tenancy-search {
+  .tclose-search {
     width: 100%;
   }
   .tenancy-selection {
@@ -236,7 +236,7 @@
     gap: 10px;
     margin-bottom: 10px;
   }
-  .tenancy-search {
+  .tclose-search {
     width: 100%;
   }
   .tclose-second-row-container {

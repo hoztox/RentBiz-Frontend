@@ -35,7 +35,7 @@
   box-sizing: border-box;
 }
 
-.add-new-master {
+.charges-add-new-master {
   background-color: #2892CE;
   color: white;
   font-family: "Inter Tight";
@@ -47,11 +47,11 @@
   box-sizing: border-box;
 }
 
-.add-new-master:hover {
+.charges-add-new-master:hover {
   background-color: #076094;
 }
 
-.download-btn {
+.charges-download-btn {
   background-color: #F0F0F0;
   font-family: "Inter Tight";
   font-size: 15px;
@@ -63,12 +63,12 @@
   box-sizing: border-box;
 }
 
-.download-btn:hover {
+.charges-download-btn:hover {
   background-color: #201D1E;
   color: white;
 }
 
-.download-btn:hover .download-img {
+.charges-download-btn:hover .download-img {
   filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%)
     hue-rotate(47deg) brightness(118%) contrast(100%);
 }
@@ -258,13 +258,13 @@ input::placeholder {
     margin-bottom: 50px;
   }
   .charges-search {
-    width: 150px; /* Adjusted for smaller screens */
+   width: 60%;
   }
   .charges-selection {
-    width: 120px;
+    width: 100%;
   }
-  .download-btn {
-    width: 120px;
+  .charges-download-btn {
+    width: 40%;
   }
   .charges-thead.charges-date-column {
     padding-left: 14px;
@@ -310,8 +310,8 @@ input::placeholder {
   .charges-selection {
     width: 120px;
   }
-  .download-btn {
-    width: 120px;
+  .charges-download-btn {
+    width: 40%;
   }
 }
 
@@ -330,14 +330,14 @@ input::placeholder {
   .charges-selection {
     width: 120px;
   }
-  .download-btn {
-    width: 120px;
+  .charges-download-btn {
+    width: 40%;
   }
 }
 
 @media (max-width: 428px) {
   .charges-thead.charges-date-column {
-    padding-left: 27px;
+    padding-left: 14px;
     padding-right: 0;
   }
   .charges-data.charges-date-column {
@@ -373,7 +373,7 @@ input::placeholder {
     flex-wrap: nowrap;
   }
   .charges-search {
-    width: 100%;
+    width: 60%;
   }
   .charges-selection {
     width: 100%;
@@ -386,12 +386,12 @@ input::placeholder {
     gap: 10px;
     margin-top: 5px;
   }
-  .add-new-master {
-    width: 169px;
-    font-size: 14px;
+  .charges-add-new-master {
+    width: 60%;
+    font-size: 15px;
   }
-  .download-btn {
-    width: 122px;
+  .charges-download-btn {
+    width: 40%;
   }
   .desktop-only {
     display: none;
@@ -448,7 +448,7 @@ input::placeholder {
   }
   .charges-data.charges-date-column {
     white-space: nowrap;
-    padding-left: 68px;
+    padding-left: 14px;
     padding-right: 0;
   }
   .dropdown-label {
@@ -472,11 +472,15 @@ input::placeholder {
   }
   .charges-dropdown-content {
     width: 100%;
+    padding: 10px 0;
   }
-  .charges-dropdown-content .grid-cols-2 {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 9px 16px; /* 9px vertical, 16px horizontal */
-    margin-bottom: 16px;
+  .charges-grid{
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .charges-grid-items {
+    width: 50%;
   }
   .dropdown-value {
     word-break: break-word;
