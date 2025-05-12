@@ -89,7 +89,7 @@ const Translate = () => {
             className="px-[14px] py-[7px] h-[38px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 translate-search"
           />
           <div className="flex flex-row gap-[10px] w-full md:w-auto second-row-container">
-            <div className="relative flex-1 md:flex-none">
+            <div className="relative flex-1 md:flex-none w-[40%] md:w-auto">
               <select
                 name="select"
                 id=""
@@ -166,10 +166,10 @@ const Translate = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="translate-table-row-head">
-              <th className="px-5 w-[110px] text-left translate-thead translate-id-column">
+              <th className="px-5 w-[50%] text-left translate-thead translate-id-column">
                 ID
               </th>
-              <th className="px-5 text-left translate-thead variable-column pl-[50px]">
+              <th className="px-5 w-[47%] text-left translate-thead variable-column">
                 VARIABLE
               </th>
               <th className="px-5 text-right translate-thead"></th>
@@ -186,7 +186,7 @@ const Translate = () => {
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left translate-data">{translate.id}</td>
-                  <td className="px-3 text-left translate-data variable-column">
+                  <td className="px-5 text-left translate-data variable-column">
                     {translate.variable}
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
@@ -209,9 +209,9 @@ const Translate = () => {
                 {expandedRows[translate.id] && (
                   <tr className="mobile-with-border border-b border-[#E9E9E9]">
                     <td colSpan={3} className="px-5">
-                      <div className="translate-dropdown-content mb-[16px]">
-                        <div className="grid translate-grid-cols-2 gap-9 mb-6">
-                          <div>
+                      <div className="translate-dropdown-content">
+                        <div className="translate-grid">
+                          <div className="translate-grid-items">
                             <div className="dropdown-label">ENGLISH</div>
                             <div className="dropdown-value">
                               <input
@@ -221,7 +221,7 @@ const Translate = () => {
                               />
                             </div>
                           </div>
-                          <div>
+                          <div className="translate-grid-items">
                             <div className="dropdown-label">ARABIC</div>
                             <div className="dropdown-value">
                               <input
