@@ -417,7 +417,6 @@ const Units = () => {
       <AddUnitModal
         open={unitModalOpen}
         onClose={closeUnitModal}
-        title="Create Unit"
       />
     </div>
   );

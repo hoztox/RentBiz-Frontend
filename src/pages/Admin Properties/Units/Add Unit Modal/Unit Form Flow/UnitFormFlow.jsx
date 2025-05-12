@@ -7,7 +7,7 @@ import DocumentsForm from "../Upload Documents/DocumentsForm";
 import UnitReview from "../Review/UnitReview";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 
-const UnitFormFlow = ({ title, onClose }) => {
+const UnitFormFlow = ({ onClose }) => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [formData, setFormData] = useState({});
   const [formProgress, setFormProgress] = useState({
@@ -18,6 +18,17 @@ const UnitFormFlow = ({ title, onClose }) => {
     submitted: 0,
   });
   const [animating, setAnimating] = useState(false);
+
+  const pageTitles = [
+    "Select Building",
+    "Create Unit",
+    "Upload Documents",
+    "Review",
+    ""
+  ];
+
+
+  const currentTitle = pageTitles[currentPageIndex];
 
   useEffect(() => {
     const newProgress = { selectBuilding: 0, createUnit: 0, uploadDocuments: 0, review: 0, submitted: 0 };
@@ -88,7 +99,7 @@ const UnitFormFlow = ({ title, onClose }) => {
       <div className="w-[1010px] px-[53px] pt-[50px] pb-[40px]">
         {/* Modal Header */}
         <div className="building-modal-header flex justify-between items-center mb-[41px]">
-          {title && <h3 className="building-modal-title">{title}</h3>}
+          <h3 className="building-modal-title">{currentTitle}</h3>
           <button
             onClick={handleClose}
             className="border border-[#E9E9E9] rounded-full p-[11px]"

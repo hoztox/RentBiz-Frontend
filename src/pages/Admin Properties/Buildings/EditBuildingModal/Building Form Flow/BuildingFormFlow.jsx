@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import closeicon from "../../../../../assets/Images/Admin Buildings/close-icon.svg";
 import FormTimeline from '../FormTimeline';
-import BuildingInfoForm from '../Create Building/BuildingInfoForm';
+import BuildingInfoForm from '../UpdateBuilding/BuildingInfoForm';
 import DocumentsForm from '../Upload Documents/DocumentsForm';
 import ReviewPage from '../ReviewPage/ReviewPage';
 import SubmissionConfirmation from '../Submit/SubmissionConfirmation';
@@ -10,7 +10,7 @@ const BuildingFormFlow = ({ onClose }) => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [formData, setFormData] = useState({});
   const [formProgress, setFormProgress] = useState({
-    createBuilding: 0,
+    updateBuilding: 0,
     uploadDocuments: 0,
     review: 0,
     submitted: 0,
@@ -19,7 +19,7 @@ const BuildingFormFlow = ({ onClose }) => {
 
   // Dynamic page titles based on current page
   const pageTitles = [
-    "Create New Building",
+    "Update Building",
     "Upload Documents",
     "Review",
     ""
@@ -30,15 +30,15 @@ const BuildingFormFlow = ({ onClose }) => {
   const currentTitle = pageTitles[currentPageIndex];
 
   useEffect(() => {
-    const newProgress = { createBuilding: 0, uploadDocuments: 0, submitted: 0 };
+    const newProgress = { updateBuilding: 0, uploadDocuments: 0, submitted: 0 };
 
-    if (currentPageIndex >= 1) newProgress.createBuilding = 100;
+    if (currentPageIndex >= 1) newProgress.updateBuilding = 100;
     if (currentPageIndex >= 2) newProgress.uploadDocuments = 100;
 
     if (currentPageIndex === 0 && formData.buildingNo) {
       const requiredFields = ['buildingNo', 'plotNo', 'buildingName', 'address'];
       const filledFields = requiredFields.filter(field => formData[field]?.trim()).length;
-      newProgress.createBuilding = Math.min(100, (filledFields / requiredFields.length) * 100);
+      newProgress.updateBuilding = Math.min(100, (filledFields / requiredFields.length) * 100);
     }
 
     setFormProgress(newProgress);
@@ -69,7 +69,7 @@ const BuildingFormFlow = ({ onClose }) => {
   const handleClose = () => {
     setCurrentPageIndex(0);
     setFormData({});
-    setFormProgress({ createBuilding: 0, uploadDocuments: 0, submitted: 0 });
+    setFormProgress({ updateBuilding: 0, uploadDocuments: 0, submitted: 0 });
     onClose(); // Call parent-provided close handler
   };
 

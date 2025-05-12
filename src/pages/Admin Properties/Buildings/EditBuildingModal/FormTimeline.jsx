@@ -4,7 +4,7 @@ import arrow from "../../../../assets/Images/Admin Buildings/timeline-arrow.svg"
 import "./formtimeline.css"
 
 const steps = [
-  { id: 1, name: "Create Building", key: "createBuilding" },
+  { id: 1, name: "Update Building", key: "updateBuilding" },
   { id: 2, name: "Upload Documents", key: "uploadDocuments" },
   { id: 3, name: "Review", key: "review" },
   { id: 4, name: "Submitted", key: "submitted" },

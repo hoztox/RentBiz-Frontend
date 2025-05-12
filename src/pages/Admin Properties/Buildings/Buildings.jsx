@@ -7,20 +7,30 @@ import editicon from "../../../assets/Images/Admin Buildings/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Buildings/delete-icon.svg";
 import AddBuildingModal from "./Add Building Modal/AddBuildingModal";
 import downarrow from "../../../assets/Images/Admin Buildings/downarrow.svg";
+import EditBuildingModal from "./EditBuildingModal/EditBuildingModal";
 
 const Buildings = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [buildingModalOpen, setBuildingModalOpen] = useState(false);
+  const [editbuildingModalOpen, setEditBuildingModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
 
   const openBuildingModal = () => {
     setBuildingModalOpen(true);
   };
 
+  const openEditBuildingModal = () => {
+    setEditBuildingModalOpen(true);
+  };
+
   const closeBuildingModal = () => {
     setBuildingModalOpen(false);
+  };
+
+  const closeEditBuildingModal = () => {
+    setEditBuildingModalOpen(false);
   };
 
   const toggleRowExpand = (id) => {
@@ -117,9 +127,8 @@ const Buildings = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                className={`absolute md:right-2 right-4 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+                className={`absolute md:right-2 right-4 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
+                  }`}
               />
             </div>
           </div>
@@ -182,17 +191,18 @@ const Buildings = () => {
                 </td>
                 <td className="px-5 text-left bldg-data">
                   <span
-                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
-                      building.status === "Active"
-                        ? "bg-[#e1ffea] text-[#28C76F]"
-                        : "bg-[#FFE1E1] text-[#C72828]"
-                    }`}
+                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${building.status === "Active"
+                      ? "bg-[#e1ffea] text-[#28C76F]"
+                      : "bg-[#FFE1E1] text-[#C72828]"
+                      }`}
                   >
                     {building.status}
                   </span>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button>
+                  <button
+                    onClick={openEditBuildingModal}
+                  >
                     <img
                       src={editicon}
                       alt="Edit"
@@ -229,11 +239,10 @@ const Buildings = () => {
             {paginatedData.map((building, index) => (
               <React.Fragment key={index}>
                 <tr
-                  className={`${
-                    expandedRows[building.id]
-                      ? "bldg-mobile-no-border"
-                      : "bldg-mobile-with-border"
-                  } border-b border-[#E9E9E9] h-[57px]`}
+                  className={`${expandedRows[building.id]
+                    ? "bldg-mobile-no-border"
+                    : "bldg-mobile-with-border"
+                    } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left bldg-data bldg-id-column">
                     {building.id}
@@ -243,17 +252,15 @@ const Buildings = () => {
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
-                      className={`bldg-dropdown-field ${
-                        expandedRows[building.id] ? "active" : ""
-                      }`}
+                      className={`bldg-dropdown-field ${expandedRows[building.id] ? "active" : ""
+                        }`}
                       onClick={() => toggleRowExpand(building.id)}
                     >
                       <img
                         src={downarrow}
                         alt="drop-down-arrow"
-                        className={`bldg-dropdown-img ${
-                          expandedRows[building.id] ? "text-white" : ""
-                        }`}
+                        className={`bldg-dropdown-img ${expandedRows[building.id] ? "text-white" : ""
+                          }`}
                       />
                     </div>
                   </td>
@@ -287,11 +294,10 @@ const Buildings = () => {
                             <div className="bldg-dropdown-label">STATUS</div>
                             <div className="bldg-dropdown-value">
                               <span
-                                className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] bldg-status ${
-                                  building.status === "Active"
-                                    ? "bg-[#e1ffea] text-[#28C76F]"
-                                    : "bg-[#FFE1E1] text-[#C72828]"
-                                }`}
+                                className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] bldg-status ${building.status === "Active"
+                                  ? "bg-[#e1ffea] text-[#28C76F]"
+                                  : "bg-[#FFE1E1] text-[#C72828]"
+                                  }`}
                               >
                                 {building.status}
                               </span>
@@ -300,7 +306,8 @@ const Buildings = () => {
                           <div className="bldg-grid-item bldg-action-column">
                             <div className="bldg-dropdown-label">ACTION</div>
                             <div className="bldg-dropdown-value bldg-flex bldg-items-center bldg-gap-2">
-                              <button>
+                              <button
+                              >
                                 <img
                                   src={editicon}
                                   alt="Edit"
@@ -352,11 +359,10 @@ const Buildings = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 bldg-page-no-btns ${
-                currentPage === startPage + i
-                  ? "bg-[#1458A2] text-white"
-                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-              }`}
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 bldg-page-no-btns ${currentPage === startPage + i
+                ? "bg-[#1458A2] text-white"
+                : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+                }`}
               onClick={() => setCurrentPage(startPage + i)}
             >
               {startPage + i}
@@ -377,12 +383,13 @@ const Buildings = () => {
             className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer bldg-pagination-btn"
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(currentPage + 1)}
-            >
+          >
             Next
           </button>
         </div>
       </div>
       <AddBuildingModal open={buildingModalOpen} onClose={closeBuildingModal} />
+      <EditBuildingModal open={editbuildingModalOpen} onClose={closeEditBuildingModal} />
     </div>
   );
 };
