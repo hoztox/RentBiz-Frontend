@@ -402,12 +402,12 @@ const AddCollectionModal = ({ isOpen, onClose }) => {
                           <div className="px-[10px] flex items-center financial-collection-modal-thead uppercase">
                             Charge Type
                           </div>
-                          <div className="px-[10px] flex items-center financial-collection-modal-thead uppercase">
+                          <div className="px-[10px] flex items-center financial-collection-modal-thead uppercase w-[50%]">
                             Description
                           </div>
                         </div>
                         <div className="grid grid-cols-2 border-b border-[#E9E9E9]">
-                          <div className="px-[10px] py-[10px] h-[57px] relative">
+                          <div className="px-[10px] py-[10px] h-[57px] relative w-[100%]">
                             <select
                               value={item.chargeType}
                               onChange={(e) =>
@@ -427,7 +427,7 @@ const AddCollectionModal = ({ isOpen, onClose }) => {
                               className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none`}
                             />
                           </div>
-                          <div className="px-[10px] py-[10px]">
+                          <div className="px-[10px] py-[10px] w-[100%]">
                             <input
                               type="text"
                               placeholder="Enter Description"

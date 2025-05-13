@@ -127,7 +127,7 @@ const Expense = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 expense-search"
             />
-            <div className="relative w-full md:w-auto">
+            <div className="relative w-[40%] md:w-auto">
               <select
                 name="select"
                 id=""
@@ -139,7 +139,7 @@ const Expense = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                className={`absolute md:right-2 right-4 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
                   isSelectOpen ? "rotate-180" : "rotate-0"
                 }`}
               />
@@ -151,9 +151,9 @@ const Expense = () => {
               onClick={openAddModal}
             >
               Add New Expense
-              <img src={plusicon} alt="plus icon" className="w-[15px] h-[15px]" />
+              <img src={plusicon} alt="plus icon" className="relative right-[5px] md:right-0 w-[15px] h-[15px]" />
             </button>
-            <button className="flex items-center justify-center gap-2 h-[38px] rounded-md duration-200 download-btn w-[122px]">
+            <button className="flex items-center justify-center gap-2 h-[38px] rounded-md duration-200 expense-download-btn w-[122px]">
               Download
               <img
                 src={downloadicon}
@@ -233,7 +233,7 @@ const Expense = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="expense-table-row-head">
-              <th className="px-5 text-left expense-thead expense-id-column">ID</th>
+              <th className="px-5 pl-[12px] text-left expense-thead expense-id-column">ID</th>
               <th className="px-5 text-left expense-thead expense-date-column">DATE</th>
               <th className="px-5 text-left expense-thead expense-expense-column">EXPENSE</th>
               <th className="px-5 text-right expense-thead"></th>
@@ -249,7 +249,7 @@ const Expense = () => {
                       : "expense-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left expense-data expense-id-column">{expense.id}</td>
+                  <td className="px-5 pl-[12px] text-left expense-data expense-id-column">{expense.id}</td>
                   <td className="px-5 text-left expense-data expense-date-column">{expense.date}</td>
                   <td className="px-5 text-left expense-data expense-expense-column">{expense.expense}</td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
@@ -278,7 +278,7 @@ const Expense = () => {
                             <div className="expense-dropdown-label">AMOUNT</div>
                             <div className="expense-dropdown-value">{expense.amount}</div>
                           </div>
-                          <div className="expense-dropdown-item expense-vat-amount-column pl-[5px]">
+                          <div className="expense-dropdown-item expense-vat-amount-column">
                             <div className="expense-dropdown-label">VAT AMOUNT</div>
                             <div className="expense-dropdown-value">{expense.vatAmount}</div>
                           </div>
@@ -302,7 +302,7 @@ const Expense = () => {
                               </span>
                             </div>
                           </div>
-                          <div className="expense-dropdown-item expense-action-column pl-[5px]">
+                          <div className="expense-dropdown-item expense-action-column">
                             <div className="expense-dropdown-label">ACTION</div>
                             <div className="expense-dropdown-value flex items-center gap-4 p-[5px]">
                               <button onClick={() => openUpdateModal(expense)}>

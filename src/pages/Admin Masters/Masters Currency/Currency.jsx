@@ -149,7 +149,7 @@ const Currency = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 currency-search"
             />
-            <div className="relative w-full md:w-auto">
+            <div className="relative w-[40%] md:w-auto">
               <select
                 name="select"
                 id=""
@@ -169,13 +169,13 @@ const Currency = () => {
           </div>
           <div className="flex gap-[10px] action-buttons-container">
             <button
-              className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md add-new-currency duration-200"
+              className="flex items-center justify-center gap-2 md:w-[176px] h-[38px] rounded-md add-new-currency duration-200"
               onClick={openAddModal}
             >
               Add New Currency
-              <img src={plusicon} alt="plus icon" className="w-[15px] h-[15px]" />
+              <img src={plusicon} alt="plus icon" className="relative right-[5px] md:right-0 w-[15px] h-[15px]" />
             </button>
-            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 download-btn">
+            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 currency-download-btn">
               Download
               <img
                 src={downloadicon}
@@ -234,8 +234,8 @@ const Currency = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="currency-table-row-head">
-              <th className="px-5 w-[74px] text-left currency-thead currency-id-column">ID</th>
-              <th className="px-3 text-left currency-thead country-column">COUNTRY</th>
+              <th className="px-5 w-[38%] text-left currency-thead currency-id-column">ID</th>
+              <th className="px-5 w-[53%] text-left currency-thead country-column">COUNTRY</th>
               <th className="px-5 text-right currency-thead"></th>
             </tr>
           </thead>
@@ -250,7 +250,7 @@ const Currency = () => {
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left currency-data">{currency.id}</td>
-                  <td className="px-3 text-left currency-data country-column">{currency.country}</td>
+                  <td className="px-5 text-left currency-data country-column">{currency.country}</td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`currency-dropdown-field ${
@@ -272,22 +272,22 @@ const Currency = () => {
                   <tr className="mobile-with-border border-b border-[#E9E9E9]">
                     <td colSpan={3} className="px-5">
                       <div className="currency-dropdown-content">
-                        <div className="grid currency-grid-cols-2 gap-4 mb-6">
-                          <div>
+                        <div className="currency-grid">
+                          <div className="currency-grid-items w-[40%]">
                             <div className="dropdown-label">CURRENCY</div>
                             <div className="dropdown-value">{currency.currency}</div>
                           </div>
-                          <div>
+                          <div className="currency-grid-items w-[60%]">
                             <div className="dropdown-label">CODE</div>
                             <div className="dropdown-value">{currency.code}</div>
                           </div>
                         </div>
-                        <div className="grid currency-grid-cols-2 gap-4 mb-6">
-                          <div>
+                        <div className="currency-grid">
+                          <div className="currency-grid-items w-[40%]">
                             <div className="dropdown-label">MINOR UNIT</div>
                             <div className="dropdown-value">{currency.minorUnit}</div>
                           </div>
-                          <div>
+                          <div className="currency-grid-items w-[60%]">
                             <div className="dropdown-label">ACTION</div>
                             <div className="dropdown-value flex items-center gap-2 p-[5px]">
                               <button onClick={() => openUpdateModal(currency)}>
@@ -301,7 +301,7 @@ const Currency = () => {
                                 <img
                                   src={deleteicon}
                                   alt="Delete"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
+                                  className="w-[18px] h-[18px] ml-[5px] action-btn duration-200"
                                 />
                               </button>
                             </div>

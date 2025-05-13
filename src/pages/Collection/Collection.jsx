@@ -102,7 +102,7 @@ const Collection = () => {
     setIsAddModalOpen(false);
   };
 
-  const openUpdateModal = (row) => {
+  const openUpdateModal = () => {
     setIsUpdateModalOpen(true);
   };
 
@@ -130,7 +130,7 @@ const Collection = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 collection-search"
             />
-            <div className="relative w-full md:w-auto">
+            <div className="relative w-[40%] md:w-auto">
               <select
                 name="select"
                 id=""
@@ -142,7 +142,7 @@ const Collection = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                className={`absolute md:right-2 right-4 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
                   isSelectOpen ? "rotate-180" : "rotate-0"
                 }`}
               />
@@ -157,10 +157,10 @@ const Collection = () => {
               <img
                 src={plusicon}
                 alt="plus icon"
-                className="w-[15px] h-[15px]"
+                className="relative right-[5px] md:right-0 w-[15px] h-[15px]"
               />
             </button>
-            <button className="flex items-center justify-center gap-2 w-[122px] h-[38px] rounded-md duration-200 download-btn">
+            <button className="flex items-center justify-center gap-2 w-[122px] h-[38px] rounded-md duration-200 collection-download-btn">
               Download
               <img
                 src={downloadicon}
@@ -181,12 +181,8 @@ const Collection = () => {
               <th className="pl-5 text-left collection-thead">TENANT NAME</th>
               <th className="px-5 text-left collection-thead">AMOUNT</th>
               <th className="px-5 text-left collection-thead">DESCRIPTION</th>
-              <th className="px-5 text-left collection-thead">
-                PAYMENT METHOD
-              </th>
-              <th className="px-5 text-left collection-thead w-[68px]">
-                STATUS
-              </th>
+              <th className="px-5 text-left collection-thead">PAYMENT METHOD</th>
+              <th className="px-5 text-left collection-thead w-[68px]">STATUS</th>
               <th className="px-5 pr-11 text-right collection-thead">ACTION</th>
             </tr>
           </thead>
@@ -196,27 +192,13 @@ const Collection = () => {
                 key={index}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-5 text-left collection-data">
-                  {collection.id}
-                </td>
-                <td className="px-5 text-left collection-data">
-                  {collection.date}
-                </td>
-                <td className="pl-5 text-left collection-data">
-                  {collection.tenancyId}
-                </td>
-                <td className="pl-5 text-left collection-data">
-                  {collection.tenantName}
-                </td>
-                <td className="px-5 text-left collection-data">
-                  {collection.amount}
-                </td>
-                <td className="px-5 text-left collection-data">
-                  {collection.description}
-                </td>
-                <td className="px-5 text-left collection-data">
-                  {collection.payment}
-                </td>
+                <td className="px-5 text-left collection-data">{collection.id}</td>
+                <td className="px-5 text-left collection-data">{collection.date}</td>
+                <td className="pl-5 text-left collection-data">{collection.tenancyId}</td>
+                <td className="pl-5 text-left collection-data">{collection.tenantName}</td>
+                <td className="px-5 text-left collection-data">{collection.amount}</td>
+                <td className="px-5 text-left collection-data">{collection.description}</td>
+                <td className="px-5 text-left collection-data">{collection.payment}</td>
                 <td className="px-5 text-left collection-data">
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] h-[28px] ${
@@ -260,15 +242,8 @@ const Collection = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="collection-table-row-head">
-              <th className="px-5 text-left collection-thead collection-id-column">
-                ID
-              </th>
-              <th className="px-5 text-left collection-thead collection-date-column">
-                DATE
-              </th>
-              <th className="px-5 text-left collection-thead collection-tenancy-id-column">
-                TENANCY ID
-              </th>
+              <th className="px-5 text-left collection-thead collection-id-column">ID</th>
+              <th className="px-5 text-left collection-thead collection-date-column">DATE</th>
               <th className="px-5 text-right collection-thead"></th>
             </tr>
           </thead>
@@ -282,15 +257,8 @@ const Collection = () => {
                       : "collection-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left collection-data collection-id-column">
-                    {collection.id}
-                  </td>
-                  <td className="px-5 text-left collection-data collection-date-column">
-                    {collection.date}
-                  </td>
-                  <td className="px-5 text-left collection-data collection-tenancy-id-column">
-                    {collection.tenancyId}
-                  </td>
+                  <td className="px-5 text-left collection-data collection-id-column">{collection.id}</td>
+                  <td className="px-5 text-left collection-data collection-date-column">{collection.date}</td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`collection-dropdown-field ${
@@ -302,9 +270,7 @@ const Collection = () => {
                         src={downarrow}
                         alt="drop-down-arrow"
                         className={`collection-dropdown-img ${
-                          expandedRows[collection.id + index]
-                            ? "text-white"
-                            : ""
+                          expandedRows[collection.id + index] ? "text-white" : ""
                         }`}
                       />
                     </div>
@@ -312,50 +278,38 @@ const Collection = () => {
                 </tr>
                 {expandedRows[collection.id + index] && (
                   <tr className="collection-mobile-with-border border-b border-[#E9E9E9]">
-                    <td colSpan={4} className="px-1">
+                    <td colSpan={3} className="px-5">
                       <div className="collection-dropdown-content">
                         <div className="collection-dropdown-grid">
-                          <div className="collection-dropdown-item collection-tenant-name-column">
-                            <div className="collection-dropdown-label">
-                              TENANT NAME
-                            </div>
-                            <div className="collection-dropdown-value">
-                              {collection.tenantName}
-                            </div>
+                          <div className="collection-dropdown-item w-[50%]">
+                            <div className="collection-dropdown-label">TENANCY ID</div>
+                            <div className="collection-dropdown-value">{collection.tenancyId}</div>
                           </div>
-                          <div className="collection-dropdown-item collection-amount-column pl-[12px]">
-                            <div className="collection-dropdown-label">
-                              AMOUNT
-                            </div>
-                            <div className="collection-dropdown-value">
-                              {collection.amount}
-                            </div>
-                          </div>
-                          <div className="collection-dropdown-item collection-description-column pl-[5px]">
-                            <div className="collection-dropdown-label">
-                              DESCRIPTION
-                            </div>
-                            <div className="collection-dropdown-value">
-                              {collection.description}
-                            </div>
+                          <div className="collection-dropdown-item w-[50%]">
+                            <div className="collection-dropdown-label">TENANT NAME</div>
+                            <div className="collection-dropdown-value">{collection.tenantName}</div>
                           </div>
                         </div>
                         <div className="collection-dropdown-grid">
-                          <div className="collection-dropdown-item collection-payment-column">
-                            <div className="collection-dropdown-label">
-                              PAYMENT METHOD
-                            </div>
-                            <div className="collection-dropdown-value">
-                              {collection.payment}
-                            </div>
+                          <div className="collection-dropdown-item w-[50%]">
+                            <div className="collection-dropdown-label">AMOUNT</div>
+                            <div className="collection-dropdown-value">{collection.amount}</div>
                           </div>
-                          <div className="collection-dropdown-item collection-status-column pl-[12px]">
-                            <div className="collection-dropdown-label">
-                              STATUS
-                            </div>
+                          <div className="collection-dropdown-item w-[50%]">
+                            <div className="collection-dropdown-label">DESCRIPTION</div>
+                            <div className="collection-dropdown-value">{collection.description}</div>
+                          </div>
+                        </div>
+                        <div className="collection-dropdown-grid">
+                          <div className="collection-dropdown-item w-[50%]">
+                            <div className="collection-dropdown-label">PAYMENT METHOD</div>
+                            <div className="collection-dropdown-value">{collection.payment}</div>
+                          </div>
+                          <div className="collection-dropdown-item w-[50%]">
+                            <div className="collection-dropdown-label">STATUS</div>
                             <div className="collection-dropdown-value">
                               <span
-                                className={`collection-status ${
+                                className={`px-[10px] py-[5px] rounded-[4px] w-[69px] h-[28px] ${
                                   collection.status === "Paid"
                                     ? "bg-[#28C76F29] text-[#28C76F]"
                                     : "bg-[#FFE1E1] text-[#C72828]"
@@ -365,10 +319,10 @@ const Collection = () => {
                               </span>
                             </div>
                           </div>
-                          <div className="collection-dropdown-item collection-action-column pl-[5px]">
-                            <div className="collection-dropdown-label">
-                              ACTION
-                            </div>
+                        </div>
+                        <div className="collection-dropdown-grid">
+                          <div className="collection-dropdown-item w-[100%]">
+                            <div className="collection-dropdown-label">ACTION</div>
                             <div className="collection-dropdown-value flex items-center gap-4">
                               <button onClick={openUpdateModal}>
                                 <img
@@ -405,10 +359,8 @@ const Collection = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 px-5 collection-pagination-container">
         <span className="collection-list-pagination collection-pagination-text">
-          Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-          {filteredData.length} entries
+          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
+          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto collection-pagination-buttons">
           <button
@@ -440,9 +392,7 @@ const Collection = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && (
-            <span className="px-2 flex items-center">...</span>
-          )}
+          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
@@ -461,10 +411,7 @@ const Collection = () => {
         </div>
       </div>
       <AddCollectionModal isOpen={isAddModalOpen} onClose={closeAddModal} />
-      <UpdateCollectionModal
-        isOpen={isUpdateModalOpen}
-        onClose={closeUpdateModal}
-      />
+      <UpdateCollectionModal isOpen={isUpdateModalOpen} onClose={closeUpdateModal} />
     </div>
   );
 };

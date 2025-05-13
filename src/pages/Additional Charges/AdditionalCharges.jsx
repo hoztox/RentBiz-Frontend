@@ -124,9 +124,9 @@ const AdminAdditionalCharges = () => {
               placeholder="Search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 admin-add-charges-search"
+              className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md md:w-[302px] focus:border-gray-300 duration-200 admin-add-charges-search"
             />
-            <div className="relative w-full md:w-auto">
+            <div className="relative w-[40%] md:w-auto">
               <select
                 name="select"
                 id=""
@@ -138,7 +138,7 @@ const AdminAdditionalCharges = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                className={`absolute md:right-2 right-4 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
                   isSelectOpen ? "rotate-180" : "rotate-0"
                 }`}
               />
@@ -146,11 +146,11 @@ const AdminAdditionalCharges = () => {
           </div>
           <div className="flex gap-[10px] admin-add-charges-action-buttons w-full md:w-auto justify-start">
             <button
-              className="flex items-center justify-center gap-2 h-[38px] rounded-md admin-add-charges-btn duration-200 w-[169px]"
+              className="flex items-center justify-center gap-2 h-[38px] rounded-md admin-add-charges-btn duration-200 md:w-[169px]"
               onClick={openAddModal}
             >
               Add Charges
-              <img src={plusicon} alt="plus icon" className="w-[15px] h-[15px]" />
+              <img src={plusicon} alt="plus icon" className="relative right-[5px] md:right-0 w-[15px] h-[15px]" />
             </button>
             <button className="flex items-center justify-center gap-2 h-[38px] rounded-md duration-200 admin-add-charges-download-btn w-[122px]">
               Download
@@ -225,10 +225,10 @@ const AdminAdditionalCharges = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="admin-add-charges-table-row-head">
-              <th className="px-5 text-left admin-add-charges-thead admin-add-charges-id-column">ID</th>
-              <th className="px-5 text-left admin-add-charges-thead admin-add-charges-charge-id-column">CHARGE ID</th>
-              <th className="px-5 text-left admin-add-charges-thead admin-add-charges-date-column">DATE</th>
-              <th className="px-5 text-right admin-add-charges-thead"></th>
+              <th className="px-5 w-[35%] text-left admin-add-charges-thead admin-add-charges-id-column">ID</th>
+              <th className="px-[10px] w-[30%] text-left admin-add-charges-thead admin-add-charges-charge-id-column">CHARGE ID</th>
+              <th className="px-[10px] w-[20%] text-left admin-add-charges-thead admin-add-charges-date-column">DATE</th>
+              <th className="px-5 w-[15%] text-right admin-add-charges-thead"></th>
             </tr>
           </thead>
           <tbody>
@@ -242,8 +242,8 @@ const AdminAdditionalCharges = () => {
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left admin-add-charges-data admin-add-charges-id-column">{charges.id}</td>
-                  <td className="px-5 text-left admin-add-charges-data admin-add-charges-charge-id-column">{charges.chargeId}</td>
-                  <td className="px-5 text-left admin-add-charges-data admin-add-charges-date-column">{charges.date}</td>
+                  <td className="px-[10px] text-left admin-add-charges-data admin-add-charges-charge-id-column">{charges.chargeId}</td>
+                  <td className="px-[10px] text-left admin-add-charges-data admin-add-charges-date-column">{charges.date}</td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`admin-add-charges-dropdown-field ${
@@ -266,21 +266,21 @@ const AdminAdditionalCharges = () => {
                     <td colSpan={4} className="px-5">
                       <div className="admin-add-charges-dropdown-content">
                         <div className="admin-add-charges-dropdown-grid">
-                          <div className="admin-add-charges-dropdown-item admin-add-charges-amount-due-column">
+                          <div className="admin-add-charges-dropdown-item w-[30%]">
                             <div className="admin-add-charges-dropdown-label">AMOUNT DUE</div>
                             <div className="admin-add-charges-dropdown-value">{charges.amountDue}</div>
                           </div>
-                          <div className="admin-add-charges-dropdown-item admin-add-charges-reason-column pl-[12px]">
+                          <div className="admin-add-charges-dropdown-item label-reason w-[30%]">
                             <div className="admin-add-charges-dropdown-label">REASON</div>
                             <div className="admin-add-charges-dropdown-value">{charges.reason}</div>
                           </div>
-                          <div className="admin-add-charges-dropdown-item admin-add-charges-due-date-column pl-[5px]">
+                          <div className="admin-add-charges-dropdown-item label-due w-[35%]">
                             <div className="admin-add-charges-dropdown-label">DUE DATE</div>
                             <div className="admin-add-charges-dropdown-value">{charges.dueDate}</div>
                           </div>
                         </div>
                         <div className="admin-add-charges-dropdown-grid">
-                          <div className="admin-add-charges-dropdown-item admin-add-charges-status-column">
+                          <div className="admin-add-charges-dropdown-item w-[30%]">
                             <div className="admin-add-charges-dropdown-label">STATUS</div>
                             <div className="admin-add-charges-dropdown-value">
                               <span
@@ -294,7 +294,7 @@ const AdminAdditionalCharges = () => {
                               </span>
                             </div>
                           </div>
-                          <div className="admin-add-charges-dropdown-item admin-add-charges-action-column pl-[12px]">
+                          <div className="admin-add-charges-dropdown-item w-[67%] label-action">
                             <div className="admin-add-charges-dropdown-label">ACTION</div>
                             <div className="admin-add-charges-dropdown-value flex items-center gap-4">
                               <button onClick={() => openUpdateModal(charges)}>

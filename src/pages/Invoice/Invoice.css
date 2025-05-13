@@ -138,16 +138,10 @@
       padding: 16px;
     }
     .inv-search {
-      width: 150px;
+      width: 60%;
     }
     .inv-selection {
-      width: 120px;
-    }
-    .inv-action-buttons-container .inv-add-invoice {
-      width: calc(58% - 5px);
-    }
-    .inv-action-buttons-container .inv-download-btn {
-      width: calc(42% - 5px);
+      width: 100%;
     }
     .inv-thead.inv-date-column {
       padding-left: 14px;
@@ -194,7 +188,7 @@
       width: 120px;
     }
     .inv-download-btn {
-      width: 120px;
+      width: 40%;
     }
   }
   
@@ -214,7 +208,7 @@
       width: 120px;
     }
     .inv-download-btn {
-      width: 120px;
+      width: 40%;
     }
   }
   
@@ -257,7 +251,7 @@
       flex-wrap: nowrap;
     }
     .inv-search {
-      width: 100%;
+      width: 60%;
     }
     .inv-selection {
       width: 100%;
@@ -270,11 +264,11 @@
       margin-top: 5px;
     }
     .inv-add-invoice {
-      width: 176px;
-      font-size: 14px;
+      width: 60%;
+      font-size: 15px;
     }
     .inv-download-btn {
-      width: 122px;
+      width: 40%;
     }
     .inv-desktop-only {
       display: none;
@@ -310,7 +304,7 @@
       background-color: #254396;
     }
     .inv-dropdown-img {
-      width: 11px;
+      width: 10px;
       transition: transform 0.3s ease;
     }
     .inv-dropdown-field.active .inv-dropdown-img {
@@ -364,29 +358,12 @@
     }
     .inv-dropdown-content-grid {
       display: flex;
-      width: 100%;
-      flex-wrap: wrap;
-    }
-    .inv-dropdown-content-grid.inv-three-columns {
-      display: flex;
-      width: 100%;
-      flex-wrap: wrap;
+      justify-content: space-between;
+      margin-bottom: 24px;
     }
     .inv-dropdown-content-item {
-      width: 50%;
       padding-right: 10px;
       box-sizing: border-box;
-      margin-bottom: 15px;
-    }
-    .inv-dropdown-content-item.inv-tenant-name-column,
-    .inv-dropdown-content-item.inv-tenancy-id-column {
-      width: 50%;
-    }
-    .inv-dropdown-content-item.inv-amount-due-column,
-    .inv-dropdown-content-item.inv-view-column,
-    .inv-dropdown-content-item.inv-action-column {
-      width: 33.33%;
-      padding-right: 0;
     }
     .inv-mobile-no-border {
       border-bottom: none !important;
@@ -409,23 +386,5 @@
     }
     .inv-data {
       font-size: 13px;
-    }
-  }
-  
-  @media (max-width: 767px) {
-    .inv-action-buttons-container {
-      width: 100%;
-      justify-content: start;
-    }
-    .inv-action-buttons-container .inv-add-invoice,
-    .inv-action-buttons-container .inv-download-btn {
-      min-width: auto;
-      max-width: none;
-    }
-    .inv-action-buttons-container .inv-add-invoice {
-      width: 176px;
-    }
-    .inv-action-buttons-container .inv-download-btn {
-      width: 50%;
     }
   }

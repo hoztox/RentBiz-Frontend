@@ -1,502 +1,400 @@
 .collection-head {
-    font-family: 'Inter Tight';
-    font-size: 21px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 24px;
-    color: #201D1E;
+  font-family: "Inter Tight";
+  font-size: 21px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+  color: #201d1e;
 }
 
 .collection-search {
-    font-family: 'Inter Tight';
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 24px;
-    box-sizing: border-box;
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  box-sizing: border-box;
 }
 
 .collection-search::placeholder {
-    font-family: 'Inter Tight';
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 24px;
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
 }
 
 .collection-selection {
-    font-family: "Public Sans", sans-serif;
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 24px;
-    color: #201D1E;
-    box-sizing: border-box;
+  font-family: "Public Sans", sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  color: #201d1e;
+  box-sizing: border-box;
 }
 
 .add-collection {
-    background-color: #2892CE;
-    color: white;
-    font-family: 'Inter Tight';
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 18px;
-    letter-spacing: 0.43px;
-    box-sizing: border-box;
+  background-color: #2892ce;
+  color: white;
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+  box-sizing: border-box;
 }
 
 .add-collection:hover {
-    background-color: #076094;
+  background-color: #076094;
 }
 
-.download-btn {
-    background-color: #F0F0F0;
-    font-family: 'Inter Tight';
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 18px;
-    letter-spacing: 0.43px;
-    color: #4D4E4D;
-    box-sizing: border-box;
+.collection-download-btn {
+  background-color: #f0f0f0;
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+  color: #4d4e4d;
+  box-sizing: border-box;
 }
 
-.download-btn:hover {
-    background-color: #201D1E;
-    color: white;
+.collection-download-btn:hover {
+  background-color: #201d1e;
+  color: white;
 }
 
-.download-btn:hover .download-img {
-    filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%) hue-rotate(47deg) brightness(118%) contrast(100%);
+.collection-download-btn:hover .download-img {
+  filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%)
+    hue-rotate(47deg) brightness(118%) contrast(100%);
 }
 
 .collection-thead {
-    font-family: 'Inter Tight';
+  font-family: "Inter Tight";
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 1px;
+  color: #818da0;
+}
+
+.collection-data {
+  font-family: "Inter Tight";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 22px;
+  color: #201d1e;
+}
+
+.action-btn:hover {
+  filter: brightness(0) saturate(100%) invert(8%) sepia(7%) saturate(582%)
+    hue-rotate(289deg) brightness(100%) contrast(91%);
+}
+
+.collection-list-pagination {
+  font-family: "Inter Tight";
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  color: #4b465c80;
+}
+
+.pagination-btn {
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+  color: #8a94a3;
+}
+
+.page-no-btns {
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+}
+
+.collection-action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* Responsive Styles (ordered from smallest to largest max-width) */
+@media (max-width: 360px) {
+  .collection-table {
+    margin-bottom: 50px;
+  }
+  .collection-table-header {
+    padding: 16px;
+  }
+  .collection-search {
+    width: 60%;
+  }
+  .collection-selection {
+    width: 100%;
+  }
+  .collection-thead.collection-date-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+  .collection-data.collection-date-column {
+    padding-left: 14px;
+    padding-right: 0;
+    white-space: nowrap;
+  }
+  .pagination-btn {
     font-size: 13px;
+    padding: 0px 10px;
+    height: 28px;
+  }
+  .page-no-btns {
+    font-size: 13px;
+    padding: 0px 10px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 375px) {
+  .collection-thead.collection-date-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+  .collection-data.collection-date-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 390px) {
+  .collection-thead.collection-date-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+  .collection-data.collection-date-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+  .collection-selection {
+    width: 100%;
+  }
+  .collection-download-btn {
+    width: 40%;
+  }
+}
+
+@media (max-width: 414px) {
+  .collection-thead {
+    font-size: 11px;
+  }
+  .collection-thead.collection-date-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+  .collection-data.collection-date-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+  .collection-selection {
+    width: 120px;
+  }
+  .collection-download-btn {
+    width: 40%;
+  }
+}
+
+@media (max-width: 428px) {
+  .collection-thead.collection-date-column {
+    padding-left: 20px;
+    padding-right: 0;
+  }
+  .collection-data.collection-date-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .collection-table {
+    max-width: calc(100vw - 40px);
+    margin-bottom: 50px;
+  }
+  .collection-table-header {
+    flex-direction: column;
+    border-bottom: none;
+    align-items: flex-start;
+    padding: 20px;
+  }
+  .collection-head {
+    display: none;
+  }
+  .collection-inputs-container {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .collection-inputs-container > div:first-child {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+    flex-wrap: nowrap;
+  }
+  .collection-search {
+    width: 60%;
+  }
+  .collection-selection {
+    width: 100%;
+  }
+  .collection-action-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 10px;
+    margin-top: 5px;
+  }
+  .add-collection {
+    width: 60%;
+    font-size: 15px;
+  }
+  .collection-download-btn {
+    width: 40%;
+  }
+  .collection-desktop-only {
+    display: none;
+  }
+  .collection-pagination-container {
+    flex-direction: column;
+    height: 97.53px;
+    justify-content: center;
+    gap: 16px;
+    align-items: center;
+  }
+  .collection-list-pagination {
+    text-align: center;
+  }
+  .collection-pagination-buttons {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    overflow-y: hidden;
+  }
+  .collection-dropdown-field {
+    background-color: #dedede;
+    border-radius: 100%;
+    width: 20px;
+    height: 20px;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+  }
+  .collection-dropdown-field.active {
+    background-color: #254396;
+  }
+  .collection-dropdown-img {
+    width: 10px;
+    transition: transform 0.3s ease;
+  }
+  .collection-dropdown-field.active .collection-dropdown-img {
+    transform: rotate(180deg);
+  }
+  .collection-table-row-head {
+    height: auto;
+    background-color: #f7f7f7;
+    border-bottom: none;
+  }
+  .collection-thead {
+    padding-right: 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .collection-id-column {
+    padding-right: 10px;
+    width: 50%;
+  }
+  .collection-date-column {
+    width: 50%;
+    padding-right: 0;
+  }
+  .collection-data.collection-date-column {
+    white-space: nowrap;
+    padding-left: 20px;
+    padding-right: 0;
+  }
+  .collection-dropdown-label {
+    font-family: "Inter Tight";
+    font-size: 12px;
     font-style: normal;
     font-weight: 500;
     line-height: normal;
     letter-spacing: 1px;
     color: #818da0;
-}
-
-.collection-data {
-    font-family: 'Inter Tight';
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 22px;
-    color: #201D1E;
-}
-
-.action-btn:hover {
-    filter: brightness(0) saturate(100%) invert(8%) sepia(7%) saturate(582%) hue-rotate(289deg) brightness(100%) contrast(91%);
-}
-
-.collection-list-pagination {
-    font-family: 'Inter Tight';
+    margin-bottom: 4px;
+    padding-left: 0;
+  }
+  .collection-dropdown-value {
+    font-family: "Inter Tight";
     font-size: 13px;
     font-style: normal;
     font-weight: 400;
-    line-height: 20px;
-    color: #4b465c80;
-}
-
-.pagination-btn {
-    font-family: 'Inter Tight';
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 18px;
-    letter-spacing: 0.43px;
-    color: #8a94a3;
-}
-
-.page-no-btns {
-    font-family: 'Inter Tight';
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 18px;
-    letter-spacing: 0.43px;
-}
-
-.collection-action-buttons {
+    line-height: 22px;
+    color: #201d1e;
+  }
+  .collection-status {
+    padding: 0px 9px;
+    border-radius: 3px;
+    margin-top: 5px;
+    display: inline-block;
+    width: 65px;
+    height: 24px;
+    text-align: center;
+    line-height: 24px;
+  }
+  .collection-dropdown-content {
+    width: 100%;
+    padding: 10px 0;
+  }
+  .collection-dropdown-grid {
     display: flex;
-    gap: 10px;
-}
-
-/* Responsive Styles (ordered from smallest to largest max-width) */
-@media (max-width: 360px) {
-    .collection-table {
-        margin-bottom: 50px;
-        overflow-x: auto; /* Allow horizontal scrolling for table */
-    }
-    .collection-table-header {
-        padding: 16px;
-    }
-    .collection-search {
-        width: 150px;
-    }
-    .collection-selection {
-        width: 120px;
-    }
-    .collection-action-buttons .add-collection {
-        width: calc(58% - 5px);
-    }
-    .collection-action-buttons .download-btn {
-        width: calc(42% - 5px);
-    }
-    .collection-thead.collection-id-column,
-    .collection-thead.collection-date-column,
-    .collection-thead.collection-tenancy-id-column {
-        padding-left: 10px; /* Reduced padding for headers */
-        padding-right: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis; /* Truncate long header text */
-    }
-    .collection-data.collection-id-column,
-    .collection-data.collection-date-column,
-    .collection-data.collection-tenancy-id-column {
-        padding-left: 10px; /* Match header padding */
-        padding-right: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis; /* Truncate long data text */
-    }
-    .pagination-btn {
-        font-size: 13px;
-        padding: 0px 10px;
-        height: 28px;
-    }
-    .page-no-btns {
-        font-size: 13px;
-        padding: 0px 10px;
-        height: 28px;
-    }
-    .collection-dropdown-content .collection-dropdown-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-@media (max-width: 375px) {
-    .collection-thead.collection-id-column,
-    .collection-thead.collection-date-column,
-    .collection-thead.collection-tenancy-id-column {
-        padding-left: 10px;
-        padding-right: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .collection-data.collection-id-column,
-    .collection-data.collection-date-column,
-    .collection-data.collection-tenancy-id-column {
-        padding-left: 10px;
-        padding-right: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-}
-
-@media (max-width: 390px) {
-    .collection-thead.collection-id-column,
-    .collection-thead.collection-date-column,
-    .collection-thead.collection-tenancy-id-column {
-        padding-left: 10px;
-        padding-right: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .collection-data.collection-id-column,
-    .collection-data.collection-date-column,
-    .collection-data.collection-tenancy-id-column {
-        padding-left: 10px;
-        padding-right: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .collection-selection {
-        width: 120px;
-    }
-    .download-btn {
-        width: 120px;
-    }
-}
-
-@media (max-width: 414px) {
-    .collection-thead {
-        font-size: 11px;
-    }
-    .collection-thead.collection-id-column,
-    .collection-thead.collection-date-column,
-    .collection-thead.collection-tenancy-id-column {
-        padding-left: 10px;
-        padding-right: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .collection-data.collection-id-column,
-    .collection-data.collection-date-column,
-    .collection-data.collection-tenancy-id-column {
-        padding-left: 10px;
-        padding-right: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .collection-selection {
-        width: 120px;
-    }
-    .download-btn {
-        width: 120px;
-    }
-}
-
-@media (max-width: 428px) {
-    .collection-thead.collection-id-column,
-    .collection-thead.collection-date-column,
-    .collection-thead.collection-tenancy-id-column {
-        padding-left: 10px;
-        padding-right: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .collection-data.collection-id-column,
-    .collection-data.collection-date-column,
-    .collection-data.collection-tenancy-id-column {
-        padding-left: 10px;
-        padding-right: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-}
-
-@media (max-width: 480px) {
-    .collection-table {
-        max-width: calc(100vw - 40px);
-        margin-bottom: 50px;
-        overflow-x: auto; 
-    }
-    .collection-table-header {
-        flex-direction: column;
-        border-bottom: none;
-        align-items: flex-start;
-        padding: 20px;
-    }
-    .collection-head {
-        display: none;
-    }
-    .collection-inputs-container {
-        flex-direction: column;
-        width: 100%;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-    .collection-inputs-container > div:first-child {
-        display: flex;
-        flex-direction: row;
-        gap: 10px;
-        width: 100%;
-        flex-wrap: nowrap;
-    }
-    .collection-search {
-        width: 100%;
-    }
-    .collection-selection {
-        width: 100%;
-    }
-    .collection-action-buttons {
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-        gap: 10px;
-        margin-top: 5px;
-    }
-    .add-collection {
-        width: 176px;
-        font-size: 14px;
-    }
-    .download-btn {
-        width: 122px;
-    }
-    .collection-desktop-only {
-        display: none;
-    }
-    .collection-pagination-container {
-        flex-direction: column;
-        height: 97.53px;
-        justify-content: center;
-        gap: 16px;
-        align-items: center;
-    }
-    .collection-list-pagination {
-        text-align: center;
-    }
-    .collection-pagination-buttons {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-        overflow-y: hidden;
-    }
-    .collection-dropdown-field {
-        background-color: #dedede;
-        border-radius: 100%;
-        width: 20px;
-        height: 20px;
-        margin-right: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background-color 0.3s ease;
-    }
-    .collection-dropdown-field.active {
-        background-color: #254396;
-    }
-    .collection-dropdown-img {
-        width: 11px;
-        transition: transform 0.3s ease;
-    }
-    .collection-dropdown-field.active .collection-dropdown-img {
-        transform: rotate(180deg);
-    }
-    .collection-table-row-head {
-        height: auto;
-        background-color: #f7f7f7;
-        border-bottom: none;
-    }
-    .collection-thead {
-        padding-right: 0px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-    }
-    .collection-id-column {
-        padding-right: 10px;
-        width: 28%; 
-    }
-    .collection-date-column {
-        width: 34%; 
-    }
-    .collection-tenancy-id-column {
-        width: 38%; 
-        padding-right: 0;
-    }
-    .collection-data.collection-id-column,
-    .collection-data.collection-date-column,
-    .collection-data.collection-tenancy-id-column {
-        white-space: nowrap;
-        padding-left: 10px;
-        padding-right: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .collection-dropdown-label {
-        font-family: "Inter Tight";
-        font-size: 12px;
-        font-style: normal;
-        font-weight: 500;
-        line-height: normal;
-        letter-spacing: 1px;
-        color: #818da0;
-        margin-bottom: 4px;
-        padding-left: 0;
-        text-align: left; 
-    }
-    .collection-dropdown-value {
-        font-family: "Inter Tight";
-        font-size: 13px;
-        font-style: normal;
-        font-weight: 400;
-        line-height: 22px;
-        color: #201D1E;
-        text-align: left; 
-    }
-    .collection-status {
-        padding: 0px 9px;
-        border-radius: 3px;
-        margin-top: 5px;
-        display: inline-block;
-        width: 65px;
-        height: 24px;
-        text-align: center;
-        line-height: 24px;
-    }
-    .collection-dropdown-content {
-        width: 100%;
-        padding: 15px 0;
-    }
-    .collection-dropdown-grid {
-        display: flex;
-        width: 100%;
-        flex-wrap: wrap;
-    }
-    .collection-dropdown-item {
-        width: 33.33%; 
-        padding-right: 10px;
-        box-sizing: border-box;
-        margin-bottom: 15px;
-    }
-    .collection-dropdown-item.collection-tenant-name-column,
-    .collection-dropdown-item.collection-amount-column,
-    .collection-dropdown-item.collection-description-column,
-    .collection-dropdown-item.collection-payment-column,
-    .collection-dropdown-item.collection-status-column,
-    .collection-dropdown-item.collection-action-column {
-        width: 33.33%; 
-        padding-right: 5px; 
-    }
-    .collection-dropdown-item.collection-status-column .collection-dropdown-value {
-        text-align: left; 
-    }
-    .collection-dropdown-item.collection-action-column .collection-dropdown-value {
-        justify-content: flex-center; 
-    }
-    .collection-mobile-no-border {
-        border-bottom: none !important;
-    }
-    .collection-mobile-with-border {
-        border-bottom: 1px solid #e9e9e9;
-    }
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .collection-dropdown-item {
+    padding-right: 10px;
+    box-sizing: border-box;
+  }
+  .collection-mobile-no-border {
+    border-bottom: none !important;
+  }
+  .collection-mobile-with-border {
+    border-bottom: 1px solid #e9e9e9;
+  }
 }
 
 @media (min-width: 481px) {
-    .collection-dropdown-field,
-    .collection-dropdown-content {
-        display: none;
-    }
+  .collection-dropdown-field,
+  .collection-dropdown-content {
+    display: none;
+  }
 }
 
 @media (max-width: 394px) {
-    .collection-thead {
-        font-size: 13px;
-    }
-    .collection-data {
-        font-size: 13px;
-    }
-}
-
-@media (max-width: 767px) {
-    .collection-action-buttons {
-        width: 100%;
-        justify-content: start;
-    }
-    .collection-action-buttons .add-collection,
-    .collection-action-buttons .download-btn {
-        min-width: auto;
-        max-width: none;
-    }
-    .collection-action-buttons .add-collection {
-        width: 176px;
-    }
-    .collection-action-buttons .download-btn {
-        width: 50%;
-    }
+  .collection-thead {
+    font-size: 13px;
+  }
+  .collection-data {
+    font-size: 13px;
+  }
 }

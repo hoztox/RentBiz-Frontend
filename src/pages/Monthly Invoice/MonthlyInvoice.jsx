@@ -116,7 +116,7 @@ const MonthlyInvoice = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 mi-search"
             />
-            <div className="relative w-full md:w-auto">
+            <div className="relative w-[40%] md:w-auto">
               <select
                 name="select"
                 id=""
@@ -128,7 +128,7 @@ const MonthlyInvoice = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                className={`absolute md:right-2 right-4 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
                   isSelectOpen ? "rotate-180" : "rotate-0"
                 }`}
               />
@@ -140,7 +140,7 @@ const MonthlyInvoice = () => {
               onClick={openAddModal}
             >
               Add New Invoice
-              <img src={plusicon} alt="plus icon" className="w-[15px] h-[15px]" />
+              <img src={plusicon} alt="plus icon" className="relative right-[5px] md:right-0 w-[15px] h-[15px]" />
             </button>
             <button className="flex items-center justify-center gap-2 h-[38px] rounded-md duration-200 mi-download-btn w-[122px]">
               Download
@@ -241,21 +241,21 @@ const MonthlyInvoice = () => {
                     <td colSpan={3} className="px-5">
                       <div className="mi-dropdown-content">
                         <div className="mi-dropdown-content-grid">
-                          <div className="mi-dropdown-content-item mi-tenancy-id-column">
+                          <div className="mi-dropdown-content-item w-[50%]">
                             <div className="mi-dropdown-label">TENANCY ID</div>
                             <div className="mi-dropdown-value">{invoice.tenancyId}</div>
                           </div>
-                          <div className="mi-dropdown-content-item mi-tenant-name-column">
+                          <div className="mi-dropdown-content-item w-[50%]">
                             <div className="mi-dropdown-label">TENANT NAME</div>
                             <div className="mi-dropdown-value">{invoice.tenantName}</div>
                           </div>
                         </div>
-                        <div className="mi-dropdown-content-grid mi-three-columns">
-                          <div className="mi-dropdown-content-item mi-amount-due-column">
+                        <div className="mi-dropdown-content-grid">
+                          <div className="mi-dropdown-content-item w-[50%]">
                             <div className="mi-dropdown-label">AMOUNT DUE</div>
                             <div className="mi-dropdown-value">{invoice.amountDue}</div>
                           </div>
-                          <div className="mi-dropdown-content-item mi-view-column pl-[50px]">
+                          <div className="mi-dropdown-content-item w-[25%]">
                             <div className="mi-dropdown-label">VIEW</div>
                             <div className="mi-dropdown-value">
                               <button onClick={openViewModal}>
@@ -267,7 +267,7 @@ const MonthlyInvoice = () => {
                               </button>
                             </div>
                           </div>
-                          <div className="mi-dropdown-content-item mi-action-column pl-[40px]">
+                          <div className="mi-dropdown-content-item w-[25%]">
                             <div className="mi-dropdown-label">ACTION</div>
                             <div className="mi-dropdown-value flex items-center gap-4">
                               <button>

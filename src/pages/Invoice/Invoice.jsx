@@ -116,7 +116,7 @@ const Invoice = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 inv-search"
             />
-            <div className="relative w-full md:w-auto">
+            <div className="relative w-[40%] md:w-auto">
               <select
                 name="select"
                 id=""
@@ -128,7 +128,7 @@ const Invoice = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                className={`absolute md:right-2 right-4 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
                   isSelectOpen ? "rotate-180" : "rotate-0"
                 }`}
               />
@@ -140,7 +140,7 @@ const Invoice = () => {
               onClick={openAddModal}
             >
               Add New Invoice
-              <img src={plusicon} alt="plus icon" className="w-[15px] h-[15px]" />
+              <img src={plusicon} alt="plus icon" className="relative right-[5px] md:right-0 w-[15px] h-[15px]" />
             </button>
             <button className="flex items-center justify-center gap-2 h-[38px] rounded-md duration-200 inv-download-btn w-[122px]">
               Download
@@ -241,21 +241,21 @@ const Invoice = () => {
                     <td colSpan={3} className="px-5">
                       <div className="inv-dropdown-content">
                         <div className="inv-dropdown-content-grid">
-                        <div className="inv-dropdown-content-item inv-tenancy-id-column">
+                        <div className="inv-dropdown-content-item w-[50%]">
                             <div className="inv-dropdown-label">TENANCY ID</div>
                             <div className="inv-dropdown-value">{invoice.tenancyId}</div>
                           </div>
-                          <div className="inv-dropdown-content-item inv-tenant-name-column">
+                          <div className="inv-dropdown-content-item w-[50%]">
                             <div className="inv-dropdown-label">TENANT NAME</div>
                             <div className="inv-dropdown-value">{invoice.tenantName}</div>
                           </div>
                         </div>
-                        <div className="inv-dropdown-content-grid inv-three-columns">
-                          <div className="inv-dropdown-content-item inv-amount-due-column">
+                        <div className="inv-dropdown-content-grid">
+                          <div className="inv-dropdown-content-item w-[50%]">
                             <div className="inv-dropdown-label">AMOUNT DUE</div>
                             <div className="inv-dropdown-value">{invoice.amountDue}</div>
                           </div>
-                          <div className="inv-dropdown-content-item inv-view-column pl-[50px]">
+                          <div className="inv-dropdown-content-item w-[25%]">
                             <div className="inv-dropdown-label">VIEW</div>
                             <div className="inv-dropdown-value">
                               <button onClick={openViewModal}>
@@ -267,7 +267,7 @@ const Invoice = () => {
                               </button>
                             </div>
                           </div>
-                          <div className="inv-dropdown-content-item inv-action-column pl-[40px]">
+                          <div className="inv-dropdown-content-item w-[25%]">
                             <div className="inv-dropdown-label">ACTION</div>
                             <div className="inv-dropdown-value flex items-center gap-4">
                               <button>

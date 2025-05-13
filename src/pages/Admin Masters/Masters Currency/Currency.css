@@ -50,7 +50,7 @@
     background-color: #076094;
 }
 
-.download-btn {
+.currency-download-btn {
     background-color: #F0F0F0;
     font-family: 'Inter Tight';
     font-size: 15px;
@@ -62,12 +62,12 @@
     box-sizing: border-box;
 }
 
-.download-btn:hover {
+.currency-download-btn:hover {
     background-color: #201D1E;
     color: white;
 }
 
-.download-btn:hover .download-img {
+.currency-download-btn:hover .download-img {
     filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%) hue-rotate(47deg) brightness(118%) contrast(100%);
 }
 
@@ -128,13 +128,13 @@
         margin-bottom: 50px;
     }
     .currency-search {
-        width: 150s
+        width: 60%
     }
     .currency-selection {
-        width: 120px;
+        width: 100%;
     }
-    .download-btn {
-        width: 120px;
+    .currency-download-btn {
+        width: 40%;
     }
     .currency-thead.country-column {
         padding-left: 14px;
@@ -180,8 +180,8 @@
     .currency-selection {
         width: 120px;
     }
-    .download-btn {
-        width: 120px;
+    .currency-download-btn {
+        width: 40%;
     }
 }
 
@@ -200,14 +200,14 @@
     .currency-selection {
         width: 120px;
     }
-    .download-btn {
-        width: 120px;
+    .currency-download-btn {
+        width: 40%;
     }
 }
 
 @media (max-width: 428px) {
     .currency-thead.country-column {
-        padding-left: 45px;
+        padding-left: 14px;
         padding-right: 0;
     }
     .currency-data.country-column {
@@ -243,7 +243,7 @@
         flex-wrap: nowrap;
     }
     .currency-search {
-        width: 100%;
+        width: 60%;
     }
     .currency-selection {
         width: 100%;
@@ -257,11 +257,11 @@
         margin-top: 5px;
     }
     .add-new-currency {
-        width: 169px;
+        width: 60%;
         font-size: 14px;
     }
-    .download-btn {
-        width: 122px;
+    .currency-download-btn {
+        width: 40%;
     }
     .desktop-only {
         display: none;
@@ -318,7 +318,7 @@
     }
     .currency-data.country-column {
         white-space: nowrap;
-        padding-left: 45px;
+        padding-left: 14px;
         padding-right: 0;
     }
     .dropdown-label {
@@ -343,9 +343,10 @@
     .currency-dropdown-content {
         width: 100%;
     }
-    .currency-grid-cols-2 {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
+    .currency-grid {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 24px;
     }
     .dropdown-value {
         word-break: break-word;

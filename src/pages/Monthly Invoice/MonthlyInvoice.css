@@ -138,16 +138,10 @@
       padding: 16px;
     }
     .mi-search {
-      width: 150px;
+      width: 60%;
     }
     .mi-selection {
-      width: 120px;
-    }
-    .mi-action-buttons-container .mi-add-btn {
-      width: calc(58% - 5px);
-    }
-    .mi-action-buttons-container .mi-download-btn {
-      width: calc(42% - 5px);
+      width: 100%;
     }
     .mi-thead.mi-date-column {
       padding-left: 14px;
@@ -191,10 +185,10 @@
       padding-right: 0;
     }
     .mi-selection {
-      width: 120px;
+      width: 100%;
     }
     .mi-download-btn {
-      width: 120px;
+      width: 40%;
     }
   }
   
@@ -214,7 +208,7 @@
       width: 120px;
     }
     .mi-download-btn {
-      width: 120px;
+      width: 40%;
     }
   }
   
@@ -257,7 +251,7 @@
       flex-wrap: nowrap;
     }
     .mi-search {
-      width: 100%;
+      width: 60%;
     }
     .mi-selection {
       width: 100%;
@@ -270,11 +264,11 @@
       margin-top: 5px;
     }
     .mi-add-btn {
-      width: 176px;
-      font-size: 14px;
+      width: 60%;
+      font-size: 15px;
     }
     .mi-download-btn {
-      width: 122px;
+      width: 40%;
     }
     .mi-desktop-only {
       display: none;
@@ -364,29 +358,12 @@
     }
     .mi-dropdown-content-grid {
       display: flex;
-      width: 100%;
-      flex-wrap: wrap;
-    }
-    .mi-dropdown-content-grid.mi-three-columns {
-      display: flex;
-      width: 100%;
-      flex-wrap: wrap;
+      justify-content: space-between;
+      margin-bottom: 24px;
     }
     .mi-dropdown-content-item {
-      width: 50%;
       padding-right: 10px;
       box-sizing: border-box;
-      margin-bottom: 15px;
-    }
-    .mi-dropdown-content-item.mi-tenant-name-column,
-    .mi-dropdown-content-item.mi-tenancy-id-column {
-      width: 50%;
-    }
-    .mi-dropdown-content-item.mi-amount-due-column,
-    .mi-dropdown-content-item.mi-view-column,
-    .mi-dropdown-content-item.mi-action-column {
-      width: 33.33%;
-      padding-right: 0;
     }
     .mi-mobile-no-border {
       border-bottom: none !important;
@@ -409,23 +386,5 @@
     }
     .mi-data {
       font-size: 13px;
-    }
-  }
-  
-  @media (max-width: 767px) {
-    .mi-action-buttons-container {
-      width: 100%;
-      justify-content: start;
-    }
-    .mi-action-buttons-container .mi-add-btn,
-    .mi-action-buttons-container .mi-download-btn {
-      min-width: auto;
-      max-width: none;
-    }
-    .mi-action-buttons-container .mi-add-btn {
-      width: 176px;
-    }
-    .mi-action-buttons-container .mi-download-btn {
-      width: 50%;
     }
   }

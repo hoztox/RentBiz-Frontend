@@ -297,12 +297,16 @@
   .financial-collection-modal-overflow-x-auto {
     width: 100%;
     overflow-x: hidden;
+
   }
 
   .financial-collection-modal-mobile-section {
     width: 100%;
     border-radius: 6px;
     overflow: hidden;
+    border: 1px solid #E9E9E9; 
+    overflow: hidden;
+    margin-bottom: 10px;
   }
 
   .financial-collection-modal-mobile-header {
@@ -321,11 +325,12 @@
 
   /* Adjusted grid columns for better input spacing */
   .financial-collection-modal-mobile-section > .grid-cols-2 {
-    grid-template-columns: 1fr 1.5fr;
+    display: flex;
+    justify-content: space-between;
   }
 
   .financial-collection-modal-mobile-section > .grid-cols-3 {
-    grid-template-columns: 2fr 1.7fr 0.8fr;;
+    grid-template-columns: 2fr 1.7fr 0.8fr;
   }
 
   .financial-collection-modal-mobile-section > .grid-cols-4 {
