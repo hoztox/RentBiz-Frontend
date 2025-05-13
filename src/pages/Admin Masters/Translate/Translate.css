@@ -130,7 +130,7 @@
     width: 100%;
   }
   .update-btn {
-    width: 60%;
+    width: 55%;
   }
   .pagination-btn {
     font-size: 13px;
@@ -149,7 +149,7 @@
     width: 100%;
   }
   .update-btn {
-    width: 60%;
+    width: 55%;
   }
 }
 
@@ -192,7 +192,7 @@
     margin-left: 0px;
   }
   .update-btn {
-    width: 60%;
+    width: 55%;
   }
   .desktop-only {
     display: none;

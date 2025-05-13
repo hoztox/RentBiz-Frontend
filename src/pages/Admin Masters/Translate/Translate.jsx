@@ -89,7 +89,7 @@ const Translate = () => {
             className="px-[14px] py-[7px] h-[38px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 translate-search"
           />
           <div className="flex flex-row gap-[10px] w-full md:w-auto second-row-container">
-            <div className="relative flex-1 md:flex-none w-[40%] md:w-auto">
+            <div className="relative flex-1 md:flex-none w-[45%] md:w-auto">
               <select
                 name="select"
                 id=""
