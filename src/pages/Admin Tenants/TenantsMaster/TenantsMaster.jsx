@@ -6,22 +6,23 @@ import downloadicon from "../../../assets/Images/Admin Tenants/download-icon.svg
 import editicon from "../../../assets/Images/Admin Tenants/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Tenants/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenants/downarrow.svg";
+import CreateTenantModal from "../CreateTenantModal/CreateTenantModal";
 
 const TenantsMaster = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  // const [addtenantModalOpen, setAddTenantModalOpen] = useState(false);
+  const [createTenantModalOpen, setCreateTenantModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
   const itemsPerPage = 10;
 
-  // const openAddTenantModal = () => {
-  //   setAddTenantModalOpen(true);
-  // };
+  const openCreateTenantModal = () => {
+    setCreateTenantModalOpen(true);
+  };
 
-  // const closeAddTenantModal = () => {
-  //   setAddTenantModalOpen(false);
-  // };
+  const closeCreateTenantModal = () => {
+    setCreateTenantModalOpen(false);
+  };
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -118,7 +119,7 @@ const TenantsMaster = () => {
           <div className="flex gap-[10px] action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md add-new-tenant duration-200"
-              // onClick={openTenantModal}
+              onClick={openCreateTenantModal}
             >
               Add New Tenant
               <img
@@ -363,7 +364,8 @@ const TenantsMaster = () => {
           </button>
         </div>
       </div>
-      {/* Add Tenant Modal /> */}
+      {/* Create Tenant Modal /> */}
+      <CreateTenantModal open={createTenantModalOpen} onClose={closeCreateTenantModal} />
     </div>
   );
 };

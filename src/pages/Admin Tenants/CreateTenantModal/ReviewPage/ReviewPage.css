@@ -1,0 +1,21 @@
+.review-page-head {
+    font-family: "Inter Tight";
+    font-weight: 400;
+    font-size: 18px;
+    padding-bottom: 20px;
+}
+
+.review-page-label {
+    font-family: "Inter Tight";
+    font-weight: 400;
+    font-size: 13px;
+    color: #4B465C60;
+    padding-bottom: 6px;
+}
+
+.review-page-data {
+    font-family: "Inter Tight";
+    font-weight: 400;
+    font-size: 15px; 
+    color: #4B465C;
+}

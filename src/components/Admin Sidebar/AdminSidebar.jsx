@@ -22,6 +22,7 @@ import reportCollection from "../../assets/Images/Admin Sidebar/report collectio
 import incomeExpense from "../../assets/Images/Admin Sidebar/income-expense.svg";
 import AdminCreateUserModal from "../AdminCreateUserModal/AdminCreateUserModal";
 import CreateTenancyModal from "../../pages/Admin Tenancy/CreateTenancy/CreateTenancyModal";
+import CreateTenantModal from "../../pages/Admin Tenants/CreateTenantModal/CreateTenantModal";
 
 const AdminSidebar = () => {
   const [activeItem, setActiveItem] = useState("Dashboard");
@@ -85,6 +86,19 @@ const AdminSidebar = () => {
     navigate("/admin/users-manage");
   };
 
+  // Create Tenant Modal
+  const [isCreateTenantModalOpen, setIsCreateTenantModalOpen] = useState(false);
+
+  const openCreateTenantModal = () => {
+    setIsCreateTenantModalOpen(true)
+    setActiveItem("Tenants Master")
+  }
+
+  const closeCreateTenantModal = () => {
+    setIsCreateTenantModalOpen(false)
+    setActiveItem("Tenants Master");
+  }
+
   // Create Tenancy Modal
   const [isTenancyModalOpen, setIsTenancyModalOpen] = useState(false);
 
@@ -97,7 +111,7 @@ const AdminSidebar = () => {
     setIsTenancyModalOpen(false);
     setActiveItem("Tenancy Master");
   };
-
+  
   return (
     <div className="flex flex-col admin-sidebar">
       {/* Logo */}
@@ -291,6 +305,7 @@ const AdminSidebar = () => {
                     }`}
                   onClick={() => {
                     setActiveItem("Create Tenant");
+                    openCreateTenantModal();
                     navigate("/admin/tenants");
                   }}
                 >
@@ -662,6 +677,9 @@ const AdminSidebar = () => {
 
       {/* Create User Modal */}
       <AdminCreateUserModal isOpen={isModalOpen} onClose={closeModal} />
+
+      {/* Create Tenant Modal */}
+      <CreateTenantModal open={isCreateTenantModalOpen} onClose={closeCreateTenantModal} />
 
       {/* Create Tenancy Modal */}
       <CreateTenancyModal

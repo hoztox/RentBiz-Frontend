@@ -8,12 +8,14 @@ import "./adminnavbar.css";
 import MobileSlideMenu from "../MobileSlideMenu/MobileSlideMenu";
 import AdminCreateUserModal from "../AdminCreateUserModal/AdminCreateUserModal";
 import CreateTenancyModal from "../../pages/Admin Tenancy/CreateTenancy/CreateTenancyModal";
+import CreateTenantModal from "../../pages/Admin Tenants/CreateTenantModal/CreateTenantModal";
 
 const AdminNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("English");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [isCreateTenantModalOpen, setIsCreateTenantModalOpen] = useState(false)
   const [isTenancyModalOpen, setIsTenancyModalOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
@@ -38,6 +40,14 @@ const AdminNavbar = () => {
   const closeUserModal = () => {
     setIsUserModalOpen(false);
   };
+
+  const openCreateTenantModal = () => {
+    setIsCreateTenantModalOpen(true)
+  }
+
+  const closeCreateTenentModal = () => {
+    setIsCreateTenantModalOpen(false)
+  }
 
   const openTenancyModal = () => {
     setIsTenancyModalOpen(true)
@@ -141,10 +151,12 @@ const AdminNavbar = () => {
         toggleMobileMenu={toggleMobileMenu}
         openModal={openUserModal}
         openTenancyModal={openTenancyModal}
+        openCreateTenantModal={openCreateTenantModal}
       />
 
       {/* Modals */}
       <AdminCreateUserModal isOpen={isUserModalOpen} onClose={closeUserModal} />
+      <CreateTenantModal open={isCreateTenantModalOpen} onClose={closeCreateTenentModal} />
       <CreateTenancyModal isOpen={isTenancyModalOpen} onClose={closeTenancyModal} />
     </>
   );

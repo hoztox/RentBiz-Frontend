@@ -28,6 +28,7 @@ const MobileSlideMenu = ({
   toggleMobileMenu,
   openModal,
   openTenancyModal,
+  openCreateTenantModal,
 }) => {
   const [activeItem, setActiveItem] = useState("Dashboard");
   const navigate = useNavigate();
@@ -297,7 +298,7 @@ const MobileSlideMenu = ({
                   }`}
                   onClick={() => {
                     setActiveItem("Create Tenant");
-                    navigate("/admin/tenants");
+                    openCreateTenantModal();
                     toggleMobileMenu();
                   }}
                 >

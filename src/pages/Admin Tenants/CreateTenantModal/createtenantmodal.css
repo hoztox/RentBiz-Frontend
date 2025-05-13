@@ -1,0 +1,22 @@
+.tenant-modal-styles {
+    width: 1360px;
+    border-radius: 6px;
+    background-color: white;
+}
+
+.tenant-modal-header {
+    background-color: white;
+    border-radius: 12px;
+    display:flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tenant-modal-title {
+    font-family: 'Inter Tight';
+    font-size: 21px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    color: #201D1E;
+}

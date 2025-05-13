@@ -129,7 +129,7 @@ const TenancyReport = () => {
             className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-[302px] focus:border-gray-300 duration-200 tenancy-report-search"
           />
           <div className="flex gap-[10px] tenancy-report-secondary-inputs">
-            <div className="relative">
+            <div className="relative w-[60%] md:w-auto">
               <select
                 name="select"
                 id=""
@@ -146,7 +146,7 @@ const TenancyReport = () => {
                 }`}
               />
             </div>
-            <button className="flex items-center justify-center gap-2 w-[132px] h-[38px] rounded-md duration-200 export-btn">
+            <button className="flex items-center justify-center gap-2 w-[132px] h-[38px] rounded-md duration-200 report-export-btn">
               Export To Excel
             </button>
           </div>

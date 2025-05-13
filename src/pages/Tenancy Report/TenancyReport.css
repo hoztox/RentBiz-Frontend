@@ -37,7 +37,7 @@
     height: 38px;
   }
   
-  .export-btn {
+  .report-export-btn {
     background-color: #f0f0f0;
     font-family: "Inter Tight";
     font-size: 15px;
@@ -49,7 +49,7 @@
     box-sizing: border-box;
   }
   
-  .export-btn:hover {
+  .report-export-btn:hover {
     background-color: #201d1e;
     color: white;
   }
@@ -112,8 +112,8 @@
     .tenancy-report-selection {
       width: 100%;
     }
-    .export-btn {
-      width: 100%;
+    .report-export-btn {
+      width: 40%;
     }
     .tenancy-report-thead.tenancy-report-name-column {
       padding-left: 18px;
@@ -159,8 +159,8 @@
     .tenancy-report-selection {
       width: 100%;
     }
-    .export-btn {
-      width: 100%;
+    .report-export-btn {
+      width: 40%;
     }
   }
   
@@ -179,8 +179,8 @@
     .tenancy-report-selection {
       width: 100%;
     }
-    .export-btn {
-      width: 100%;
+    .report-export-btn {
+      width: 40%;
     }
   }
   
@@ -227,9 +227,9 @@
       width: 100%;
       margin-left: 0px;
     }
-    .export-btn {
-      width: 100%;
-      font-size: 14px;
+    .report-export-btn {
+      width: 40%;
+      font-size: 15px;
     }
     .tenancy-report-secondary-inputs > div,
     .tenancy-report-secondary-inputs > button {
