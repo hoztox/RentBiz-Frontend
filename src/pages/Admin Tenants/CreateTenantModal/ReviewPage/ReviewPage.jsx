@@ -1,47 +1,77 @@
-import { useState } from 'react'
-import "./ReviewPage.css"
-import DocumentView from './DocumentView'
+import { useState } from "react";
+import "./ReviewPage.css";
+import DocumentView from "./DocumentView";
 
-const ReviewPage = ({onNext, onBack}) => {
-    const [buildingData] = useState({
-      buildingNo: 'B24090001',
-      buildingName: 'Emaar Square Area',
-      description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi orci ante, scelerisque faucibus condimentum',
-      latitude: '1.1',
-      status: 'Active',
-      plotNo: 'B24090001',
-      address: 'Boulevard Downtown Dubai, PO Box 111969 Dubai, UAE',
-      remarks: 'Lorem ipsum dolor consectetur adipiscing elit. Morbi orci',
-      longitude: '2.2',
-      nearByLandmark: 'Lorem ipsum dolor'
-    });
-  
+const ReviewPage = ({ onNext, onBack }) => {
+  const [buildingData] = useState({
+    tenant_name: "B24090001",
+    mob_no: "9988776655",
+    email: "test@gmail.com",
+    address: "Lorem ipsum dolor consectetur adipiscing elit. Morbi orci",
+    trade_license_no: "TD1232",
+    id_no: "ID12",
+    sponsor_name: "Test",
+    sponsor_id_no: "SPID12",
+    status: "Active",
+    nationality: "Indian",
+    alternative_mob_no: "9988776655",
+    description: "Lorem ipsum dolor consectetur adipiscing elit. Morbi orci",
+    tenant_type: "Type1",
+    id_type: "ID1",
+    id_validity: "20-02-2025",
+    sponsor_id_type: "SPID1",
+    sponsor_id_validity: "25-02-2025",
+    remarks: "Lorem ipsum dolor consectetur adipiscing elit. Morbi orci",
+  });
+
   return (
     <div>
       <div className="border rounded-md border-[#E9E9E9] p-5">
-        <h2 className="review-page-head">Building</h2>
+        <h2 className="review-page-head">Tenant</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2">
           {/* Left Column */}
           <div className="space-y-8 border-r border-[#E9E9E9]">
             <div>
-              <p className="review-page-label">Building No*</p>
-              <p className="review-page-data">{buildingData.buildingNo}</p>
+              <p className="review-page-label">Tenant Name*</p>
+              <p className="review-page-data">{buildingData.tenant_name}</p>
             </div>
 
             <div>
-              <p className="review-page-label">Building Name*</p>
-              <p className="review-page-data">{buildingData.buildingName}</p>
+              <p className="review-page-label">Mobile Number*</p>
+              <p className="review-page-data">{buildingData.mob_no}</p>
             </div>
 
             <div>
-              <p className="review-page-label">Description</p>
-              <p className="review-page-data">{buildingData.description}</p>
+              <p className="review-page-label">Email*</p>
+              <p className="review-page-data">{buildingData.email}</p>
             </div>
 
             <div>
-              <p className="review-page-label">Latitude</p>
-              <p className="review-page-data">{buildingData.latitude}</p>
+              <p className="review-page-label">Address*</p>
+              <p className="review-page-data">{buildingData.address}</p>
+            </div>
+
+            <div>
+              <p className="review-page-label">Trade License Number*</p>
+              <p className="review-page-data">
+                {buildingData.trade_license_no}
+              </p>
+            </div>
+
+            <div>
+              <p className="review-page-label">ID Number*</p>
+              <p className="review-page-data">{buildingData.id_no}</p>
+            </div>
+
+            <div>
+              <p className="review-page-label">Sponsor Name*</p>
+              <p className="review-page-data">{buildingData.sponsor_name}</p>
+            </div>
+
+            <div>
+              <p className="review-page-label">Sponsor ID Number*</p>
+              <p className="review-page-data">{buildingData.sponsor_id_no}</p>
             </div>
 
             <div>
@@ -53,28 +83,52 @@ const ReviewPage = ({onNext, onBack}) => {
           {/* Right Column */}
           <div className="space-y-8 ml-5">
             <div>
-              <p className="review-page-label">Plot No*</p>
-              <p className="review-page-data">{buildingData.plotNo}</p>
+              <p className="review-page-label">Nationality*</p>
+              <p className="review-page-data">{buildingData.nationality}</p>
             </div>
 
             <div>
-              <p className="review-page-label">Address*</p>
-              <p className="review-page-data">{buildingData.address}</p>
+              <p className="review-page-label">Alternative Mobile Number*</p>
+              <p className="review-page-data">
+                {buildingData.alternative_mob_no}
+              </p>
+            </div>
+
+            <div>
+              <p className="review-page-label">Description</p>
+              <p className="review-page-data">{buildingData.description}</p>
+            </div>
+
+            <div>
+              <p className="review-page-label">Tenant Type</p>
+              <p className="review-page-data">{buildingData.tenant_type}</p>
+            </div>
+
+            <div>
+              <p className="review-page-label">ID Type</p>
+              <p className="review-page-data">{buildingData.id_type}</p>
+            </div>
+
+            <div>
+              <p className="review-page-label">ID Validity</p>
+              <p className="review-page-data">{buildingData.id_validity}</p>
+            </div>
+
+            <div>
+              <p className="review-page-label">Sponsor ID Type*</p>
+              <p className="review-page-data">{buildingData.sponsor_id_type}</p>
+            </div>
+
+            <div>
+              <p className="review-page-label">Sponsor ID Validity*</p>
+              <p className="review-page-data">
+                {buildingData.sponsor_id_validity}
+              </p>
             </div>
 
             <div>
               <p className="review-page-label">Remarks</p>
               <p className="review-page-data">{buildingData.remarks}</p>
-            </div>
-
-            <div>
-              <p className="review-page-label">Longitude</p>
-              <p className="review-page-data">{buildingData.longitude}</p>
-            </div>
-
-            <div>
-              <p className="review-page-label">Near By Landmark</p>
-              <p className="review-page-data">{buildingData.nearByLandmark}</p>
             </div>
           </div>
         </div>
@@ -99,7 +153,7 @@ const ReviewPage = ({onNext, onBack}) => {
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ReviewPage
+export default ReviewPage;

@@ -1,48 +1,60 @@
 .tenant-info-form-label {
-    margin-bottom: 10px;
-    font-family: 'Inter Tight';
-    font-size: 13px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    color: #201D1E;
+  margin-bottom: 10px;
+  font-family: "Inter Tight";
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  color: #201d1e;
 }
 
 .tenant-info-form-inputs::placeholder {
-    font-family: 'Inter Tight';
-    font-size: 15px;
+  font-family: "Inter Tight";
+  font-size: 15px;
+}
+
+.tenant-info-form-inputs-mob {
+  background-color: white;
+  border-radius: 6px;
+  padding: px 14px;
+  outline: none;
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  color: #8a898b;
 }
 
 .tenant-info-form-inputs {
-    border: 1px solid #E9E9E9;
-    background-color: white;
-    border-radius: 6px;
-    padding: 7px 14px;
-    outline: none;
-    font-family: 'Inter Tight';
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 24px;
-    color: #8a898b;
+  border: 1px solid #e9e9e9;
+  background-color: white;
+  border-radius: 6px;
+  padding: 7px 14px;
+  outline: none;
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  color: #8a898b;
 }
 
 .next-btn {
-    background-color: #2892CE;
-    border-radius: 6px;
-    color: white;
-    font-family: 'Inter Tight';
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 18px;
-    letter-spacing: 0.43px;
+  background-color: #2892ce;
+  border-radius: 6px;
+  color: white;
+  font-family: "Inter Tight";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.43px;
 }
 
 .next-btn:hover {
-    background-color: #0d74af;
+  background-color: #0d74af;
 }
-
 
 /* Hide number input spinners */
 input[type="number"]::-webkit-outer-spin-button,
@@ -53,4 +65,73 @@ input[type="number"]::-webkit-inner-spin-button {
 
 input[type="number"] {
   -moz-appearance: textfield; /* Firefox */
+}
+
+/* Phone Input Styles */
+.phone-input-container {
+  width: 100%;
+}
+
+.phone-input {
+  width: 100% !important;
+  height: 38px !important;
+  padding-left: 70px !important;
+  font-family: "Inter Tight" !important;
+  font-size: 15px !important;
+  color: #8a898b !important;
+  border: 1px solid #e9e9e9 !important;
+  border-radius: 6px !important;
+  background-color: white !important;
+}
+
+.phone-input:focus {
+  border-color: #e9e9e9 !important;
+}
+
+.phone-input-button {
+  background: white !important;
+  border-color: #e9e9e9 !important;
+  border-right: 1px solid #e9e9e9 !important;
+  border-radius: 6px 0 0 6px !important;
+  padding: 0 12px 0 12px !important;
+}
+
+.phone-input-dropdown {
+  border: 1px solid #e9e9e9 !important;
+  border-radius: 6px !important;
+  margin-top: 4px !important;
+  box-shadow: none !important;
+  font-family: "Inter Tight" !important;
+}
+
+.phone-input-dropdown input {
+  font-family: "Inter Tight" !important;
+  font-size: 15px !important;
+}
+
+.react-tel-input .flag-dropdown.open .selected-flag {
+  background: white !important;
+  border-radius: 6px 0 0 0 !important;
+}
+
+.react-tel-input .selected-flag {
+  padding: 0 0 0 12px !important;
+  border-radius: 6px 0 0 6px !important;
+}
+
+.react-tel-input .selected-flag .arrow {
+  left: 28px !important;
+}
+
+.react-tel-input .country-list .country {
+  padding: 7px 10px !important;
+  font-size: 14px !important;
+}
+
+.react-tel-input .country-list .country:hover {
+  background-color: #f5f5f5 !important;
+}
+
+.react-tel-input .country-list .country.highlight {
+  background-color: #f5f5f5 !important;
 }
