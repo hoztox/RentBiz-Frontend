@@ -1,5 +1,4 @@
-import React from "react";
-import "./documentview.css";
+import "./DocumentView.css";
 import { File, FileText, Image } from "lucide-react";
 import img1 from "../../../../assets/Images/Admin Tenants/img1.jpg";
 import img2 from "../../../../assets/Images/Admin Tenants/img2.jpg";

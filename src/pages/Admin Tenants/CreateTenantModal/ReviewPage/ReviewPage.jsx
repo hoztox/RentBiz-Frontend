@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./ReviewPage.css";
+import "./ReviewPage.css"
 import DocumentView from "./DocumentView";
 
 const ReviewPage = ({ onNext, onBack }) => {
