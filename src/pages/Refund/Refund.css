@@ -1,458 +1,448 @@
 /* Existing Desktop Styles */
 .refund-head {
-    font-family: "Inter Tight";
-    font-size: 21px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 24px;
-    color: #201d1e;
+  font-family: "Inter Tight";
+  font-size: 21px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 24px;
+  color: #201d1e;
 }
 
 .refund-search {
-    font-family: "Inter Tight";
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 24px;
-    box-sizing: border-box;
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  box-sizing: border-box;
 }
 
 .refund-search::placeholder {
-    font-family: "Inter Tight";
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 24px;
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
 }
 
 .refund-selection {
-    font-family: "Public Sans", sans-serif;
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 24px;
-    color: #201d1e;
-    box-sizing: border-box;
+  font-family: "Public Sans", sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  color: #201d1e;
+  box-sizing: border-box;
 }
 
 .add-refund {
-    background-color: #2892ce;
-    color: white;
-    font-family: "Inter Tight";
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 18px;
-    letter-spacing: 0.43px;
-    box-sizing: border-box;
+  background-color: #2892ce;
+  color: white;
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+  box-sizing: border-box;
 }
 
 .add-refund:hover {
-    background-color: #076094;
+  background-color: #076094;
 }
 
 .download-btn {
-    background-color: #f0f0f0;
-    font-family: "Inter Tight";
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 18px;
-    letter-spacing: 0.43px;
-    color: #4d4e4d;
-    box-sizing: border-box;
+  background-color: #f0f0f0;
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+  color: #4d4e4d;
+  box-sizing: border-box;
 }
 
 .download-btn:hover {
-    background-color: #201d1e;
-    color: white;
+  background-color: #201d1e;
+  color: white;
 }
 
 .download-btn:hover .download-img {
-    filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%)
-        hue-rotate(47deg) brightness(118%) contrast(100%);
+  filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%)
+    hue-rotate(47deg) brightness(118%) contrast(100%);
 }
 
 .refund-thead {
-    font-family: "Inter Tight";
+  font-family: "Inter Tight";
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 1px;
+  color: #818da0;
+}
+
+.refund-data {
+  font-family: "Inter Tight";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 22px;
+  color: #201d1e;
+}
+
+.action-btn:hover {
+  filter: brightness(0) saturate(100%) invert(8%) sepia(7%) saturate(582%)
+    hue-rotate(289deg) brightness(100%) contrast(91%);
+}
+
+.collection-list-pagination {
+  font-family: "Inter Tight";
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  color: #4b465c80;
+}
+
+.pagination-btn {
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+  color: #8a94a3;
+}
+
+.page-no-btns {
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+}
+
+/* Mobile Responsive Styles */
+.refund-action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* Responsive Styles (ordered from smallest to largest max-width) */
+@media (max-width: 360px) {
+  .refund-table {
+    margin-bottom: 50px;
+  }
+  .refund-table-header {
+    padding: 16px;
+  }
+  .refund-search {
+    width: 60%;
+  }
+  .refund-selection {
+    width: 100%;
+  }
+  .refund-thead.refund-date-column,
+  .refund-thead.refund-tenancy-id-column {
+    padding-left: 14px;
+    padding-right: 0;
+    font-size: 11px;
+  }
+  .refund-data.refund-date-column,
+  .refund-data.refund-tenancy-id-column {
+    padding-left: 14px;
+    padding-right: 0;
+    white-space: nowrap;
+  }
+  .refund-dropdown-label {
+    font-size: 11px !important;
+  }
+  .pagination-btn {
     font-size: 13px;
+    padding: 0px 10px;
+    height: 28px;
+  }
+  .page-no-btns {
+    font-size: 13px;
+    padding: 0px 10px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 375px) {
+  .refund-thead.refund-date-column,
+  .refund-thead.refund-tenancy-id-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+  .refund-data.refund-date-column,
+  .refund-data.refund-tenancy-id-column {
+    padding-left: 14px;
+    padding-right: 0;
+  } 
+  .refund-thead{
+    font-size: 12px !important;
+  }
+  .refund-dropdown-label{
+    font-size: 11px !important;
+  }
+}
+
+@media (max-width: 390px) {
+  .refund-thead.refund-date-column,
+  .refund-thead.refund-tenancy-id-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+  .refund-data.refund-date-column,
+  .refund-data.refund-tenancy-id-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+  .refund-selection {
+    width: 120px;
+  }
+  .download-btn {
+    width: 120px;
+  }
+}
+
+@media (max-width: 414px) {
+  .refund-thead {
+    font-size: 11px;
+  }
+  .refund-thead.refund-date-column,
+  .refund-thead.refund-tenancy-id-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+  .refund-data.refund-date-column,
+  .refund-data.refund-tenancy-id-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+  .refund-selection {
+    width: 120px;
+  }
+  .download-btn {
+    width: 120px;
+  }
+}
+
+@media (max-width: 428px) {
+  .refund-thead.refund-date-column,
+  .refund-thead.refund-tenancy-id-column {
+    padding-left: 18px;
+    padding-right: 0;
+  }
+  .refund-data.refund-date-column,
+  .refund-data.refund-tenancy-id-column {
+    padding-left: 14px;
+    padding-right: 0;
+  }
+  .refund-dropdown-item.refund-tenant-name-column{
+    width: 31% !important;
+  }
+  .refund-dropdown-item.refund-amount-column{
+    width: 24% !important;
+  }
+  .refund-dropdown-item.refund-payment-method-column{
+    width: 41% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .refund-table {
+    max-width: calc(100vw - 40px);
+    margin-bottom: 50px;
+  }
+  .refund-table-header {
+    flex-direction: column;
+    border-bottom: none;
+    align-items: flex-start;
+    padding: 20px;
+  }
+  .refund-head {
+    display: none;
+  }
+  .refund-inputs-container {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .refund-inputs-container > div:first-child {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+    flex-wrap: nowrap;
+  }
+  .refund-search {
+    width: 60%;
+  }
+  .refund-selection {
+    width: 100%;
+  }
+  .refund-action-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 10px;
+    margin-top: 5px;
+  }
+  .add-refund {
+    width: 60%;
+    font-size: 15px;
+  }
+  .download-btn {
+    width: 40%;
+  }
+  .refund-pagination-container {
+    flex-direction: column;
+    height: 97.53px;
+    justify-content: center;
+    gap: 16px;
+    align-items: center;
+  }
+  .refund-pagination {
+    text-align: center;
+  }
+  .refund-pagination-buttons {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    overflow-y: hidden;
+  }
+  .refund-dropdown-field {
+    background-color: #dedede;
+    border-radius: 100%;
+    width: 20px;
+    height: 20px;
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+  }
+  .refund-dropdown-field.active {
+    background-color: #254396;
+  }
+  .refund-dropdown-img {
+    width: 10px;
+    transition: transform 0.3s ease;
+  }
+  .refund-dropdown-field.active .refund-dropdown-img {
+    transform: rotate(180deg);
+  }
+  .refund-table-row-head {
+    height: auto;
+    background-color: #f7f7f7;
+    border-bottom: none;
+  }
+  .refund-thead {
+    padding-right: 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+  .refund-id-column {
+    padding-right: 10px;
+    width: 30%;
+  }
+  .refund-date-column {
+    width: 25%;
+  }
+  .refund-tenancy-id-column {
+    width: 30%;
+    padding-right: 0;
+  }
+  .refund-data.refund-date-column,
+  .refund-data.refund-tenancy-id-column {
+    white-space: nowrap;
+    padding-left: 18px;
+    padding-right: 0;
+  }
+  .refund-dropdown-label {
+    font-family: "Inter Tight";
+    font-size: 12px;
     font-style: normal;
     font-weight: 500;
     line-height: normal;
     letter-spacing: 1px;
     color: #818da0;
-}
-
-.refund-data {
-    font-family: "Inter Tight";
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 22px;
-    color: #201d1e;
-}
-
-.action-btn:hover {
-    filter: brightness(0) saturate(100%) invert(8%) sepia(7%) saturate(582%)
-        hue-rotate(289deg) brightness(100%) contrast(91%);
-}
-
-.collection-list-pagination {
+    margin-bottom: 4px;
+    padding-left: 0;
+  }
+  .refund-dropdown-value {
     font-family: "Inter Tight";
     font-size: 13px;
     font-style: normal;
     font-weight: 400;
-    line-height: 20px;
-    color: #4b465c80;
-}
-
-.pagination-btn {
-    font-family: "Inter Tight";
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 18px;
-    letter-spacing: 0.43px;
-    color: #8a94a3;
-}
-
-.page-no-btns {
-    font-family: "Inter Tight";
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 18px;
-    letter-spacing: 0.43px;
-}
-
-/* Mobile Responsive Styles */
-.refund-action-buttons {
+    line-height: 22px;
+    color: #201d1e;
+  }
+  .refund-status {
+    padding: 0px 9px;
+    border-radius: 3px;
+    margin-top: 5px;
+    display: inline-block;
+    width: 65px;
+    height: 24px;
+    text-align: center;
+    line-height: 24px;
+  }
+  .refund-dropdown-content {
+    width: 100%;
+    padding: 5px 0;
+  }
+  .refund-dropdown-grid {
     display: flex;
-    gap: 10px;
-}
-
-/* Responsive Styles (ordered from smallest to largest max-width) */
-@media (max-width: 360px) {
-    .refund-table {
-        margin-bottom: 50px;
-    }
-    .refund-table-header {
-        padding: 16px;
-    }
-    .refund-search {
-        width: 150px;
-    }
-    .refund-selection {
-        width: 120px;
-    }
-    .refund-action-buttons .add-refund {
-        width: calc(58% - 5px);
-    }
-    .refund-action-buttons .download-btn {
-        width: calc(42% - 5px);
-    }
-    .refund-thead.refund-date-column,
-    .refund-thead.refund-tenancy-id-column {
-        padding-left: 14px;
-        padding-right: 0;
-    }
-    .refund-data.refund-date-column,
-    .refund-data.refund-tenancy-id-column {
-        padding-left: 14px;
-        padding-right: 0;
-        white-space: nowrap;
-    }
-    .pagination-btn {
-        font-size: 13px;
-        padding: 0px 10px;
-        height: 28px;
-    }
-    .page-no-btns {
-        font-size: 13px;
-        padding: 0px 10px;
-        height: 28px;
-    }
-    .refund-dropdown-content .refund-dropdown-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-@media (max-width: 375px) {
-    .refund-thead.refund-date-column,
-    .refund-thead.refund-tenancy-id-column {
-        padding-left: 14px;
-        padding-right: 0;
-    }
-    .refund-data.refund-date-column,
-    .refund-data.refund-tenancy-id-column {
-        padding-left: 14px;
-        padding-right: 0;
-    }
-}
-
-@media (max-width: 390px) {
-    .refund-thead.refund-date-column,
-    .refund-thead.refund-tenancy-id-column {
-        padding-left: 14px;
-        padding-right: 0;
-    }
-    .refund-data.refund-date-column,
-    .refund-data.refund-tenancy-id-column {
-        padding-left: 14px;
-        padding-right: 0;
-    }
-    .refund-selection {
-        width: 120px;
-    }
-    .download-btn {
-        width: 120px;
-    }
-}
-
-@media (max-width: 414px) {
-    .refund-thead {
-        font-size: 11px;
-    }
-    .refund-thead.refund-date-column,
-    .refund-thead.refund-tenancy-id-column {
-        padding-left: 14px;
-        padding-right: 0;
-    }
-    .refund-data.refund-date-column,
-    .refund-data.refund-tenancy-id-column {
-        padding-left: 14px;
-        padding-right: 0;
-    }
-    .refund-selection {
-        width: 120px;
-    }
-    .download-btn {
-        width: 120px;
-    }
-}
-
-@media (max-width: 428px) {
-    .refund-thead.refund-date-column,
-    .refund-thead.refund-tenancy-id-column {
-        padding-left: 18px;
-        padding-right: 0;
-    }
-    .refund-data.refund-date-column,
-    .refund-data.refund-tenancy-id-column {
-        padding-left: 14px;
-        padding-right: 0;
-    }
-}
-
-@media (max-width: 480px) {
-    .refund-table {
-        max-width: calc(100vw - 40px);
-        margin-bottom: 50px;
-    }
-    .refund-table-header {
-        flex-direction: column;
-        border-bottom: none;
-        align-items: flex-start;
-        padding: 20px;
-    }
-    .refund-head {
-        display: none;
-    }
-    .refund-inputs-container {
-        flex-direction: column;
-        width: 100%;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-    .refund-inputs-container > div:first-child {
-        display: flex;
-        flex-direction: row;
-        gap: 10px;
-        width: 100%;
-        flex-wrap: nowrap;
-    }
-    .refund-search {
-        width: 100%;
-    }
-    .refund-selection {
-        width: 100%;
-    }
-    .refund-action-buttons {
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-        gap: 10px;
-        margin-top: 5px;
-    }
-    .add-refund {
-        width: 176px;
-        font-size: 14px;
-    }
-    .download-btn {
-        width: 122px;
-    }
-    .refund-pagination-container {
-        flex-direction: column;
-        height: 97.53px;
-        justify-content: center;
-        gap: 16px;
-        align-items: center;
-    }
-    .refund-pagination {
-        text-align: center;
-    }
-    .refund-pagination-buttons {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-        overflow-y: hidden;
-    }
-    .refund-dropdown-field {
-        background-color: #dedede;
-        border-radius: 100%;
-        width: 20px;
-        height: 20px;
-        margin-right: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background-color 0.3s ease;
-    }
-    .refund-dropdown-field.active {
-        background-color: #254396;
-    }
-    .refund-dropdown-img {
-        width: 11px;
-        transition: transform 0.3s ease;
-    }
-    .refund-dropdown-field.active .refund-dropdown-img {
-        transform: rotate(180deg);
-    }
-    .refund-table-row-head {
-        height: auto;
-        background-color: #f7f7f7;
-        border-bottom: none;
-    }
-    .refund-thead {
-        padding-right: 0px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-    }
-    .refund-id-column {
-        padding-right: 10px;
-        width: 24%;
-    }
-    .refund-date-column {
-        width: 40%;
-    }
-    .refund-tenancy-id-column {
-        width: 36%;
-        padding-right: 0;
-    }
-    .refund-data.refund-date-column,
-    .refund-data.refund-tenancy-id-column {
-        white-space: nowrap;
-        padding-left: 18px;
-        padding-right: 0;
-    }
-    .refund-dropdown-label {
-        font-family: "Inter Tight";
-        font-size: 12px;
-        font-style: normal;
-        font-weight: 500;
-        line-height: normal;
-        letter-spacing: 1px;
-        color: #818da0;
-        margin-bottom: 4px;
-        padding-left: 0;
-    }
-    .refund-dropdown-value {
-        font-family: "Inter Tight";
-        font-size: 13px;
-        font-style: normal;
-        font-weight: 400;
-        line-height: 22px;
-        color: #201d1e;
-    }
-    .refund-status {
-        padding: 0px 9px;
-        border-radius: 3px;
-        margin-top: 5px;
-        display: inline-block;
-        width: 65px;
-        height: 24px;
-        text-align: center;
-        line-height: 24px;
-    }
-    .refund-dropdown-content {
-        width: 100%;
-        padding: 5px 0;
-    }
-    .refund-dropdown-grid {
-        display: flex;
-        width: 100%;
-        flex-wrap: wrap;
-    }
-    .refund-dropdown-item {
-        width: 33.33%;
-        padding-right: 10px;
-        box-sizing: border-box;
-        margin-bottom: 15px;
-    }
-    .refund-dropdown-item.refund-tenant-name-column {
-        width: 24%;
-    }
-    .refund-dropdown-item.refund-amount-column {
-        width: 38%;
-    }
-    .refund-dropdown-item.refund-payment-method-column {
-        width: 36%;
-        padding-right: 0;
-    }
-    .refund-dropdown-item.refund-status-column {
-        width: 24%;
-    }
-    .refund-dropdown-item.refund-action-column {
-        width: 40%;
-    }
-    .refund-mobile-no-border {
-        border-bottom: none !important;
-    }
-    .refund-mobile-with-border {
-        border-bottom: 1px solid #e9e9e9;
-    }
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .refund-dropdown-item {
+    padding-right: 10px;
+    box-sizing: border-box;
+  }
+  .refund-dropdown-item.refund-tenant-name-column {
+    width: 33% !important;
+  }
+  .refund-dropdown-item.refund-amount-column {
+    width: 30% !important;
+  }
+  .refund-dropdown-item.refund-payment-method-column {
+    width: 37% !important;
+    padding-right: 0;
+  }
+  .refund-dropdown-item.refund-status-column {
+    width: 25%;
+  }
+  .refund-dropdown-item.refund-action-column {
+    width: 67%;
+  }
+  .refund-mobile-no-border {
+    border-bottom: none !important;
+  }
+  .refund-mobile-with-border {
+    border-bottom: 1px solid #e9e9e9;
+  }
 }
 
 @media (min-width: 481px) {
-    .refund-dropdown-field,
-    .refund-dropdown-content {
-        display: none;
-    }
+  .refund-dropdown-field,
+  .refund-dropdown-content {
+    display: none;
+  }
 }
 
 @media (max-width: 394px) {
-    .refund-thead {
-        font-size: 13px;
-    }
-    .refund-data {
-        font-size: 13px;
-    }
-}
-
-@media (max-width: 767px) {
-    .refund-action-buttons {
-        width: 100%;
-        justify-content: start;
-    }
-    .refund-action-buttons .add-refund,
-    .refund-action-buttons .download-btn {
-        min-width: auto;
-        max-width: none;
-    }
-    .refund-action-buttons .add-refund {
-        width: 176px;
-    }
-    .refund-action-buttons .download-btn {
-        width: 50%;
-    }
+  .refund-thead {
+    font-size: 13px;
+  }
+  .refund-data {
+    font-size: 13px;
+  }
 }

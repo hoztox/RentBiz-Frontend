@@ -124,7 +124,7 @@ const Refund = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 refund-search"
             />
-            <div className="relative w-full md:w-auto">
+            <div className="relative w-[40%] md:w-auto">
               <select
                 name="select"
                 id=""
@@ -136,7 +136,7 @@ const Refund = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                className={`absolute md:right-2 right-4 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
                   isSelectOpen ? "rotate-180" : "rotate-0"
                 }`}
               />
@@ -230,10 +230,10 @@ const Refund = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="refund-table-row-head">
-              <th className="px-5 text-left refund-thead refund-id-column">ID</th>
+              <th className="px-5 pl-[12px] text-left refund-thead refund-id-column">ID</th>
               <th className="px-5 text-left refund-thead refund-date-column">DATE</th>
               <th className="px-5 text-left refund-thead refund-tenancy-id-column">TENANCY ID</th>
-              <th className="px-1 text-right refund-thead"></th>
+              <th className="text-right refund-thead"></th>
             </tr>
           </thead>
           <tbody>
@@ -246,7 +246,7 @@ const Refund = () => {
                       : "refund-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left refund-data refund-id-column">{refund.id}</td>
+                  <td className="px-5 pl-[12px] text-left refund-data refund-id-column">{refund.id}</td>
                   <td className="px-5 text-left refund-data refund-date-column">{refund.date}</td>
                   <td className="px-5 text-left refund-data refund-tenancy-id-column">{refund.tenancyId}</td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
@@ -275,7 +275,7 @@ const Refund = () => {
                             <div className="refund-dropdown-label">TENANT NAME</div>
                             <div className="refund-dropdown-value">{refund.tenantName}</div>
                           </div>
-                          <div className="refund-dropdown-item refund-amount-column pl-[5px]">
+                          <div className="refund-dropdown-item refund-amount-column">
                             <div className="refund-dropdown-label">AMOUNT</div>
                             <div className="refund-dropdown-value">{refund.amount}</div>
                           </div>
@@ -299,7 +299,7 @@ const Refund = () => {
                               </span>
                             </div>
                           </div>
-                          <div className="refund-dropdown-item refund-action-column pl-[5px]">
+                          <div className="refund-dropdown-item refund-action-column">
                             <div className="refund-dropdown-label">ACTION</div>
                             <div className="refund-dropdown-value flex items-center gap-4 p-[5px]">
                               <button onClick={() => openUpdateModal(refund)}>
