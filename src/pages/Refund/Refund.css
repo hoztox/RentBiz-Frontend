@@ -149,7 +149,7 @@
   .refund-thead.refund-tenancy-id-column {
     padding-left: 14px;
     padding-right: 0;
-    font-size: 11px;
+    font-size: 11px !important;
   }
   .refund-data.refund-date-column,
   .refund-data.refund-tenancy-id-column {
