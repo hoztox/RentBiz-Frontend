@@ -22,7 +22,6 @@ import reportCollection from "../../assets/Images/Admin Sidebar/report collectio
 import incomeExpense from "../../assets/Images/Admin Sidebar/income-expense.svg";
 import closeicon from "../../assets/Images/Admin Navbar/close-icon.svg";
 
-
 const MobileSlideMenu = ({
   isMobileMenuOpen,
   toggleMobileMenu,
@@ -493,6 +492,20 @@ const MobileSlideMenu = ({
                 >
                   <p className="pl-10 py-[7px]">ID Type</p>
                 </div>
+
+                <div
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                    activeItem === "Charge Code Type" ? "submenu-active" : ""
+                  }`}
+                  onClick={() => {
+                    setActiveItem("Charge Code Type");
+                    navigate("/admin/masters-charge-code-type");
+                    toggleMobileMenu();
+                  }}
+                >
+                  <p className="pl-10 py-[7px]">Charge Code Type</p>
+                </div>
+
                 <div
                   className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
                     activeItem === "Charges" ? "submenu-active" : ""
