@@ -1,8 +1,8 @@
 import React from "react";
-import "./addunit.css";
+import "./editunitmodal.css";
 import UnitFormFlow from "./Unit Form Flow/UnitFormFlow";
 
-const AddUnitModal = ({ open, onClose, title }) => {
+const EditUnitModal = ({ open, onClose, title }) => {
   return (
     <div
       onClick={onClose}
@@ -21,4 +21,4 @@ const AddUnitModal = ({ open, onClose, title }) => {
   );
 };
 
-export default AddUnitModal;
+export default EditUnitModal;

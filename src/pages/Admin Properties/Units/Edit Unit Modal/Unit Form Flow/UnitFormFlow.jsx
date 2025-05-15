@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import closeicon from "../../../../../assets/Images/Admin Units/close-icon.svg";
-import FromTimeline from "../FromTimeline";
-import BuildingInfoForm from "../Select Building/BuildingInfoForm";
-import UnitInfoForm from "../Create Unit/UnitInfoForm";
-import DocumentsForm from "../Upload Documents/DocumentsForm";
-import UnitReview from "../Review/UnitReview";
+import FormTimeline from "../FormTimeline"
+import BuildingInfoForm from "../Select Building/BuildingInfoForm"
+import UnitInfoForm from "../Update Unit/UnitInfoForm";
+import DocumentsForm from "../Upload Documents/DocumentsForm"
+import UnitReview from "../ReviewPage/ReviewPage"
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 
 const UnitFormFlow = ({ onClose }) => {
@@ -21,13 +21,13 @@ const UnitFormFlow = ({ onClose }) => {
 
   const pageTitles = [
     "Select Building",
-    "Create Unit",
+    "Update Unit",
     "Upload Documents",
     "Review",
     "",
   ];
 
-  const currentTitle = pageTitles[currentPageIndex];
+  const currentTitle = pageTitles[currentPageIndex]
 
   useEffect(() => {
     const newProgress = {
@@ -114,7 +114,7 @@ const UnitFormFlow = ({ onClose }) => {
     <div className="flex">
       {/* Left Side - Timeline */}
       <div className="w-[350px] pr-[53px]">
-        <FromTimeline
+        <FormTimeline
           key={currentPageIndex}
           currentStep={currentPageIndex + 1}
           progress={formProgress}

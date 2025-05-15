@@ -173,7 +173,7 @@ const DocumentsForm = ({ onNext, onBack }) => {
           </div>
 
           {/* Add Document Button */}
-          <div className="px-6 py-4 flex justify-end">
+          <div className="py-4 flex justify-end">
             <button
               type="button"
               onClick={handleAddDocument}
@@ -186,7 +186,7 @@ const DocumentsForm = ({ onNext, onBack }) => {
         </div>
 
         {/* Navigation Buttons */}
-        <div className="flex justify-end gap-4 p-6 border-t mt-auto">
+        <div className="flex justify-end gap-4 border-t pt-[35px] mt-auto">
           <button
             type="button"
             className="text-[#201D1E] bg-white hover:bg-[#201D1E] hover:text-white back-button duration-200"

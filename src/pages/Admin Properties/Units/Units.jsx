@@ -7,14 +7,16 @@ import editicon from "../../../assets/Images/Admin Units/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Units/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Units/downarrow.svg";
 import AddUnitModal from "./Add Unit Modal/AddUnitModal";
+import EditUnitModal from "./Edit Unit Modal/EditUnitModal";
 
 const Units = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
   const [unitModalOpen, setUnitModalOpen] = useState(false);
+  const [updateUnitModalOpen, setUpdateUnitModalOpen] = useState(false)
   const [expandedRows, setExpandedRows] = useState({});
+  const itemsPerPage = 10;
 
   const openUnitModal = () => {
     setUnitModalOpen(true);
@@ -23,6 +25,14 @@ const Units = () => {
   const closeUnitModal = () => {
     setUnitModalOpen(false);
   };
+
+  const openUpdateUnitModal = () => {
+    setUpdateUnitModalOpen(true)
+  }
+
+  const closeUpdateUnitModal = () => {
+    setUpdateUnitModalOpen(false)
+  }
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -235,7 +245,7 @@ const Units = () => {
                   </span>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button>
+                  <button onClick={openUpdateUnitModal}>
                     <img
                       src={editicon}
                       alt="Edit"
@@ -335,7 +345,7 @@ const Units = () => {
                           <div className="unit-grid-item unit-action-column">
                             <div className="unit-dropdown-label">ACTION</div>
                             <div className="unit-dropdown-value unit-flex unit-items-center unit-gap-2">
-                              <button>
+                              <button onClick={openUpdateUnitModal}>
                                 <img
                                   src={editicon}
                                   alt="Edit"
@@ -414,10 +424,13 @@ const Units = () => {
           </button>
         </div>
       </div>
+      {/* Add & Update Modals */}
       <AddUnitModal
         open={unitModalOpen}
         onClose={closeUnitModal}
       />
+
+      <EditUnitModal open={updateUnitModalOpen} onClose={closeUpdateUnitModal} />
     </div>
   );
 };

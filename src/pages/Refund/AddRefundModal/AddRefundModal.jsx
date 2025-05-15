@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./AddRefundModal.css";
 import { ChevronDown } from "lucide-react";
 import closeicon from "../../../assets/Images/Refund/close-icon.svg";
-import calendaricon from "../../../assets/Images/Refund/calendar-icon.svg";
+// import calendaricon from "../../../assets/Images/Refund/calendar-icon.svg";
 
 const AddRefundModal = ({ isOpen, onClose }) => {
   const [form, setForm] = useState({
@@ -202,14 +202,14 @@ const AddRefundModal = ({ isOpen, onClose }) => {
                 <label className="block add-refund-label">End Date</label>
                 <div className="relative">
                   <input
-                    type="text"
+                    type="date"
                     value={form.endDate}
                     onChange={(e) => updateForm("endDate", e.target.value)}
                     placeholder="dd/mm/yyyy"
-                    className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-input"
+                    className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 text-gray-400 add-refund-input"
                   />
                   <div className="absolute inset-y-0 right-1 flex items-center px-2">
-                    <img src={calendaricon} alt="calendar" className="w-5 h-5" />
+                    {/* <img src={calendaricon} alt="calendar" className="w-5 h-5" /> */}
                   </div>
                 </div>
               </div>
@@ -300,19 +300,19 @@ const AddRefundModal = ({ isOpen, onClose }) => {
                             {/* DATE */}
                             <td className="px-[5px] py-[5px] w-[136px] relative">
                               <input
-                                type="text"
+                                type="date"
                                 placeholder="mm/dd/yyyy"
                                 value={item.date}
                                 onChange={(e) =>
                                   handleItemChange(index, "date", e.target.value)
                                 }
-                                className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 refund-modal-table-input"
+                                className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 !text-gray-400 refund-modal-table-input"
                               />
-                              <img
+                              {/* <img
                                 src={calendaricon}
                                 alt="Calendar"
                                 className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                              />
+                              /> */}
                             </td>
 
                             {/* AMOUNT */}
@@ -443,19 +443,19 @@ const AddRefundModal = ({ isOpen, onClose }) => {
                         <div className="flex justify-between border-b border-[#E9E9E9]">
                           <div className="px-[10px] py-[10px] relative w-full">
                             <input
-                              type="text"
+                              type="date"
                               placeholder="mm/dd/yyyy"
                               value={item.date}
                               onChange={(e) =>
                                 handleItemChange(index, "date", e.target.value)
                               }
-                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-modal-mobile-table-input"
+                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 text-gray-400 add-refund-modal-mobile-table-input"
                             />
-                            <img
+                            {/* <img
                               src={calendaricon}
                               alt="Calendar"
                               className="absolute right-[15px] top-[52%] transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                            />
+                            /> */}
                           </div>
                           <div className="px-[10px] py-[10px] w-full">
                             <input
@@ -527,14 +527,14 @@ const AddRefundModal = ({ isOpen, onClose }) => {
                 </label>
                 <div className="relative">
                   <input
-                    type="text"
+                    type="date"
                     value={form.paymentDate}
                     onChange={(e) => updateForm("paymentDate", e.target.value)}
                     placeholder="dd/mm/yyyy"
-                    className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-input"
+                    className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 text-gray-400 add-refund-input"
                   />
                   <div className="absolute inset-y-0 right-1 flex items-center px-2">
-                    <img src={calendaricon} alt="calendar" className="w-5 h-5" />
+                    {/* <img src={calendaricon} alt="calendar" className="w-5 h-5" /> */}
                   </div>
                 </div>
               </div>

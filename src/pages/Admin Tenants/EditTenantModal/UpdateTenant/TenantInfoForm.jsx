@@ -176,7 +176,7 @@ const TenantInfoForm = ({onNext}) => {
             onChange={handleInputChange}
             placeholder=""
             rows="2"
-            className="w-full tenant-info-form-inputs focus:border-gray-300 duration-200"
+            className="w-full tenant-info-form-inputs resize-none focus:border-gray-300 duration-200"
           />
         </div>
 
@@ -189,7 +189,7 @@ const TenantInfoForm = ({onNext}) => {
             value={formState.address}
             onChange={handleInputChange}
             placeholder=""
-            className="w-full tenant-info-form-inputs focus:border-gray-300 duration-200"
+            className="w-full tenant-info-form-inputs resize-none focus:border-gray-300 duration-200"
             required
           />
         </div>

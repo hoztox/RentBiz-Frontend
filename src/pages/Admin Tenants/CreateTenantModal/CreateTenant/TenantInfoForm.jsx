@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./tenantinfoform.css";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 const TenantInfoForm = ({ onNext }) => {
   // Form state
@@ -29,7 +29,7 @@ const TenantInfoForm = ({ onNext }) => {
 
   const [mobno, setMobno] = useState("");
   const [altMobno, setAltMobno] = useState("");
-  
+
   // Track focus state for each dropdown separately
   const [focusedField, setFocusedField] = useState(null);
 
@@ -178,7 +178,7 @@ const TenantInfoForm = ({ onNext }) => {
             onChange={handleInputChange}
             placeholder=""
             rows="2"
-            className="w-full tenant-info-form-inputs focus:border-gray-300 duration-200"
+            className="w-full tenant-info-form-inputs resize-none focus:border-gray-300 duration-200"
           />
         </div>
 
@@ -191,7 +191,7 @@ const TenantInfoForm = ({ onNext }) => {
             value={formState.address}
             onChange={handleInputChange}
             placeholder=""
-            className="w-full tenant-info-form-inputs focus:border-gray-300 duration-200"
+            className="w-full tenant-info-form-inputs resize-none focus:border-gray-300 duration-200"
             required
           />
         </div>

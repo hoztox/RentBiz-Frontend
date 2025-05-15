@@ -1,9 +1,8 @@
-import React, { useState } from "react";
-import "./buildinginfo.css";
+import { useState } from "react";
+import "./buildinginfoform.css";
 import { ChevronDown } from "lucide-react";
 
 const BuildingInfoForm = ({ onNext }) => {
-  // Form state
   const [formState, setFormState] = useState({
     buildingName: "",
     description: "",
@@ -30,16 +29,6 @@ const BuildingInfoForm = ({ onNext }) => {
     }
   };
 
-  // Function to handle incrementing/decrementing number inputs
-  // const handleNumberStep = (name, step) => {
-  //   const currentValue = parseFloat(formState[name]) || 0;
-  //   setFormState({
-  //     ...formState,
-  //     [name]: (currentValue + step).toString(),
-  //   });
-  // };
-
-  // Function to handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     // Form submission logic would go here

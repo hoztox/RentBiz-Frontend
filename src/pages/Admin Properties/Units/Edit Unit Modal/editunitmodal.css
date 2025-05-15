@@ -1,11 +1,11 @@
 .unit-modal-styles {
   width: 1365px;
   border-radius: 6px;
-  background-color: white;
+  background-color: #fff;
 }
 
 .unit-modal-header {
-  background-color: white;
+  background-color: #fff;
   border-radius: 12px;
   display: flex;
   justify-content: space-between;

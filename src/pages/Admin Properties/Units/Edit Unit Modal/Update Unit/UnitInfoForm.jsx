@@ -35,15 +35,6 @@ const UnitInfoForm = ({ onNext, onBack }) => {
     }
   };
 
-  // Function to handle incrementing/decrementing number inputs
-  //   const handleNumberStep = (name, step) => {
-  //     const currentValue = parseFloat(formState[name]) || 0;
-  //     setFormState({
-  //       ...formState,
-  //       [name]: (currentValue + step).toString()
-  //     });
-  //   };
-
   // Function to handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();

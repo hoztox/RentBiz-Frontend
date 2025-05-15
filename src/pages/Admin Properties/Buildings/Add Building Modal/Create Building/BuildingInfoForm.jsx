@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import "./buildinginfoform.css";
-import { ChevronDown, ChevronUp } from 'lucide-react'; // Import both icons
+import { ChevronDown, ChevronUp } from "lucide-react"; // Import both icons
 
 const BuildingInfoForm = ({ onNext }) => {
   // Form state
   const [formState, setFormState] = useState({
-    buildingNo: '',
-    plotNo: '',
-    buildingName: '',
-    address: '',
-    description: '',
-    remarks: '',
-    status: 'Active',
-    latitude: '',
-    longitude: '',
-    nearByLandmark: '',
+    buildingNo: "",
+    plotNo: "",
+    buildingName: "",
+    address: "",
+    description: "",
+    remarks: "",
+    status: "Active",
+    latitude: "",
+    longitude: "",
+    nearByLandmark: "",
   });
 
   // State to track if select is focused
@@ -35,13 +35,12 @@ const BuildingInfoForm = ({ onNext }) => {
     }
   };
 
-
   // Function to handle incrementing/decrementing number inputs
   const handleNumberStep = (name, step) => {
     const currentValue = parseFloat(formState[name]) || 0;
     setFormState({
       ...formState,
-      [name]: (currentValue + step).toString()
+      [name]: (currentValue + step).toString(),
     });
   };
 
@@ -49,7 +48,7 @@ const BuildingInfoForm = ({ onNext }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Form submission logic would go here
-    console.log('Form submitted:', formState);
+    console.log("Form submitted:", formState);
 
     // Call the onNext prop to move to the next page
     if (onNext) onNext(formState);
@@ -60,9 +59,7 @@ const BuildingInfoForm = ({ onNext }) => {
       <div className="grid grid-cols-2 gap-5">
         {/* Building No */}
         <div className="col-span-1">
-          <label className="block building-info-form-label">
-            Building No*
-          </label>
+          <label className="block building-info-form-label">Building No*</label>
           <input
             type="text"
             name="buildingNo"
@@ -75,9 +72,7 @@ const BuildingInfoForm = ({ onNext }) => {
 
         {/* Plot No */}
         <div className="col-span-1">
-          <label className="block building-info-form-label">
-            Plot No*
-          </label>
+          <label className="block building-info-form-label">Plot No*</label>
           <input
             type="text"
             name="plotNo"
@@ -106,55 +101,47 @@ const BuildingInfoForm = ({ onNext }) => {
 
         {/* Address */}
         <div className="col-span-1">
-          <label className="block building-info-form-label">
-            Address*
-          </label>
+          <label className="block building-info-form-label">Address*</label>
           <textarea
             type="text"
             name="address"
             value={formState.address}
             onChange={handleInputChange}
             placeholder=""
-            className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
+            className="w-full building-info-form-inputs resize-none focus:border-gray-300 duration-200"
             required
           />
         </div>
 
         {/* Description */}
         <div className="col-span-1">
-          <label className="block building-info-form-label">
-            Description
-          </label>
+          <label className="block building-info-form-label">Description</label>
           <textarea
             name="description"
             value={formState.description}
             onChange={handleInputChange}
             placeholder=""
             rows="2"
-            className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
+            className="w-full building-info-form-inputs resize-none focus:border-gray-300 duration-200"
           />
         </div>
 
         {/* Remarks 1 */}
         <div className="col-span-1">
-          <label className="block building-info-form-label">
-            Remarks
-          </label>
+          <label className="block building-info-form-label">Remarks</label>
           <textarea
             name="remarks"
             value={formState.remarks}
             onChange={handleInputChange}
             placeholder=""
             rows="2"
-            className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
+            className="w-full building-info-form-inputs resize-none focus:border-gray-300 duration-200"
           />
         </div>
 
         {/* Latitude */}
         <div className="col-span-1">
-          <label className="block building-info-form-label">
-            Latitude
-          </label>
+          <label className="block building-info-form-label">Latitude</label>
           <div className="relative">
             <input
               type="number"
@@ -168,14 +155,14 @@ const BuildingInfoForm = ({ onNext }) => {
               <button
                 type="button"
                 className="flex items-center justify-center h-4 text-[#201D1E]"
-                onClick={() => handleNumberStep('latitude', 0.01)}
+                onClick={() => handleNumberStep("latitude", 0.01)}
               >
                 <ChevronUp size={14} />
               </button>
               <button
                 type="button"
                 className="flex items-center justify-center h-0 text-[#201D1E]"
-                onClick={() => handleNumberStep('latitude', -0.01)}
+                onClick={() => handleNumberStep("latitude", -0.01)}
               >
                 <ChevronDown size={14} />
               </button>
@@ -185,9 +172,7 @@ const BuildingInfoForm = ({ onNext }) => {
 
         {/* Longitude */}
         <div className="col-span-1">
-          <label className="block building-info-form-label">
-            Longitude
-          </label>
+          <label className="block building-info-form-label">Longitude</label>
           <div className="relative">
             <input
               type="number"
@@ -201,14 +186,14 @@ const BuildingInfoForm = ({ onNext }) => {
               <button
                 type="button"
                 className="flex items-center justify-center h-4 text-[#201D1E]"
-                onClick={() => handleNumberStep('longitude', 0.01)}
+                onClick={() => handleNumberStep("longitude", 0.01)}
               >
                 <ChevronUp size={14} />
               </button>
               <button
                 type="button"
                 className="flex items-center justify-center h-0 text-[#201D1E]"
-                onClick={() => handleNumberStep('longitude', -0.01)}
+                onClick={() => handleNumberStep("longitude", -0.01)}
               >
                 <ChevronDown size={14} />
               </button>
@@ -218,9 +203,7 @@ const BuildingInfoForm = ({ onNext }) => {
 
         {/* Status */}
         <div className="col-span-1">
-          <label className="block building-info-form-label">
-            Status*
-          </label>
+          <label className="block building-info-form-label">Status*</label>
           <div className="relative">
             <select
               name="status"
@@ -237,7 +220,9 @@ const BuildingInfoForm = ({ onNext }) => {
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
-                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${isSelectFocused ? 'rotate-180' : ''}`}
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
+                  isSelectFocused ? "rotate-180" : ""
+                }`}
               />
             </div>
           </div>
