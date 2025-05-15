@@ -1,29 +1,28 @@
-import React from 'react'
-import "./ReviewPage.css"
-import DocumentView from "./DocumentView"
+import "./reviewpage.css";
+import DocumentView from "./DocumentView";
 
-const ReviewPage = ({onNext, onBack}) => {
-    const [buildingData] = useState({
-        tenant_name: "B24090001",
-        mob_no: "9988776655",
-        email: "test@gmail.com",
-        address: "Lorem ipsum dolor consectetur adipiscing elit. Morbi orci",
-        trade_license_no: "TD1232",
-        id_no: "ID12",
-        sponsor_name: "Test",
-        sponsor_id_no: "SPID12",
-        status: "Active",
-        nationality: "Indian",
-        alternative_mob_no: "9988776655",
-        description: "Lorem ipsum dolor consectetur adipiscing elit. Morbi orci",
-        tenant_type: "Type1",
-        id_type: "ID1",
-        id_validity: "20-02-2025",
-        sponsor_id_type: "SPID1",
-        sponsor_id_validity: "25-02-2025",
-        remarks: "Lorem ipsum dolor consectetur adipiscing elit. Morbi orci",
-      });
-      
+const ReviewPage = ({ onNext, onBack }) => {
+  const [buildingData] = useState({
+    tenant_name: "B24090001",
+    mob_no: "9988776655",
+    email: "test@gmail.com",
+    address: "Lorem ipsum dolor consectetur adipiscing elit. Morbi orci",
+    trade_license_no: "TD1232",
+    id_no: "ID12",
+    sponsor_name: "Test",
+    sponsor_id_no: "SPID12",
+    status: "Active",
+    nationality: "Indian",
+    alternative_mob_no: "9988776655",
+    description: "Lorem ipsum dolor consectetur adipiscing elit. Morbi orci",
+    tenant_type: "Type1",
+    id_type: "ID1",
+    id_validity: "20-02-2025",
+    sponsor_id_type: "SPID1",
+    sponsor_id_validity: "25-02-2025",
+    remarks: "Lorem ipsum dolor consectetur adipiscing elit. Morbi orci",
+  });
+
   return (
     <div>
       <div className="border rounded-md border-[#E9E9E9] p-5">
@@ -153,7 +152,7 @@ const ReviewPage = ({onNext, onBack}) => {
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ReviewPage
+export default ReviewPage;
