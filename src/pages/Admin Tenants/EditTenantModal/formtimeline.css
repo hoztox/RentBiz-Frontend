@@ -1,0 +1,84 @@
+.circle {
+  font-family: "Inter Tight";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+}
+.step-label.active {
+  font-family: "Inter Tight";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  color: white;
+}
+
+.step-label.inactive {
+  font-family: "Inter Tight";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  color: #64a2e7;
+}
+
+/* Base styles */
+.step-label.active {
+  color: white;
+}
+
+.step-label.inactive {
+  color: #64a2e7;
+}
+
+/* Animation for step transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
+}
+
+/* Apply animations */
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.circle.bg-white {
+  animation: scaleUp 0.3s ease-out forwards, pulse 2s infinite;
+}
+
+/* Step completion animation */
+.step-completion-bar {
+  height: 3px;
+  background-color: #64a2e7;
+  transition: width 0.8s ease-in-out;
+  margin-top: 8px;
+  border-radius: 2px;
+}

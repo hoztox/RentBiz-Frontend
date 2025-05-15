@@ -7,12 +7,14 @@ import editicon from "../../../assets/Images/Admin Tenants/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Tenants/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenants/downarrow.svg";
 import CreateTenantModal from "../CreateTenantModal/CreateTenantModal";
+import EditTenantModal from "../EditTenantModal/EditTenantModal";
 
 const TenantsMaster = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [createTenantModalOpen, setCreateTenantModalOpen] = useState(false);
+  const [updateTenantModalOpen, setUpdateTenantModalOpen] = useState(false)
   const [expandedRows, setExpandedRows] = useState({});
   const itemsPerPage = 10;
 
@@ -23,6 +25,14 @@ const TenantsMaster = () => {
   const closeCreateTenantModal = () => {
     setCreateTenantModalOpen(false);
   };
+
+  const openUpdateTenantModal = () => {
+    setUpdateTenantModalOpen(true);
+  }
+
+  const closeUpdateTenantModal = () => {
+    setUpdateTenantModalOpen(false)
+  }
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -179,7 +189,7 @@ const TenantsMaster = () => {
                   {tenant.type}
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button>
+                  <button onClick={openUpdateTenantModal}>
                     <img
                       src={editicon}
                       alt="Edit"
@@ -281,7 +291,7 @@ const TenantsMaster = () => {
                           <div className="tenant-grid-item w-[20%]">
                             <div className="dropdown-label">ACTION</div>
                             <div className="dropdown-value flex items-center gap-2 mt-[10px]">
-                              <button>
+                              <button onClick={openUpdateTenantModal}>
                                 <img
                                   src={editicon}
                                   alt="Edit"
@@ -366,6 +376,9 @@ const TenantsMaster = () => {
       </div>
       {/* Create Tenant Modal /> */}
       <CreateTenantModal open={createTenantModalOpen} onClose={closeCreateTenantModal} />
+
+      {/* Update Tenant Modal */}
+      <EditTenantModal open={updateTenantModalOpen} onClose={closeUpdateTenantModal} />
     </div>
   );
 };
