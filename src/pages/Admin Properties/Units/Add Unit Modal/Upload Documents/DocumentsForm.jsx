@@ -1,37 +1,21 @@
-import { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
-import documentIcon from '../../../../../assets/Images/Admin Units/document-icon.svg';
-import calendarIcon from '../../../../../assets/Images/Admin Units/calendar-icon.svg';
-import closeIcon from '../../../../../assets/Images/Admin Units/close-icon-white.svg';
-import plusIcon from '../../../../../assets/Images/Admin Units/plus-icon-black.svg';
-import './documents.css'
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
+import documentIcon from "../../../../../assets/Images/Admin Units/document-icon.svg";
+// import calendarIcon from '../../../../../assets/Images/Admin Units/calendar-icon.svg';
+import closeIcon from "../../../../../assets/Images/Admin Units/close-icon-white.svg";
+import plusIcon from "../../../../../assets/Images/Admin Units/plus-icon-black.svg";
+import "./documentform.css";
 
-const DocumentsForm = ({ onNext }) => {
+const DocumentsForm = ({ onNext, onBack }) => {
   const [documents, setDocuments] = useState([
     {
       id: 1,
-      type: "Permit",
-      number: "0123456789",
-      issueDate: "19/01/2024",
-      expiryDate: "19/01/2024",
-      files: ["Attach Files"]
-    },
-    {
-      id: 2,
-      type: "Permit",
-      number: "0123456789",
-      issueDate: "19/01/2024",
-      expiryDate: "19/01/2024",
-      files: ["Attach Files"]
-    },
-    {
-      id: 3,
-      type: "Permit",
+      type: "",
       number: "",
       issueDate: "",
       expiryDate: "",
-      files: ["Attach Files"]
-    }
+      files: [],
+    },
   ]);
 
   const handleSubmit = (e) => {
@@ -42,17 +26,23 @@ const DocumentsForm = ({ onNext }) => {
   const handleAddDocument = () => {
     const newDoc = {
       id: documents.length + 1,
-      type: "Permit",
+      type: "",
       number: "",
       issueDate: "",
       expiryDate: "",
-      files: []
+      files: [],
     };
     setDocuments([...documents, newDoc]);
   };
 
   const handleRemoveDocument = (id) => {
-    setDocuments(documents.filter(doc => doc.id !== id));
+    setDocuments(documents.filter((doc) => doc.id !== id));
+  };
+
+  const handleChange = (id, field, value) => {
+    setDocuments((prevDocs) =>
+      prevDocs.map((doc) => (doc.id === id ? { ...doc, [field]: value } : doc))
+    );
   };
 
   return (
@@ -62,108 +52,151 @@ const DocumentsForm = ({ onNext }) => {
           {/* Document List */}
           <div>
             {documents.map((doc) => (
-              <div key={doc.id} className="border-b">
-                <div className="grid grid-cols-12 gap-x-4 gap-y-6 px-6 py-6">
-                  <div className="col-span-3">
-                    <label className="block text-xs text-gray-600 mb-2">Doc.Type</label>
+              <div key={doc.id} className="border-b first:pt-0 py-5">
+                <div className="flex gap-[10px] justify-between">
+                  {/* Document Type */}
+                  <div>
+                    <label className="block documents-label">Doc.Type</label>
                     <div className="relative">
-                      <select 
-                        className="text-sm text-gray-700 appearance-none bg-white doctype-input" 
-                        defaultValue={doc.type}
+                      <select
+                        className="appearance-none documents-inputs w-[226px] cursor-pointer"
+                        value={doc.type}
+                        onChange={(e) =>
+                          handleChange(doc.id, "type", e.target.value)
+                        }
                       >
-                        <option value="Permit">Permit</option>
+                        <option value="">Select Document</option>
                         <option value="License">License</option>
                         <option value="Certificate">Certificate</option>
+                        <option value="Permit">Permit</option>
                       </select>
-                      <ChevronDown className="absolute right-2 top-2.5 h-4 w-4 text-gray-500 pointer-events-none" />
+                      <ChevronDown className="absolute right-2 top-[12px] h-4 w-4 text-[#000000] pointer-events-none" />
                     </div>
                   </div>
-                  
-                  <div className="col-span-2">
-                    <label className="block text-xs text-gray-600 mb-2">Number</label>
-                    <input
-                      type="text"
-                      className="p-2 text-sm phone-input"
-                      defaultValue={doc.number}
-                      placeholder="0123456789"
-                    />
-                  </div>
-                  
-                  <div className="col-span-2">
-                    <label className="block text-xs text-gray-600 mb-2">Issue Date</label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        className="w-full border border-gray-300 rounded p-2 text-sm date-input"
-                        defaultValue={doc.issueDate}
-                        placeholder="19/01/2024"
-                      />
-                      <img src={calendarIcon} alt="" className="absolute right-2 top-2 h-5 w-5" />
-                    </div>
-                  </div>
-                  
-                  <div className="col-span-2">
-                    <label className="block text-xs text-gray-600 mb-2">Expiry Date</label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        className="w-full border border-gray-300 rounded p-2 text-sm date-input"
-                        defaultValue={doc.expiryDate}
-                        placeholder="19/01/2024"
-                      />
-                      <img src={calendarIcon} alt="" className="absolute right-2 top-2 h-5 w-5" />
-                    </div>
-                  </div>
-                  
-                  <div className="col-span-2">
-                    <label className="block text-xs text-gray-600 mb-2">Upload Files</label>
-                    <button 
-                      type="button" 
-                      className="flex items-center justify-between text-sm text-gray-700 bg-white attachfile-button"
-                    >
-                      <span>{doc.files.length ? doc.files[0] : "Upload"}</span>
-                      <img src={documentIcon} alt="" className="ml-2 h-5 w-5" />
-                    </button>
-                  </div>
-                  
+
+                  {/* Conditional Fields */}
+                  {doc.type && (
+                    <>
+                      <div>
+                        <label className="block documents-label">Number</label>
+                        <input
+                          type="text"
+                          className="documents-inputs w-[168px] outline-none"
+                          value={doc.number}
+                          onChange={(e) =>
+                            handleChange(doc.id, "number", e.target.value)
+                          }
+                          placeholder="Number"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block documents-label">
+                          Issue Date
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="date"
+                            className="documents-inputs w-[149px] appearance-none outline-none cursor-pointer"
+                            value={doc.issueDate}
+                            onChange={(e) =>
+                              handleChange(doc.id, "issueDate", e.target.value)
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block documents-label">
+                          Expiry Date
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="date"
+                            className="documents-inputs w-[150px] appearance-none outline-none cursor-pointer"
+                            value={doc.expiryDate}
+                            onChange={(e) =>
+                              handleChange(doc.id, "expiryDate", e.target.value)
+                            }
+                          />
+                        </div>
+                      </div>
+
+                      <div className="relative">
+                        <label className="block documents-label">
+                          Upload Files
+                        </label>
+                        <input
+                          type="file"
+                          className="hidden documents-inputs"
+                          id={`fileInput-${doc.id}`}
+                          multiple
+                          onChange={(e) =>
+                            handleChange(
+                              doc.id,
+                              "files",
+                              Array.from(e.target.files)
+                            )
+                          }
+                        />
+                        <label
+                          htmlFor={`fileInput-${doc.id}`}
+                          className="flex items-center justify-between documents-inputs cursor-pointer w-[161px] !py-2"
+                        >
+                          <span className="text-[#4B465C60] text-sm truncate">
+                            {doc.files.length > 0
+                              ? `${doc.files.length} file(s)`
+                              : "Attach Files"}
+                          </span>
+                          <img
+                            src={documentIcon}
+                            alt="attach"
+                            className="ml-2 h-5 w-5 files-icon"
+                          />
+                        </label>
+                      </div>
+                    </>
+                  )}
+
                   <div className="col-span-1 flex items-end justify-end">
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={() => handleRemoveDocument(doc.id)}
-                      className="p-2 bg-[#E44747] hover:bg-[#d43939] remove-btn"
+                      className="p-2 bg-[#E44747] hover:bg-[#d43939] remove-btn flex justify-center items-center duration-200"
                     >
-                      <img src={closeIcon} className="h-5 w-5 ml-[2px]" alt="" />
+                      <img src={closeIcon} className="h-[15px] w-[15px]" alt="remove" />
                     </button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          
+
           {/* Add Document Button */}
           <div className="px-6 py-4 flex justify-end">
             <button
               type="button"
               onClick={handleAddDocument}
-              className="inline-flex justify-center items-center px-5 py-5 text-[#201D1E] bg-white hover:bg-gray-100 add-button"
-            > 
+              className="inline-flex justify-center items-center px-5 py-5 text-[#201D1E] bg-white hover:bg-[#201D1E] hover:text-white add-button duration-200"
+            >
               Add
-              <img src={plusIcon} className='ml-1 h-5 w-5' alt="" />
+              <img src={plusIcon} className="ml-1 h-5 w-5 add-icon" alt="add" />
             </button>
           </div>
         </div>
-        
+
         {/* Navigation Buttons */}
         <div className="flex justify-end gap-4 p-6 border-t mt-auto">
           <button
             type="button"
-            className="text-[#201D1E] hover:bg-gray-100 back-button"
+            className="text-[#201D1E] bg-white hover:bg-[#201D1E] hover:text-white back-button duration-200"
+            onClick={onBack}
           >
             Back
           </button>
           <button
             type="submit"
-            className="bg-[#2892CE] text-white  hover:bg-[#1f709e] next-button"
+            className="bg-[#2892CE] text-white hover:bg-[#1f709e] next-button duration-200"
           >
             Next
           </button>

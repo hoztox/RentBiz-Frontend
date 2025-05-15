@@ -53,7 +53,9 @@ const BuildingInfoForm = ({ onNext }) => {
       <div className="grid grid-cols-2 gap-5">
         {/* Building Name */}
         <div className="col-span-1">
-          <label className="block building-info-form-label">Building Name*</label>
+          <label className="block building-info-form-label">
+            Building Name*
+          </label>
           <div className="relative">
             <select
               name="buildingName"
@@ -80,9 +82,7 @@ const BuildingInfoForm = ({ onNext }) => {
 
         {/* Description */}
         <div className="col-span-1">
-          <label className="block building-info-form-label">
-            Description*
-          </label>
+          <label className="block building-info-form-label">Description*</label>
           <textarea
             type="text"
             name="description"
@@ -113,7 +113,7 @@ const BuildingInfoForm = ({ onNext }) => {
           <label className="block building-info-form-label">Building No*</label>
           <input
             type="text"
-            name="remarks1"
+            name="buildingNo"
             value={formState.buildingNo}
             onChange={handleInputChange}
             placeholder=""
@@ -126,23 +126,23 @@ const BuildingInfoForm = ({ onNext }) => {
           <label className="block building-info-form-label">Plot No*</label>
           <input
             type="text"
-            name="remarks2"
+            name="plotNo"
             value={formState.plotNo}
             onChange={handleInputChange}
             placeholder=""
             className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
           />
         </div>
-      </div>
 
-      {/* Submit Button */}
-      <div className="mt-6 text-right">
-        <button
-          type="submit"
-          className="w-[150px] h-[38px] next-btn duration-300"
-        >
-          Next
-        </button>
+        {/* Submit Button */}
+        <div className="mt-[29px] col-span-1 text-right">
+          <button
+            type="submit"
+            className="w-[150px] h-[38px] next-btn duration-300"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </form>
   );

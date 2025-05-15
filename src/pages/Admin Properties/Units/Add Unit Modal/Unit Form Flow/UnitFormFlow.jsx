@@ -69,6 +69,15 @@ const UnitFormFlow = ({ onClose }) => {
     }, 500); // Match this with your CSS transition duration
   };
 
+   const handlePreviousPage = () => {
+    setAnimating(true);
+
+    setTimeout(() => {
+      setCurrentPageIndex(prev => Math.max(prev - 1, 0)); // prevent going below 0
+      setAnimating(false);
+    }, 500);
+  };
+
   const handleClose = () => {
     setCurrentPageIndex(0);
     setFormData({});
@@ -78,9 +87,9 @@ const UnitFormFlow = ({ onClose }) => {
 
   const pageComponents = [
     <BuildingInfoForm key="building" onNext={handleNextPage} />,
-    <UnitInfoForm key="info" onNext={handleNextPage} />,
-    <DocumentsForm key="docs" onNext={handleNextPage} />,
-    <UnitReview key="review" onNext={handleNextPage} />,
+    <UnitInfoForm key="info" onNext={handleNextPage} onBack={handlePreviousPage} />,
+    <DocumentsForm key="docs" onNext={handleNextPage} onBack={handlePreviousPage} />,
+    <UnitReview key="review" onNext={handleNextPage} onBack={handlePreviousPage} />,
     <SubmissionConfirmation key="confirm" formData={formData} />,
   ];
 
@@ -96,7 +105,7 @@ const UnitFormFlow = ({ onClose }) => {
       </div>
 
       {/* Right Side - Form Steps & Modal Header */}
-      <div className="w-[1010px] px-[53px] pt-[50px] pb-[40px]">
+      <div className="w-full h-[780px] px-[33px] pt-[50px] pb-[40px] overflow-y-scroll">
         {/* Modal Header */}
         <div className="building-modal-header flex justify-between items-center mb-[41px]">
           <h3 className="building-modal-title">{currentTitle}</h3>

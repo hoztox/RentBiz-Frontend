@@ -1,48 +1,55 @@
 .unit-info-form-label {
-    margin-bottom: 10px;
-    font-family: 'Inter Tight';
-    font-size: 13px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    color: #201D1E;
+  margin-bottom: 10px;
+  font-family: "Inter Tight";
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  color: #201d1e;
 }
 
 .building-info-form-inputs::placeholder {
-    font-family: 'Inter Tight';
-    font-size: 15px;
+  font-family: "Inter Tight";
+  font-size: 15px;
 }
 
 .unit-info-form-inputs {
-    border: 1px solid #E9E9E9;
-    background-color: white;
-    border-radius: 6px;
-    padding: 7px 14px;
-    outline: none;
-    font-family: 'Inter Tight';
-    font-size: 15px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 24px;
-    color: #8a898b;
+  border: 1px solid #e9e9e9;
+  background-color: white;
+  border-radius: 6px;
+  padding: 7px 14px;
+  outline: none;
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  color: #8a898b;
+}
+
+.back-button {
+  font-family: "Inter Tight";
+  width: 150px;
+  height: 38px;
+  border-radius: 6px;
+  border: 1px solid #201d1e;
 }
 
 .next-btn {
-    background-color: #2892CE;
-    border-radius: 6px;
-    color: white;
-    font-family: 'Inter Tight';
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 18px;
-    letter-spacing: 0.43px;
+  background-color: #2892ce;
+  border-radius: 6px;
+  color: white;
+  font-family: "Inter Tight";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.43px;
 }
 
 .next-btn:hover {
-    background-color: #0d74af;
+  background-color: #0d74af;
 }
-
 
 /* Hide number input spinners */
 input[type="number"]::-webkit-outer-spin-button,
