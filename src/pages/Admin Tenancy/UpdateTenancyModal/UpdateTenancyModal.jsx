@@ -171,7 +171,7 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
               </div>
             </div>
 
-            <div className="update-tenancy-column">
+            <div className="md:flex update-tenancy-column gap-4">
               <div className="w-1/2">
                 <label className="block update-tenancy-modal-label">Unit *</label>
                 <div className="relative">
@@ -206,38 +206,38 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                 />
               </div>
             </div>
-            <div className="update-tenancy-column">
+            <div className="md:flex update-tenancy-column gap-4">
               <div className="w-1/2">
                 <label className="block update-tenancy-modal-label">Start Date*</label>
                 <div className="relative">
                   <input
-                    type="text"
+                    type="date"
                     placeholder="dd/mm/yyyy"
-                    className="w-full p-2 pr-10 focus:outline-none focus:ring-gray-700 focus:border-gray-700 update-tenancy-input-box"
+                    className="w-full p-2 focus:outline-none focus:ring-gray-700 focus:border-gray-700 text-gray-400 update-tenancy-input-box"
                     defaultValue={tenancyData?.startDate || ""}
                   />
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                  {/* <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                     <img src={calendaricon} alt="" className="w-5 h-5" />
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <div className="w-1/2">
                 <label className="block update-tenancy-modal-label">End Date*</label>
                 <div className="relative">
                   <input
-                    type="text"
+                    type="date"
                     placeholder="dd/mm/yyyy"
-                    className="w-full p-2 pr-10 focus:outline-none focus:ring-gray-700 focus:border-gray-700 update-tenancy-input-box"
+                    className="w-full p-2 focus:outline-none focus:ring-gray-700 focus:border-gray-700 text-gray-400 update-tenancy-input-box"
                     defaultValue={tenancyData?.endDate || ""}
                   />
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                  {/* <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                     <img src={calendaricon} alt="" className="w-5 h-5" />
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
 
-            <div className="update-tenancy-column">
+            <div className="md:flex update-tenancy-column gap-4">
               <div className="w-1/2">
                 <label className="block update-tenancy-modal-label">
                   No. Of Payments*
@@ -255,14 +255,14 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                 </label>
                 <div className="relative">
                   <input
-                    type="text"
+                    type="date"
                     placeholder="mm/dd/yyyy"
-                    className="w-full p-2 pr-10 focus:outline-none focus:ring-gray-700 focus:border-gray-700 update-tenancy-input-box"
+                    className="w-full p-2 focus:outline-none focus:ring-gray-700 focus:border-gray-700 text-gray-400 update-tenancy-input-box"
                     defaultValue={tenancyData?.firstRentDue || ""}
                   />
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                  {/* <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                     <img src={calendaricon} alt="" className="w-5 h-5" />
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -408,16 +408,16 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                         </td>
                         <td className="px-[10px] py-[5px] w-[173px] relative">
                           <input
-                            type="text"
+                            type="date"
                             placeholder="mm/dd/yyyy"
-                            className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 update-tenancy-modal-table-input"
+                            className="w-full h-[38px] border focus:outline-none focus:ring-gray-700 focus:border-gray-700 !text-gray-400  update-tenancy-modal-table-input"
                             defaultValue={charge.dueDate || ""}
                           />
-                          <img
+                          {/* <img
                             src={calendaricon}
                             alt="Calendar"
                             className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                          />
+                          /> */}
                         </td>
                         <td className="px-[10px] py-[5px] w-[55px] text-[14px] text-[#201D1E]">
                           {charge.status}
@@ -519,7 +519,7 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                         <input
                           type="text"
                           placeholder="mm/dd/yyyy"
-                          className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 update-tenancy-modal-table-input"
+                          className="w-full h-[38px] border focus:outline-none focus:ring-gray-700 focus:border-gray-700 update-tenancy-modal-table-input"
                           defaultValue={charge.dueDate || ""}
                         />
                         <img
@@ -647,16 +647,16 @@ const UpdateTenancyModal = ({ isOpen, onClose, tenancyData = {} }) => {
                             {item.id === "03" ? (
                               <div className="relative">
                                 <input
-                                  type="text"
+                                  type="date"
                                   placeholder="mm/dd/yyyy"
-                                  className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 update-tenancy-modal-table-input"
+                                  className="w-full h-[38px] border focus:outline-none focus:ring-gray-700 focus:border-gray-700 !text-gray-400 update-tenancy-modal-table-input"
                                   defaultValue={item.dueDate || ""}
                                 />
-                                <img
+                                {/* <img
                                   src={calendaricon}
                                   alt="Calendar"
                                   className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                                />
+                                /> */}
                               </div>
                             ) : (
                               <span className="text-[14px] text-[#201D1E]">
