@@ -160,6 +160,16 @@
   .refund-dropdown-label {
     font-size: 11px !important;
   }
+  .refund-dropdown-item.refund-tenant-name-column{
+    width: 33% !important;
+  }
+  .refund-dropdown-item.refund-amount-column {
+    width: 30% !important;
+  }
+    .refund-dropdown-item.refund-payment-method-column {
+    width: 37% !important;
+    padding-right: 0;
+  }
   .pagination-btn {
     font-size: 13px;
     padding: 0px 10px;
@@ -172,7 +182,7 @@
   }
 }
 
-@media (max-width: 375px) {
+@media (min-width: 361px) and (max-width: 375px) {
   .refund-thead.refund-date-column,
   .refund-thead.refund-tenancy-id-column {
     padding-left: 14px;
@@ -184,14 +194,24 @@
     padding-right: 0;
   } 
   .refund-thead{
-    font-size: 12px !important;
+    font-size: 11px !important;
   }
   .refund-dropdown-label{
     font-size: 11px !important;
   }
+   .refund-dropdown-item.refund-tenant-name-column{
+    width: 34% !important;
+  }
+  .refund-dropdown-item.refund-amount-column {
+    width: 30% !important;
+  }
+    .refund-dropdown-item.refund-payment-method-column {
+    width: 40% !important;
+    padding-right: 0;
+  }
 }
 
-@media (max-width: 390px) {
+@media (min-width: 376px) and (max-width: 390px) {
   .refund-thead.refund-date-column,
   .refund-thead.refund-tenancy-id-column {
     padding-left: 14px;
@@ -203,10 +223,20 @@
     padding-right: 0;
   }
   .refund-selection {
-    width: 120px;
+    width: 100%;
   }
   .download-btn {
-    width: 120px;
+    width: 40%;
+  }
+    .refund-dropdown-item.refund-tenant-name-column{
+    width: 33% !important;
+  }
+  .refund-dropdown-item.refund-amount-column {
+    width: 27% !important;
+  }
+    .refund-dropdown-item.refund-payment-method-column {
+    width: 40% !important;
+    padding-right: 0;
   }
 }
 
@@ -244,13 +274,13 @@
     padding-right: 0;
   }
   .refund-dropdown-item.refund-tenant-name-column{
-    width: 31% !important;
+    width: 31%;
   }
   .refund-dropdown-item.refund-amount-column{
-    width: 24% !important;
+    width: 24%;
   }
   .refund-dropdown-item.refund-payment-method-column{
-    width: 41% !important;
+    width: 41%;
   }
 }
 
@@ -408,13 +438,13 @@
     box-sizing: border-box;
   }
   .refund-dropdown-item.refund-tenant-name-column {
-    width: 33% !important;
+    width: 30%;
   }
   .refund-dropdown-item.refund-amount-column {
-    width: 30% !important;
+    width: 24%;
   }
   .refund-dropdown-item.refund-payment-method-column {
-    width: 37% !important;
+    width: 41%;
     padding-right: 0;
   }
   .refund-dropdown-item.refund-status-column {
