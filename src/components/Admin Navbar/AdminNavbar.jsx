@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import { ChevronDown, X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { ChevronDown } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import logo from "../../assets/Images/Admin Sidebar/Rentbiz Logo.svg";
 import profile from "../../assets/Images/Admin Navbar/profile.svg";
 import mobilemenu from "../../assets/Images/Admin Navbar/mobile-menu.svg";
@@ -9,6 +9,37 @@ import MobileSlideMenu from "../MobileSlideMenu/MobileSlideMenu";
 import AdminCreateUserModal from "../AdminCreateUserModal/AdminCreateUserModal";
 import CreateTenancyModal from "../../pages/Admin Tenancy/CreateTenancy/CreateTenancyModal";
 import CreateTenantModal from "../../pages/Admin Tenants/CreateTenantModal/CreateTenantModal";
+
+const routeTitles = {
+  "/admin/dashboard": "Dashboard Overview",
+  "/admin/users-manage": "Users Overview",
+  "/admin/buildings": "Building Overview",
+  "/admin/units": "Unit Overview",
+  "/admin/tenants": "Tenant Overview",
+  "/admin/tenancy-master": "Tenancy Overview",
+  "/admin/tenancy-confirm": "Tenancy Confirm Overview",
+  "/admin/tenancy-renewal": "Tenancy Renewal Overview",
+  "/admin/tenancy-termination": "Tenancy Cancellation Overview",
+  "/admin/tenancy-close": "Tenancy Close Overview",
+  "/admin/masters-unit-type": "Unit Masters Overview",
+  "/admin/masters-id-type": "ID Type Masters Overview",
+  "/admin/masters-charge-code-type": "Charge Code Type Masters Overview",
+  "/admin/masters-charges": "Charges Masters Overview",
+  "/admin/masters-document-type": "Document Type Masters Overview",
+  "/admin/masters-translate": "Language Overview",
+  "/admin/masters-currency": "Currency Overview",
+  "/admin/additional-charges": "Additional Charges Overview",
+  "/admin/invoice": "Invoice Overview",
+  "/admin/monthly-invoice": "Invoice Overview",
+  "/admin/collection": "Collection Overview",
+  "/admin/expense": "Expense Overview",
+  "/admin/refund": "Refund Overview",
+  "/admin/tenancy-report": "Tenant Report Overview",
+  "/admin/upcoming-collection": "Upcoming Collection Overview",
+  "/admin/collection-report": "Collection Report Overview",
+  "/admin/income-expense-report": "Income / Expense Report Overview",
+  default: "Admin Panel"
+}
 
 const AdminNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,6 +50,24 @@ const AdminNavbar = () => {
   const [isTenancyModalOpen, setIsTenancyModalOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const getPageTitle = () => {
+    const path = location.pathname;
+
+    // checking for correct route
+    if(routeTitles[path]) return routeTitles[path];
+
+    // Handle nested routes (e.g., /admin/buildings/:id)
+    // if (path.startsWith("/admin/buildings")) return "Buildings Overview";
+    // if (path.startsWith("/admin/units")) return "Units Overview";
+    // if (path.startsWith("/admin/tenants")) return "Tenants Overview";
+    // if (path.startsWith("/admin/tenancy")) return "Tenancy Overview";
+    // if (path.startsWith("/admin/masters")) return "Masters Overview";
+
+    // Fallback for unknown routes
+    return routeTitles.default
+  }
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -77,7 +126,7 @@ const AdminNavbar = () => {
     <>
       <nav className="flex items-center justify-between mx-5 h-[86px] border-b border-[#E9E9E9] bg-white admin-navbar">
         <div>
-          <h1 className="navbar-head">Dashboard Overview</h1>
+          <h1 className="navbar-head">{getPageTitle()}</h1>
           <img
             src={logo}
             alt="RentBiz Logo"
