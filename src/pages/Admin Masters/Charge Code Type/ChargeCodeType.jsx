@@ -78,7 +78,7 @@ const ChargeCodeType = () => {
     <div className="border border-gray-200 rounded-md idtype-table">
       {/* Header Section */}
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] idtype-table-header">
-        <h1 className="idtype-head">Charge Code Type</h1>
+        <h1 className="idtype-head">Charge Code Type Masters</h1>
         <div className="flex flex-col md:flex-row gap-[10px] idtype-inputs-container">
           <div className="flex flex-col md:flex-row gap-[10px] w-full">
             <input
