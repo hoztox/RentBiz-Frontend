@@ -164,7 +164,7 @@ const TenancyViewModal = ({ isOpen, onClose }) => {
                 {additionalCharges.map((charge) => (
                   <tr
                     key={charge.id}
-                    className="h-[57px] border-b border-[#E9E9E9] hover:bg-gray-100"
+                    className="h-[57px] border-b border-[#E9E9E9] last:border-b-0 hover:bg-gray-100"
                   >
                     <td className="px-[10px] py-[5px] w-[20px] view-tenancy-charges-tdata">
                       {charge.id}
