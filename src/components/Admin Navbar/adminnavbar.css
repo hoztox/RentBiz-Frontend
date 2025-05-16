@@ -1,125 +1,191 @@
 .navbar-head {
-    font-family: 'Inter Tight';
-    font-size: 24px;
-    font-style: normal;
-    font-weight: 600;
-    line-height: normal;
-    color: #201D1E;
+  font-family: "Inter Tight";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: normal;
+  color: #201d1e;
 }
 
 .select-box {
-    font-family: 'Inter Tight';
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    color: #201D1E;
+  font-family: "Inter Tight";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  color: #201d1e;
 }
 
 .options-text {
-    font-family: 'Inter Tight';
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    color: #201D1E;
+  font-family: "Inter Tight";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  color: #201d1e;
 }
 
 .profile-section {
-    border-left: 1px solid #E9E9E9;
-    padding-left: 20px;
+  border-left: 1px solid #e9e9e9;
+  padding-left: 20px;
 }
 
 .admin-name {
-    font-family: 'Inter Tight';
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    color: #201D1E;
+  font-family: "Inter Tight";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  color: #201d1e;
 }
 
 .admin-email {
-    font-family: 'Inter Tight';
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    color: #999999;
+  font-family: "Inter Tight";
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  color: #999999;
+}
+
+.back-arrow {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.mobile-page-title {
+  display: none;
+  font-family: "Inter Tight";
+  font-size: 21px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  color: #201d1e;
+  text-align: center;
+  margin-top: 20px;
+  flex: 1;
 }
 
 /* === Mobile Slide Menu Base === */
 .mobile-slide-menu {
-    display: none;
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 250px;
-    height: 100vh;
-    background-color: white;
-    z-index: 9999;
-    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* When Open */
-  .mobile-slide-menu.open {
-    transform: translateX(0);
-  }
-  
-  /* === Overlay behind menu (optional but recommended) === */
-  .mobile-slide-overlay {
-    display: none;
-  }
-  
-  .mobile-slide-overlay.active {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.4);
-    z-index: 9998;
-  }
-  
-  /* === Show Mobile Slide Menu only on mobile === */
-  @media (max-width: 768px) {
-    .mobile-slide-menu {
-      display: block;
-    }
-  
-    .navbar-right-side {
-      display: none !important;
-    }
-  }
-
-@media(min-width:481px) {
-    .RentBiz-Logo, .mobile-menu {
-        display: none;
-    }
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 250px;
+  height: 100vh;
+  background-color: white;
+  z-index: 9999;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
 }
 
-@media(max-width:480px) {
-    .admin-navbar {
-        /* max-width: calc(100vw - 40px); */
-        width: 100vw; /* Ensure full viewport width */
-        margin: 0; /* Remove horizontal margins */
-        border-bottom: none;
-        height: 90px;
-        display: flex;
-        align-items: end;
-    }
-    .navbar-head, .navbar-right-side {
-        display: none;
-    }
-    .RentBiz-Logo {
-        height: 55.955px;
-        width: 91px;
-        margin-bottom: 15px;
-        margin-left: 20px;
-    }
-    .mobile-menu {
-        background-color: #1458A2;
-        border-radius: 100%;
-        padding: 10px;
-        margin-bottom: 25px;
-        margin-right: 20px;
-    }
+/* When Open */
+.mobile-slide-menu.open {
+  transform: translateX(0);
+}
+
+/* === Overlay behind menu (optional but recommended) === */
+.mobile-slide-overlay {
+  display: none;
+}
+
+.mobile-slide-overlay.active {
+  display: block;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 9998;
+}
+
+/* === Desktop View (min-width: 481px) === */
+@media (min-width: 481px) {
+  .RentBiz-Logo,
+  .mobile-menu,
+  .back-arrow,
+  .mobile-page-title {
+    display: none;
+  }
+}
+
+/* === Mobile View (max-width: 480px) === */
+@media (max-width: 480px) {
+  .admin-navbar {
+    width: 100vw;
+    margin: 0;
+    border-bottom: none;
+    height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-sizing: border-box;
+  }
+
+  .navbar-head,
+  .navbar-right-side {
+    display: none;
+  }
+
+  .left-section {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+  }
+
+  .RentBiz-Logo {
+    height: 55.955px;
+    width: 91px;
+    display: none; /* Hidden by default */
+  }
+
+  .back-arrow {
+    display: none;
+  }
+
+  .mobile-menu {
+    background-color: #1458a2;
+    border-radius: 100%;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Dashboard-specific styles */
+  .dashboard-nav {
+    align-items: flex-end;
+    padding-bottom: 15px;
+  }
+
+  .dashboard-nav .RentBiz-Logo {
+    display: block;
+  }
+
+  .dashboard-nav .mobile-page-title,
+  .dashboard-nav .back-arrow {
+    display: none;
+  }
+
+  /* Non-dashboard styles */
+  .non-dashboard-nav {
+    align-items: center;
+    padding-top: 15px;
+  }
+
+  .non-dashboard-nav .RentBiz-Logo {
+    display: none;
+  }
+
+  .non-dashboard-nav .back-arrow {
+    display: block;
+  }
+
+  .non-dashboard-nav .mobile-page-title {
+    display: block;
+  }
+
+  .mobile-slide-menu {
+    display: block;
+  }
 }

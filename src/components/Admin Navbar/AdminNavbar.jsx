@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import logo from "../../assets/Images/Admin Sidebar/Rentbiz Logo.svg";
+import backarrow from "../../assets/Images/Admin Navbar/backarrow.svg";
 import profile from "../../assets/Images/Admin Navbar/profile.svg";
 import mobilemenu from "../../assets/Images/Admin Navbar/mobile-menu.svg";
 import "./adminnavbar.css";
@@ -38,36 +39,68 @@ const routeTitles = {
   "/admin/upcoming-collection": "Upcoming Collection Overview",
   "/admin/collection-report": "Collection Report Overview",
   "/admin/income-expense-report": "Income / Expense Report Overview",
-  default: "Admin Panel"
-}
+  default: "Admin Panel",
+};
+
+const mobileRouteTitles = {
+  "/admin/users-manage": "Users",
+  "/admin/buildings": "Buildings",
+  "/admin/units": "Units",
+  "/admin/tenants": "Tenants",
+  "/admin/tenancy-master": "Tenancy",
+  "/admin/tenancy-confirm": "Tenancy Confirm",
+  "/admin/tenancy-renewal": "Tenancy Renewal",
+  "/admin/tenancy-termination": "Tenancy Termination",
+  "/admin/tenancy-close": "Tenancy Closing",
+  "/admin/masters-unit-type": "Unit Type Masters",
+  "/admin/masters-id-type": "ID Type Masters",
+  "/admin/masters-charge-code-type": "Charge Code Type",
+  "/admin/masters-charges": "Charges Master",
+  "/admin/masters-document-type": "Document Type Masters",
+  "/admin/masters-translate": "Translation",
+  "/admin/masters-currency": "Currency",
+  "/admin/additional-charges": "Additional Charges",
+  "/admin/invoice": "Invoice List",
+  "/admin/monthly-invoice": "Monthly Invoice List",
+  "/admin/collection": "Collection",
+  "/admin/expense": "Expenses",
+  "/admin/refund": "Refund",
+  "/admin/tenancy-report": "Tenant Report",
+  "/admin/upcoming-collection": "Upcoming Collection Report",
+  "/admin/collection-report": "Collection Report",
+  "/admin/income-expense-report": "Income-Expense Report",
+};
 
 const AdminNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("English");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
-  const [isCreateTenantModalOpen, setIsCreateTenantModalOpen] = useState(false)
+  const [isCreateTenantModalOpen, setIsCreateTenantModalOpen] = useState(false);
   const [isTenancyModalOpen, setIsTenancyModalOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const getPageTitle = () => {
+  const isDashboard = location.pathname === "/admin/dashboard";
+
+  const getPageTitle = (isMobile = false) => {
     const path = location.pathname;
+    const titles = isMobile ? mobileRouteTitles : routeTitles;
 
-    // checking for correct route
-    if(routeTitles[path]) return routeTitles[path];
+    // Check for exact route match
+    if (titles[path]) return titles[path];
 
-    // Handle nested routes (e.g., /admin/buildings/:id)
-    // if (path.startsWith("/admin/buildings")) return "Buildings Overview";
-    // if (path.startsWith("/admin/units")) return "Units Overview";
-    // if (path.startsWith("/admin/tenants")) return "Tenants Overview";
-    // if (path.startsWith("/admin/tenancy")) return "Tenancy Overview";
-    // if (path.startsWith("/admin/masters")) return "Masters Overview";
+    // Handle nested routes (optional, uncomment if needed)
+    // if (path.startsWith("/admin/buildings")) return titles["/admin/buildings"];
+    // if (path.startsWith("/admin/units")) return titles["/admin/units"];
+    // if (path.startsWith("/admin/tenants")) return titles["/admin/tenants"];
+    // if (path.startsWith("/admin/tenancy")) return titles["/admin/tenancy-master"];
+    // if (path.startsWith("/admin/masters")) return titles["/admin/masters-unit-type"];
 
     // Fallback for unknown routes
-    return routeTitles.default
-  }
+    return titles.default;
+  };
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -91,20 +124,28 @@ const AdminNavbar = () => {
   };
 
   const openCreateTenantModal = () => {
-    setIsCreateTenantModalOpen(true)
-  }
+    setIsCreateTenantModalOpen(true);
+  };
 
   const closeCreateTenentModal = () => {
-    setIsCreateTenantModalOpen(false)
-  }
+    setIsCreateTenantModalOpen(false);
+  };
 
   const openTenancyModal = () => {
-    setIsTenancyModalOpen(true)
-  }
+    setIsTenancyModalOpen(true);
+  };
 
   const closeTenancyModal = () => {
-    setIsTenancyModalOpen(false)
-  }
+    setIsTenancyModalOpen(false);
+  };
+
+  const handleBackClick = () => {
+    navigate(-1); // Navigate back
+  };
+
+  const handleLogoClick = () => {
+    navigate("/admin/dashboard");
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -118,27 +159,46 @@ const AdminNavbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleLogoClick = () => {
-    navigate("/admin/dashboard");
-  };
-
   return (
     <>
-      <nav className="flex items-center justify-between mx-5 h-[86px] border-b border-[#E9E9E9] bg-white admin-navbar">
-        <div>
-          <h1 className="navbar-head">{getPageTitle()}</h1>
-          <img
-            src={logo}
-            alt="RentBiz Logo"
-            className="RentBiz-Logo"
-            onClick={handleLogoClick}
-          />
+      <nav
+        className={`flex items-center justify-between mx-5 h-[86px] border-b border-[#E9E9E9] bg-white admin-navbar ${
+          isDashboard ? "dashboard-nav" : "non-dashboard-nav"
+        }`}
+      >
+        <div className="flex items-center w-full">
+          {/* Left Section: Logo or Back Arrow */}
+          <div className="left-section">
+            {isDashboard ? (
+              <img
+                src={logo}
+                alt="RentBiz Logo"
+                className="RentBiz-Logo"
+                onClick={handleLogoClick}
+              />
+            ) : (
+              <img
+                src={backarrow}
+                alt="Back Arrow"
+                className="back-arrow"
+                onClick={handleBackClick}
+              />
+            )}
+          </div>
+          {/* Center Section: Page Title (non-dashboard pages in mobile) */}
+          {!isDashboard && (
+            <h1 className="mobile-page-title">{getPageTitle(true)}</h1>
+          )}
+          {/* Desktop Page Title */}
+          <h1 className="navbar-head">{getPageTitle(false)}</h1>
         </div>
 
+        {/* Mobile Menu Button */}
         <button className="mobile-menu" onClick={toggleMobileMenu}>
-          <img src={mobilemenu} alt="Menu Icon" className="w-[18px] h-[18px]" />
+          <img src={mobilemenu} alt="Menu Icon" className="w-[20px] h-[20px]" />
         </button>
 
+        {/* Right Section: Language Dropdown and Profile (Desktop) */}
         <div className="flex items-center navbar-right-side">
           <div className="relative mr-5" ref={dropdownRef}>
             <button
@@ -178,7 +238,7 @@ const AdminNavbar = () => {
             </div>
           </div>
 
-          <div className="flex items-center  profile-section">
+          <div className="flex items-center profile-section">
             <div className="w-10 h-10 rounded-full overflow-hidden mr-5">
               <img
                 src={profile}
@@ -205,8 +265,14 @@ const AdminNavbar = () => {
 
       {/* Modals */}
       <AdminCreateUserModal isOpen={isUserModalOpen} onClose={closeUserModal} />
-      <CreateTenantModal open={isCreateTenantModalOpen} onClose={closeCreateTenentModal} />
-      <CreateTenancyModal isOpen={isTenancyModalOpen} onClose={closeTenancyModal} />
+      <CreateTenantModal
+        open={isCreateTenantModalOpen}
+        onClose={closeCreateTenentModal}
+      />
+      <CreateTenancyModal
+        isOpen={isTenancyModalOpen}
+        onClose={closeTenancyModal}
+      />
     </>
   );
 };
