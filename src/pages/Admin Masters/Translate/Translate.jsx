@@ -242,7 +242,7 @@ const Translate = () => {
           </tbody>
         </table>
       </div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-3 md:px-5 pagination-container">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
         <span className="collection-list-pagination pagination-text">
           Showing{" "}
           {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}

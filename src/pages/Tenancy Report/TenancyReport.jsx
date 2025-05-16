@@ -314,7 +314,7 @@ const TenancyReport = () => {
           </tbody>
         </table>
       </div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center h-[77.5px] px-5 tenancy-report-pagination-container">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 px-5 tenancy-report-pagination-container">
         <span className="collection-list-pagination tenancy-report-pagination-text">
           Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
           {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
