@@ -169,7 +169,7 @@ const IncomeExpenseReport = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 income-expense-search"
             />
-            <div className="relative w-full md:w-auto">
+            <div className="relative w-[45%] md:w-auto">
               <select
                 className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 income-expense-selection"
                 onFocus={() => setOpenSelectKey("showing")}
@@ -186,7 +186,7 @@ const IncomeExpenseReport = () => {
             </div>
           </div>
           <div className="flex gap-[10px] income-expense-action-buttons-container">
-            <div className="relative w-full md:w-auto">
+            <div className="relative w-[55%] md:w-auto">
               <select
                 className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 income-expense-selection"
                 onFocus={() => setOpenSelectKey("filter")}
@@ -452,9 +452,9 @@ const IncomeExpenseReport = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="income-expense-table-row-head">
-              <th className="px-5 w-[45%] text-left income-expense-thead income-expense-date-column">DATE</th>
-              <th className="px-3 w-[30%] text-left income-expense-thead income-expense-tenant-column">TENANT</th>
-              <th className="px-5 text-right income-expense-thead"></th>
+              <th className="px-5 pl-[1rem] w-[50%] text-left income-expense-thead income-expense-date-column">DATE</th>
+              <th className="px-3 w-[33.33%] text-left income-expense-thead income-expense-tenant-column">BUILDING</th>
+              <th className=" text-right income-expense-thead"></th>
             </tr>
           </thead>
           <tbody>
@@ -468,7 +468,7 @@ const IncomeExpenseReport = () => {
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left income-expense-data income-expense-date-column w-[35%] pl-[16px]">{report.date}</td>
-                  <td className="px-3 text-left income-expense-data income-expense-tenant-column w-[30%]">{report.tenant}</td>
+                  <td className="px-3 text-left income-expense-data income-expense-tenant-column w-[30%]">{report.building}</td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`income-expense-dropdown-field ${
@@ -492,20 +492,20 @@ const IncomeExpenseReport = () => {
                       <div className="income-expense-grid-container">
                         <div className="income-expense-grid">
                           <div className="income-expense-grid-item">
-                            <div className="income-expense-dropdown-label">BUILDING</div>
-                            <div className="income-expense-dropdown-value">{report.building}</div>
-                          </div>
-                          <div className="income-expense-grid-item w-[56%]">
-                            <div className="income-expense-dropdown-label">UNIT</div>
+                            <div className="income-expense-dropdown-label w-[50%]">UNIT</div>
                             <div className="income-expense-dropdown-value">{report.unit}</div>
+                          </div>
+                          <div className="income-expense-grid-item w-[50%]">
+                            <div className="income-expense-dropdown-label">TENANT</div>
+                            <div className="income-expense-dropdown-value">{report.tenant}</div>
                           </div>
                         </div>
                         <div className="income-expense-grid">
-                          <div className="income-expense-grid-item w-[44%]">
+                          <div className="income-expense-grid-item w-[50%]">
                             <div className="income-expense-dropdown-label">CHARGE</div>
                             <div className="income-expense-dropdown-value">{report.charge}</div>
                           </div>
-                          <div className="income-expense-grid-item w-[56%]">
+                          <div className="income-expense-grid-item w-[50%]">
                             <div className="income-expense-dropdown-label">INVOICE NO/EXPENSE NO</div>
                             <div className="income-expense-dropdown-value">{report.invoice_no}</div>
                           </div>
