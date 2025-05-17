@@ -7,9 +7,7 @@ import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Tenancy/delete-icon.svg";
 import viewicon from "../../../assets/Images/Admin Tenancy/view-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
-import CreateTenancyModal from "../CreateTenancy/CreateTenancyModal";
-import UpdateTenancyModal from "../UpdateTenancyModal/UpdateTenancyModal";
-import TenancyViewModal from "../TenancyViewModal/TenancyViewModal";
+import { useModal } from "../../../context/ModalContext";
 
 const TenancyMaster = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -17,34 +15,7 @@ const TenancyMaster = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
   const itemsPerPage = 10;
-
-  const [createTenancyModal, setCreateTenancyModal] = useState(false);
-  const [updateTenancyModal, setUpdateTenancyModal] = useState(false);
-  const [viewTenancyModal, setViewTenancyModal] = useState(false);
-
-  const openCreateTenancyModal = () => {
-    setCreateTenancyModal(true);
-  };
-
-  const closeCreateTenancyModal = () => {
-    setCreateTenancyModal(false);
-  };
-
-  const openUpdateTenancyModal = () => {
-    setUpdateTenancyModal(true);
-  };
-
-  const closeUpdateTenancyModal = () => {
-    setUpdateTenancyModal(false);
-  };
-
-  const openViewTenancyModal = () => {
-    setViewTenancyModal(true);
-  };
-
-  const closeViewTenancyModal = () => {
-    setViewTenancyModal(false);
-  };
+  const {openModal} = useModal()
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -154,7 +125,7 @@ const TenancyMaster = () => {
           <div className="flex gap-[10px] tenancy-action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-[51%] md:w-[176px] h-[38px] rounded-md tenancy-add-new-tenancy duration-200"
-              onClick={openCreateTenancyModal}
+              onClick={()=>openModal("tenancy-create")}
             >
               Add New Tenancy
               <img src={plusicon} alt="plus icon" className="relative right-[5px] w-[16px] h-[15px]" />
@@ -209,7 +180,7 @@ const TenancyMaster = () => {
                   </span>
                 </td>
                 <td className="pl-12 pr-5 pt-2 text-center">
-                  <button onClick={openViewTenancyModal}>
+                  <button onClick={()=>openModal("tenancy-view")}>
                     <img
                       src={tenancy.view}
                       alt="View"
@@ -218,7 +189,7 @@ const TenancyMaster = () => {
                   </button>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={openUpdateTenancyModal}>
+                  <button onClick={()=>openModal("tenancy-update")}>
                     <img
                       src={editicon}
                       alt="Edit"
@@ -314,7 +285,7 @@ const TenancyMaster = () => {
                           <div className="tenancy-grid-item">
                             <div className="tenancy-dropdown-label">VIEW</div>
                             <div className="tenancy-dropdown-value">
-                              <button onClick={openViewTenancyModal}>
+                              <button onClick={()=>openModal("tenancy-view")}>
                                 <img
                                   src={tenancy.view}
                                   alt="View"
@@ -326,7 +297,7 @@ const TenancyMaster = () => {
                           <div className="tenancy-grid-item tenancy-action-column">
                             <div className="tenancy-dropdown-label">ACTION</div>
                             <div className="tenancy-dropdown-value tenancy-flex tenancy-items-center tenancy-gap-2">
-                              <button onClick={openUpdateTenancyModal}>
+                              <button onClick={()=>openModal("tenancy-update")}>
                                 <img
                                   src={editicon}
                                   alt="Edit"
@@ -405,18 +376,6 @@ const TenancyMaster = () => {
           </button>
         </div>
       </div>
-      <CreateTenancyModal
-        isOpen={createTenancyModal}
-        onClose={closeCreateTenancyModal}
-      />
-      <UpdateTenancyModal
-        isOpen={updateTenancyModal}
-        onClose={closeUpdateTenancyModal}
-      />
-      <TenancyViewModal
-        isOpen={viewTenancyModal}
-        onClose={closeViewTenancyModal}
-      />
     </div>
   );
 };

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import "./TenancyViewModal.css";
 import closeicon from "../../../assets/Images/Admin Tenancy/close-icon.svg";
+import { useModal } from "../../../context/ModalContext";
 
-const TenancyViewModal = ({ isOpen, onClose }) => {
+const TenancyViewModal = () => {
+  const {modalState, closeModal} = useModal();
   const [expandedStates, setExpandedStates] = useState({
     "01": false,
     "02": false,
@@ -15,7 +17,8 @@ const TenancyViewModal = ({ isOpen, onClose }) => {
     }));
   };
 
-  if (!isOpen) return null;
+  // Only render for "tenancy-view" type
+  if(!modalState.isOpen || modalState.type !== "tenancy-view") return null;
 
   const additionalCharges = [
     {
@@ -42,7 +45,7 @@ const TenancyViewModal = ({ isOpen, onClose }) => {
 
   return (
     <div
-      onClick={onClose}
+      onClick={closeModal}
       className="view-modal-overlay fixed inset-0 flex items-center justify-center transition-colors z-50"
     >
       <div
@@ -52,7 +55,7 @@ const TenancyViewModal = ({ isOpen, onClose }) => {
         <div className="flex justify-between items-center mt-[5px] mb-[30px]">
           <h2 className="tenancy-view-modal-head">Tenancy View</h2>
           <button
-            onClick={onClose}
+            onClick={closeModal}
             className="tenancy-view-modal-close-btn hover:bg-gray-100 duration-200"
           >
             <img src={closeicon} alt="Close" className="w-[15px] h-[15px]" />

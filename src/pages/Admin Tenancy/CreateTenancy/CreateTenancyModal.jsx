@@ -5,10 +5,32 @@ import calendaricon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/ca
 import deleteicon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/delete-icon.svg";
 import plusicon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/plus-icon.svg";
 import { ChevronDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useModal } from "../../../context/ModalContext";
 
-const CreateTenancyModal = ({ isOpen, onClose }) => {
+const CreateTenancyModal = () => {
+  const { modalState, closeModal } = useModal();
+  const navigate = useNavigate();
   const [selectOpenStates, setSelectOpenStates] = useState({});
   const [showPaymentSchedule, setShowPaymentSchedule] = useState(true);
+
+  // Form state
+  const [formData, setFormData] = useState({
+    tenantName: "",
+    building: "",
+    unit: "",
+    rentalMonths: "",
+    startDate: "",
+    endDate: "",
+    noOfPayments: "",
+    firstRentDueOn: "",
+    rentPerFrequency: "",
+    totalRentReceivable: "",
+    deposit: "",
+    commission: "",
+    remarks: "",
+  });
+
   const [additionalCharges, setAdditionalCharges] = useState([
     {
       id: "01",
@@ -57,11 +79,33 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
     paymentSchedule.reduce((acc, item) => ({ ...acc, [item.id]: false }), {})
   );
 
+  // Only render for "tenancy-create" type
+  if (!modalState.isOpen || modalState.type !== "tenancy-create") return null;
+
   const toggleSelectOpen = (selectId) => {
     setSelectOpenStates((prev) => ({
       ...prev,
       [selectId]: !prev[selectId],
     }));
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAdditionalChargeChange = (id, field, value) => {
+    setAdditionalCharges((prev) =>
+      prev.map((charge) =>
+        charge.id === id ? { ...charge, [field]: value } : charge
+      )
+    );
+  };
+
+  const handlePaymentScheduleChange = (id, field, value) => {
+    setPaymentSchedule((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
+    );
   };
 
   const addRow = () => {
@@ -98,7 +142,55 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
     }));
   };
 
-  if (!isOpen) return null;
+  const handleSubmit = () => {
+    // Basic validation
+    const requiredFields = [
+      "tenantName",
+      "building",
+      "unit",
+      "rentalMonths",
+      "startDate",
+      "endDate",
+      "noOfPayments",
+      "firstRentDueOn",
+      "remarks",
+    ];
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        alert(`Please fill the ${field} field`);
+        return;
+      }
+    }
+    // Validate additional charges
+    for (const charge of additionalCharges) {
+      if (
+        !charge.chargeType ||
+        !charge.reason ||
+        !charge.dueDate ||
+        !charge.amount
+      ) {
+        alert("Please fill all fields in Additional Charges");
+        return;
+      }
+    }
+    // Validate payment schedule (for editable fields)
+    const rentItem = paymentSchedule.find((item) => item.id === "03");
+    if (rentItem && (!rentItem.dueDate || !rentItem.amount)) {
+      alert(
+        "Please fill due date and amount for Monthly Rent in Payment Schedule"
+      );
+      return;
+    }
+
+    // TODO: Add API call (e.g., POST /api/tenancies)
+    console.log("Form submitted:", {
+      ...formData,
+      additionalCharges,
+      paymentSchedule,
+    });
+    closeModal();
+    navigate("/admin/tenancy-master"); // Adjust route as needed
+  };
 
   return (
     <div className="tenancy-modal-overlay">
@@ -110,8 +202,9 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
           <div className="flex justify-between items-center md:mb-8">
             <h2 className="tenancy-modal-head">Create New Tenancy</h2>
             <button
-              onClick={onClose}
+              onClick={closeModal}
               className="tenancy-close-btn hover:bg-gray-100 duration-200"
+              aria-label="Close modal"
             >
               <img src={closeicon} alt="close-button" />
             </button>
@@ -122,11 +215,15 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               <label className="block tenancy-modal-label">Tenant Name*</label>
               <div className="relative">
                 <select
+                  name="tenantName"
+                  value={formData.tenantName}
+                  onChange={handleInputChange}
                   className="w-full p-2 appearance-none tenancy-input-box"
                   onFocus={() => toggleSelectOpen("tenantName")}
                   onBlur={() => toggleSelectOpen("tenantName")}
                 >
-                  <option>Choose</option>
+                  <option value="">Choose</option>
+                  {/* TODO: Populate with tenant data from API */}
                 </select>
                 <ChevronDown
                   className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
@@ -142,11 +239,15 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               <label className="block tenancy-modal-label">Building*</label>
               <div className="relative">
                 <select
+                  name="building"
+                  value={formData.building}
+                  onChange={handleInputChange}
                   className="w-full p-2 appearance-none tenancy-input-box"
                   onFocus={() => toggleSelectOpen("building")}
                   onBlur={() => toggleSelectOpen("building")}
                 >
-                  <option>Choose</option>
+                  <option value="">Choose</option>
+                  {/* TODO: Populate with building data from API */}
                 </select>
                 <ChevronDown
                   className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
@@ -164,11 +265,15 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                 <label className="block tenancy-modal-label">Unit *</label>
                 <div className="relative">
                   <select
+                    name="unit"
+                    value={formData.unit}
+                    onChange={handleInputChange}
                     className="w-full p-2 appearance-none tenancy-input-box"
                     onFocus={() => toggleSelectOpen("unit")}
                     onBlur={() => toggleSelectOpen("unit")}
                   >
-                    <option>Choose</option>
+                    <option value="">Choose</option>
+                    {/* TODO: Populate with unit data from API */}
                   </select>
                   <ChevronDown
                     className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
@@ -186,6 +291,9 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                 </label>
                 <input
                   type="text"
+                  name="rentalMonths"
+                  value={formData.rentalMonths}
+                  onChange={handleInputChange}
                   placeholder="Enter Rental Months"
                   className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 tenancy-input-box"
                 />
@@ -197,11 +305,18 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                 <div className="relative">
                   <input
                     type="text"
+                    name="startDate"
+                    value={formData.startDate}
+                    onChange={handleInputChange}
                     placeholder="dd/mm/yyyy"
                     className="w-full p-2 pr-10 focus:outline-none focus:border-gray-700 focus:ring-gray-700 tenancy-input-box"
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                    <img src={calendaricon} alt="" className="w-5 h-5" />
+                    <img
+                      src={calendaricon}
+                      alt="Calendar"
+                      className="w-5 h-5"
+                    />
                   </div>
                 </div>
               </div>
@@ -210,11 +325,18 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                 <div className="relative">
                   <input
                     type="text"
+                    name="endDate"
+                    value={formData.endDate}
+                    onChange={handleInputChange}
                     placeholder="dd/mm/yyyy"
                     className="w-full p-2 pr-10 focus:outline-none focus:border-gray-700 focus:ring-gray-700 tenancy-input-box"
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                    <img src={calendaricon} alt="" className="w-5 h-5" />
+                    <img
+                      src={calendaricon}
+                      alt="Calendar"
+                      className="w-5 h-5"
+                    />
                   </div>
                 </div>
               </div>
@@ -227,6 +349,9 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                 </label>
                 <input
                   type="text"
+                  name="noOfPayments"
+                  value={formData.noOfPayments}
+                  onChange={handleInputChange}
                   placeholder="Enter No. Of Payments"
                   className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 tenancy-input-box"
                 />
@@ -238,11 +363,18 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                 <div className="relative">
                   <input
                     type="text"
+                    name="firstRentDueOn"
+                    value={formData.firstRentDueOn}
+                    onChange={handleInputChange}
                     placeholder="mm/dd/yyyy"
                     className="w-full p-2 pr-10 focus:outline-none focus:border-gray-700 focus:ring-gray-700 tenancy-input-box"
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                    <img src={calendaricon} alt="" className="w-5 h-5" />
+                    <img
+                      src={calendaricon}
+                      alt="Calendar"
+                      className="w-5 h-5"
+                    />
                   </div>
                 </div>
               </div>
@@ -253,6 +385,9 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               </label>
               <input
                 type="text"
+                name="rentPerFrequency"
+                value={formData.rentPerFrequency}
+                onChange={handleInputChange}
                 placeholder="Enter Rent Per Frequency"
                 className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 tenancy-input-box"
               />
@@ -264,6 +399,9 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               </label>
               <input
                 type="text"
+                name="totalRentReceivable"
+                value={formData.totalRentReceivable}
+                onChange={handleInputChange}
                 placeholder="Enter Total Rent Receivable"
                 className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 tenancy-input-box"
               />
@@ -274,6 +412,9 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               </label>
               <input
                 type="text"
+                name="deposit"
+                value={formData.deposit}
+                onChange={handleInputChange}
                 placeholder="Enter Deposit"
                 className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 tenancy-input-box"
               />
@@ -285,6 +426,9 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               </label>
               <input
                 type="text"
+                name="commission"
+                value={formData.commission}
+                onChange={handleInputChange}
                 placeholder="Enter Commission"
                 className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 tenancy-input-box"
               />
@@ -293,6 +437,9 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
               <label className="block tenancy-modal-label">Remarks*</label>
               <input
                 type="text"
+                name="remarks"
+                value={formData.remarks}
+                onChange={handleInputChange}
                 placeholder="Enter Remarks"
                 className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 tenancy-input-box"
               />
@@ -352,6 +499,14 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                         </td>
                         <td className="px-[10px] py-[5px] w-[138px] relative">
                           <select
+                            value={charge.chargeType}
+                            onChange={(e) =>
+                              handleAdditionalChargeChange(
+                                charge.id,
+                                "chargeType",
+                                e.target.value
+                              )
+                            }
                             className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-700 focus:border-gray-700 bg-white tenancy-modal-table-select"
                             onFocus={() =>
                               toggleSelectOpen(`charge-${charge.id}`)
@@ -361,6 +516,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                             }
                           >
                             <option value="">Choose</option>
+                            {/* TODO: Populate with charge types from API */}
                           </select>
                           <ChevronDown
                             className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
@@ -373,6 +529,14 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                         <td className="px-[10px] py-[5px] w-[162px]">
                           <input
                             type="text"
+                            value={charge.reason}
+                            onChange={(e) =>
+                              handleAdditionalChargeChange(
+                                charge.id,
+                                "reason",
+                                e.target.value
+                              )
+                            }
                             placeholder="Enter Reason"
                             className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
                           />
@@ -380,6 +544,14 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                         <td className="px-[10px] py-[5px] w-[173px] relative">
                           <input
                             type="text"
+                            value={charge.dueDate}
+                            onChange={(e) =>
+                              handleAdditionalChargeChange(
+                                charge.id,
+                                "dueDate",
+                                e.target.value
+                              )
+                            }
                             placeholder="mm/dd/yyyy"
                             className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
                           />
@@ -390,11 +562,19 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                           />
                         </td>
                         <td className="px-[10px] py-[5px] w-[55px] text-[14px] text-[#201D1E]">
-                          Pending
+                          {charge.status}
                         </td>
                         <td className="px-[10px] py-[5px] w-[148px]">
                           <input
                             type="text"
+                            value={charge.amount}
+                            onChange={(e) =>
+                              handleAdditionalChargeChange(
+                                charge.id,
+                                "amount",
+                                e.target.value
+                              )
+                            }
                             placeholder="Enter Amount"
                             className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
                           />
@@ -444,6 +624,14 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                       </div>
                       <div className="px-[10px] py-[13px] relative w-full">
                         <select
+                          value={charge.chargeType}
+                          onChange={(e) =>
+                            handleAdditionalChargeChange(
+                              charge.id,
+                              "chargeType",
+                              e.target.value
+                            )
+                          }
                           className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-700 focus:border-gray-700 bg-white tenancy-modal-table-select"
                           onFocus={() =>
                             toggleSelectOpen(`charge-${charge.id}`)
@@ -451,6 +639,7 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                           onBlur={() => toggleSelectOpen(`charge-${charge.id}`)}
                         >
                           <option value="">Choose</option>
+                          {/* TODO: Populate with charge types from API */}
                         </select>
                         <ChevronDown
                           className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
@@ -463,6 +652,14 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                       <div className="px-[10px] py-[13px] w-full">
                         <input
                           type="text"
+                          value={charge.reason}
+                          onChange={(e) =>
+                            handleAdditionalChargeChange(
+                              charge.id,
+                              "reason",
+                              e.target.value
+                            )
+                          }
                           placeholder="Enter Reason"
                           className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
                         />
@@ -485,6 +682,14 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                       <div className="px-[9px] py-[13px] relative w-full">
                         <input
                           type="text"
+                          value={charge.dueDate}
+                          onChange={(e) =>
+                            handleAdditionalChargeChange(
+                              charge.id,
+                              "dueDate",
+                              e.target.value
+                            )
+                          }
                           placeholder="mm/dd/yyyy"
                           className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
                         />
@@ -495,11 +700,19 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                         />
                       </div>
                       <div className="py-[10px] text-[14px] text-[#201D1E]">
-                        Pending
+                        {charge.status}
                       </div>
                       <div className="px-[10px] py-[13px] w-full">
                         <input
                           type="text"
+                          value={charge.amount}
+                          onChange={(e) =>
+                            handleAdditionalChargeChange(
+                              charge.id,
+                              "amount",
+                              e.target.value
+                            )
+                          }
                           placeholder="Enter Amount"
                           className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
                         />
@@ -614,6 +827,14 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                               <div className="relative">
                                 <input
                                   type="text"
+                                  value={item.dueDate}
+                                  onChange={(e) =>
+                                    handlePaymentScheduleChange(
+                                      item.id,
+                                      "dueDate",
+                                      e.target.value
+                                    )
+                                  }
                                   placeholder="mm/dd/yyyy"
                                   className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
                                 />
@@ -636,6 +857,14 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                             {item.id === "03" ? (
                               <input
                                 type="text"
+                                value={item.amount}
+                                onChange={(e) =>
+                                  handlePaymentScheduleChange(
+                                    item.id,
+                                    "amount",
+                                    e.target.value
+                                  )
+                                }
                                 placeholder="Enter Amount"
                                 className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
                               />
@@ -725,6 +954,14 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                                 <>
                                   <input
                                     type="text"
+                                    value={item.dueDate}
+                                    onChange={(e) =>
+                                      handlePaymentScheduleChange(
+                                        item.id,
+                                        "dueDate",
+                                        e.target.value
+                                      )
+                                    }
                                     placeholder="mm/dd/yyyy"
                                     className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
                                   />
@@ -747,6 +984,14 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
                               {item.id === "03" ? (
                                 <input
                                   type="text"
+                                  value={item.amount}
+                                  onChange={(e) =>
+                                    handlePaymentScheduleChange(
+                                      item.id,
+                                      "amount",
+                                      e.target.value
+                                    )
+                                  }
                                   placeholder="Enter Amount"
                                   className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
                                 />
@@ -792,7 +1037,11 @@ const CreateTenancyModal = ({ isOpen, onClose }) => {
           </div>
 
           <div className="flex justify-end mt-6 mb-4">
-            <button className="bg-[#2892CE] hover:bg-[#1f6c99] duration-200 text-white px-8 py-2 tenancy-save-btn">
+            <button
+              onClick={handleSubmit}
+              className="bg-[#2892CE] hover:bg-[#1f6c99] duration-200 text-white px-8 py-2 tenancy-save-btn"
+              aria-label="Save tenancy"
+            >
               Save
             </button>
           </div>

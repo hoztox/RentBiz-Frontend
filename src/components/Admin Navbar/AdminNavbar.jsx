@@ -76,9 +76,9 @@ const mobileRouteTitles = {
 const modalTitles = {
   "user-create": "Create User",
   "user-update": "Update User",
-  "tenant-create": "Add Tenant",
-  "tenancy-create": "New Tenancy",
+  "tenancy-create": "Create New Tenancy",
   "tenancy-update": "Update Tenancy",
+  "tenancy-view": "Tenancy View"
 }
 
 const AdminNavbar = () => {
@@ -150,29 +150,29 @@ const AdminNavbar = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const openUserModal = () => {
-    setIsUserModalOpen(true);
-  };
+  // const openUserModal = () => {
+  //   setIsUserModalOpen(true);
+  // };
 
-  const closeUserModal = () => {
-    setIsUserModalOpen(false);
-  };
+  // const closeUserModal = () => {
+  //   setIsUserModalOpen(false);
+  // };
 
-  const openCreateTenantModal = () => {
-    setIsCreateTenantModalOpen(true);
-  };
+  // const openCreateTenantModal = () => {
+  //   setIsCreateTenantModalOpen(true);
+  // };
 
-  const closeCreateTenentModal = () => {
-    setIsCreateTenantModalOpen(false);
-  };
+  // const closeCreateTenentModal = () => {
+  //   setIsCreateTenantModalOpen(false);
+  // };
 
-  const openTenancyModal = () => {
-    setIsTenancyModalOpen(true);
-  };
+  // const openTenancyModal = () => {
+  //   setIsTenancyModalOpen(true);
+  // };
 
-  const closeTenancyModal = () => {
-    setIsTenancyModalOpen(false);
-  };
+  // const closeTenancyModal = () => {
+  //   setIsTenancyModalOpen(false);
+  // };
 
   
   const handleBackClick = () => {
