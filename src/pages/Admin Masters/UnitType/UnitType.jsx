@@ -7,17 +7,14 @@ import editicon from "../../../assets/Images/Admin Masters/edit-icon.svg";
 import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
 import unitimg from "../../../assets/Images/Admin Masters/units-img.svg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
-import CreateUnitTypeModal from "./CreateUnitTypeModal/CreateUnitTypeModal";
-import UpdateUnitTypeModal from "./UpdateUnitTypeModal/UpdateUnitTypeModal";
+import { useModal } from "../../../context/ModalContext";
 
 const UnitType = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [selectedUnit, setSelectedUnit] = useState(null);
   const [expandedRows, setExpandedRows] = useState({});
+  const { openModal } = useModal();
   const itemsPerPage = 10;
 
   const demoData = [
@@ -50,29 +47,16 @@ const UnitType = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const openCreateModal = () => {
-    setIsCreateModalOpen(true);
-  };
-
-  const closeCreateModal = () => {
-    setIsCreateModalOpen(false);
-  };
-
   const openUpdateModal = (unit) => {
-    setSelectedUnit(unit);
-    setIsUpdateModalOpen(true);
-  };
-
-  const closeUpdateModal = () => {
-    setIsUpdateModalOpen(false);
+    openModal("update-unit-type-master", unit);
   };
 
   const toggleRowExpand = (id) => {
-    setExpandedRows((prev)=>({
+    setExpandedRows((prev) => ({
       ...prev,
-      [id]: !prev[id]
-    }))
-  }
+      [id]: !prev[id],
+    }));
+  };
 
   return (
     <div className="border border-gray-200 rounded-md unit-table">
@@ -91,7 +75,6 @@ const UnitType = () => {
             <div className="relative w-[40%] md:w-auto">
               <select
                 name="select"
-                id=""
                 className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 unit-selection"
                 onFocus={() => setIsSelectOpen(true)}
                 onBlur={() => setIsSelectOpen(false)}
@@ -109,10 +92,14 @@ const UnitType = () => {
           <div className="flex gap-[10px] utype-action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md utype-add-new-master duration-200"
-              onClick={openCreateModal}
+              onClick={() => openModal("create-unit-type-master")}
             >
               Add New Master
-              <img src={plusicon} alt="plus icon" className="relative right-[5px] md:right-0 w-[15px] h-[15px]" />
+              <img
+                src={plusicon}
+                alt="plus icon"
+                className="relative right-[5px] md:right-0 w-[15px] h-[15px]"
+              />
             </button>
             <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 utype-download-btn">
               Download
@@ -129,7 +116,6 @@ const UnitType = () => {
       {/* Content Section */}
       <div className="utype-desktop-only">
         <div className="flex gap-4 p-5">
-          {/* Table Section */}
           <div className="w-[60%] border border-gray-200 rounded-md">
             <table className="w-full border-collapse">
               <thead>
@@ -154,8 +140,12 @@ const UnitType = () => {
                       }`}
                     >
                       <td className="px-5 text-left unit-data">{unit.id}</td>
-                      <td className="px-5 text-left unit-data">{unit.entriDate}</td>
-                      <td className="pl-5 text-left unit-data w-[22%]">{unit.name}</td>
+                      <td className="px-5 text-left unit-data">
+                        {unit.entriDate}
+                      </td>
+                      <td className="pl-5 text-left unit-data w-[22%]">
+                        {unit.name}
+                      </td>
                       <td className="px-5 utype-flex-gap-23 h-[57px]">
                         <button onClick={() => openUpdateModal(unit)}>
                           <img
@@ -178,9 +168,7 @@ const UnitType = () => {
               </tbody>
             </table>
           </div>
-          {/* Right Section */}
           <div className="w-[40%] border border-[#E9E9E9] rounded-md p-5">
-            {/* Total Unit Card */}
             <div className="bg-[#F0F8FF] p-6 rounded-md flex flex-col items-center justify-center">
               <div className="mb-6">
                 <img src={unitimg} alt="" className="mb-4" />
@@ -190,12 +178,12 @@ const UnitType = () => {
                 <p className="text-[#1458A2] unit-card-num">50</p>
               </div>
             </div>
-
-            {/* Total Apartment Card */}
             <div className="bg-[#F0F8FF] p-5 mt-4 rounded-md">
               <div className="flex items-center gap-4">
                 <div className="w-1/3">
-                  <p className="text-[#201D1E] unit-card-text">Total Apartment</p>
+                  <p className="text-[#201D1E] unit-card-text">
+                    Total Apartment
+                  </p>
                   <p className="text-[#1458A2] apartment-card-num mt-2">30</p>
                 </div>
                 <div className="w-1/3">
@@ -212,8 +200,6 @@ const UnitType = () => {
                 </div>
               </div>
             </div>
-
-            {/* Total Shop Card */}
             <div className="bg-[#F0F8FF] p-5 mt-4 rounded-md">
               <div className="flex items-center gap-4">
                 <div className="w-1/3">
@@ -243,8 +229,12 @@ const UnitType = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="unit-table-row-head">
-              <th className="px-5 w-[52%] text-left unit-thead utype-id-column">ID</th>
-              <th className="px-5 w-[47%] text-left unit-thead utype-entry-date-column">ENTRY DATE</th>
+              <th className="px-5 w-[52%] text-left unit-thead utype-id-column">
+                ID
+              </th>
+              <th className="px-5 w-[47%] text-left unit-thead utype-entry-date-column">
+                ENTRY DATE
+              </th>
               <th className="px-5 text-right unit-thead"></th>
             </tr>
           </thead>
@@ -253,11 +243,15 @@ const UnitType = () => {
               <React.Fragment key={unit.id}>
                 <tr
                   className={`${
-                    expandedRows[unit.id] ? "utype-mobile-no-border" : "utype-mobile-with-border"
+                    expandedRows[unit.id]
+                      ? "utype-mobile-no-border"
+                      : "utype-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left unit-data">{unit.id}</td>
-                  <td className="px-5 text-left unit-data utype-entry-date-column">{unit.entriDate}</td>
+                  <td className="px-5 text-left unit-data utype-entry-date-column">
+                    {unit.entriDate}
+                  </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`unit-dropdown-field ${
@@ -282,7 +276,9 @@ const UnitType = () => {
                         <div className="utype-grid">
                           <div className="utype-grid-items">
                             <div className="utype-dropdown-label">NAME</div>
-                            <div className="utype-dropdown-value">{unit.name}</div>
+                            <div className="utype-dropdown-value">
+                              {unit.name}
+                            </div>
                           </div>
                           <div className="utype-grid-items">
                             <div className="utype-dropdown-label">ACTION</div>
@@ -372,17 +368,6 @@ const UnitType = () => {
           </button>
         </div>
       </div>
-
-      {/* Modals */}
-      <CreateUnitTypeModal
-        isOpen={isCreateModalOpen}
-        onClose={closeCreateModal}
-      />
-      <UpdateUnitTypeModal
-        isOpen={isUpdateModalOpen}
-        onClose={closeUpdateModal}
-        unit={selectedUnit}
-      />
     </div>
   );
 };

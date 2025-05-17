@@ -1,35 +1,52 @@
 import React, { useEffect, useState } from "react";
 import "./CreateUnitTypeModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
+import { useModal } from "../../../../context/ModalContext";
 
-const CreateUnitTypeModal = ({ isOpen, onClose }) => {
+const CreateUnitTypeModal = () => {
+  const { modalState, closeModal } = useModal();
   const [name, setName] = useState("");
 
-  const handleSave = () => {
-    if (name) {
-      console.log("New Unit Type Created: ", name);
-      onClose();
-    }
-  };
-
+  // Reset form state when modal opens
   useEffect(() => {
-    if (isOpen) {
+    if (modalState.isOpen) {
       setName("");
     }
-  }, [isOpen]);
+  }, [modalState.isOpen]);
 
-  if (!isOpen) return null;
+  // Only render for "create-unit-type-master" type
+  if (!modalState.isOpen || modalState.type !== "create-unit-type-master") {
+    return null;
+  }
+
+  const handleSave = () => {
+    if (!name) {
+      alert("Please fill the Name field");
+      return;
+    }
+    console.log("New Unit Type Created: ", name);
+    closeModal();
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
-      <div className="create-unit-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[262px] p-6">
-        <h2 className="modal-head mt-4 mb-6">Create New Unit Type Master</h2>
-        <button onClick={onClose} className="absolute top-6 right-6 close-btn duration-200">
-          <img src={closeicon} alt="close" className="w-4 h-4" />
-        </button>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="create-unit-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[262px] p-6"
+      >
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="modal-head">Create New Unit Type Master</h2>
+          <button
+            onClick={closeModal}
+            className="close-btn hover:bg-gray-100 duration-200"
+            aria-label="Close modal"
+          >
+            <img src={closeicon} alt="close" className="w-4 h-4" />
+          </button>
+        </div>
 
         <div className="mb-6">
-          <label className="block pt-2">Name</label>
+          <label className="block pt-2 tenancy-modal-label">Name*</label>
           <input
             type="text"
             className="w-full border border-[#E9E9E9] rounded-md mt-1 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500 input-style"
@@ -43,6 +60,7 @@ const CreateUnitTypeModal = ({ isOpen, onClose }) => {
           <button
             onClick={handleSave}
             className="bg-[#2892CE] hover:bg-[#2276a7] text-white rounded w-[150px] h-[38px] modal-save-btn duration-200"
+            aria-label="Save unit type"
           >
             Save
           </button>

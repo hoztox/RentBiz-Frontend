@@ -7,6 +7,8 @@ import EditUserModal from "./Admin Users Management/EditUserModal/EditUserModal"
 import TenancyViewModal from "./Admin Tenancy/TenancyViewModal/TenancyViewModal";
 import UpdateTenancyModal from "./Admin Tenancy/UpdateTenancyModal/UpdateTenancyModal";
 import CreateTenancyModal from "./Admin Tenancy/CreateTenancy/CreateTenancyModal";
+import CreateUnitTypeModal from "./Admin Masters/UnitType/CreateUnitTypeModal/CreateUnitTypeModal";
+import UpdateUnitTypeModal from "./Admin Masters/UnitType/UpdateUnitTypeModal/UpdateUnitTypeModal";
 
 const Layout = () => {
   const { modalState } = useModal();
@@ -26,6 +28,8 @@ const Layout = () => {
       {modalState.isOpen && modalState.type === "tenancy-create" && <CreateTenancyModal />}
       {modalState.isOpen && modalState.type === "tenancy-update" && <UpdateTenancyModal />}
       {modalState.isOpen && modalState.type === "tenancy-view" && <TenancyViewModal />}
+      {modalState.isOpen && modalState.type === "create-unit-type-master" && <CreateUnitTypeModal />}
+      {modalState.isOpen && modalState.type === "update-unit-type-master" && <UpdateUnitTypeModal />}
     </div>
   );
 };

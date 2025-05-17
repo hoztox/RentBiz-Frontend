@@ -78,7 +78,13 @@ const modalTitles = {
   "user-update": "Update User",
   "tenancy-create": "Create New Tenancy",
   "tenancy-update": "Update Tenancy",
-  "tenancy-view": "Tenancy View"
+  "tenancy-view": "Tenancy View",
+  "create-unit-type-master": "Create New Unit Type Master",
+  "update-unit-type-master": "Update Unit Type Master",
+  "create-id-type-master":"Create New ID Type Master",
+  "update-id-type-master":"Update ID Type Master",
+  "create-charge-code-type": "Create New Charge Code Master",
+  "update-charge-code-type": "Update Charge Code Master"
 }
 
 const AdminNavbar = () => {
