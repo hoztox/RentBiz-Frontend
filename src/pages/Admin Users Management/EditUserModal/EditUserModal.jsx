@@ -4,11 +4,38 @@ import closeicon from "../../../assets/Images/Admin Users Management/close-icon.
 import addImageIcon from "../../../assets/Images/Admin Users Management/addImageIcon.svg";
 import { ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useModal } from "../../../context/ModalContext";
 
-const EditUserModal = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
+const EditUserModal = () => {
+  const { modalState, closeModal } = useModal();
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const navigate = useNavigate();
+
+  // Initialize form with user data
+  const userData = modalState.data || {};
+  const [formData, setFormData] = useState({
+    name: userData.name || "",
+    email: userData.username || "",
+    role: userData.role || "",
+  });
+
+  // Only render for "user-update" type AFTER hooks
+  if (!modalState.isOpen || modalState.type !== "user-update") return null;
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = () => {
+    if (!formData.name || !formData.email || !formData.role) {
+      alert("Please fill all required fields");
+      return;
+    }
+    console.log("Form submitted:", { id: userData.id, ...formData });
+    closeModal();
+    navigate("/admin/users-manage");
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 modal-overlay">
@@ -20,7 +47,8 @@ const EditUserModal = ({ isOpen, onClose }) => {
           </h2>
           <button
             className="close-button hover:bg-gray-200 duration-200"
-            onClick={onClose}
+            onClick={closeModal}
+            aria-label="Close modal"
           >
             <img src={closeicon} alt="Close" className="w-4 h-4" />
           </button>
@@ -37,7 +65,7 @@ const EditUserModal = ({ isOpen, onClose }) => {
                 className="h-[18px] md:h-[22px] w-[18px] md:w-[22px] cursor-pointer"
               />
             </div>
-            <input type="file" className="hidden" />
+            <input type="file" className="hidden" accept="image/*" />
           </div>
         </div>
 
@@ -50,6 +78,9 @@ const EditUserModal = ({ isOpen, onClose }) => {
             </label>
             <input
               type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
               placeholder="Enter Name"
               className="input-style focus:border-gray-700"
             />
@@ -62,6 +93,9 @@ const EditUserModal = ({ isOpen, onClose }) => {
             </label>
             <input
               type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
               placeholder="Enter Your Email"
               className="input-style focus:border-gray-700"
             />
@@ -73,11 +107,16 @@ const EditUserModal = ({ isOpen, onClose }) => {
               Role*
             </label>
             <select
+              name="role"
+              value={formData.role}
+              onChange={handleInputChange}
               className="input-style select custom-select focus:border-gray-700"
               onFocus={() => setIsSelectOpen(true)}
               onBlur={() => setIsSelectOpen(false)}
             >
               <option
+                value=""
+                disabled
                 style={{
                   color: "#CFCFCF",
                   fontSize: "15px",
@@ -87,6 +126,9 @@ const EditUserModal = ({ isOpen, onClose }) => {
               >
                 Choose
               </option>
+              <option value="admin">Admin</option>
+              <option value="manager">Manager</option>
+              <option value="user">User</option>
             </select>
             <ChevronDown
               className={`absolute right-[20px] md:right-[25px] top-[36px] md:top-[40px] text-gray-400 pointer-events-none transition-transform duration-300 drop-down-icon ${
@@ -110,10 +152,7 @@ const EditUserModal = ({ isOpen, onClose }) => {
         <div className="px-4 md:px-6 mt-6 md:mt-8 md:mr-[8px] mb-6 md:mb-6 flex justify-end">
           <button
             className="bg-[#2892CE] hover:bg-[#076094] duration-200 edit-user-button"
-            onClick={()=>{
-              onClose();
-              navigate("/admin/users-manage")
-            }}
+            onClick={handleSubmit}
           >
             Edit User
           </button>
