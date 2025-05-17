@@ -78,14 +78,19 @@ const AdminNavbar = () => {
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isCreateTenantModalOpen, setIsCreateTenantModalOpen] = useState(false);
   const [isTenancyModalOpen, setIsTenancyModalOpen] = useState(false);
+  const [currentPath, setCurrentPath] = useState("");
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isDashboard = location.pathname === "/admin/dashboard";
+  useEffect(() => {
+    setCurrentPath(location.pathname);
+  }, [location.pathname]);
+
+  const isDashboard = currentPath === "/admin/dashboard";
 
   const getPageTitle = (isMobile = false) => {
-    const path = location.pathname;
+    const path = currentPath;
     const titles = isMobile ? mobileRouteTitles : routeTitles;
 
     // Check for exact route match
@@ -101,6 +106,21 @@ const AdminNavbar = () => {
     // Fallback for unknown routes
     return titles.default;
   };
+
+  // Store current path in localstorage when it changes
+  useEffect(() => {
+    if (currentPath) {
+      localStorage.setItem("currentAdminPath", currentPath);
+    }
+  }, [currentPath]);
+
+  // Retrieve path from localstorage on initial load
+  useEffect(() => {
+    const savedPath = localStorage.getItem("currentAdminPath");
+    if (savedPath && !currentPath) {
+      setCurrentPath(savedPath);
+    }
+  });
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
