@@ -128,14 +128,12 @@ const Buildings = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
- 
                 // className={`absolute md:right-2 right-4 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
                 //   }`}
- 
-                className={`absolute md:right-2 right-[8px] top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
+
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
                   isSelectOpen ? "rotate-180" : "rotate-0"
                 }`}
- 
               />
             </div>
           </div>
@@ -184,32 +182,25 @@ const Buildings = () => {
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
                 <td className="px-5 text-left bldg-data">{building.id}</td>
-                <td className="px-5 text-left bldg-data">
-                  {building.date}
-                </td>
-                <td className="pl-5 text-left bldg-data">
-                  {building.name}
-                </td>
-                <td className="px-5 text-left bldg-data">
-                  {building.address}
-                </td>
+                <td className="px-5 text-left bldg-data">{building.date}</td>
+                <td className="pl-5 text-left bldg-data">{building.name}</td>
+                <td className="px-5 text-left bldg-data">{building.address}</td>
                 <td className="pl-12 pr-5 text-left bldg-data">
                   {building.units}
                 </td>
                 <td className="px-5 text-left bldg-data">
                   <span
-                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${building.status === "Active"
-                      ? "bg-[#e1ffea] text-[#28C76F]"
-                      : "bg-[#FFE1E1] text-[#C72828]"
-                      }`}
+                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
+                      building.status === "Active"
+                        ? "bg-[#e1ffea] text-[#28C76F]"
+                        : "bg-[#FFE1E1] text-[#C72828]"
+                    }`}
                   >
                     {building.status}
                   </span>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button
-                    onClick={openEditBuildingModal}
-                  >
+                  <button onClick={openEditBuildingModal}>
                     <img
                       src={editicon}
                       alt="Edit"
@@ -233,9 +224,7 @@ const Buildings = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="bldg-table-row-head">
-              <th className="px-5 text-left bldg-thead bldg-id-column">
-                ID
-              </th>
+              <th className="px-5 text-left bldg-thead bldg-id-column">ID</th>
               <th className="px-5 text-left bldg-thead bldg-date-column">
                 DATE
               </th>
@@ -246,10 +235,11 @@ const Buildings = () => {
             {paginatedData.map((building, index) => (
               <React.Fragment key={index}>
                 <tr
-                  className={`${expandedRows[building.id]
-                    ? "bldg-mobile-no-border"
-                    : "bldg-mobile-with-border"
-                    } border-b border-[#E9E9E9] h-[57px]`}
+                  className={`${
+                    expandedRows[building.id]
+                      ? "bldg-mobile-no-border"
+                      : "bldg-mobile-with-border"
+                  } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left bldg-data bldg-id-column">
                     {building.id}
@@ -259,15 +249,17 @@ const Buildings = () => {
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
-                      className={`bldg-dropdown-field ${expandedRows[building.id] ? "active" : ""
-                        }`}
+                      className={`bldg-dropdown-field ${
+                        expandedRows[building.id] ? "active" : ""
+                      }`}
                       onClick={() => toggleRowExpand(building.id)}
                     >
                       <img
                         src={downarrow}
                         alt="drop-down-arrow"
-                        className={`bldg-dropdown-img ${expandedRows[building.id] ? "text-white" : ""
-                          }`}
+                        className={`bldg-dropdown-img ${
+                          expandedRows[building.id] ? "text-white" : ""
+                        }`}
                       />
                     </div>
                   </td>
@@ -292,7 +284,9 @@ const Buildings = () => {
                         </div>
                         <div className="bldg-grid">
                           <div className="bldg-grid-item w-[33%]">
-                            <div className="bldg-dropdown-label">NO. OF UNITS</div>
+                            <div className="bldg-dropdown-label">
+                              NO. OF UNITS
+                            </div>
                             <div className="bldg-dropdown-value">
                               {building.units}
                             </div>
@@ -301,10 +295,11 @@ const Buildings = () => {
                             <div className="bldg-dropdown-label">STATUS</div>
                             <div className="bldg-dropdown-value">
                               <span
-                                className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] bldg-status ${building.status === "Active"
-                                  ? "bg-[#e1ffea] text-[#28C76F]"
-                                  : "bg-[#FFE1E1] text-[#C72828]"
-                                  }`}
+                                className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] bldg-status ${
+                                  building.status === "Active"
+                                    ? "bg-[#e1ffea] text-[#28C76F]"
+                                    : "bg-[#FFE1E1] text-[#C72828]"
+                                }`}
                               >
                                 {building.status}
                               </span>
@@ -313,8 +308,7 @@ const Buildings = () => {
                           <div className="bldg-grid-item bldg-action-column w-[20%]">
                             <div className="bldg-dropdown-label">ACTION</div>
                             <div className="bldg-dropdown-value bldg-flex bldg-items-center bldg-gap-2">
-                              <button
-                              >
+                              <button>
                                 <img
                                   src={editicon}
                                   alt="Edit"
@@ -341,7 +335,7 @@ const Buildings = () => {
         </table>
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 bldg-pagination-container">
-        <span className="bldg-pagination collection-list-pagination">
+        <span className="bldg-pagination bldg-collection-list-pagination">
           Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
           {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
         </span>
@@ -365,17 +359,11 @@ const Buildings = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 bldg-page-no-btns ${currentPage === startPage + i
-                ? "bg-[#1458A2] text-white"
-                : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-                }`}
- 
-              // className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
-              //   currentPage === startPage + i
-              //     ? "bg-[#1458A2] text-white"
-              //     : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-              // }`}
- 
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+                currentPage === startPage + i
+                  ? "bg-[#1458A2] text-white"
+                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+              }`}
               onClick={() => setCurrentPage(startPage + i)}
             >
               {startPage + i}
@@ -400,7 +388,10 @@ const Buildings = () => {
         </div>
       </div>
       <AddBuildingModal open={buildingModalOpen} onClose={closeBuildingModal} />
-      <EditBuildingModal open={editbuildingModalOpen} onClose={closeEditBuildingModal} />
+      <EditBuildingModal
+        open={editbuildingModalOpen}
+        onClose={closeEditBuildingModal}
+      />
     </div>
   );
 };

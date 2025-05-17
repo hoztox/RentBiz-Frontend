@@ -337,15 +337,31 @@ const UpcomingCollection = () => {
           <thead>
             <tr className="border-b border-[#E9E9E9] h-[57px]">
               <th className="px-5 text-left upcoming-collection-thead">ID</th>
-              <th className="px-5 text-left upcoming-collection-thead">INVOICE NO</th>
-              <th className="px-5 text-left upcoming-collection-thead">INVOICE DATE</th>
-              <th className="px-5 text-left upcoming-collection-thead">TENANT</th>
-              <th className="px-5 text-left upcoming-collection-thead">BUILDING</th>
+              <th className="px-5 text-left upcoming-collection-thead">
+                INVOICE NO
+              </th>
+              <th className="px-5 text-left upcoming-collection-thead">
+                INVOICE DATE
+              </th>
+              <th className="px-5 text-left upcoming-collection-thead">
+                TENANT
+              </th>
+              <th className="px-5 text-left upcoming-collection-thead">
+                BUILDING
+              </th>
               <th className="px-5 text-left upcoming-collection-thead">UNIT</th>
-              <th className="px-5 text-left upcoming-collection-thead">CHARGE</th>
-              <th className="px-5 text-left upcoming-collection-thead">AMOUNT</th>
-              <th className="px-5 text-left upcoming-collection-thead">DUE DATE</th>
-              <th className="px-5 text-center upcoming-collection-thead">STATUS</th>
+              <th className="px-5 text-left upcoming-collection-thead">
+                CHARGE
+              </th>
+              <th className="px-5 text-left upcoming-collection-thead">
+                AMOUNT
+              </th>
+              <th className="px-5 text-left upcoming-collection-thead">
+                DUE DATE
+              </th>
+              <th className="px-5 text-center upcoming-collection-thead">
+                STATUS
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -355,14 +371,28 @@ const UpcomingCollection = () => {
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
                 <td className="px-5 upcoming-collection-data">{report.id}</td>
-                <td className="px-5 upcoming-collection-data">{report.invoice_no}</td>
-                <td className="px-5 upcoming-collection-data">{report.invoice_date}</td>
-                <td className="px-5 upcoming-collection-data">{report.tenant}</td>
-                <td className="px-5 upcoming-collection-data">{report.building}</td>
+                <td className="px-5 upcoming-collection-data">
+                  {report.invoice_no}
+                </td>
+                <td className="px-5 upcoming-collection-data">
+                  {report.invoice_date}
+                </td>
+                <td className="px-5 upcoming-collection-data">
+                  {report.tenant}
+                </td>
+                <td className="px-5 upcoming-collection-data">
+                  {report.building}
+                </td>
                 <td className="px-5 upcoming-collection-data">{report.unit}</td>
-                <td className="px-5 upcoming-collection-data">{report.charge}</td>
-                <td className="px-5 upcoming-collection-data">{report.amount}</td>
-                <td className="px-5 upcoming-collection-data">{report.due_date}</td>
+                <td className="px-5 upcoming-collection-data">
+                  {report.charge}
+                </td>
+                <td className="px-5 upcoming-collection-data">
+                  {report.amount}
+                </td>
+                <td className="px-5 upcoming-collection-data">
+                  {report.due_date}
+                </td>
                 <td className="px-5 text-center upcoming-collection-data">
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${getStatusStyle(
@@ -382,8 +412,12 @@ const UpcomingCollection = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="upcoming-collection-table-row-head">
-              <th className="px-5 w-[74px] text-left upcoming-collection-thead upcoming-collection-id-column">ID</th>
-              <th className="px-3 text-left upcoming-collection-thead upcoming-collection-tenant-column">INVOICE NO</th>
+              <th className="px-5 w-[74px] text-left upcoming-collection-thead upcoming-collection-id-column">
+                ID
+              </th>
+              <th className="px-3 text-left upcoming-collection-thead upcoming-collection-tenant-column">
+                INVOICE NO
+              </th>
               <th className="px-5 text-right upcoming-collection-thead"></th>
             </tr>
           </thead>
@@ -397,8 +431,12 @@ const UpcomingCollection = () => {
                       : "upcoming-collection-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 w-[50%] text-left upcoming-collection-data upcoming-collection-id-column">{report.id}</td>
-                  <td className="px-3 w-[41%] text-left upcoming-collection-data upcoming-collection-tenant-column">{report.invoice_no}</td>
+                  <td className="px-5 w-[50%] text-left upcoming-collection-data upcoming-collection-id-column">
+                    {report.id}
+                  </td>
+                  <td className="px-3 w-[41%] text-left upcoming-collection-data upcoming-collection-tenant-column">
+                    {report.invoice_no}
+                  </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`upcoming-collection-dropdown-field ${
@@ -422,41 +460,71 @@ const UpcomingCollection = () => {
                       <div className="upcoming-collection-dropdown-content">
                         <div className="upcoming-collection-grid">
                           <div className="upcoming-collection-grid-item">
-                            <div className="upcoming-collection-dropdown-label">INVOICE DATE</div>
-                            <div className="upcoming-collection-dropdown-value">{report.invoice_date}</div>
+                            <div className="upcoming-collection-dropdown-label">
+                              INVOICE DATE
+                            </div>
+                            <div className="upcoming-collection-dropdown-value">
+                              {report.invoice_date}
+                            </div>
                           </div>
                           <div className="upcoming-collection-grid-item">
-                            <div className="upcoming-collection-dropdown-label">TENANT</div>
-                            <div className="upcoming-collection-dropdown-value">{report.tenant}</div>
-                          </div>
-                        </div>
-                        <div className="upcoming-collection-grid">
-                          <div className="upcoming-collection-grid-item">
-                            <div className="upcoming-collection-dropdown-label">BUILDING</div>
-                            <div className="upcoming-collection-dropdown-value">{report.building}</div>
-                          </div>
-                          <div className="upcoming-collection-grid-item">
-                            <div className="upcoming-collection-dropdown-label">UNIT</div>
-                            <div className="upcoming-collection-dropdown-value">{report.unit}</div>
+                            <div className="upcoming-collection-dropdown-label">
+                              TENANT
+                            </div>
+                            <div className="upcoming-collection-dropdown-value">
+                              {report.tenant}
+                            </div>
                           </div>
                         </div>
                         <div className="upcoming-collection-grid">
                           <div className="upcoming-collection-grid-item">
-                            <div className="upcoming-collection-dropdown-label">CHARGE</div>
-                            <div className="upcoming-collection-dropdown-value">{report.charge}</div>
+                            <div className="upcoming-collection-dropdown-label">
+                              BUILDING
+                            </div>
+                            <div className="upcoming-collection-dropdown-value">
+                              {report.building}
+                            </div>
                           </div>
                           <div className="upcoming-collection-grid-item">
-                            <div className="upcoming-collection-dropdown-label">AMOUNT</div>
-                            <div className="upcoming-collection-dropdown-value">{report.amount}</div>
+                            <div className="upcoming-collection-dropdown-label">
+                              UNIT
+                            </div>
+                            <div className="upcoming-collection-dropdown-value">
+                              {report.unit}
+                            </div>
                           </div>
                         </div>
                         <div className="upcoming-collection-grid">
                           <div className="upcoming-collection-grid-item">
-                            <div className="upcoming-collection-dropdown-label">DUE DATE</div>
-                            <div className="upcoming-collection-dropdown-value">{report.due_date}</div>
+                            <div className="upcoming-collection-dropdown-label">
+                              CHARGE
+                            </div>
+                            <div className="upcoming-collection-dropdown-value">
+                              {report.charge}
+                            </div>
                           </div>
                           <div className="upcoming-collection-grid-item">
-                            <div className="upcoming-collection-dropdown-label">STATUS</div>
+                            <div className="upcoming-collection-dropdown-label">
+                              AMOUNT
+                            </div>
+                            <div className="upcoming-collection-dropdown-value">
+                              {report.amount}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="upcoming-collection-grid">
+                          <div className="upcoming-collection-grid-item">
+                            <div className="upcoming-collection-dropdown-label">
+                              DUE DATE
+                            </div>
+                            <div className="upcoming-collection-dropdown-value">
+                              {report.due_date}
+                            </div>
+                          </div>
+                          <div className="upcoming-collection-grid-item">
+                            <div className="upcoming-collection-dropdown-label">
+                              STATUS
+                            </div>
                             <div className="upcoming-collection-dropdown-value">
                               <span
                                 className={`px-[10px] py-[5px] h-[24px] rounded-[4px] upcoming-collection-status ${getStatusStyle(
@@ -478,12 +546,14 @@ const UpcomingCollection = () => {
         </table>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 px-5 upcoming-collection-pagination-container">
-        <span className="collection-list-pagination upcoming-collection-pagination-text">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 upcoming-collection-pagination-container">
+        <span className="upcoming-collection-pagination collection-list-pagination">
+          Showing{" "}
+          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+          {filteredData.length} entries
         </span>
-        <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto upcoming-collection-pagination-buttons">
+        <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
           <button
             className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
             disabled={currentPage === 1}
@@ -513,7 +583,9 @@ const UpcomingCollection = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
+          {endPage < totalPages - 1 && (
+            <span className="px-2 flex items-center">...</span>
+          )}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"

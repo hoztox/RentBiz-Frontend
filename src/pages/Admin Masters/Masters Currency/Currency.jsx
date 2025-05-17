@@ -316,6 +316,8 @@ const Currency = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
         <span className="collection-list-pagination">
           Showing{" "}
@@ -323,7 +325,7 @@ const Currency = () => {
           to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
           {filteredData.length} entries
         </span>
-        <div className="flex gap-[4px] overflow-x-auto py-2 w-full md:w-auto pagination-buttons">
+        <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
           <button
             className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
             disabled={currentPage === 1}
