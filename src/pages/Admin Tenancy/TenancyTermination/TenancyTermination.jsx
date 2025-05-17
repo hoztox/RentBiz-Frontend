@@ -6,16 +6,16 @@ import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
 import terminateicon from "../../../assets/Images/Admin Tenancy/terminate-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
 import TenancyTerminateModal from "./TenancyTerminateModal/TenancyTerminateModal";
-import UpdateTenancyModal from "../UpdateTenancyModal/UpdateTenancyModal";
+import { useModal } from "../../../context/ModalContext";
 
 const TenancyTermination = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [terminateModalOpen, setTerminateModalOpen] = useState(false);
   const [selectedTenancy, setSelectedTenancy] = useState(null);
   const [expandedRows, setExpandedRows] = useState({});
+  const { openModal } = useModal();
   const itemsPerPage = 10;
 
   const openTerminateModal = (tenancy) => {
@@ -79,7 +79,8 @@ const TenancyTermination = () => {
       tenancy.building.toLowerCase().includes(searchTerm.toLowerCase()) ||
       tenancy.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       tenancy.unit.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (tenancy.endDate && tenancy.endDate.toLowerCase().includes(searchTerm.toLowerCase()))
+      (tenancy.endDate &&
+        tenancy.endDate.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -91,14 +92,6 @@ const TenancyTermination = () => {
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
-
-  const openUpdateModal = () => {
-    setIsUpdateModalOpen(true);
-  };
-
-  const closeUpdateModal = () => {
-    setIsUpdateModalOpen(false);
-  };
 
   return (
     <div className="border border-[#E9E9E9] rounded-md tenancy-table">
@@ -145,12 +138,24 @@ const TenancyTermination = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-[#E9E9E9] h-[57px]">
-              <th className="px-4 text-left tenancy-thead whitespace-nowrap">ID</th>
-              <th className="px-4 text-left tenancy-thead whitespace-nowrap">NAME</th>
-              <th className="px-4 text-left tenancy-thead whitespace-nowrap">BUILDING NAME</th>
-              <th className="px-4 text-left tenancy-thead whitespace-nowrap w-[20%]">UNIT NAME</th>
-              <th className="px-4 text-left tenancy-thead whitespace-nowrap w-[12%]">END DATE</th>
-              <th className="px-4 pr-6 text-right tenancy-thead whitespace-nowrap">ACTION</th>
+              <th className="px-4 text-left tenancy-thead whitespace-nowrap">
+                ID
+              </th>
+              <th className="px-4 text-left tenancy-thead whitespace-nowrap">
+                NAME
+              </th>
+              <th className="px-4 text-left tenancy-thead whitespace-nowrap">
+                BUILDING NAME
+              </th>
+              <th className="px-4 text-left tenancy-thead whitespace-nowrap w-[20%]">
+                UNIT NAME
+              </th>
+              <th className="px-4 text-left tenancy-thead whitespace-nowrap w-[12%]">
+                END DATE
+              </th>
+              <th className="px-4 pr-6 text-right tenancy-thead whitespace-nowrap">
+                ACTION
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -160,13 +165,19 @@ const TenancyTermination = () => {
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
                 <td className="px-4 text-left tenancy-data">{tenancy.id}</td>
-                <td className="px-4 text-left tenancy-data">{tenancy.tenant}</td>
-                <td className="px-4 text-left tenancy-data">{tenancy.building}</td>
+                <td className="px-4 text-left tenancy-data">
+                  {tenancy.tenant}
+                </td>
+                <td className="px-4 text-left tenancy-data">
+                  {tenancy.building}
+                </td>
                 <td className="px-4 text-left tenancy-data">{tenancy.unit}</td>
-                <td className="px-4 text-left tenancy-data">{tenancy.endDate}</td>
+                <td className="px-4 text-left tenancy-data">
+                  {tenancy.endDate}
+                </td>
                 <td className="px-4 text-right">
                   <div className="flex gap-3 justify-end items-center">
-                    <button onClick={openUpdateModal}>
+                    <button onClick={() => openModal("tenancy-update")}>
                       <img
                         src={editicon}
                         alt="Edit"
@@ -191,8 +202,12 @@ const TenancyTermination = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="tenancy-table-row-head">
-              <th className="px-5 w-[53%] text-left tenancy-thead tterm-id-column">ID</th>
-              <th className="px-5 w-[47%] text-left tenancy-thead tterm-end-date-column">NAME</th>
+              <th className="px-5 w-[53%] text-left tenancy-thead tterm-id-column">
+                ID
+              </th>
+              <th className="px-5 w-[47%] text-left tenancy-thead tterm-end-date-column">
+                NAME
+              </th>
               <th className="px-5 text-right tenancy-thead"></th>
             </tr>
           </thead>
@@ -201,14 +216,22 @@ const TenancyTermination = () => {
               <React.Fragment key={tenancy.id}>
                 <tr
                   className={`${
-                    expandedRows[tenancy.id] ? "tterm-mobile-no-border" : "tterm-mobile-with-border"
+                    expandedRows[tenancy.id]
+                      ? "tterm-mobile-no-border"
+                      : "tterm-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left tenancy-data tterm-id-column">{tenancy.id}</td>
-                  <td className="px-5 text-left tenancy-data tterm-end-date-column">{tenancy.tenant}</td>
+                  <td className="px-5 text-left tenancy-data tterm-id-column">
+                    {tenancy.id}
+                  </td>
+                  <td className="px-5 text-left tenancy-data tterm-end-date-column">
+                    {tenancy.tenant}
+                  </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
-                      className={`tenancy-dropdown-field ${expandedRows[tenancy.id] ? "active" : ""}`}
+                      className={`tenancy-dropdown-field ${
+                        expandedRows[tenancy.id] ? "active" : ""
+                      }`}
                       onClick={() => toggleRowExpand(tenancy.id)}
                     >
                       <img
@@ -227,30 +250,44 @@ const TenancyTermination = () => {
                       <div className="tenancy-dropdown-content">
                         <div className="tterm-grid">
                           <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">BUILDING NAME</div>
-                            <div className="tterm-dropdown-value">{tenancy.building}</div>
+                            <div className="tterm-dropdown-label">
+                              BUILDING NAME
+                            </div>
+                            <div className="tterm-dropdown-value">
+                              {tenancy.building}
+                            </div>
                           </div>
                           <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">UNIT NAME</div>
-                            <div className="tterm-dropdown-value">{tenancy.unit}</div>
+                            <div className="tterm-dropdown-label">
+                              UNIT NAME
+                            </div>
+                            <div className="tterm-dropdown-value">
+                              {tenancy.unit}
+                            </div>
                           </div>
                         </div>
                         <div className="tterm-grid">
                           <div className="tterm-grid-item">
                             <div className="tterm-dropdown-label">END DATE</div>
-                            <div className="tterm-dropdown-value">{tenancy.endDate}</div>
+                            <div className="tterm-dropdown-value">
+                              {tenancy.endDate}
+                            </div>
                           </div>
                           <div className="tterm-grid-item">
                             <div className="tterm-dropdown-label">ACTION</div>
                             <div className="tterm-dropdown-value tterm-flex tterm-items-center mt-[10px] ml-[5px]">
-                              <button onClick={openUpdateModal}>
+                              <button
+                                onClick={() => openModal("tenancy-update")}
+                              >
                                 <img
                                   src={editicon}
                                   alt="Edit"
                                   className="w-[18px] h-[18px] tterm-action-btn duration-200"
                                 />
                               </button>
-                              <button onClick={() => openTerminateModal(tenancy)}>
+                              <button
+                                onClick={() => openTerminateModal(tenancy)}
+                              >
                                 <img
                                   src={terminateicon}
                                   alt="Terminate"
@@ -271,8 +308,10 @@ const TenancyTermination = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 tterm-pagination-container">
         <span className="tterm-pagination collection-list-pagination">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
+          Showing{" "}
+          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+          {filteredData.length} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto tterm-pagination-buttons">
           <button
@@ -304,7 +343,9 @@ const TenancyTermination = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
+          {endPage < totalPages - 1 && (
+            <span className="px-2 flex items-center">...</span>
+          )}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
@@ -322,7 +363,6 @@ const TenancyTermination = () => {
           </button>
         </div>
       </div>
-      <UpdateTenancyModal isOpen={isUpdateModalOpen} onClose={closeUpdateModal} />
       <TenancyTerminateModal
         isOpen={terminateModalOpen}
         onCancel={() => setTerminateModalOpen(false)}

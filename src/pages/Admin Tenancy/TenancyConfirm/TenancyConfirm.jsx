@@ -8,46 +8,17 @@ import viewicon from "../../../assets/Images/Admin Tenancy/view-icon.svg";
 import confirmicon from "../../../assets/Images/Admin Tenancy/confirm-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
 import TenancyConfirmModal from "./TenancyConfirmModal/TenancyConfirmModal";
-import CreateTenancyModal from "../CreateTenancy/CreateTenancyModal";
-import UpdateTenancyModal from "../UpdateTenancyModal/UpdateTenancyModal";
-import TenancyViewModal from "../TenancyViewModal/TenancyViewModal";
+import { useModal } from "../../../context/ModalContext";
 
 const TenancyConfirm = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
-  const itemsPerPage = 10;
-
-  const [createTenancyModal, setCreateTenancyModal] = useState(false);
-  const [updateTenancyModal, setUpdateTenancyModal] = useState(false);
-  const [tenancyViewModal, setTenancyViewModal] = useState(false);
+  const { openModal } = useModal();
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [selectedTenancy, setSelectedTenancy] = useState(null);
-
-  const openCreateTenancyModal = () => {
-    setCreateTenancyModal(true);
-  };
-
-  const closeCreateTenancyModal = () => {
-    setCreateTenancyModal(false);
-  };
-
-  const openUpdateTenancyModal = () => {
-    setUpdateTenancyModal(true);
-  };
-
-  const closeUpdateTenancyModal = () => {
-    setUpdateTenancyModal(false);
-  };
-
-  const openTenancyViewModal = () => {
-    setTenancyViewModal(true);
-  };
-
-  const closeViewTenancyModal = () => {
-    setTenancyViewModal(false);
-  };
+  const itemsPerPage = 10;
 
   const openConfirmModal = (tenancy) => {
     setSelectedTenancy(tenancy);
@@ -167,7 +138,7 @@ const TenancyConfirm = () => {
           <div className="flex gap-[10px] tconfirm-action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md tconfirm-add-new-tenancy duration-200"
-              onClick={openCreateTenancyModal}
+              onClick={() => openModal("tenancy-create")}
             >
               Add New Tenancy
               <img
@@ -240,7 +211,7 @@ const TenancyConfirm = () => {
                   </span>
                 </td>
                 <td className="pl-12 pr-5 pt-2 text-center">
-                  <button onClick={openTenancyViewModal}>
+                  <button onClick={() => openModal("tenancy-view")}>
                     <img
                       src={tenancy.view}
                       alt="View"
@@ -249,7 +220,7 @@ const TenancyConfirm = () => {
                   </button>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={openUpdateTenancyModal}>
+                  <button onClick={() => openModal("tenancy-update")}>
                     <img
                       src={editicon}
                       alt="Edit"
@@ -367,7 +338,7 @@ const TenancyConfirm = () => {
                           <div className="tconfirm-grid-item">
                             <div className="tconfirm-dropdown-label">VIEW</div>
                             <div className="tconfirm-dropdown-value">
-                              <button onClick={openTenancyViewModal}>
+                              <button onClick={() => openModal("tenancy-view")}>
                                 <img
                                   src={tenancy.view}
                                   alt="View"
@@ -381,7 +352,9 @@ const TenancyConfirm = () => {
                               ACTION
                             </div>
                             <div className="tconfirm-dropdown-value tconfirm-flex tconfirm-items-center p-[3px] ml-[5px]">
-                              <button onClick={openUpdateTenancyModal}>
+                              <button
+                                onClick={() => openModal("tenancy-update")}
+                              >
                                 <img
                                   src={editicon}
                                   alt="Edit"
@@ -466,18 +439,6 @@ const TenancyConfirm = () => {
           </button>
         </div>
       </div>
-      <CreateTenancyModal
-        isOpen={createTenancyModal}
-        onClose={closeCreateTenancyModal}
-      />
-      <UpdateTenancyModal
-        isOpen={updateTenancyModal}
-        onClose={closeUpdateTenancyModal}
-      />
-      <TenancyViewModal
-        isOpen={tenancyViewModal}
-        onClose={closeViewTenancyModal}
-      />
       <TenancyConfirmModal
         isOpen={confirmModalOpen}
         onCancel={() => setConfirmModalOpen(false)}

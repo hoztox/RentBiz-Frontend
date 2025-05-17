@@ -92,7 +92,11 @@
   color: #201d1e;
 }
 
-.tconfirm-action-btn:hover,
+.tconfirm-action-btn:hover {
+  filter: brightness(0) saturate(100%) invert(8%) sepia(7%) saturate(582%)
+    hue-rotate(289deg) brightness(100%) contrast(91%);
+}
+
 .tconfirm-confirm-btn:hover {
   filter: brightness(0) saturate(100%) invert(73%) sepia(20%) saturate(848%)
     hue-rotate(86deg) brightness(94%) contrast(90%);

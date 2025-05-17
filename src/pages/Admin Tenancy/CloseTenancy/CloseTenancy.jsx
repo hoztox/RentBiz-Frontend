@@ -6,16 +6,14 @@ import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
 import deleteicon from "../../../assets/Images/Admin Tenancy/delete-icon.svg";
 import viewicon from "../../../assets/Images/Admin Tenancy/view-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
-import TenancyViewModal from "../TenancyViewModal/TenancyViewModal";
-import UpdateTenancyModal from "../UpdateTenancyModal/UpdateTenancyModal";
+import { useModal } from "../../../context/ModalContext";
 
 const CloseTenancy = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
+  const { openModal } = useModal();
   const itemsPerPage = 10;
 
   const demoData = [
@@ -90,22 +88,6 @@ const CloseTenancy = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const openViewModal = () => {
-    setIsViewModalOpen(true);
-  };
-
-  const closeViewModal = () => {
-    setIsViewModalOpen(false);
-  };
-
-  const openUpdateModal = () => {
-    setIsUpdateModalOpen(true);
-  };
-
-  const closeUpdateModal = () => {
-    setIsUpdateModalOpen(false);
-  };
-
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
       ...prev,
@@ -160,11 +142,17 @@ const CloseTenancy = () => {
             <tr className="border-b border-[#E9E9E9] h-[57px]">
               <th className="px-5 text-left tenancy-thead">ID</th>
               <th className="px-5 text-left tenancy-thead w-[12%]">NAME</th>
-              <th className="pl-5 text-left tenancy-thead w-[15%]">BUILDING NAME</th>
-              <th className="pl-5 text-left tenancy-thead w-[12%]">UNIT NAME</th>
+              <th className="pl-5 text-left tenancy-thead w-[15%]">
+                BUILDING NAME
+              </th>
+              <th className="pl-5 text-left tenancy-thead w-[12%]">
+                UNIT NAME
+              </th>
               <th className="px-5 text-left tenancy-thead">RENTAL MONTHS</th>
               <th className="px-5 text-left tenancy-thead w-[12%]">END DATE</th>
-              <th className="pl-12 pr-5 text-center tenancy-thead w-[10%]">VIEW</th>
+              <th className="pl-12 pr-5 text-center tenancy-thead w-[10%]">
+                VIEW
+              </th>
               <th className="px-5 pr-6 text-right tenancy-thead">ACTION</th>
             </tr>
           </thead>
@@ -175,15 +163,23 @@ const CloseTenancy = () => {
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
                 <td className="px-5 text-left tenancy-data">{tenancy.id}</td>
-                <td className="px-5 text-left tenancy-data">{tenancy.tenant}</td>
-                <td className="pl-5 text-left tenancy-data">{tenancy.building}</td>
+                <td className="px-5 text-left tenancy-data">
+                  {tenancy.tenant}
+                </td>
+                <td className="pl-5 text-left tenancy-data">
+                  {tenancy.building}
+                </td>
                 <td className="pl-5 text-left tenancy-data">{tenancy.unit}</td>
                 <td className="px-5 tenancy-data">
-                  <div className="w-[63%] flex justify-center">{tenancy.months}</div>
+                  <div className="w-[63%] flex justify-center">
+                    {tenancy.months}
+                  </div>
                 </td>
-                <td className="pl-5 text-left tenancy-data">{tenancy.endDate}</td>
+                <td className="pl-5 text-left tenancy-data">
+                  {tenancy.endDate}
+                </td>
                 <td className="pl-14 text-center pr-5 pt-2">
-                  <button onClick={openViewModal}>
+                  <button onClick={() => openModal("tenancy-view")}>
                     <img
                       src={tenancy.view}
                       alt="View"
@@ -192,7 +188,7 @@ const CloseTenancy = () => {
                   </button>
                 </td>
                 <td className="px-5 tclose-flex-gap-23 h-[57px]">
-                  <button onClick={openUpdateModal}>
+                  <button onClick={() => openModal("tenancy-update")}>
                     <img
                       src={editicon}
                       alt="Edit"
@@ -216,8 +212,12 @@ const CloseTenancy = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="tenancy-table-row-head">
-              <th className="px-5 w-[53%] text-left tenancy-thead tclose-id-column">ID</th>
-              <th className="px-5 w-[47%] text-left tenancy-thead tclose-end-date-column">NAME</th>
+              <th className="px-5 w-[53%] text-left tenancy-thead tclose-id-column">
+                ID
+              </th>
+              <th className="px-5 w-[47%] text-left tenancy-thead tclose-end-date-column">
+                NAME
+              </th>
               <th className="px-5 text-right tenancy-thead"></th>
             </tr>
           </thead>
@@ -226,14 +226,20 @@ const CloseTenancy = () => {
               <React.Fragment key={tenancy.id}>
                 <tr
                   className={`${
-                    expandedRows[tenancy.id] ? "tclose-mobile-no-border" : "tclose-mobile-with-border"
+                    expandedRows[tenancy.id]
+                      ? "tclose-mobile-no-border"
+                      : "tclose-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left tenancy-data">{tenancy.id}</td>
-                  <td className="px-5 text-left tenancy-data tclose-end-date-column">{tenancy.tenant}</td>
+                  <td className="px-5 text-left tenancy-data tclose-end-date-column">
+                    {tenancy.tenant}
+                  </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
-                      className={`tenancy-dropdown-field ${expandedRows[tenancy.id] ? "active" : ""}`}
+                      className={`tenancy-dropdown-field ${
+                        expandedRows[tenancy.id] ? "active" : ""
+                      }`}
                       onClick={() => toggleRowExpand(tenancy.id)}
                     >
                       <img
@@ -252,29 +258,45 @@ const CloseTenancy = () => {
                       <div className="tenancy-dropdown-content">
                         <div className="tclose-grid">
                           <div className="tclose-grid-item">
-                            <div className="tclose-dropdown-label">BULDING NAME</div>
-                            <div className="tclose-dropdown-value">{tenancy.building}</div>
+                            <div className="tclose-dropdown-label">
+                              BULDING NAME
+                            </div>
+                            <div className="tclose-dropdown-value">
+                              {tenancy.building}
+                            </div>
                           </div>
                           <div className="tclose-grid-item">
-                            <div className="tclose-dropdown-label">UNIT NAME</div>
-                            <div className="tclose-dropdown-value">{tenancy.unit}</div>
+                            <div className="tclose-dropdown-label">
+                              UNIT NAME
+                            </div>
+                            <div className="tclose-dropdown-value">
+                              {tenancy.unit}
+                            </div>
                           </div>
                         </div>
                         <div className="tclose-grid">
                           <div className="tclose-grid-item">
-                            <div className="tclose-dropdown-label">RENTAL MONTHS</div>
-                            <div className="tclose-dropdown-value">{tenancy.months}</div>
+                            <div className="tclose-dropdown-label">
+                              RENTAL MONTHS
+                            </div>
+                            <div className="tclose-dropdown-value">
+                              {tenancy.months}
+                            </div>
                           </div>
                           <div className="tclose-grid-item">
-                            <div className="tclose-dropdown-label">END DATE</div>
-                            <div className="tclose-dropdown-value">{tenancy.endDate}</div>
+                            <div className="tclose-dropdown-label">
+                              END DATE
+                            </div>
+                            <div className="tclose-dropdown-value">
+                              {tenancy.endDate}
+                            </div>
                           </div>
                         </div>
                         <div className="tclose-grid">
                           <div className="tclose-grid-item">
                             <div className="tclose-dropdown-label">VIEW</div>
                             <div className="tclose-dropdown-value">
-                              <button onClick={openViewModal}>
+                              <button onClick={() => openModal("tenancy-view")}>
                                 <img
                                   src={tenancy.view}
                                   alt="View"
@@ -286,7 +308,9 @@ const CloseTenancy = () => {
                           <div className="tclose-grid-item">
                             <div className="tclose-dropdown-label">ACTION</div>
                             <div className="tclose-dropdown-value tclose-flex-items-center-gap-2 mt-[10px] ml-[5px]">
-                              <button onClick={openUpdateModal}>
+                              <button
+                                onClick={() => openModal("tenancy-update")}
+                              >
                                 <img
                                   src={editicon}
                                   alt="Edit"
@@ -314,8 +338,10 @@ const CloseTenancy = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 tclose-pagination-container">
         <span className="tclose-pagination collection-list-pagination">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
+          Showing{" "}
+          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+          {filteredData.length} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto tclose-pagination-buttons">
           <button
@@ -347,7 +373,9 @@ const CloseTenancy = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
+          {endPage < totalPages - 1 && (
+            <span className="px-2 flex items-center">...</span>
+          )}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
@@ -365,8 +393,6 @@ const CloseTenancy = () => {
           </button>
         </div>
       </div>
-      <TenancyViewModal isOpen={isViewModalOpen} onClose={closeViewModal} />
-      <UpdateTenancyModal isOpen={isUpdateModalOpen} onClose={closeUpdateModal} />
     </div>
   );
 };

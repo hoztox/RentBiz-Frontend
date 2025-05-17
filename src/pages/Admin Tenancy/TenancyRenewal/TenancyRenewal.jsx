@@ -6,17 +6,14 @@ import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Tenancy/delete-icon.svg";
 import viewicon from "../../../assets/Images/Admin Tenancy/view-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenants/downarrow.svg";
-import TenancyViewModal from "../TenancyViewModal/TenancyViewModal";
-import UpdateTenancyModal from "../UpdateTenancyModal/UpdateTenancyModal";
+import { useModal } from "../../../context/ModalContext";
 
 const TenancyRenewal = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isTenancyViewModalOpen, setIsTenancyViewModalOpen] = useState(false);
-  const [isTenancyUpdateModalOpen, setIsTenancyUpdateModalOpen] =
-    useState(false);
   const [expandedRows, setExpandedRows] = useState({});
+  const { openModal } = useModal();
   const itemsPerPage = 10;
 
   const demoData = [
@@ -91,22 +88,6 @@ const TenancyRenewal = () => {
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
-
-  const openTenancyViewModal = () => {
-    setIsTenancyViewModalOpen(true);
-  };
-
-  const closeTenancyViewModal = () => {
-    setIsTenancyViewModalOpen(false);
-  };
-
-  const openTenancyUpdateModal = () => {
-    setIsTenancyUpdateModalOpen(true);
-  };
-
-  const closeTenancyUpdateModal = () => {
-    setIsTenancyUpdateModalOpen(false);
-  };
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -213,7 +194,7 @@ const TenancyRenewal = () => {
                   </button>
                 </td>
                 <td className="pl-14 text-center pr-5 pt-2">
-                  <button onClick={openTenancyViewModal}>
+                  <button onClick={() => openModal("tenancy-view")}>
                     <img
                       src={tenancy.view}
                       alt="View"
@@ -222,7 +203,7 @@ const TenancyRenewal = () => {
                   </button>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={openTenancyUpdateModal}>
+                  <button onClick={() => openModal("tenancy-update")}>
                     <img
                       src={editicon}
                       alt="Edit"
@@ -343,7 +324,7 @@ const TenancyRenewal = () => {
                           <div className="trenew-grid-item w-[26%]">
                             <div className="trenew-dropdown-label">VIEW</div>
                             <div className="trenew-dropdown-value">
-                              <button onClick={openTenancyViewModal}>
+                              <button onClick={() => openModal("tenancy-view")}>
                                 <img
                                   src={tenancy.view}
                                   alt="View"
@@ -355,7 +336,9 @@ const TenancyRenewal = () => {
                           <div className="trenew-grid-item w-[20%]">
                             <div className="trenew-dropdown-label">ACTION</div>
                             <div className="trenew-dropdown-value trenew-flex trenew-items-center mt-[10px] ml-[7px]">
-                              <button onClick={openTenancyUpdateModal}>
+                              <button
+                                onClick={() => openModal("tenancy-update")}
+                              >
                                 <img
                                   src={editicon}
                                   alt="Edit"
@@ -438,14 +421,6 @@ const TenancyRenewal = () => {
           </button>
         </div>
       </div>
-      <TenancyViewModal
-        isOpen={isTenancyViewModalOpen}
-        onClose={closeTenancyViewModal}
-      />
-      <UpdateTenancyModal
-        isOpen={isTenancyUpdateModalOpen}
-        onClose={closeTenancyUpdateModal}
-      />
     </div>
   );
 };
