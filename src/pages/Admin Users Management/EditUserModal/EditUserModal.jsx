@@ -142,7 +142,7 @@ const EditUserModal = () => {
 
           {/* Change Password Button */}
           <div>
-            <button className="reset-button hover:bg-[#A3C1E5] hover:text-white duration-200">
+            <button className="reset-button hover:bg-[#1458A2] hover:text-white duration-200">
               Change Password
             </button>
           </div>
