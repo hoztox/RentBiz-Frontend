@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./MobileSlideMenu.css";
 import { ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useModal } from "../../context/ModalContext";
 import logo from "../../assets/Images/Admin Sidebar/Rentbiz Logo.svg";
 import dashboard from "../../assets/Images/Admin Sidebar/dashboard.svg";
 import users from "../../assets/Images/Admin Sidebar/users.svg";
@@ -22,15 +23,10 @@ import reportCollection from "../../assets/Images/Admin Sidebar/report collectio
 import incomeExpense from "../../assets/Images/Admin Sidebar/income-expense.svg";
 import closeicon from "../../assets/Images/Admin Navbar/close-icon.svg";
 
-const MobileSlideMenu = ({
-  isMobileMenuOpen,
-  toggleMobileMenu,
-  openModal,
-  openTenancyModal,
-  openCreateTenantModal,
-}) => {
+const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
   const [activeItem, setActiveItem] = useState("Dashboard");
   const navigate = useNavigate();
+  const { openModal } = useModal();
 
   const [expandedMenus, setExpandedMenus] = useState({
     Users: false,
@@ -161,7 +157,7 @@ const MobileSlideMenu = ({
                   }`}
                   onClick={() => {
                     setActiveItem("Create User");
-                    openModal();
+                    openModal("user-create");
                     toggleMobileMenu();
                   }}
                 >
@@ -297,7 +293,7 @@ const MobileSlideMenu = ({
                   }`}
                   onClick={() => {
                     setActiveItem("Create Tenant");
-                    openCreateTenantModal();
+                    openModal("tenant-create");
                     toggleMobileMenu();
                   }}
                 >
@@ -358,8 +354,7 @@ const MobileSlideMenu = ({
                       }`}
                       onClick={() => {
                         setActiveItem("Create Tenancy");
-                        openTenancyModal();
-                        navigate("/admin/tenancy-master");
+                        openModal("tenancy-create");
                         toggleMobileMenu();
                       }}
                     >
@@ -492,7 +487,6 @@ const MobileSlideMenu = ({
                 >
                   <p className="pl-10 py-[7px]">ID Type</p>
                 </div>
-
                 <div
                   className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
                     activeItem === "Charge Code Type" ? "submenu-active" : ""
@@ -505,7 +499,6 @@ const MobileSlideMenu = ({
                 >
                   <p className="pl-10 py-[7px]">Charge Code Type</p>
                 </div>
-
                 <div
                   className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
                     activeItem === "Charges" ? "submenu-active" : ""

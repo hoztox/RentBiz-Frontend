@@ -30,9 +30,11 @@ import UpcomingCollection from "./pages/UpcomingCollection/UpcomingCollection";
 import ReportCollection from "./pages/ReportCollection/ReportCollection";
 import IncomeExpenseReport from "./pages/IncomeExpenseReport/IncomeExpenseReport";
 import ChargeCodeType from "./pages/Admin Masters/Charge Code Type/ChargeCodeType";
+import { ModalProvider } from "./context/ModalContext";
 
 const App = () => {
   return (
+    <ModalProvider>
     <BrowserRouter>
       <Routes>
         <Route path="/">
@@ -73,6 +75,7 @@ const App = () => {
         </Route>
       </Routes>
     </BrowserRouter>
+    </ModalProvider>
   );
 };
 

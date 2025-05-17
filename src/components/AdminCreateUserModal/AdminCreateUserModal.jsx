@@ -4,14 +4,39 @@ import cancelIcon from "../../assets/Images/Admin Create Modal/cancelIcon.svg";
 import addImageIcon from "../../assets/Images/Admin Create Modal/addImageIcon.svg";
 import { ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useModal } from "../../context/ModalContext"; // Adjust path
 
-const AdminCreateUserModal = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
+const AdminCreateUserModal = () => {
+  const { modalState, closeModal } = useModal();
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const navigate = useNavigate();
 
+  // Form state
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    role: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  // Early return AFTER hooks
+  if (!modalState.isOpen || modalState.type !== "user-create") return null;
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = () => {
+    // TODO: Add form validation and API call
+    console.log("Form submitted:", formData);
+    closeModal();
+    navigate("/admin/users-manage");
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 modal-overlay">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
       <div className="modal-container relative bg-white rounded-[6px] overflow-hidden shadow-lg w-full max-w-[830px] h-auto md:h-[548px] flex flex-col">
         {/* Header */}
         <div className="h-[100px] md:h-[133px] md:bg-[#F8F9FA] rounded-t-[6px] flex justify-between items-start px-4 md:px-6 pt-6">
@@ -20,7 +45,8 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
           </h2>
           <button
             className="close-button hover:bg-gray-200 duration-200"
-            onClick={onClose}
+            onClick={closeModal}
+            aria-label="Close modal"
           >
             <img src={cancelIcon} alt="Close" className="w-5 h-5" />
           </button>
@@ -33,11 +59,11 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
             <div className="absolute bottom-[6px] md:bottom-[8px] left-1/2 transform -translate-x-1/2">
               <img
                 src={addImageIcon}
-                alt="Add"
+                alt="Add image"
                 className="h-[18px] md:h-[22px] w-[18px] md:w-[22px]"
               />
             </div>
-            <input type="file" className="hidden" />
+            <input type="file" className="hidden" accept="image/*" />
           </div>
         </div>
 
@@ -50,6 +76,9 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
             </label>
             <input
               type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
               placeholder="Enter Name"
               className="input-style focus:border-gray-700"
             />
@@ -62,6 +91,9 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
             </label>
             <input
               type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
               placeholder="Enter Your Email"
               className="input-style focus:border-gray-700"
             />
@@ -73,20 +105,19 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
               Role*
             </label>
             <select
+              name="role"
+              value={formData.role}
+              onChange={handleInputChange}
               className="input-style select custom-select focus:border-gray-700"
               onFocus={() => setIsSelectOpen(true)}
               onBlur={() => setIsSelectOpen(false)}
             >
-              <option
-                style={{
-                  color: "#CFCFCF",
-                  fontSize: "15px",
-                  fontWeight: "400",
-                  fontFamily: "Inter Tight",
-                }}
-              >
+              <option value="" disabled>
                 Choose
               </option>
+              <option value="admin">Admin</option>
+              <option value="manager">Manager</option>
+              <option value="user">User</option>
             </select>
             <ChevronDown
               className={`absolute right-[20px] md:right-[25px] top-[36px] md:top-[40px] text-gray-400 pointer-events-none transition-transform duration-300 drop-down-icon ${
@@ -108,6 +139,9 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
             </label>
             <input
               type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
               placeholder="Password"
               className="input-style focus:border-gray-700"
             />
@@ -120,6 +154,9 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
             </label>
             <input
               type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleInputChange}
               placeholder="Confirm Password"
               className="input-style focus:border-gray-700"
             />
@@ -130,10 +167,7 @@ const AdminCreateUserModal = ({ isOpen, onClose }) => {
         <div className="px-4 md:px-6 mt-6 md:mt-6 mb-48 md:mb-6 flex justify-end">
           <button
             className="bg-[#2892CE] hover:bg-[#076094] duration-200 create-user-button"
-            onClick={() => {
-              onClose();         
-              navigate("/admin/users-manage"); 
-            }}
+            onClick={handleSubmit}
           >
             Create User
           </button>

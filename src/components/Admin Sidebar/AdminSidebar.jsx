@@ -23,11 +23,12 @@ import incomeExpense from "../../assets/Images/Admin Sidebar/income-expense.svg"
 import AdminCreateUserModal from "../AdminCreateUserModal/AdminCreateUserModal";
 import CreateTenancyModal from "../../pages/Admin Tenancy/CreateTenancy/CreateTenancyModal";
 import CreateTenantModal from "../../pages/Admin Tenants/CreateTenantModal/CreateTenantModal";
+import { useModal } from "../../context/ModalContext";
 
 const AdminSidebar = () => {
   const [activeItem, setActiveItem] = useState("Dashboard");
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
+  const { openModal } = useModal();
 
   const handleNonDropdownClick = (item, path) => {
     setActiveItem(item);
@@ -75,16 +76,6 @@ const AdminSidebar = () => {
     navigate("/admin/dashboard");
   };
 
-  const openModal = () => {
-    setIsModalOpen(true);
-    setActiveItem("Manage Users");
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setActiveItem("Manage Users");
-    navigate("/admin/users-manage");
-  };
 
   // Create Tenant Modal
   const [isCreateTenantModalOpen, setIsCreateTenantModalOpen] = useState(false);
@@ -177,7 +168,10 @@ const AdminSidebar = () => {
               <div
                 className={`cursor-pointer mb-2 transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Create User" ? "submenu-active" : ""
                   }`}
-                onClick={openModal}
+                onClick={()=>{
+                  setActiveItem("Create User");
+                  openModal("user-create")
+                }}
               >
                 <p className="pl-10 py-[7px]">Create User</p>
               </div>
@@ -686,9 +680,6 @@ const AdminSidebar = () => {
           </div>
         </div>
       </div>
-
-      {/* Create User Modal */}
-      <AdminCreateUserModal isOpen={isModalOpen} onClose={closeModal} />
 
       {/* Create Tenant Modal */}
       <CreateTenantModal open={isCreateTenantModalOpen} onClose={closeCreateTenantModal} />

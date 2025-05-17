@@ -5,21 +5,16 @@ import downloadicon from "../../assets/Images/Admin Users Management/download-ic
 import editicon from "../../assets/Images/Admin Users Management/edit-icon.svg";
 import deletesicon from "../../assets/Images/Admin Users Management/delete-icon.svg";
 import "./AdminUsers.css";
-import AdminCreateUserModal from "../../components/AdminCreateUserModal/AdminCreateUserModal";
-import EditUserModal from "./EditUserModal/EditUserModal";
-import downarrow from "../../assets/Images/Admin Users Management/downarrow.svg"
+import downarrow from "../../assets/Images/Admin Users Management/downarrow.svg";
+import { useModal } from "../../context/ModalContext";
 
 const AdminUsers = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  
+  const { openModal } = useModal(); // Use ModalContext
   const [expandedRows, setExpandedRows] = useState({});
-
   const [toggleStates, setToggleStates] = useState({
     "01": false,
     "02": false,
@@ -41,26 +36,10 @@ const AdminUsers = () => {
   };
 
   const toggleRowExpand = (id) => {
-    setExpandedRows(prev => ({
+    setExpandedRows((prev) => ({
       ...prev,
-      [id]: !prev[id]
+      [id]: !prev[id],
     }));
-  };
-
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const openEditModal = () => {
-    setIsEditModalOpen(true);
-  };
-
-  const closeEditModal = () => {
-    setIsEditModalOpen(false);
   };
 
   const demoData = [
@@ -189,7 +168,6 @@ const AdminUsers = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 user-search"
             />
-
             <div className="relative w-[40%] md:w-auto">
               <select
                 name="select"
@@ -208,11 +186,10 @@ const AdminUsers = () => {
               />
             </div>
           </div>
-
           <div className="flex gap-[10px] user-action-buttons-container w-full md:w-auto justify-start">
             <button
               className="flex items-center justify-center gap-2 h-[38px] rounded-md user-create-btn duration-200 w-[176px]"
-              onClick={openModal}
+              onClick={() => openModal("user-create")}
             >
               Create User
               <img
@@ -221,9 +198,7 @@ const AdminUsers = () => {
                 className="relative right-[5px] md:right-0 w-[15px] h-[15px]"
               />
             </button>
-            <button
-              className="flex items-center justify-center gap-2 h-[38px] rounded-md duration-200 user-download-btn w-[122px]"
-            >
+            <button className="flex items-center justify-center gap-2 h-[38px] rounded-md duration-200 user-download-btn w-[122px]">
               Download
               <img
                 src={downloadicon}
@@ -281,7 +256,7 @@ const AdminUsers = () => {
                   />
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={openEditModal}>
+                  <button onClick={() => openModal("user-update", user)}>
                     <img
                       src={editicon}
                       alt="Edit"
@@ -306,8 +281,12 @@ const AdminUsers = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="user-table-row-head">
-              <th className="px-5 w-[38%] text-left user-thead user-id-column">ID</th>
-              <th className="px-5 w-[60%] text-left user-thead">CREATED DATE</th>
+              <th className="px-5 w-[38%] text-left user-thead user-id-column">
+                ID
+              </th>
+              <th className="px-5 w-[60%] text-left user-thead">
+                CREATED DATE
+              </th>
               <th className="px-5 text-right user-thead"></th>
             </tr>
           </thead>
@@ -330,8 +309,10 @@ const AdminUsers = () => {
                       }`}
                       onClick={() => toggleRowExpand(user.id)}
                     >
-                      <img src={downarrow} alt="drop-down-arrow"
-                        className={`user-dropdown-img  ${
+                      <img
+                        src={downarrow}
+                        alt="drop-down-arrow"
+                        className={`user-dropdown-img ${
                           expandedRows[user.id] ? "text-white" : ""
                         }`}
                       />
@@ -349,7 +330,9 @@ const AdminUsers = () => {
                           </div>
                           <div className="user-grid-item w-[35.33%]">
                             <div className="dropdown-label">USERNAME</div>
-                            <div className="dropdown-value">{user.username}</div>
+                            <div className="dropdown-value">
+                              {user.username}
+                            </div>
                           </div>
                           <div className="user-grid-item w-[20%]">
                             <div className="dropdown-label">ROLE</div>
@@ -358,7 +341,9 @@ const AdminUsers = () => {
                         </div>
                         <div className="user-grid">
                           <div className="user-grid-item w-[33.33%]">
-                            <div className="dropdown-label !mb-[10px]">STATUS</div>
+                            <div className="dropdown-label !mb-[10px]">
+                              STATUS
+                            </div>
                             <div className="dropdown-value">
                               <span
                                 className={`px-[10px] py-[5px] w-[53px] h-[24px] rounded-[4px] user-status ${
@@ -384,7 +369,9 @@ const AdminUsers = () => {
                           <div className="user-grid-item w-[20%]">
                             <div className="dropdown-label">ACTION</div>
                             <div className="dropdown-value flex items-center gap-[15px] ml-[5px] mt-[10px]">
-                              <button onClick={openEditModal}>
+                              <button
+                                onClick={() => openModal("user-update", user)}
+                              >
                                 <img
                                   src={editicon}
                                   alt="Edit"
@@ -413,8 +400,10 @@ const AdminUsers = () => {
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
         <span className="pagination collection-list-pagination">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
+          Showing{" "}
+          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+          {filteredData.length} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
           <button
@@ -446,7 +435,9 @@ const AdminUsers = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
+          {endPage < totalPages - 1 && (
+            <span className="px-2 flex items-center">...</span>
+          )}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
@@ -464,9 +455,6 @@ const AdminUsers = () => {
           </button>
         </div>
       </div>
-
-      <AdminCreateUserModal isOpen={isModalOpen} onClose={closeModal} />
-      <EditUserModal isOpen={isEditModalOpen} onClose={closeEditModal} />
     </div>
   );
 };

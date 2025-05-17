@@ -10,6 +10,7 @@ import MobileSlideMenu from "../MobileSlideMenu/MobileSlideMenu";
 import AdminCreateUserModal from "../AdminCreateUserModal/AdminCreateUserModal";
 import CreateTenancyModal from "../../pages/Admin Tenancy/CreateTenancy/CreateTenancyModal";
 import CreateTenantModal from "../../pages/Admin Tenants/CreateTenantModal/CreateTenantModal";
+import { useModal } from "../../context/ModalContext";
 
 const routeTitles = {
   "/admin/dashboard": "Dashboard Overview",
@@ -69,19 +70,29 @@ const mobileRouteTitles = {
   "/admin/upcoming-collection": "Upcoming Collection Report",
   "/admin/collection-report": "Collection Report",
   "/admin/income-expense-report": "Income-Expense Report",
+  default: "Admin"
 };
+
+const modalTitles = {
+  "user-create": "Create User",
+  "user-update": "Update User",
+  "tenant-create": "Add Tenant",
+  "tenancy-create": "New Tenancy",
+  "tenancy-update": "Update Tenancy",
+}
 
 const AdminNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("English");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
-  const [isCreateTenantModalOpen, setIsCreateTenantModalOpen] = useState(false);
-  const [isTenancyModalOpen, setIsTenancyModalOpen] = useState(false);
+  // const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  // const [isCreateTenantModalOpen, setIsCreateTenantModalOpen] = useState(false);
+  // const [isTenancyModalOpen, setIsTenancyModalOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState("");
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const { modalState, closeModal} = useModal();
 
   useEffect(() => {
     setCurrentPath(location.pathname);
@@ -90,13 +101,17 @@ const AdminNavbar = () => {
   const isDashboard = currentPath === "/admin/dashboard";
 
   const getPageTitle = (isMobile = false) => {
+    if (isMobile && modalState.isOpen) {
+      return modalTitles[modalState.type] || mobileRouteTitles.default;
+    }
+
     const path = currentPath;
     const titles = isMobile ? mobileRouteTitles : routeTitles;
 
     // Check for exact route match
     if (titles[path]) return titles[path];
 
-    // Handle nested routes (optional, uncomment if needed)
+      // Handle nested routes (optional, uncomment if needed)
     // if (path.startsWith("/admin/buildings")) return titles["/admin/buildings"];
     // if (path.startsWith("/admin/units")) return titles["/admin/units"];
     // if (path.startsWith("/admin/tenants")) return titles["/admin/tenants"];
@@ -104,7 +119,7 @@ const AdminNavbar = () => {
     // if (path.startsWith("/admin/masters")) return titles["/admin/masters-unit-type"];
 
     // Fallback for unknown routes
-    return titles.default;
+    return titles.default || "Admin";
   };
 
   // Store current path in localstorage when it changes
@@ -159,8 +174,13 @@ const AdminNavbar = () => {
     setIsTenancyModalOpen(false);
   };
 
+  
   const handleBackClick = () => {
-    navigate(-1); // Navigate back
+    if (modalState.isOpen) {
+      closeModal();
+    } else {
+      navigate(-1);
+    }
   };
 
   const handleLogoClick = () => {
@@ -184,17 +204,18 @@ const AdminNavbar = () => {
       <nav
         className={`flex items-center justify-between mx-5 h-[86px] border-b border-[#E9E9E9] bg-white admin-navbar ${
           isDashboard ? "dashboard-nav" : "non-dashboard-nav"
-        }`}
+        } ${modalState.isOpen ? "modal-open" : ""}`}
       >
         <div className="flex items-center w-full">
           {/* Left Section: Logo or Back Arrow */}
           <div className="left-section">
-            {isDashboard ? (
+            {isDashboard && !modalState.isOpen ? (
               <img
                 src={logo}
                 alt="RentBiz Logo"
                 className="RentBiz-Logo"
                 onClick={handleLogoClick}
+                aria-label="Navigate to dashboard"
               />
             ) : (
               <img
@@ -202,13 +223,16 @@ const AdminNavbar = () => {
                 alt="Back Arrow"
                 className="back-arrow"
                 onClick={handleBackClick}
+                aria-label={modalState.isOpen ? "Close modal" : "Go back"}
               />
             )}
           </div>
-          {/* Center Section: Page Title (non-dashboard pages in mobile) */}
-          {!isDashboard && (
+
+          {/* Center Section: Page Title (non-dashboard pages or modals in mobile) */}
+          {(modalState.isOpen || !isDashboard) && (
             <h1 className="mobile-page-title">{getPageTitle(true)}</h1>
           )}
+
           {/* Desktop Page Title */}
           <h1 className="navbar-head">{getPageTitle(false)}</h1>
         </div>
@@ -278,21 +302,12 @@ const AdminNavbar = () => {
       <MobileSlideMenu
         isMobileMenuOpen={isMobileMenuOpen}
         toggleMobileMenu={toggleMobileMenu}
-        openModal={openUserModal}
-        openTenancyModal={openTenancyModal}
-        openCreateTenantModal={openCreateTenantModal}
       />
 
       {/* Modals */}
-      <AdminCreateUserModal isOpen={isUserModalOpen} onClose={closeUserModal} />
-      <CreateTenantModal
-        open={isCreateTenantModalOpen}
-        onClose={closeCreateTenentModal}
-      />
-      <CreateTenancyModal
-        isOpen={isTenancyModalOpen}
-        onClose={closeTenancyModal}
-      />
+      <AdminCreateUserModal />
+      <CreateTenantModal />
+      <CreateTenancyModal />
     </>
   );
 };
