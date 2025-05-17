@@ -36,7 +36,7 @@ const UpdateCurrencyModal = ({ isOpen, onClose, currencyData }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
-      <div className="add-document-modal-container relative bg-white rounded-md w-full max-w-[523px] h-auto md:h-[514px] p-6">
+      <div className="update-currency-modal-container relative bg-white rounded-md w-full max-w-[523px] h-auto md:h-[514px] p-6">
         <h2 className="currency-modal-head mt-4 mb-6">Update Currency</h2>
         <button
           onClick={onClose}

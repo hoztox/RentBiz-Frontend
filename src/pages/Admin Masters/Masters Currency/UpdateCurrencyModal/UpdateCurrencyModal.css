@@ -54,7 +54,7 @@ input::placeholder {
 }
 
 /* Responsive Styles */
-.add-document-modal-container {
+.update-currency-modal-container {
   width: 100%;
   max-width: 100vw;
   height: 100vh;
@@ -64,17 +64,11 @@ input::placeholder {
 }
 
 @media (min-width: 768px) {
-  .add-document-modal-container {
-    width: 523px;
-    max-width: 523px;
-    height: 514px;
-    border-radius: 6px;
-    background-color: #ffffff;
-  }
+  
 }
 
 @media (max-width: 480px) {
-  .add-document-modal-container {
+  .update-currency-modal-container {
     position: absolute;
     top: 90px;
     left: 0;
@@ -119,6 +113,14 @@ input::placeholder {
 }
 
 @media (min-width: 768px) {
+  .update-currency-modal-container {
+    width: 523px;
+    max-width: 523px;
+    height: 514px;
+    border-radius: 6px;
+    background-color: #ffffff;
+  }
+  
   .input-style {
     width: 100%;
   }
