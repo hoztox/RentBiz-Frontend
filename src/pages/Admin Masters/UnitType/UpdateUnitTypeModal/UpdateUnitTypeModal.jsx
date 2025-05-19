@@ -43,7 +43,7 @@ const UpdateUnitTypeModal = () => {
         onClick={(e) => e.stopPropagation()}
         className="update-unit-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[262px] p-6"
       >
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center md:mb-6">
           <h2 className="update-modal-head">Update Unit Type Master</h2>
           <button
             onClick={closeModal}
