@@ -3,8 +3,10 @@ import "./AddInvoiceModal.css";
 import { ChevronDown } from "lucide-react";
 import calendaricon from "../../../assets/Images/Invoice/calendar-icon.svg";
 import closeicon from "../../../assets/Images/Invoice/close-icon.svg";
+import { useModal } from "../../../context/ModalContext";
 
-const AddInvoiceModal = ({ isOpen, onClose }) => {
+const AddInvoiceModal = () => {
+  const { modalState, closeModal } = useModal();
   const [formData, setFormData] = useState({
     tenancy: "",
     inDate: "",
@@ -30,7 +32,7 @@ const AddInvoiceModal = ({ isOpen, onClose }) => {
   });
 
   useEffect(() => {
-    if (isOpen) {
+    if (modalState.isOpen) {
       setFormData({
         tenancy: "",
         inDate: "",
@@ -49,7 +51,7 @@ const AddInvoiceModal = ({ isOpen, onClose }) => {
         ],
       });
     }
-  }, [isOpen]);
+  }, [modalState.isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -76,10 +78,14 @@ const AddInvoiceModal = ({ isOpen, onClose }) => {
   };
 
   const handleSave = () => {
-    onClose();
+    console.log("Invoice Data Saved: ", formData);
+    closeModal();
   };
 
-  if (!isOpen) return null;
+  // Only render for "create-invoice" type
+  if (!modalState.isOpen || modalState.type !== "create-invoice") {
+    return null;
+  }
 
   return (
     <div className="modal-overlay">
@@ -89,7 +95,7 @@ const AddInvoiceModal = ({ isOpen, onClose }) => {
             Create New Invoice
           </h2>
           <button
-            onClick={onClose}
+            onClick={closeModal}
             className="invoice-modal-close-btn hover:bg-gray-100 duration-200"
           >
             <img src={closeicon} alt="close" className="w-[15px] h-[15px]" />

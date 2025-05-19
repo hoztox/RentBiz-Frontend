@@ -8,6 +8,7 @@ import viewicon from "../../assets/Images/Invoice/view-icon.svg";
 import downarrow from "../../assets/Images/Invoice/downarrow.svg";
 import AddInvoiceModal from "./AddInvoiceModal/AddInvoiceModal";
 import ViewInvoiceModal from "./ViewInvoiceModal/ViewInvoiceModal";
+import { useModal } from "../../context/ModalContext";
 
 const Invoice = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -16,6 +17,7 @@ const Invoice = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
+  const { openModal } = useModal();
   const itemsPerPage = 10;
 
   const demoData = [
@@ -137,7 +139,7 @@ const Invoice = () => {
           <div className="flex gap-[10px] inv-action-buttons-container w-full md:w-auto justify-start">
             <button
               className="flex items-center justify-center gap-2 h-[38px] rounded-md inv-add-invoice duration-200 w-[176px]"
-              onClick={openAddModal}
+              onClick={()=>openModal("create-invoice")}
             >
               Add New Invoice
               <img src={plusicon} alt="plus icon" className="relative right-[5px] md:right-0 w-[15px] h-[15px]" />
@@ -178,7 +180,7 @@ const Invoice = () => {
                 <td className="pl-5 text-left inv-data">{invoice.tenantName}</td>
                 <td className="px-5 text-left inv-data">{invoice.amountDue}</td>
                 <td className="pl-14 text-center pr-5 pt-2">
-                  <button onClick={openViewModal}>
+                  <button onClick={()=>openModal("view-invoice")}>
                     <img
                       src={invoice.view}
                       alt="View"
@@ -258,7 +260,7 @@ const Invoice = () => {
                           <div className="inv-dropdown-content-item w-[25%]">
                             <div className="inv-dropdown-label">VIEW</div>
                             <div className="inv-dropdown-value">
-                              <button onClick={openViewModal}>
+                              <button onClick={()=>openModal("view-invoice")}>
                                 <img
                                   src={invoice.view}
                                   alt="View"
@@ -289,14 +291,18 @@ const Invoice = () => {
           </tbody>
         </table>
       </div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 inv-pagination-container">
-        <span className="inv-collection-list-pagination inv-pagination-text">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
+
+      {/* Pagination Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
+        <span className="collection-list-pagination">
+          Showing{" "}
+          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+          {filteredData.length} entries
         </span>
-        <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto inv-pagination-buttons">
+        <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer inv-pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
@@ -304,7 +310,7 @@ const Invoice = () => {
           </button>
           {startPage > 1 && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 inv-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(1)}
             >
               1
@@ -314,7 +320,7 @@ const Invoice = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 inv-page-no-btns ${
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
                 currentPage === startPage + i
                   ? "bg-[#1458A2] text-white"
                   : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
@@ -324,17 +330,19 @@ const Invoice = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
+          {endPage < totalPages - 1 && (
+            <span className="px-2 flex items-center">...</span>
+          )}
           {endPage < totalPages && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 inv-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(totalPages)}
             >
               {totalPages}
             </button>
           )}
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer inv-pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(currentPage + 1)}
           >

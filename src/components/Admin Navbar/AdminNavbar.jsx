@@ -92,7 +92,9 @@ const modalTitles = {
   "add-currency-master": "Create New Currency",
   "update-currency-master": "Update Currency",
   "create-additional-charges": "Create New Additional Charges",
-  "update-additional-charges": "Update Additional Charges"
+  "update-additional-charges": "Update Additional Charges",
+  "create-invoice": "Create New Invoice",
+  "view-invoice": "Invoice View"
 }
 
 const AdminNavbar = () => {

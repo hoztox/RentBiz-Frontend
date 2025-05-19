@@ -1,9 +1,12 @@
-import React from "react";
 import "./ViewInvoiceModal.css";
 import closeicon from "../../../assets/Images/Invoice/close-icon.svg";
+import { useModal } from "../../../context/ModalContext";
 
-const ViewInvoiceModal = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
+const ViewInvoiceModal = () => {
+  const { modalState, closeModal } = useModal();
+
+  // Only render for "view-invoice" type
+  if (!modalState.isOpen || modalState.type !== "view-invoice") return null;
 
   return (
     <div className="modal-overlay">
@@ -11,7 +14,7 @@ const ViewInvoiceModal = ({ isOpen, onClose }) => {
         <div className="flex justify-between items-center md:mb-6">
           <h2 className="view-invoice-modal-head">Invoice View</h2>
           <button
-            onClick={onClose}
+            onClick={closeModal}
             className="view-invoice-modal-close-btn hover:bg-gray-100 duration-200"
           >
             <img src={closeicon} alt="Close" className="w-[15px] h-[15px]" />
@@ -22,10 +25,14 @@ const ViewInvoiceModal = ({ isOpen, onClose }) => {
         <div className="border border-[#E9E9E9] rounded-md p-6 mb-6">
           <div className="view-invoice-modal-grid gap-4">
             <div className="pr-4 border-r border-[#E9E9E9]">
-              <div className="view-invoice-modal-label mb-1">Select Tenancy</div>
+              <div className="view-invoice-modal-label mb-1">
+                Select Tenancy
+              </div>
               <div className="view-invoice-modal-data">Test</div>
 
-              <div className="view-invoice-modal-label mb-1 mt-4">Building Name</div>
+              <div className="view-invoice-modal-label mb-1 mt-4">
+                Building Name
+              </div>
               <div className="view-invoice-modal-data">DANAT ALZAHIA</div>
 
               <div className="view-invoice-modal-label mb-1 mt-4">Due Date</div>
@@ -36,7 +43,9 @@ const ViewInvoiceModal = ({ isOpen, onClose }) => {
               <div className="view-invoice-modal-label mb-1">In Date</div>
               <div className="view-invoice-modal-data">20-05-2025</div>
 
-              <div className="view-invoice-modal-label mb-1 mt-4">Unit Name</div>
+              <div className="view-invoice-modal-label mb-1 mt-4">
+                Unit Name
+              </div>
               <div className="view-invoice-modal-data">Furniture shop</div>
             </div>
           </div>
@@ -133,7 +142,7 @@ const ViewInvoiceModal = ({ isOpen, onClose }) => {
 
               {/* Third Header: Total */}
               <div className="view-invoice-modal-mobile-header border-b border-[#E9E9E9] h-[57px] grid grid-cols-2">
-              <div className="px-[10px] flex items-center view-invoice-charges-thead uppercase">
+                <div className="px-[10px] flex items-center view-invoice-charges-thead uppercase">
                   SELECT
                 </div>
                 <div className="px-[10px] flex items-center view-invoice-charges-thead uppercase ml-[70px]">
