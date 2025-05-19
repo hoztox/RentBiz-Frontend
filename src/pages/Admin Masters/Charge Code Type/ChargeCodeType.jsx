@@ -7,17 +7,14 @@ import editicon from "../../../assets/Images/Admin Masters/edit-icon.svg";
 import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
 import buildingimg from "../../../assets/Images/Admin Masters/building2.jpg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
-import CreateChargeCodeModal from "./CreateChargeCodeModal/CreateChargeCodeModal";
-import UpdateChargeCode from "./UpdateChargeCodeModal/UpdateChargeCode";
+import { useModal } from "../../../context/ModalContext";
 
 const ChargeCodeType = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModal] = useState(false);
-  const [selectedChargeCodeType, setSelectedChargeCodeType] = useState(null);
   const [expandedRows, setExpandedRows] = useState({});
+  const { openModal } = useModal();
   const itemsPerPage = 10;
 
   const demoData = [
@@ -35,7 +32,9 @@ const ChargeCodeType = () => {
 
   const filteredData = demoData.filter(
     (chargecodetype) =>
-      chargecodetype.entriDate.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      chargecodetype.entriDate
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       chargecodetype.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       chargecodetype.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -50,23 +49,10 @@ const ChargeCodeType = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const openCreateModal = () => {
-    setIsCreateModalOpen(true);
-  } 
-
-  const closeCreateModal = () => {
-    setIsCreateModalOpen(false);
-  }
-
   const openUpdateModal = (chargecodetype) => {
-    setSelectedChargeCodeType(chargecodetype)
-    setIsUpdateModal(true)
-  }
+    openModal("update-charge-code-type", chargecodetype);
+  };
 
-  const closeUpdateModal = () => {
-    setIsUpdateModal(false)
-  }
-  
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
       ...prev,
@@ -109,7 +95,7 @@ const ChargeCodeType = () => {
           <div className="flex gap-[10px] action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md idtype-add-new-master duration-200"
-              onClick={openCreateModal}
+              onClick={() => openModal("create-charge-code-type")}
             >
               Add New Master
               <img
@@ -169,7 +155,7 @@ const ChargeCodeType = () => {
                         {chargecodetype.name}
                       </td>
                       <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                        <button onClick={()=>openUpdateModal(chargecodetype)}>
+                        <button onClick={() => openUpdateModal(chargecodetype)}>
                           <img
                             src={editicon}
                             alt="Edit"
@@ -225,7 +211,9 @@ const ChargeCodeType = () => {
                       : "mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left idtype-data">{chargecodetype.id}</td>
+                  <td className="px-5 text-left idtype-data">
+                    {chargecodetype.id}
+                  </td>
                   <td className="px-3 text-left idtype-data idtype-entry-date-column">
                     {chargecodetype.entriDate}
                   </td>
@@ -253,12 +241,16 @@ const ChargeCodeType = () => {
                         <div className="idtype-grid">
                           <div className="idtype-grid-items">
                             <div className="dropdown-label">NAME</div>
-                            <div className="dropdown-value">{chargecodetype.name}</div>
+                            <div className="dropdown-value">
+                              {chargecodetype.name}
+                            </div>
                           </div>
                           <div className="idtype-grid-items">
                             <div className="dropdown-label">ACTION</div>
                             <div className="dropdown-value flex items-center gap-2 p-1 ml-[5px]">
-                              <button onClick={() => openUpdateModal(chargecodetype)}>
+                              <button
+                                onClick={() => openUpdateModal(chargecodetype)}
+                              >
                                 <img
                                   src={editicon}
                                   alt="Edit"
@@ -343,10 +335,6 @@ const ChargeCodeType = () => {
           </button>
         </div>
       </div>
-
-      {/* Modals */}
-      <CreateChargeCodeModal isOpen={isCreateModalOpen} onClose={closeCreateModal} />
-      <UpdateChargeCode isOpen={isUpdateModalOpen} onClose={closeUpdateModal} chargecodetype={selectedChargeCodeType} />
     </div>
   );
 };

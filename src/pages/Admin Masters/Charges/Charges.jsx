@@ -8,8 +8,7 @@ import editicon from "../../../assets/Images/Admin Masters/edit-icon.svg";
 import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
 import closeicon from "../../../assets/Images/Admin Masters/close-icon.svg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
-import CreateChargesModal from "./CreateChargesModal/CreateChargesModal";
-import UpdateChargesModal from "./UpdateChargesModal/UpdateChargesModal";
+import { useModal } from "../../../context/ModalContext";
 
 const Charges = () => {
   const [isHeaderSelectOpen, setIsHeaderSelectOpen] = useState(false);
@@ -17,11 +16,9 @@ const Charges = () => {
   const [isChargeCodeSelectOpen, setIsChargeCodeSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [selectedCharge, setSelectedCharge] = useState(null);
   const [isRefundable, setIsRefundable] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
+  const { openModal } = useModal();
   const itemsPerPage = 10;
 
   const demoData = [
@@ -105,21 +102,8 @@ const Charges = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const openCreateChargeModal = () => {
-    setIsCreateModalOpen(true);
-  };
-
-  const closeCreateModal = () => {
-    setIsCreateModalOpen(false);
-  };
-
   const openUpdateModal = (charge) => {
-    setSelectedCharge(charge);
-    setIsUpdateModalOpen(true);
-  };
-
-  const closeUpdateModal = () => {
-    setIsUpdateModalOpen(false);
+    openModal("update-charges-master", charge);
   };
 
   const handleRefundableToggle = () => {
@@ -167,8 +151,8 @@ const Charges = () => {
           </div>
           <div className="flex gap-[10px] action-buttons-container">
             <button
-              onClick={openCreateChargeModal}
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md charges-add-new-master duration-200"
+              onClick={() => openModal("create-charges-master")}
             >
               Add New Master
               <img
@@ -567,17 +551,6 @@ const Charges = () => {
           </button>
         </div>
       </div>
-
-      {/* Modals */}
-      <CreateChargesModal
-        isOpen={isCreateModalOpen}
-        onClose={closeCreateModal}
-      />
-      <UpdateChargesModal
-        isOpen={isUpdateModalOpen}
-        onClose={closeUpdateModal}
-        charge={selectedCharge}
-      />
     </div>
   );
 };

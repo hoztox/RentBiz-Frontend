@@ -1,31 +1,37 @@
 import React, { useEffect, useState } from "react";
 import "./createchargecodemodal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
+import { useModal } from "../../../../context/ModalContext";
 
-const CreateChargeCodeModal = ({ isOpen, onClose }) => {
+const CreateChargeCodeModal = () => {
+  const { modalState, closeModal } = useModal();
   const [name, setName] = useState("");
+
+  // Reset form state when modal opens
+  useEffect(() => {
+    if (modalState.isOpen) {
+      setName("");
+    }
+  }, [modalState.isOpen]);
+
+  // Only render for "create-charge-code-type"
+  if (!modalState.isOpen || modalState.type !== "create-charge-code-type") {
+    return null;
+  }
 
   const handleSave = () => {
     if (name) {
       console.log("New Charge Code Type: ", name);
-      onClose();
     }
+    closeModal();
   };
-
-  useEffect(() => {
-    if (isOpen) {
-      setName("");
-    }
-  }, [isOpen]);
-
-  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
       <div className="create-id-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[262px] p-6">
         <h2 className="modal-head mt-4 mb-6">Create New Charge Code Type</h2>
         <button
-          onClick={onClose}
+          onClick={closeModal}
           className="absolute top-6 right-6 close-btn duration-200"
         >
           <img src={closeicon} alt="close" className="w-4 h-4" />
@@ -39,6 +45,7 @@ const CreateChargeCodeModal = ({ isOpen, onClose }) => {
             placeholder="Enter Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            required
           />
         </div>
 

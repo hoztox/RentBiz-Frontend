@@ -7,17 +7,14 @@ import editicon from "../../../assets/Images/Admin Masters/edit-icon.svg";
 import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
 import buildingimg from "../../../assets/Images/Admin Masters/building-img.svg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
-import AddDocumentModal from "./AddDocumentModal/AddDocumentModal";
-import UpdateDocumentModal from "./UpdateDocumentModal/UpdateDocumentModal";
+import { useModal } from "../../../context/ModalContext";
 
 const DocumentType = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState(null);
   const [expandedRows, setExpandedRows] = useState({});
+  const { openModal } = useModal();
   const itemsPerPage = 10;
 
   const demoData = [
@@ -50,16 +47,8 @@ const DocumentType = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
-
   const openUpdateModal = (document) => {
-    setSelectedDocument(document);
-    setIsUpdateModalOpen(true);
-  };
-
-  const closeUpdateModal = () => {
-    setIsUpdateModalOpen(false);
+    openModal("update-document-type-master", document);
   };
 
   const toggleRowExpand = (id) => {
@@ -104,10 +93,14 @@ const DocumentType = () => {
           <div className="flex gap-[10px] action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md doctype-add-new-master duration-200"
-              onClick={openModal}
+              onClick={() => openModal("create-document-type-master")}
             >
               Add New Master
-              <img src={plusicon} alt="plus icon" className="relative right-[5px] md:right-0 w-[15px] h-[15px]" />
+              <img
+                src={plusicon}
+                alt="plus icon"
+                className="relative right-[5px] md:right-0 w-[15px] h-[15px]"
+              />
             </button>
             <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 doctype-download-btn">
               Download
@@ -148,9 +141,15 @@ const DocumentType = () => {
                         shouldRemoveBorder ? "" : "border-b border-[#E9E9E9]"
                       }`}
                     >
-                      <td className="px-5 text-left doctype-data">{document.id}</td>
-                      <td className="px-5 text-left doctype-data">{document.date}</td>
-                      <td className="pl-5 text-left doctype-data">{document.name}</td>
+                      <td className="px-5 text-left doctype-data">
+                        {document.id}
+                      </td>
+                      <td className="px-5 text-left doctype-data">
+                        {document.date}
+                      </td>
+                      <td className="pl-5 text-left doctype-data">
+                        {document.name}
+                      </td>
                       <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
                         <button onClick={() => openUpdateModal(document)}>
                           <img
@@ -189,8 +188,12 @@ const DocumentType = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="doctype-table-row-head">
-              <th className="px-5 w-[52%] text-left doctype-thead doctype-id-column">ID</th>
-              <th className="px-5 w-[47%] text-left doctype-thead doctype-date-column">DATE</th>
+              <th className="px-5 w-[52%] text-left doctype-thead doctype-id-column">
+                ID
+              </th>
+              <th className="px-5 w-[47%] text-left doctype-thead doctype-date-column">
+                DATE
+              </th>
               <th className="px-5 text-right doctype-thead"></th>
             </tr>
           </thead>
@@ -199,11 +202,15 @@ const DocumentType = () => {
               <React.Fragment key={document.id}>
                 <tr
                   className={`${
-                    expandedRows[document.id] ? "mobile-no-border" : "mobile-with-border"
+                    expandedRows[document.id]
+                      ? "mobile-no-border"
+                      : "mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left doctype-data">{document.id}</td>
-                  <td className="px-5 text-left doctype-data doctype-date-column">{document.date}</td>
+                  <td className="px-5 text-left doctype-data doctype-date-column">
+                    {document.date}
+                  </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`doctype-dropdown-field ${
@@ -228,7 +235,9 @@ const DocumentType = () => {
                         <div className="doctype-grid">
                           <div className="doctype-grid-items">
                             <div className="dropdown-label">NAME</div>
-                            <div className="dropdown-value">{document.name}</div>
+                            <div className="dropdown-value">
+                              {document.name}
+                            </div>
                           </div>
                           <div className="doctype-grid-items">
                             <div className="dropdown-label">ACTION</div>
@@ -318,14 +327,6 @@ const DocumentType = () => {
           </button>
         </div>
       </div>
-
-      {/* Modals */}
-      <AddDocumentModal isOpen={isModalOpen} onClose={closeModal} />
-      <UpdateDocumentModal
-        isOpen={isUpdateModalOpen}
-        onClose={closeUpdateModal}
-        document={selectedDocument}
-      />
     </div>
   );
 };

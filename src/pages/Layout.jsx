@@ -9,6 +9,16 @@ import UpdateTenancyModal from "./Admin Tenancy/UpdateTenancyModal/UpdateTenancy
 import CreateTenancyModal from "./Admin Tenancy/CreateTenancy/CreateTenancyModal";
 import CreateUnitTypeModal from "./Admin Masters/UnitType/CreateUnitTypeModal/CreateUnitTypeModal";
 import UpdateUnitTypeModal from "./Admin Masters/UnitType/UpdateUnitTypeModal/UpdateUnitTypeModal";
+import CreateIdModal from "./Admin Masters/IdType/CreateIdModal/CreateIdModal";
+import UpdateIdModal from "./Admin Masters/IdType/UpdateIdModal/UpdateIdModal";
+import CreateChargeCodeModal from "./Admin Masters/Charge Code Type/CreateChargeCodeModal/CreateChargeCodeModal";
+import UpdateChargeCode from "./Admin Masters/Charge Code Type/UpdateChargeCodeModal/UpdateChargeCode";
+import CreateChargesModal from "./Admin Masters/Charges/CreateChargesModal/CreateChargesModal";
+import UpdateChargesModal from "./Admin Masters/Charges/UpdateChargesModal/UpdateChargesModal";
+import AddDocumentModal from "./Admin Masters/DocumentType/AddDocumentModal/AddDocumentModal";
+import UpdateDocumentModal from "./Admin Masters/DocumentType/UpdateDocumentModal/UpdateDocumentModal";
+import AddCurrencyModal from "./Admin Masters/Masters Currency/AddCurrencyModal/AddCurrencyModal";
+import UpdateCurrencyModal from "./Admin Masters/Masters Currency/UpdateCurrencyModal/UpdateCurrencyModal";
 
 const Layout = () => {
   const { modalState } = useModal();
@@ -30,6 +40,16 @@ const Layout = () => {
       {modalState.isOpen && modalState.type === "tenancy-view" && <TenancyViewModal />}
       {modalState.isOpen && modalState.type === "create-unit-type-master" && <CreateUnitTypeModal />}
       {modalState.isOpen && modalState.type === "update-unit-type-master" && <UpdateUnitTypeModal />}
+      {modalState.isOpen && modalState.type === "create-id-type-master" && <CreateIdModal />}
+      {modalState.isOpen && modalState.type === "update-id-type-master" && <UpdateIdModal />}
+      {modalState.isOpen && modalState.type === "create-charge-code-type" && <CreateChargeCodeModal />}
+      {modalState.isOpen && modalState.type === "update-charge-code-type" && <UpdateChargeCode />}
+      {modalState.isOpen && modalState.type === "create-charges-master" && <CreateChargesModal />}
+      {modalState.isOpen && modalState.type === "update-charges-master" && <UpdateChargesModal />}
+      {modalState.isOpen && modalState.type === "create-document-type-master" && <AddDocumentModal />}
+      {modalState.isOpen && modalState.type === "update-document-type-master" && <UpdateDocumentModal />}
+      {modalState.isOpen && modalState.type === "add-currency-master" && <AddCurrencyModal />}
+      {modalState.isOpen && modalState.type === "update-currency-master" && <UpdateCurrencyModal />}
     </div>
   );
 };

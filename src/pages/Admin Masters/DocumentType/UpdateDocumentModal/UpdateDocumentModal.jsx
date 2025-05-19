@@ -1,32 +1,43 @@
 import React, { useEffect, useState } from "react";
 import "./UpdateDocumentModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
+import { useModal } from "../../../../context/ModalContext";
 
-const UpdateDocumentModal = ({ isOpen, onClose, document }) => {
+const UpdateDocumentModal = () => {
+  const { modalState, closeModal } = useModal();
   const [name, setName] = useState("");
 
+  // Reset form state when modal opens or unit data changes
   useEffect(() => {
-    if (document) {
-      setName(document.name);
+    if (modalState.isOpen && modalState.data) {
+      setName(modalState.data.name || "");
     } else {
       setName("");
     }
-  }, [document]);
+  }, [modalState.isOpen, modalState.data]);
+
+  // Only render for "update-document-type-master" type and valid data
+  if (
+    !modalState.isOpen ||
+    modalState.type !== "update-document-type-master" ||
+    !modalState.data
+  ) {
+    return null;
+  }
 
   const handleUpdate = () => {
     if (name) {
       console.log("Document type updated", name);
-      onClose();
     }
+    closeModal();
   };
 
-  if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
       <div className="update-document-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[262px] p-6">
         <h2 className="modal-head mt-4 mb-6">Update Document Type Master</h2>
         <button
-          onClick={onClose}
+          onClick={closeModal}
           className="absolute top-6 right-6 close-btn duration-200"
         >
           <img src={closeicon} alt="close" className="w-4 h-4" />

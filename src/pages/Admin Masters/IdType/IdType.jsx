@@ -7,17 +7,14 @@ import editicon from "../../../assets/Images/Admin Masters/edit-icon.svg";
 import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
 import buildingimg from "../../../assets/Images/Admin Masters/building-img2.svg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
-import CreateIdModal from "./CreateIdModal/CreateIdModal";
-import UpdateIdModal from "./UpdateIdModal/UpdateIdModal";
+import { useModal } from "../../../context/ModalContext";
 
 const IdType = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isCreateModalOpen, setIsCreateModal] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModal] = useState(false);
-  const [selectedIdtype, setSelectedIdtype] = useState(null);
   const [expandedRows, setExpandedRows] = useState({});
+  const { openModal } = useModal();
   const itemsPerPage = 10;
 
   const demoData = [
@@ -50,21 +47,8 @@ const IdType = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const openCreateModal = () => {
-    setIsCreateModal(true);
-  };
-
-  const closeCreateModal = () => {
-    setIsCreateModal(false);
-  };
-
-  const openUpdateModal = (idtype) => {
-    setSelectedIdtype(idtype);
-    setIsUpdateModal(true);
-  };
-
-  const closeUpdateModal = () => {
-    setIsUpdateModal(false);
+  const openUpdateModal = (idType) => {
+    openModal("update-id-type-master", idType);
   };
 
   const toggleRowExpand = (id) => {
@@ -109,7 +93,7 @@ const IdType = () => {
           <div className="flex gap-[10px] action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md idtype-add-new-master duration-200"
-              onClick={openCreateModal}
+              onClick={() => openModal("create-id-type-master")}
             >
               Add New Master
               <img
@@ -343,14 +327,6 @@ const IdType = () => {
           </button>
         </div>
       </div>
-
-      {/* Modals */}
-      <CreateIdModal isOpen={isCreateModalOpen} onClose={closeCreateModal} />
-      <UpdateIdModal
-        isOpen={isUpdateModalOpen}
-        onClose={closeUpdateModal}
-        idtype={selectedIdtype}
-      />
     </div>
   );
 };

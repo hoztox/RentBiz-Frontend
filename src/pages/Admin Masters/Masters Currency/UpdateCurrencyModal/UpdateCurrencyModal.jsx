@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import "./UpdateCurrencyModal.css";
 import { ChevronDown } from "lucide-react";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
+import { useModal } from "../../../../context/ModalContext";
 
-const UpdateCurrencyModal = ({ isOpen, onClose, currencyData }) => {
+const UpdateCurrencyModal = () => {
+  const { modalState, closeModal } = useModal();
   const [country, setCountry] = useState("");
   const [currency, setCurrency] = useState("");
   const [currencyCode, setCurrencyCode] = useState("");
@@ -12,13 +14,22 @@ const UpdateCurrencyModal = ({ isOpen, onClose, currencyData }) => {
 
   // Update state when currencyData changes
   useEffect(() => {
-    if (currencyData) {
-      setCountry(currencyData.country || "");
-      setCurrency(currencyData.currency || "");
-      setCurrencyCode(currencyData.code || "");
-      setMinorUnit(currencyData.minorUnit || "");
+    if (modalState.isOpen && modalState.data) {
+      setCountry(modalState.data.country || "");
+      setCurrency(modalState.data.currency || "");
+      setCurrencyCode(modalState.data.code || "");
+      setMinorUnit(modalState.data.minorUnit || "");
     }
-  }, [currencyData]);
+  }, []);
+
+  // Only render for "update-currency-master" type and valid data
+  if (
+    !modalState.isOpen ||
+    modalState.type !== "update-currency-master" ||
+    !modalState.data
+  ) {
+    return null;
+  }
 
   const handleUpdate = () => {
     if (country && currency && currencyCode && minorUnit) {
@@ -28,18 +39,16 @@ const UpdateCurrencyModal = ({ isOpen, onClose, currencyData }) => {
         currencyCode,
         minorUnit,
       });
-      onClose();
     }
+    closeModal();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 currency-modal-overlay">
       <div className="update-currency-modal-container relative bg-white rounded-md w-full max-w-[523px] h-auto md:h-[514px] p-6">
         <h2 className="currency-modal-head mt-4 mb-6">Update Currency</h2>
         <button
-          onClick={onClose}
+          onClick={closeModal}
           className="absolute top-6 right-6 currency-modal-close-btn hover:bg-gray-100 duration-200"
         >
           <img src={closeicon} alt="close" className="w-4 h-4" />

@@ -2,20 +2,32 @@ import React, { useEffect, useState } from "react";
 import "./UpdateChargesModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { ChevronDown } from "lucide-react";
+import { useModal } from "../../../../context/ModalContext";
 
-const UpdateChargesModal = ({ isOpen, onClose, charge }) => {
+const UpdateChargesModal = () => {
+  const { modalState, closeModal} = useModal();
   const [name, setName] = useState("");
   const [chargeType, setChargeType] = useState("");
   const [percentage, setPercentage] = useState("");
   const [isSelectOpen, setIsSelectOpen] = useState(false);
 
+  // Reset form state when modal opens or charges data changes
   useEffect(() => {
-    if (isOpen && charge) {
-      setName(charge.name || "");
-      setChargeType(charge.chargeType || "");
-      setPercentage(charge.percentage || "");
+    if (modalState.isOpen && modalState.data) {
+      setName(modalState.data.name || "");
+      setChargeType(modalState.data.chargeType || "");
+      setPercentage(modalState.data.percentage || "");
     }
-  }, [isOpen, charge]);
+  }, [modalState.isOpen, modalState.data]);
+
+  // Only render for for "update-charges-master" type and valid data
+   if (
+    !modalState.isOpen ||
+    modalState.type !== "update-charges-master" ||
+    !modalState.data
+  ) {
+    return null;
+  }
 
   const handleUpdate = () => {
     if (name && chargeType && percentage) {
@@ -24,17 +36,16 @@ const UpdateChargesModal = ({ isOpen, onClose, charge }) => {
         chargeType,
         percentage,
       });
-      onClose();
+      closeModal();
     }
   };
 
-  if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
       <div className="update-masters-charges-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[427px] p-6">
         <h2 className="modal-head mt-4 mb-6">Update Charges Master</h2>
         <button
-          onClick={onClose}
+          onClick={closeModal}
           className="absolute top-6 right-6 close-btn duration-200"
         >
           <img src={closeicon} alt="close" className="w-4 h-4" />

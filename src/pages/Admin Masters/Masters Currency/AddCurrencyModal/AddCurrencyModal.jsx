@@ -2,13 +2,30 @@ import React, { useEffect, useState } from "react";
 import "./AddCurrencyModal.css";
 import { ChevronDown } from "lucide-react";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
+import { useModal } from "../../../../context/ModalContext";
 
-const AddCurrencyModal = ({ isOpen, onClose }) => {
+const AddCurrencyModal = () => {
+  const { modalState, closeModal } = useModal();
   const [country, setCountry] = useState("");
   const [currency, setCurrency] = useState("");
   const [currencyCode, setCurrencyCode] = useState("");
   const [minorUnit, setMinorUnit] = useState("");
   const [isSelectOpen, setIsSelectOpen] = useState(false);
+  
+  // Reset form state when modal opens
+  useEffect(() => {
+    if (modalState.isOpen) {
+      setCountry("");
+      setCurrency("");
+      setCurrencyCode("");
+      setMinorUnit("");
+    }
+  }, [modalState.isOpen]);
+
+  // Only render for "add-currency-master"
+  if (!modalState.isOpen || modalState.type !== "add-currency-master") {
+    return null;
+  }
 
   const handleSave = () => {
     if (country && currency && currencyCode && minorUnit) {
@@ -18,27 +35,16 @@ const AddCurrencyModal = ({ isOpen, onClose }) => {
         currencyCode,
         minorUnit,
       });
-      onClose();
+      closeModal();
     }
   };
 
-  useEffect(() => {
-    if (isOpen) {
-      setCountry("");
-      setCurrency("");
-      setCurrencyCode("");
-      setMinorUnit("");
-    }
-  }, [isOpen]);
-
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 currency-modal-overlay">
       <div className="add-currency-modal-container relative bg-white rounded-md w-full max-w-[523px] h-auto md:h-[514px] p-6">
         <h2 className="currency-modal-head mt-4 mb-6">Create New Currency</h2>
         <button
-          onClick={onClose}
+          onClick={closeModal}
           className="absolute top-6 right-6 currency-modal-close-btn hover:bg-gray-100 duration-200"
         >
           <img src={closeicon} alt="close" className="w-4 h-4" />

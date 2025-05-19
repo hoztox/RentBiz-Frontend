@@ -84,7 +84,13 @@ const modalTitles = {
   "create-id-type-master":"Create New ID Type Master",
   "update-id-type-master":"Update ID Type Master",
   "create-charge-code-type": "Create New Charge Code Master",
-  "update-charge-code-type": "Update Charge Code Master"
+  "update-charge-code-type": "Update Charge Code Master",
+  "create-charges-master": "Create New Charges Master",
+  "update-charges-master": "Update Charges Master",
+  "create-document-type-master": "Create New Document Type Master",
+  "update-document-type-master": "Update Document Type Master",
+  "add-currency-master": "Create New Currency",
+  "update-currency-master": "Update Currency",
 }
 
 const AdminNavbar = () => {

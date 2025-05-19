@@ -6,17 +6,14 @@ import downloadicon from "../../../assets/Images/Admin Masters/download-icon.svg
 import editicon from "../../../assets/Images/Admin Masters/edit-icon.svg";
 import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
-import AddCurrencyModal from "./AddCurrencyModal/AddCurrencyModal";
-import UpdateCurrencyModal from "./UpdateCurrencyModal/UpdateCurrencyModal";
+import { useModal } from "../../../context/ModalContext";
 
 const Currency = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [selectedCurrency, setSelectedCurrency] = useState(null);
   const [expandedRows, setExpandedRows] = useState({});
+  const { openModal } = useModal();
   const itemsPerPage = 10;
 
   const demoData = [
@@ -111,22 +108,8 @@ const Currency = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const openAddModal = () => {
-    setIsAddModalOpen(true);
-  };
-
-  const closeAddModal = () => {
-    setIsAddModalOpen(false);
-  };
-
   const openUpdateModal = (currency) => {
-    setSelectedCurrency(currency);
-    setIsUpdateModalOpen(true);
-  };
-
-  const closeUpdateModal = () => {
-    setIsUpdateModalOpen(false);
-    setSelectedCurrency(null);
+    openModal("update-currency-master", currency);
   };
 
   const toggleRowExpand = (id) => {
@@ -170,7 +153,7 @@ const Currency = () => {
           <div className="flex gap-[10px] action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 md:w-[176px] h-[38px] rounded-md add-new-currency duration-200"
-              onClick={openAddModal}
+              onClick={()=>openModal("add-currency-master")}
             >
               Add New Currency
               <img src={plusicon} alt="plus icon" className="relative right-[5px] md:right-0 w-[15px] h-[15px]" />
@@ -375,12 +358,6 @@ const Currency = () => {
           </button>
         </div>
       </div>
-      <AddCurrencyModal isOpen={isAddModalOpen} onClose={closeAddModal} />
-      <UpdateCurrencyModal
-        isOpen={isUpdateModalOpen}
-        onClose={closeUpdateModal}
-        currencyData={selectedCurrency}
-      />
     </div>
   );
 };

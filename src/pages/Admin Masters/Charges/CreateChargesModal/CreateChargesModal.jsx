@@ -2,12 +2,28 @@ import React, { useEffect, useState } from "react";
 import "./CreateChargesModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { ChevronDown } from "lucide-react";
+import { useModal } from "../../../../context/ModalContext";
 
-const CreateChargesModal = ({ isOpen, onClose }) => {
+const CreateChargesModal = () => {
+  const { modalState, closeModal } = useModal();
   const [name, setName] = useState("");
   const [chargeType, setChargeType] = useState("");
   const [percentage, setPercentage] = useState("");
   const [isSelectOpen, setIsSelectOpen] = useState(false);
+
+  // Reset form state when modal opens
+  useEffect(() => {
+    if (modalState.isOpen) {
+      setName("");
+      setChargeType("");
+      setPercentage("");
+    }
+  }, [modalState.isOpen]);
+
+  // Only render for "create-charges-master" type
+  if (!modalState.isOpen || modalState.type !== "create-charges-master") {
+    return null;
+  }
 
   const handleSave = () => {
     if (name && chargeType && percentage) {
@@ -16,26 +32,16 @@ const CreateChargesModal = ({ isOpen, onClose }) => {
         chargeType,
         percentage,
       });
-      onClose();
     }
+    closeModal();
   };
-
-  useEffect(() => {
-    if (isOpen) {
-      setName("");
-      setChargeType("");
-      setPercentage("");
-    }
-  }, [isOpen]);
-
-  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
       <div className="create-charges-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[427px] p-6">
         <h2 className="modal-head mt-4 mb-6">Create New Charges Master</h2>
         <button
-          onClick={onClose}
+          onClick={closeModal}
           className="absolute top-6 right-6 close-btn duration-200"
         >
           <img src={closeicon} alt="close" className="w-4 h-4" />
