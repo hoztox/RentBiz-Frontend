@@ -6,17 +6,14 @@ import downloadicon from "../../assets/Images/Additional Charges/download-icon.s
 import editicon from "../../assets/Images/Additional Charges/edit-icon.svg";
 import deleteicon from "../../assets/Images/Additional Charges/delete-icon.svg";
 import downarrow from "../../assets/Images/Additional Charges/downarrow.svg";
-import AddChargesModal from "./AddChargesModal/AddChargesModal";
-import UpdateChargesModal from "./UpdateChargesModal/UpdateChargesModal";
+import { useModal } from "../../context/ModalContext";
 
 const AdminAdditionalCharges = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [selectedCharge, setSelectedCharge] = useState(null);
   const [expandedRows, setExpandedRows] = useState({});
+  const { openModal } = useModal();
   const itemsPerPage = 10;
 
   const demoData = [
@@ -88,22 +85,8 @@ const AdminAdditionalCharges = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const openAddModal = () => {
-    setIsAddModalOpen(true);
-  };
-
-  const closeAddModal = () => {
-    setIsAddModalOpen(false);
-  };
-
   const openUpdateModal = (charge) => {
-    setSelectedCharge(charge);
-    setIsUpdateModalOpen(true);
-  };
-
-  const closeUpdateModal = () => {
-    setIsUpdateModalOpen(false);
-    setSelectedCharge(null);
+    openModal("update-additional-charges", charge);
   };
 
   const toggleRowExpand = (id) => {
@@ -147,10 +130,14 @@ const AdminAdditionalCharges = () => {
           <div className="flex gap-[10px] admin-add-charges-action-buttons w-full md:w-auto justify-start">
             <button
               className="flex items-center justify-center gap-2 h-[38px] rounded-md admin-add-charges-btn duration-200 md:w-[169px]"
-              onClick={openAddModal}
+              onClick={() => openModal("create-additional-charges")}
             >
               Add Charges
-              <img src={plusicon} alt="plus icon" className="relative right-[5px] md:right-0 w-[15px] h-[15px]" />
+              <img
+                src={plusicon}
+                alt="plus icon"
+                className="relative right-[5px] md:right-0 w-[15px] h-[15px]"
+              />
             </button>
             <button className="flex items-center justify-center gap-2 h-[38px] rounded-md duration-200 admin-add-charges-download-btn w-[122px]">
               Download
@@ -168,13 +155,23 @@ const AdminAdditionalCharges = () => {
           <thead>
             <tr className="border-b border-[#E9E9E9] h-[57px]">
               <th className="px-5 text-left admin-add-charges-thead">ID</th>
-              <th className="px-5 text-left admin-add-charges-thead">CHARGE ID</th>
+              <th className="px-5 text-left admin-add-charges-thead">
+                CHARGE ID
+              </th>
               <th className="pl-5 text-left admin-add-charges-thead">DATE</th>
-              <th className="pl-5 text-left admin-add-charges-thead">AMOUNT DUE</th>
+              <th className="pl-5 text-left admin-add-charges-thead">
+                AMOUNT DUE
+              </th>
               <th className="px-5 text-left admin-add-charges-thead">REASON</th>
-              <th className="px-5 text-left admin-add-charges-thead">DUE DATE</th>
-              <th className="px-5 text-left admin-add-charges-thead w-[68px]">STATUS</th>
-              <th className="px-5 pr-6 text-right admin-add-charges-thead">ACTION</th>
+              <th className="px-5 text-left admin-add-charges-thead">
+                DUE DATE
+              </th>
+              <th className="px-5 text-left admin-add-charges-thead w-[68px]">
+                STATUS
+              </th>
+              <th className="px-5 pr-6 text-right admin-add-charges-thead">
+                ACTION
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -183,12 +180,24 @@ const AdminAdditionalCharges = () => {
                 key={index}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-5 text-left admin-add-charges-data">{charges.id}</td>
-                <td className="px-5 text-left admin-add-charges-data">{charges.chargeId}</td>
-                <td className="pl-5 text-left admin-add-charges-data">{charges.date}</td>
-                <td className="pl-5 text-left admin-add-charges-data">{charges.amountDue}</td>
-                <td className="px-5 text-left admin-add-charges-data">{charges.reason}</td>
-                <td className="px-5 text-left admin-add-charges-data">{charges.dueDate}</td>
+                <td className="px-5 text-left admin-add-charges-data">
+                  {charges.id}
+                </td>
+                <td className="px-5 text-left admin-add-charges-data">
+                  {charges.chargeId}
+                </td>
+                <td className="pl-5 text-left admin-add-charges-data">
+                  {charges.date}
+                </td>
+                <td className="pl-5 text-left admin-add-charges-data">
+                  {charges.amountDue}
+                </td>
+                <td className="px-5 text-left admin-add-charges-data">
+                  {charges.reason}
+                </td>
+                <td className="px-5 text-left admin-add-charges-data">
+                  {charges.dueDate}
+                </td>
                 <td className="px-5 text-left admin-add-charges-data">
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
@@ -225,9 +234,15 @@ const AdminAdditionalCharges = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="admin-add-charges-table-row-head">
-              <th className="px-5 w-[35%] text-left admin-add-charges-thead admin-add-charges-id-column">ID</th>
-              <th className="px-[10px] w-[30%] text-left admin-add-charges-thead admin-add-charges-charge-id-column">CHARGE ID</th>
-              <th className="px-[10px] w-[20%] text-left admin-add-charges-thead admin-add-charges-date-column">DATE</th>
+              <th className="px-5 w-[35%] text-left admin-add-charges-thead admin-add-charges-id-column">
+                ID
+              </th>
+              <th className="px-[10px] w-[30%] text-left admin-add-charges-thead admin-add-charges-charge-id-column">
+                CHARGE ID
+              </th>
+              <th className="px-[10px] w-[20%] text-left admin-add-charges-thead admin-add-charges-date-column">
+                DATE
+              </th>
               <th className="px-5 w-[15%] text-right admin-add-charges-thead"></th>
             </tr>
           </thead>
@@ -241,9 +256,15 @@ const AdminAdditionalCharges = () => {
                       : "admin-add-charges-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left admin-add-charges-data admin-add-charges-id-column">{charges.id}</td>
-                  <td className="px-[10px] text-left admin-add-charges-data admin-add-charges-charge-id-column">{charges.chargeId}</td>
-                  <td className="px-[10px] text-left admin-add-charges-data admin-add-charges-date-column">{charges.date}</td>
+                  <td className="px-5 text-left admin-add-charges-data admin-add-charges-id-column">
+                    {charges.id}
+                  </td>
+                  <td className="px-[10px] text-left admin-add-charges-data admin-add-charges-charge-id-column">
+                    {charges.chargeId}
+                  </td>
+                  <td className="px-[10px] text-left admin-add-charges-data admin-add-charges-date-column">
+                    {charges.date}
+                  </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`admin-add-charges-dropdown-field ${
@@ -267,21 +288,35 @@ const AdminAdditionalCharges = () => {
                       <div className="admin-add-charges-dropdown-content">
                         <div className="admin-add-charges-dropdown-grid">
                           <div className="admin-add-charges-dropdown-item w-[30%]">
-                            <div className="admin-add-charges-dropdown-label">AMOUNT DUE</div>
-                            <div className="admin-add-charges-dropdown-value">{charges.amountDue}</div>
+                            <div className="admin-add-charges-dropdown-label">
+                              AMOUNT DUE
+                            </div>
+                            <div className="admin-add-charges-dropdown-value">
+                              {charges.amountDue}
+                            </div>
                           </div>
                           <div className="admin-add-charges-dropdown-item label-reason w-[30%]">
-                            <div className="admin-add-charges-dropdown-label">REASON</div>
-                            <div className="admin-add-charges-dropdown-value">{charges.reason}</div>
+                            <div className="admin-add-charges-dropdown-label">
+                              REASON
+                            </div>
+                            <div className="admin-add-charges-dropdown-value">
+                              {charges.reason}
+                            </div>
                           </div>
                           <div className="admin-add-charges-dropdown-item label-due w-[35%]">
-                            <div className="admin-add-charges-dropdown-label">DUE DATE</div>
-                            <div className="admin-add-charges-dropdown-value">{charges.dueDate}</div>
+                            <div className="admin-add-charges-dropdown-label">
+                              DUE DATE
+                            </div>
+                            <div className="admin-add-charges-dropdown-value">
+                              {charges.dueDate}
+                            </div>
                           </div>
                         </div>
                         <div className="admin-add-charges-dropdown-grid">
                           <div className="admin-add-charges-dropdown-item w-[30%]">
-                            <div className="admin-add-charges-dropdown-label">STATUS</div>
+                            <div className="admin-add-charges-dropdown-label">
+                              STATUS
+                            </div>
                             <div className="admin-add-charges-dropdown-value">
                               <span
                                 className={`admin-add-charges-status ${
@@ -295,7 +330,9 @@ const AdminAdditionalCharges = () => {
                             </div>
                           </div>
                           <div className="admin-add-charges-dropdown-item w-[67%] label-action">
-                            <div className="admin-add-charges-dropdown-label">ACTION</div>
+                            <div className="admin-add-charges-dropdown-label">
+                              ACTION
+                            </div>
                             <div className="admin-add-charges-dropdown-value flex items-center gap-4">
                               <button onClick={() => openUpdateModal(charges)}>
                                 <img
@@ -323,14 +360,16 @@ const AdminAdditionalCharges = () => {
           </tbody>
         </table>
       </div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 admin-add-charges-pagination-container">
-        <span className="admin-add-charges-pagination admin-add-charges-pagination-text">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
+        <span className="collection-list-pagination">
+          Showing{" "}
+          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+          {filteredData.length} entries
         </span>
-        <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto admin-add-charges-pagination-buttons">
+        <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer admin-add-charges-pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
@@ -338,7 +377,7 @@ const AdminAdditionalCharges = () => {
           </button>
           {startPage > 1 && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 admin-add-charges-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(1)}
             >
               1
@@ -348,7 +387,7 @@ const AdminAdditionalCharges = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 admin-add-charges-page-no-btns ${
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
                 currentPage === startPage + i
                   ? "bg-[#1458A2] text-white"
                   : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
@@ -358,17 +397,19 @@ const AdminAdditionalCharges = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
+          {endPage < totalPages - 1 && (
+            <span className="px-2 flex items-center">...</span>
+          )}
           {endPage < totalPages && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 admin-add-charges-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(totalPages)}
             >
               {totalPages}
             </button>
           )}
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer admin-add-charges-pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(currentPage + 1)}
           >
@@ -376,8 +417,6 @@ const AdminAdditionalCharges = () => {
           </button>
         </div>
       </div>
-      <AddChargesModal isOpen={isAddModalOpen} onClose={closeAddModal} />
-      <UpdateChargesModal isOpen={isUpdateModalOpen} onClose={closeUpdateModal} chargeData={selectedCharge} />
     </div>
   );
 };

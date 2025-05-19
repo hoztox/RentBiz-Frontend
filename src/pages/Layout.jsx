@@ -19,6 +19,8 @@ import AddDocumentModal from "./Admin Masters/DocumentType/AddDocumentModal/AddD
 import UpdateDocumentModal from "./Admin Masters/DocumentType/UpdateDocumentModal/UpdateDocumentModal";
 import AddCurrencyModal from "./Admin Masters/Masters Currency/AddCurrencyModal/AddCurrencyModal";
 import UpdateCurrencyModal from "./Admin Masters/Masters Currency/UpdateCurrencyModal/UpdateCurrencyModal";
+import AddChargesModal from "./Additional Charges/AddChargesModal/AddChargesModal";
+import UpdateAdditionalCharges from "./Additional Charges/UpdateChargesModal/UpdateAdditionalCharges";
 
 const Layout = () => {
   const { modalState } = useModal();
@@ -50,6 +52,8 @@ const Layout = () => {
       {modalState.isOpen && modalState.type === "update-document-type-master" && <UpdateDocumentModal />}
       {modalState.isOpen && modalState.type === "add-currency-master" && <AddCurrencyModal />}
       {modalState.isOpen && modalState.type === "update-currency-master" && <UpdateCurrencyModal />}
+      {modalState.isOpen && modalState.type === "create-additional-charges" && <AddChargesModal />}
+      {modalState.isOpen && modalState.type === "update-additional-charges" && <UpdateAdditionalCharges />}
     </div>
   );
 };

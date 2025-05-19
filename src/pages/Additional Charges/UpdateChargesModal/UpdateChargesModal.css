@@ -1,3 +1,12 @@
+.additional-charges-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
 .update-charges-head {
   font-family: "Inter Tight";
   font-weight: 500;
@@ -100,17 +109,8 @@
   }
 }
 
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
 @media (max-width: 480px) {
-  .modal-overlay {
+  .additional-charges-modal-overlay {
     position: static;
     inset: auto;
     display: block;

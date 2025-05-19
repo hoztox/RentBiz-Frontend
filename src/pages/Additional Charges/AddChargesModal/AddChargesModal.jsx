@@ -4,8 +4,10 @@ import { ChevronDown } from "lucide-react";
 import closeicon from "../../../assets/Images/Additional Charges/close-icon.svg";
 import calendaricon from "../../../assets/Images/Additional Charges/calendar-icon.svg";
 import plusicon from "../../../assets/Images/Additional Charges/input-plus-icon.svg";
+import { useModal } from "../../../context/ModalContext";
 
-const AddChargesModal = ({ isOpen, onClose }) => {
+const AddChargesModal = () => {
+  const { modalState, closeModal } = useModal();
   const [tenancyContract, setTenancyContract] = useState("");
   const [id, setId] = useState("");
   const [date, setDate] = useState("");
@@ -20,6 +22,28 @@ const AddChargesModal = ({ isOpen, onClose }) => {
   const [isSelectOpenTenancy, setIsSelectOpenTenancy] = useState(false);
   const [isSelectOpenChargeCode, setIsSelectOpenChargeCode] = useState(false);
   const [isSelectOpenStatus, setIsSelectOpenStatus] = useState(false);
+
+  // Reset form state when modal opens
+  useEffect(() => {
+    if (modalState.isOpen) {
+      setTenancyContract("");
+      setId("");
+      setDate("");
+      setChargeCode("");
+      setReason("");
+      setAmountDue("");
+      setVatAmount("");
+      setTotalAmount("");
+      setDueDate("");
+      setStatus("");
+      setRemarks("");
+    }
+  }, [modalState.isOpen]);
+
+  // Only render for "create-unit-type-master" type
+  if (!modalState.isOpen || modalState.type !== "create-additional-charges") {
+    return null;
+  }
 
   const handleSave = () => {
     // Validate required fields (marked with *)
@@ -38,42 +62,22 @@ const AddChargesModal = ({ isOpen, onClose }) => {
         remarks,
       };
       console.log("New Charge Added: ", formData);
-      // Add actual save logic here (e.g., API call)
-      onClose();
     } else {
       console.log("Please fill all required fields");
       // Optionally, show an error message to the user
     }
+    closeModal();
   };
 
-  useEffect(() => {
-    if (isOpen) {
-      // Reset form fields when modal opens
-      setTenancyContract("");
-      setId("");
-      setDate("");
-      setChargeCode("");
-      setReason("");
-      setAmountDue("");
-      setVatAmount("");
-      setTotalAmount("");
-      setDueDate("");
-      setStatus("");
-      setRemarks("");
-    }
-  }, [isOpen]);
-
-  if (!isOpen) return null;
-
   return (
-    <div className="modal-overlay">
+    <div className="additional-charges-modal-overlay">
       <div className="add-charges-modal-container bg-white rounded-md w-[1006px] shadow-lg p-1">
         <div className="flex justify-between items-center md:p-6 mt-2">
           <h2 className="text-[#201D1E] add-charges-head">
             Create New Additional Charge
           </h2>
           <button
-            onClick={onClose}
+            onClick={closeModal}
             className="add-charges-close-btn hover:bg-gray-100 duration-200"
           >
             <img src={closeicon} alt="close" className="w-[15px] h-[15px]" />

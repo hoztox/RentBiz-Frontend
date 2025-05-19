@@ -4,8 +4,10 @@ import { ChevronDown } from "lucide-react";
 import closeicon from "../../../assets/Images/Additional Charges/close-icon.svg";
 import calendaricon from "../../../assets/Images/Additional Charges/calendar-icon.svg";
 import plusicon from "../../../assets/Images/Additional Charges/input-plus-icon.svg";
+import { useModal } from "../../../context/ModalContext";
 
-const UpdateChargesModal = ({ isOpen, onClose, chargeData }) => {
+const UpdateAdditionalCharges = () => {
+  const { modalState, closeModal } = useModal();
   const [tenancyContract, setTenancyContract] = useState("");
   const [id, setId] = useState("");
   const [date, setDate] = useState("");
@@ -20,6 +22,32 @@ const UpdateChargesModal = ({ isOpen, onClose, chargeData }) => {
   const [isSelectOpenTenancy, setIsSelectOpenTenancy] = useState(false);
   const [isSelectOpenChargeCode, setIsSelectOpenChargeCode] = useState(false);
   const [isSelectOpenStatus, setIsSelectOpenStatus] = useState(false);
+
+  // Reset form state when modal opens
+  useEffect(() => {
+    if (modalState.isOpen && modalState.data) {
+      setId(modalState.data.id || "");
+      setTenancyContract(modalState.data.tenancyContract || "");
+      setDate(modalState.data.date || "");
+      setChargeCode(modalState.data.chargeCode || "");
+      setReason(modalState.data.reason || "");
+      setAmountDue(modalState.data.amountDue || "");
+      setVatAmount(modalState.data.vatAmount || "");
+      setTotalAmount(modalState.data.totalAmount || "");
+      setDueDate(modalState.data.dueDate || "");
+      setStatus(modalState.data.status || "");
+      setRemarks(modalState.data.remarks || "");
+    }
+  }, [modalState.isOpen, modalState.data]);
+
+  // Only render for "update-additional-charges" type and valid data
+  if (
+    !modalState.isOpen ||
+    modalState.type !== "update-additional-charges" ||
+    !modalState.data
+  ) {
+    return null;
+  }
 
   const handleUpdate = () => {
     const updatedData = {
@@ -36,36 +64,18 @@ const UpdateChargesModal = ({ isOpen, onClose, chargeData }) => {
       remarks,
     };
     console.log("Updated Data:", updatedData);
-    onClose();
+    closeModal();
   };
 
-  useEffect(() => {
-    if (chargeData) {
-      setId(chargeData.id || '');
-      setTenancyContract(chargeData.tenancyContract || '');
-      setDate(chargeData.date || '');
-      setChargeCode(chargeData.chargeCode || '');
-      setReason(chargeData.reason || '');
-      setAmountDue(chargeData.amountDue || '');
-      setVatAmount(chargeData.vatAmount || '');
-      setTotalAmount(chargeData.totalAmount || '');
-      setDueDate(chargeData.dueDate || '');
-      setStatus(chargeData.status || '');
-      setRemarks(chargeData.remarks || '');
-    }
-  }, [chargeData]);
-
-  if (!isOpen) return null;
-
   return (
-    <div className="modal-overlay">
+    <div className="additional-charges-modal-overlay">
       <div className="update-charges-modal-container bg-white rounded-md w-[1006px] shadow-lg p-1">
         <div className="flex justify-between items-center md:p-6 mt-2">
           <h2 className="text-[#201D1E] update-charges-head">
             Update Additional Charge
           </h2>
           <button
-            onClick={onClose}
+            onClick={closeModal}
             className="update-charges-close-btn hover:bg-gray-100 duration-200"
           >
             <img src={closeicon} alt="close" className="w-[15px] h-[15px]" />
@@ -309,4 +319,4 @@ const UpdateChargesModal = ({ isOpen, onClose, chargeData }) => {
   );
 };
 
-export default UpdateChargesModal;
+export default UpdateAdditionalCharges;
