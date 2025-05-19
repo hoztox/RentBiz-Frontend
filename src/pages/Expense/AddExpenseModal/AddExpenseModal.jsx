@@ -3,8 +3,10 @@ import "./AddExpenseModal.css";
 import { ChevronDown } from "lucide-react";
 import closeicon from "../../../assets/Images/Expense/close-icon.svg";
 import calendaricon from "../../../assets/Images/Expense/calendar-icon.svg";
+import { useModal } from "../../../context/ModalContext";
 
-const AddExpenseModal = ({ isOpen, onClose }) => {
+const AddExpenseModal = () => {
+  const { modalState, closeModal } = useModal();
   const initialFormData = {
     tenant: "",
     building: "",
@@ -21,6 +23,12 @@ const AddExpenseModal = ({ isOpen, onClose }) => {
   const [isSelectOpenTenant, setIsSelectOpenTenant] = useState(false);
   const [isSelectOpenExpense, setIsSelectOpenExpense] = useState(false);
   const [isSelectOpenStatus, setIsSelectOpenStatus] = useState(false);
+
+  useEffect(() => {
+    if (modalState.isOpen) {
+      setFormData(initialFormData);
+    }
+  }, [modalState.isOpen]);
 
   const handleChange = (field) => (e) => {
     setFormData({ ...formData, [field]: e.target.value });
@@ -59,24 +67,21 @@ const AddExpenseModal = ({ isOpen, onClose }) => {
       status
     ) {
       console.log("New Charge Added: ", formData);
-      onClose();
+      closeModal();
     } else {
       console.log("Please fill all required fields");
     }
   };
 
-  useEffect(() => {
-    if (isOpen) {
-      setFormData(initialFormData);
-    }
-  }, [isOpen]);
-
   const handleClose = () => {
     setFormData(initialFormData); // Reset form data
-    onClose(); // Call the original onClose prop
+    closeModal();
   };
 
-  if (!isOpen) return null;
+  // Only render for "create-Expense" type
+  if (!modalState.isOpen || modalState.type !== "create-expense") {
+    return null;
+  }
 
   return (
     <div className="financial-expense-add-modal-wrapper">

@@ -3,8 +3,10 @@ import "./UpdateRefundModal.css";
 import { ChevronDown } from "lucide-react";
 import closeicon from "../../../assets/Images/Refund/close-icon.svg";
 import calendaricon from "../../../assets/Images/Refund/calendar-icon.svg";
+import { useModal } from "../../../context/ModalContext";
 
-const UpdateRefundModal = ({ isOpen, onClose, selectedRow }) => {
+const UpdateRefundModal = () => {
+  const { modalState, closeModal } = useModal();
   const [form, setForm] = useState({
     selectTenancy: "",
     buildingName: "",
@@ -33,6 +35,80 @@ const UpdateRefundModal = ({ isOpen, onClose, selectedRow }) => {
   const [openDropdowns, setOpenDropdowns] = useState({
     charge: false,
   });
+
+  // Reset form state when modal opens or data changes
+  useEffect(() => {
+    if (modalState.isOpen && modalState.data) {
+      setForm({
+        selectTenancy: modalState.data.selectTenancy || "",
+        buildingName: modalState.data.buildingName || "",
+        unitName: modalState.data.unitName || "",
+        endDate: modalState.data.endDate || "",
+        paymentDate: modalState.data.paymentDate || "",
+        paymentMethod: modalState.data.paymentMethod || "",
+        remarks: modalState.data.remarks || "",
+      });
+      setFormData({
+        refundItems: modalState.data.refundItems?.length
+          ? modalState.data.refundItems.map((item) => ({
+              charge: item.charge || "",
+              description: item.description || "",
+              date: item.date || "",
+              amount: item.amount || "",
+              vat: item.vat || "",
+              paidAmount: item.paidAmount || "",
+              amountRefund: item.amountRefund || "",
+              total: item.total || "0",
+            }))
+          : [
+              {
+                charge: "",
+                description: "",
+                date: "",
+                amount: "",
+                vat: "",
+                paidAmount: "",
+                amountRefund: "",
+                total: "0",
+              },
+            ],
+      });
+    } else {
+      // Reset form when modal is closed
+      setForm({
+        selectTenancy: "",
+        buildingName: "",
+        unitName: "",
+        endDate: "",
+        paymentDate: "",
+        paymentMethod: "",
+        remarks: "",
+      });
+      setFormData({
+        refundItems: [
+          {
+            charge: "",
+            description: "",
+            date: "",
+            amount: "",
+            vat: "",
+            paidAmount: "",
+            amountRefund: "",
+            total: "0",
+          },
+        ],
+      });
+    }
+  }, [modalState.isOpen, modalState.data]);
+
+  // Only render for "update-refund" type and valid data
+  if (
+    !modalState.isOpen ||
+    modalState.type !== "update-refund" ||
+    !modalState.data
+  ) {
+    return null;
+  }
 
   const updateForm = (key, value) => {
     setForm((prev) => ({
@@ -78,52 +154,11 @@ const UpdateRefundModal = ({ isOpen, onClose, selectedRow }) => {
     ) {
       console.log("Refund Updated: ", form);
       console.log("Refund Items: ", formData.refundItems);
-      onClose();
+      closeModal();
     } else {
       console.log("Please fill all required fields");
     }
   };
-
-  useEffect(() => {
-    if (isOpen && selectedRow) {
-      setForm({
-        selectTenancy: selectedRow.selectTenancy || "",
-        buildingName: selectedRow.buildingName || "",
-        unitName: selectedRow.unitName || "",
-        endDate: selectedRow.endDate || "",
-        paymentDate: selectedRow.paymentDate || "",
-        paymentMethod: selectedRow.paymentMethod || "",
-        remarks: selectedRow.remarks || "",
-      });
-      setFormData({
-        refundItems: selectedRow.refundItems?.length
-          ? selectedRow.refundItems.map((item) => ({
-              charge: item.charge || "",
-              description: item.description || "",
-              date: item.date || "",
-              amount: item.amount || "",
-              vat: item.vat || "",
-              paidAmount: item.paidAmount || "",
-              amountRefund: item.amountRefund || "",
-              total: item.total || "0",
-            }))
-          : [
-              {
-                charge: "",
-                description: "",
-                date: "",
-                amount: "",
-                vat: "",
-                paidAmount: "",
-                amountRefund: "",
-                total: "0",
-              },
-            ],
-      });
-    }
-  }, [isOpen, selectedRow]);
-
-  if (!isOpen) return null;
 
   return (
     <div className="update-refund-modal-wrapper">
@@ -134,7 +169,7 @@ const UpdateRefundModal = ({ isOpen, onClose, selectedRow }) => {
               Update Refund
             </h2>
             <button
-              onClick={onClose}
+              onClick={closeModal}
               className="update-refund-close-btn hover:bg-gray-100 duration-200"
             >
               <img src={closeicon} alt="close" className="w-[15px] h-[15px]" />

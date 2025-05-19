@@ -3,8 +3,10 @@ import "./AddCollectionModal.css";
 import { ChevronDown } from "lucide-react";
 import closeicon from "../../../assets/Images/Collection/close-icon.svg";
 import calendaricon from "../../../assets/Images/Collection/calendar-icon.svg";
+import { useModal } from "../../../context/ModalContext";
 
-const AddCollectionModal = ({ isOpen, onClose }) => {
+const AddCollectionModal = () => {
+  const { modalState, closeModal } = useModal();
   const [form, setForm] = useState({
     selectTenancy: "",
     buildingName: "",
@@ -56,36 +58,8 @@ const AddCollectionModal = ({ isOpen, onClose }) => {
     }));
   };
 
-  const handleSave = () => {
-    const {
-      selectTenancy,
-      buildingName,
-      unitName,
-      endDate,
-      paymentDate,
-      paymentMethod,
-      remarks,
-    } = form;
-
-    if (
-      selectTenancy &&
-      buildingName &&
-      unitName &&
-      endDate &&
-      paymentDate &&
-      paymentMethod &&
-      remarks
-    ) {
-      console.log("New Charge Added: ", form);
-      console.log("Collection Items: ", formData.collectionItems);
-      onClose();
-    } else {
-      console.log("Please fill all required fields");
-    }
-  };
-
   useEffect(() => {
-    if (isOpen) {
+    if (modalState.isOpen) {
       setForm({
         selectTenancy: "",
         buildingName: "",
@@ -110,9 +84,40 @@ const AddCollectionModal = ({ isOpen, onClose }) => {
         ],
       });
     }
-  }, [isOpen]);
+  }, [modalState.isOpen]);
 
-  if (!isOpen) return null;
+  const handleSave = () => {
+    const {
+      selectTenancy,
+      buildingName,
+      unitName,
+      endDate,
+      paymentDate,
+      paymentMethod,
+      remarks,
+    } = form;
+
+    if (
+      selectTenancy &&
+      buildingName &&
+      unitName &&
+      endDate &&
+      paymentDate &&
+      paymentMethod &&
+      remarks
+    ) {
+      console.log("New Charge Added: ", form);
+      console.log("Collection Items: ", formData.collectionItems);
+      closeModal();
+    } else {
+      console.log("Please fill all required fields");
+    }
+  };
+
+  // Only render for "create-invoice" type
+  if (!modalState.isOpen || modalState.type !== "create-collection") {
+    return null;
+  }
 
   return (
     <div className="financial-collection-modal-wrapper">
@@ -123,7 +128,7 @@ const AddCollectionModal = ({ isOpen, onClose }) => {
               Create New Collection
             </h2>
             <button
-              onClick={onClose}
+              onClick={closeModal}
               className="financial-collection-close-btn hover:bg-gray-100 duration-200"
             >
               <img src={closeicon} alt="close" className="w-[15px] h-[15px]" />

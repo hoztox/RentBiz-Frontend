@@ -7,16 +7,14 @@ import editicon from "../../assets/Images/Collection/edit-icon.svg";
 import printericon from "../../assets/Images/Collection/printer-icon.svg";
 import downloadactionicon from "../../assets/Images/Collection/download-action-icon.svg";
 import downarrow from "../../assets/Images/Collection/downarrow.svg";
-import AddCollectionModal from "./AddCollectionModal/AddCollectionModal";
-import UpdateCollectionModal from "./UpdateCollectionModal/UpdateCollectionModal";
+import { useModal } from "../../context/ModalContext";
 
 const Collection = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
+  const { openModal } = useModal();
   const itemsPerPage = 10;
 
   const demoData = [
@@ -94,20 +92,8 @@ const Collection = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const openAddModal = () => {
-    setIsAddModalOpen(true);
-  };
-
-  const closeAddModal = () => {
-    setIsAddModalOpen(false);
-  };
-
-  const openUpdateModal = () => {
-    setIsUpdateModalOpen(true);
-  };
-
-  const closeUpdateModal = () => {
-    setIsUpdateModalOpen(false);
+  const openUpdateModal = (collection) => {
+    openModal("update-collection", collection);
   };
 
   const toggleRowExpand = (id) => {
@@ -151,7 +137,7 @@ const Collection = () => {
           <div className="flex gap-[10px] collection-action-buttons w-full md:w-auto justify-start">
             <button
               className="flex items-center justify-center gap-2 w-[176px] h-[38px] rounded-md add-collection duration-200"
-              onClick={openAddModal}
+              onClick={() => openModal("create-collection")}
             >
               Add Collection
               <img
@@ -181,8 +167,12 @@ const Collection = () => {
               <th className="pl-5 text-left collection-thead">TENANT NAME</th>
               <th className="px-5 text-left collection-thead">AMOUNT</th>
               <th className="px-5 text-left collection-thead">DESCRIPTION</th>
-              <th className="px-5 text-left collection-thead">PAYMENT METHOD</th>
-              <th className="px-5 text-left collection-thead w-[68px]">STATUS</th>
+              <th className="px-5 text-left collection-thead">
+                PAYMENT METHOD
+              </th>
+              <th className="px-5 text-left collection-thead w-[68px]">
+                STATUS
+              </th>
               <th className="px-5 pr-11 text-right collection-thead">ACTION</th>
             </tr>
           </thead>
@@ -192,13 +182,27 @@ const Collection = () => {
                 key={index}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-5 text-left collection-data">{collection.id}</td>
-                <td className="px-5 text-left collection-data">{collection.date}</td>
-                <td className="pl-5 text-left collection-data">{collection.tenancyId}</td>
-                <td className="pl-5 text-left collection-data">{collection.tenantName}</td>
-                <td className="px-5 text-left collection-data">{collection.amount}</td>
-                <td className="px-5 text-left collection-data">{collection.description}</td>
-                <td className="px-5 text-left collection-data">{collection.payment}</td>
+                <td className="px-5 text-left collection-data">
+                  {collection.id}
+                </td>
+                <td className="px-5 text-left collection-data">
+                  {collection.date}
+                </td>
+                <td className="pl-5 text-left collection-data">
+                  {collection.tenancyId}
+                </td>
+                <td className="pl-5 text-left collection-data">
+                  {collection.tenantName}
+                </td>
+                <td className="px-5 text-left collection-data">
+                  {collection.amount}
+                </td>
+                <td className="px-5 text-left collection-data">
+                  {collection.description}
+                </td>
+                <td className="px-5 text-left collection-data">
+                  {collection.payment}
+                </td>
                 <td className="px-5 text-left collection-data">
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] h-[28px] ${
@@ -211,7 +215,7 @@ const Collection = () => {
                   </span>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={openUpdateModal}>
+                  <button onClick={() => openUpdateModal(collection)}>
                     <img
                       src={editicon}
                       alt="Edit"
@@ -242,8 +246,12 @@ const Collection = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="collection-table-row-head">
-              <th className="px-5 text-left collection-thead collection-id-column">ID</th>
-              <th className="px-5 text-left collection-thead collection-date-column">DATE</th>
+              <th className="px-5 text-left collection-thead collection-id-column">
+                ID
+              </th>
+              <th className="px-5 text-left collection-thead collection-date-column">
+                DATE
+              </th>
               <th className="px-5 text-right collection-thead"></th>
             </tr>
           </thead>
@@ -257,8 +265,12 @@ const Collection = () => {
                       : "collection-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left collection-data collection-id-column">{collection.id}</td>
-                  <td className="px-5 text-left collection-data collection-date-column">{collection.date}</td>
+                  <td className="px-5 text-left collection-data collection-id-column">
+                    {collection.id}
+                  </td>
+                  <td className="px-5 text-left collection-data collection-date-column">
+                    {collection.date}
+                  </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`collection-dropdown-field ${
@@ -270,7 +282,9 @@ const Collection = () => {
                         src={downarrow}
                         alt="drop-down-arrow"
                         className={`collection-dropdown-img ${
-                          expandedRows[collection.id + index] ? "text-white" : ""
+                          expandedRows[collection.id + index]
+                            ? "text-white"
+                            : ""
                         }`}
                       />
                     </div>
@@ -282,31 +296,53 @@ const Collection = () => {
                       <div className="collection-dropdown-content">
                         <div className="collection-dropdown-grid">
                           <div className="collection-dropdown-item w-[50%]">
-                            <div className="collection-dropdown-label">TENANCY ID</div>
-                            <div className="collection-dropdown-value">{collection.tenancyId}</div>
+                            <div className="collection-dropdown-label">
+                              TENANCY ID
+                            </div>
+                            <div className="collection-dropdown-value">
+                              {collection.tenancyId}
+                            </div>
                           </div>
                           <div className="collection-dropdown-item w-[50%]">
-                            <div className="collection-dropdown-label">TENANT NAME</div>
-                            <div className="collection-dropdown-value">{collection.tenantName}</div>
-                          </div>
-                        </div>
-                        <div className="collection-dropdown-grid">
-                          <div className="collection-dropdown-item w-[50%]">
-                            <div className="collection-dropdown-label">AMOUNT</div>
-                            <div className="collection-dropdown-value">{collection.amount}</div>
-                          </div>
-                          <div className="collection-dropdown-item w-[50%]">
-                            <div className="collection-dropdown-label">DESCRIPTION</div>
-                            <div className="collection-dropdown-value">{collection.description}</div>
+                            <div className="collection-dropdown-label">
+                              TENANT NAME
+                            </div>
+                            <div className="collection-dropdown-value">
+                              {collection.tenantName}
+                            </div>
                           </div>
                         </div>
                         <div className="collection-dropdown-grid">
                           <div className="collection-dropdown-item w-[50%]">
-                            <div className="collection-dropdown-label">PAYMENT METHOD</div>
-                            <div className="collection-dropdown-value">{collection.payment}</div>
+                            <div className="collection-dropdown-label">
+                              AMOUNT
+                            </div>
+                            <div className="collection-dropdown-value">
+                              {collection.amount}
+                            </div>
                           </div>
                           <div className="collection-dropdown-item w-[50%]">
-                            <div className="collection-dropdown-label">STATUS</div>
+                            <div className="collection-dropdown-label">
+                              DESCRIPTION
+                            </div>
+                            <div className="collection-dropdown-value">
+                              {collection.description}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="collection-dropdown-grid">
+                          <div className="collection-dropdown-item w-[50%]">
+                            <div className="collection-dropdown-label">
+                              PAYMENT METHOD
+                            </div>
+                            <div className="collection-dropdown-value">
+                              {collection.payment}
+                            </div>
+                          </div>
+                          <div className="collection-dropdown-item w-[50%]">
+                            <div className="collection-dropdown-label">
+                              STATUS
+                            </div>
                             <div className="collection-dropdown-value">
                               <span
                                 className={`px-[10px] py-[5px] rounded-[4px] w-[69px] h-[28px] ${
@@ -322,9 +358,13 @@ const Collection = () => {
                         </div>
                         <div className="collection-dropdown-grid">
                           <div className="collection-dropdown-item w-[100%]">
-                            <div className="collection-dropdown-label">ACTION</div>
+                            <div className="collection-dropdown-label">
+                              ACTION
+                            </div>
                             <div className="collection-dropdown-value flex items-center gap-4">
-                              <button onClick={openUpdateModal}>
+                              <button
+                                onClick={() => openUpdateModal(collection)}
+                              >
                                 <img
                                   src={editicon}
                                   alt="Edit"
@@ -359,8 +399,10 @@ const Collection = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 px-5 collection-pagination-container">
         <span className="collection-list-pagination collection-pagination-text">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
+          Showing{" "}
+          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+          {filteredData.length} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto collection-pagination-buttons">
           <button
@@ -392,7 +434,9 @@ const Collection = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
+          {endPage < totalPages - 1 && (
+            <span className="px-2 flex items-center">...</span>
+          )}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
@@ -410,8 +454,6 @@ const Collection = () => {
           </button>
         </div>
       </div>
-      <AddCollectionModal isOpen={isAddModalOpen} onClose={closeAddModal} />
-      <UpdateCollectionModal isOpen={isUpdateModalOpen} onClose={closeUpdateModal} />
     </div>
   );
 };

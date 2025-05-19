@@ -7,9 +7,6 @@ import profile from "../../assets/Images/Admin Navbar/profile.svg";
 import mobilemenu from "../../assets/Images/Admin Navbar/mobile-menu.svg";
 import "./adminnavbar.css";
 import MobileSlideMenu from "../MobileSlideMenu/MobileSlideMenu";
-import AdminCreateUserModal from "../AdminCreateUserModal/AdminCreateUserModal";
-import CreateTenancyModal from "../../pages/Admin Tenancy/CreateTenancy/CreateTenancyModal";
-import CreateTenantModal from "../../pages/Admin Tenants/CreateTenantModal/CreateTenantModal";
 import { useModal } from "../../context/ModalContext";
 
 const routeTitles = {
@@ -97,6 +94,12 @@ const modalTitles = {
   "view-invoice": "Invoice View",
   "create-monthly-invoice": "Create New Monthly Invoice",
   "view-monthly-invoice": "Monthly Invoice View",
+  "create-collection": "Create New Collection",
+  "update-collection": "Update Collection",
+  "create-expense": "Create New Expense",
+  "update-expense": "Update Expense",
+  "create-refund": "Create Refund",
+  "update-refund": "Update Refund",
 };
 
 const AdminNavbar = () => {
@@ -118,7 +121,6 @@ const AdminNavbar = () => {
   const getPageTitle = (isMobile = false) => {
     // Prioritize modal titles when modal is open
     if (modalState.isOpen && modalState.type) {
-      console.log("Rendering modal title:", modalTitles[modalState.type]);
       return modalTitles[modalState.type] || mobileRouteTitles.default;
     }
 
@@ -183,15 +185,6 @@ const AdminNavbar = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  // Debug modal state and rendering
-  useEffect(() => {
-    console.log("Modal State:", modalState);
-    console.log("Current Path:", currentPath);
-    console.log("Rendering:", modalState.isOpen ? "Back Arrow" : isDashboard ? "Logo" : "Back Arrow");
-    console.log("Desktop Title:", getPageTitle(false));
-    console.log("Mobile Title:", getPageTitle(true));
-  }, [modalState.isOpen, modalState.type, currentPath]);
 
   return (
     <>
@@ -299,11 +292,6 @@ const AdminNavbar = () => {
         isMobileMenuOpen={isMobileMenuOpen}
         toggleMobileMenu={toggleMobileMenu}
       />
-
-      {/* Modals */}
-      <AdminCreateUserModal />
-      <CreateTenantModal />
-      <CreateTenancyModal />
     </>
   );
 };

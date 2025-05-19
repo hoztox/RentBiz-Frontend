@@ -25,6 +25,12 @@ import AddInvoiceModal from "./Invoice/AddInvoiceModal/AddInvoiceModal";
 import ViewInvoiceModal from "./Invoice/ViewInvoiceModal/ViewInvoiceModal";
 import AddMonthlyInvoiceModal from "./Monthly Invoice/AddMonthlyInvoiceModal/AddMonthlyInvoiceModal";
 import ViewMonthlyInvoiceModal from "./Monthly Invoice/ViewMonthlyInvoiceModal/ViewMonthlyInvoiceModal";
+import AddCollectionModal from "./Collection/AddCollectionModal/AddCollectionModal";
+import UpdateCollectionModal from "./Collection/UpdateCollectionModal/UpdateCollectionModal";
+import AddExpenseModal from "./Expense/AddExpenseModal/AddExpenseModal";
+import UpdateExpenseModal from "./Expense/UpdateExpenseModal/UpdateExpenseModal";
+import AddRefundModal from "./Refund/AddRefundModal/AddRefundModal";
+import UpdateRefundModal from "./Refund/UpdateRefundModal/UpdateRefundModal";
 
 const Layout = () => {
   const { modalState } = useModal();
@@ -62,6 +68,12 @@ const Layout = () => {
       {modalState.isOpen && modalState.type === "view-invoice" && <ViewInvoiceModal />}
       {modalState.isOpen && modalState.type === "create-monthly-invoice" && <AddMonthlyInvoiceModal />}
       {modalState.isOpen && modalState.type === "view-monthly-invoice" && <ViewMonthlyInvoiceModal />}
+      {modalState.isOpen && modalState.type === "create-collection" && <AddCollectionModal />}
+      {modalState.isOpen && modalState.type === "update-collection" && <UpdateCollectionModal />}
+      {modalState.isOpen && modalState.type === "create-expense" && <AddExpenseModal />}
+      {modalState.isOpen && modalState.type === "update-expense" && <UpdateExpenseModal />}
+      {modalState.isOpen && modalState.type === "create-refund" && <AddRefundModal />}
+      {modalState.isOpen && modalState.type === "update-refund" && <UpdateRefundModal />}
     </div>
   );
 };

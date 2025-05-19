@@ -3,8 +3,10 @@ import "./UpdateExpenseModal.css";
 import { ChevronDown } from "lucide-react";
 import closeicon from "../../../assets/Images/Expense/close-icon.svg";
 import calendaricon from "../../../assets/Images/Expense/calendar-icon.svg";
+import { useModal } from "../../../context/ModalContext";
 
-const UpdateExpenseModal = ({ isOpen, onClose, expenseData }) => {
+const UpdateExpenseModal = () => {
+  const { modalState, closeModal } = useModal();
   const [formData, setFormData] = useState({
     id: "",
     date: "",
@@ -22,13 +24,41 @@ const UpdateExpenseModal = ({ isOpen, onClose, expenseData }) => {
   const [isSelectOpenExpense, setIsSelectOpenExpense] = useState(false);
   const [isSelectOpenStatus, setIsSelectOpenStatus] = useState(false);
 
+  // Reset form state when modal opens or data changes
   useEffect(() => {
-    if (expenseData) {
-      setFormData(expenseData);
+    if (modalState.isOpen && modalState.data) {
+      setFormData({
+        id: modalState.data.id || "",
+        date: modalState.data.date || "",
+        tenant: modalState.data.tenant || "",
+        building: modalState.data.building || "",
+        units: modalState.data.units || "",
+        expense: modalState.data.expense || "",
+        amount: modalState.data.amount || "",
+        vatAmount: modalState.data.vatAmount || "",
+        totalAmount: modalState.data.totalAmount || "",
+        description: modalState.data.description || "",
+        status: modalState.data.status || "",
+      });
+    } else {
+      // Reset form when modal is closed
+      setFormData({
+        id: "",
+        date: "",
+        tenant: "",
+        building: "",
+        units: "",
+        expense: "",
+        amount: "",
+        vatAmount: "",
+        totalAmount: "",
+        description: "",
+        status: "",
+      });
     }
-  }, [expenseData]);
+  }, [modalState.isOpen, modalState.data]);
 
-  const handleChange = (e) => {
+   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (e.target.tagName === "SELECT") {
@@ -40,21 +70,37 @@ const UpdateExpenseModal = ({ isOpen, onClose, expenseData }) => {
     }
   };
 
+  // Only render for "update-expense" type and valid data
+  if (
+    !modalState.isOpen ||
+    modalState.type !== "update-expense" ||
+    !modalState.data
+  ) {
+    return null;
+  }
+
   const handleUpdate = (e) => {
     e.preventDefault();
-    onClose();
+    const { tenant, building, units, expense, date, vatAmount, status } =
+      formData;
+    if (tenant && building && units && expense && date && vatAmount && status) {
+      console.log("Expense Updated: ", formData);
+      closeModal();
+    } else {
+      console.log("Please fill all required fields");
+    }
   };
-
-  if (!isOpen) return null;
 
   return (
     <div className="financial-expense-update-modal-wrapper">
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 financial-expense-update-modal-overlay">
         <div className="bg-white rounded-md w-[1006px] shadow-lg p-1 financial-expense-update-modal-container">
           <div className="flex justify-between items-center md:p-6 mt-2">
-            <h2 className="text-[#201D1E] financial-expense-update-head">Update Expense</h2>
+            <h2 className="text-[#201D1E] financial-expense-update-head">
+              Update Expense
+            </h2>
             <button
-              onClick={onClose}
+              onClick={closeModal}
               className="financial-expense-update-close-btn hover:bg-gray-100 duration-200"
             >
               <img src={closeicon} alt="close" className="w-[15px] h-[15px]" />
@@ -65,7 +111,9 @@ const UpdateExpenseModal = ({ isOpen, onClose, expenseData }) => {
             <div className="grid gap-6 financial-expense-update-modal-grid">
               {/* Tenant */}
               <div className="space-y-2">
-                <label className="block financial-expense-update-label">Tenant*</label>
+                <label className="block financial-expense-update-label">
+                  Tenant*
+                </label>
                 <div className="relative">
                   <select
                     name="tenant"
@@ -74,7 +122,9 @@ const UpdateExpenseModal = ({ isOpen, onClose, expenseData }) => {
                     onFocus={() => setIsSelectOpenTenant(true)}
                     onBlur={() => setIsSelectOpenTenant(false)}
                     className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-update-selection ${
-                      formData.tenant === "" ? "financial-expense-update-selected" : ""
+                      formData.tenant === ""
+                        ? "financial-expense-update-selected"
+                        : ""
                     }`}
                   >
                     <option value="" disabled hidden>
@@ -96,7 +146,9 @@ const UpdateExpenseModal = ({ isOpen, onClose, expenseData }) => {
 
               {/* Building */}
               <div className="space-y-2">
-                <label className="block financial-expense-update-label">Building*</label>
+                <label className="block financial-expense-update-label">
+                  Building*
+                </label>
                 <input
                   type="text"
                   name="building"
@@ -109,7 +161,9 @@ const UpdateExpenseModal = ({ isOpen, onClose, expenseData }) => {
 
               {/* Units */}
               <div className="space-y-2">
-                <label className="block financial-expense-update-label">Units*</label>
+                <label className="block financial-expense-update-label">
+                  Units*
+                </label>
                 <input
                   name="units"
                   type="text"
@@ -122,7 +176,9 @@ const UpdateExpenseModal = ({ isOpen, onClose, expenseData }) => {
 
               {/* Expense */}
               <div className="space-y-2">
-                <label className="block financial-expense-update-label">Expense*</label>
+                <label className="block financial-expense-update-label">
+                  Expense*
+                </label>
                 <div className="relative">
                   <select
                     name="expense"
@@ -131,7 +187,9 @@ const UpdateExpenseModal = ({ isOpen, onClose, expenseData }) => {
                     onFocus={() => setIsSelectOpenExpense(true)}
                     onBlur={() => setIsSelectOpenExpense(false)}
                     className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-update-selection ${
-                      formData.expense === "" ? "financial-expense-update-selected" : ""
+                      formData.expense === ""
+                        ? "financial-expense-update-selected"
+                        : ""
                     }`}
                   >
                     <option value="" disabled hidden>
@@ -153,7 +211,9 @@ const UpdateExpenseModal = ({ isOpen, onClose, expenseData }) => {
 
               {/* Date */}
               <div className="space-y-2">
-                <label className="block financial-expense-update-label">Date*</label>
+                <label className="block financial-expense-update-label">
+                  Date*
+                </label>
                 <div className="relative">
                   <input
                     name="date"
@@ -164,14 +224,20 @@ const UpdateExpenseModal = ({ isOpen, onClose, expenseData }) => {
                     className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-update-input"
                   />
                   <div className="absolute inset-y-0 right-1 flex items-center px-2">
-                    <img src={calendaricon} alt="calendar" className="w-5 h-5" />
+                    <img
+                      src={calendaricon}
+                      alt="calendar"
+                      className="w-5 h-5"
+                    />
                   </div>
                 </div>
               </div>
 
               {/* Amount */}
               <div className="space-y-2">
-                <label className="block financial-expense-update-label">Amount</label>
+                <label className="block financial-expense-update-label">
+                  Amount
+                </label>
                 <input
                   name="amount"
                   type="text"
@@ -184,7 +250,9 @@ const UpdateExpenseModal = ({ isOpen, onClose, expenseData }) => {
 
               {/* VAT Amount */}
               <div className="space-y-2">
-                <label className="block financial-expense-update-label">Vat Amount*</label>
+                <label className="block financial-expense-update-label">
+                  Vat Amount*
+                </label>
                 <input
                   name="vatAmount"
                   type="text"
@@ -197,7 +265,9 @@ const UpdateExpenseModal = ({ isOpen, onClose, expenseData }) => {
 
               {/* Total Amount */}
               <div className="space-y-2">
-                <label className="block financial-expense-update-label">Total Amount</label>
+                <label className="block financial-expense-update-label">
+                  Total Amount
+                </label>
                 <input
                   name="totalAmount"
                   type="text"
@@ -210,7 +280,9 @@ const UpdateExpenseModal = ({ isOpen, onClose, expenseData }) => {
 
               {/* Description */}
               <div className="space-y-2">
-                <label className="block financial-expense-update-label">Description</label>
+                <label className="block financial-expense-update-label">
+                  Description
+                </label>
                 <input
                   name="description"
                   type="text"
@@ -223,7 +295,9 @@ const UpdateExpenseModal = ({ isOpen, onClose, expenseData }) => {
 
               {/* Status */}
               <div className="space-y-2">
-                <label className="block financial-expense-update-label">Status*</label>
+                <label className="block financial-expense-update-label">
+                  Status*
+                </label>
                 <div className="relative">
                   <select
                     name="status"
@@ -232,7 +306,9 @@ const UpdateExpenseModal = ({ isOpen, onClose, expenseData }) => {
                     onFocus={() => setIsSelectOpenStatus(true)}
                     onBlur={() => setIsSelectOpenStatus(false)}
                     className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-update-selection ${
-                      formData.status === "" ? "financial-expense-update-selected" : ""
+                      formData.status === ""
+                        ? "financial-expense-update-selected"
+                        : ""
                     }`}
                   >
                     <option value="" disabled hidden>

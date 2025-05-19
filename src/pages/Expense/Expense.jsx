@@ -7,17 +7,14 @@ import editicon from "../../assets/Images/Expense/edit-icon.svg";
 import printericon from "../../assets/Images/Expense/printer-icon.svg";
 import downloadactionicon from "../../assets/Images/Expense/download-action-icon.svg";
 import downarrow from "../../assets/Images/Expense/downarrow.svg";
-import AddExpenseModal from "./AddExpenseModal/AddExpenseModal";
-import UpdateExpenseModal from "./UpdateExpenseModal/UpdateExpenseModal";
+import { useModal } from "../../context/ModalContext";
 
 const Expense = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [selectedExpense, setSelectedExpense] = useState(null);
   const [expandedRows, setExpandedRows] = useState({});
+  const { openModal } = useModal();
   const itemsPerPage = 10;
 
   const demoData = [
@@ -89,22 +86,8 @@ const Expense = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const openAddModal = () => {
-    setIsAddModalOpen(true);
-  };
-
-  const closeAddModal = () => {
-    setIsAddModalOpen(false);
-  };
-
   const openUpdateModal = (expense) => {
-    setSelectedExpense(expense);
-    setIsUpdateModalOpen(true);
-  };
-
-  const closeUpdateModal = () => {
-    setIsUpdateModalOpen(false);
-    setSelectedExpense(null);
+    openModal("update-expense", expense);
   };
 
   const toggleRowExpand = (id) => {
@@ -148,10 +131,14 @@ const Expense = () => {
           <div className="flex gap-[10px] expense-action-buttons w-full md:w-auto justify-start">
             <button
               className="flex items-center justify-center gap-2 h-[38px] rounded-md add-expense duration-200 w-[176px]"
-              onClick={openAddModal}
+              onClick={() => openModal("create-expense")}
             >
               Add New Expense
-              <img src={plusicon} alt="plus icon" className="relative right-[5px] md:right-0 w-[15px] h-[15px]" />
+              <img
+                src={plusicon}
+                alt="plus icon"
+                className="relative right-[5px] md:right-0 w-[15px] h-[15px]"
+              />
             </button>
             <button className="flex items-center justify-center gap-2 h-[38px] rounded-md duration-200 expense-download-btn w-[122px]">
               Download
@@ -186,10 +173,18 @@ const Expense = () => {
               >
                 <td className="px-5 text-left expense-data">{expense.id}</td>
                 <td className="px-5 text-left expense-data">{expense.date}</td>
-                <td className="pl-5 text-left expense-data">{expense.expense}</td>
-                <td className="pl-5 text-left expense-data">{expense.amount}</td>
-                <td className="px-5 text-left expense-data">{expense.vatAmount}</td>
-                <td className="px-5 text-left expense-data">{expense.totalAmount}</td>
+                <td className="pl-5 text-left expense-data">
+                  {expense.expense}
+                </td>
+                <td className="pl-5 text-left expense-data">
+                  {expense.amount}
+                </td>
+                <td className="px-5 text-left expense-data">
+                  {expense.vatAmount}
+                </td>
+                <td className="px-5 text-left expense-data">
+                  {expense.totalAmount}
+                </td>
                 <td className="px-5 text-left expense-data">
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] h-[28px] ${
@@ -233,9 +228,15 @@ const Expense = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="expense-table-row-head">
-              <th className="px-5 pl-[12px] text-left expense-thead expense-id-column">ID</th>
-              <th className="px-5 text-left expense-thead expense-date-column">DATE</th>
-              <th className="px-5 text-left expense-thead expense-expense-column">EXPENSE</th>
+              <th className="px-5 pl-[12px] text-left expense-thead expense-id-column">
+                ID
+              </th>
+              <th className="px-5 text-left expense-thead expense-date-column">
+                DATE
+              </th>
+              <th className="px-5 text-left expense-thead expense-expense-column">
+                EXPENSE
+              </th>
               <th className="px-5 text-right expense-thead"></th>
             </tr>
           </thead>
@@ -249,9 +250,15 @@ const Expense = () => {
                       : "expense-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 pl-[12px] text-left expense-data expense-id-column">{expense.id}</td>
-                  <td className="px-5 text-left expense-data expense-date-column">{expense.date}</td>
-                  <td className="px-5 text-left expense-data expense-expense-column">{expense.expense}</td>
+                  <td className="px-5 pl-[12px] text-left expense-data expense-id-column">
+                    {expense.id}
+                  </td>
+                  <td className="px-5 text-left expense-data expense-date-column">
+                    {expense.date}
+                  </td>
+                  <td className="px-5 text-left expense-data expense-expense-column">
+                    {expense.expense}
+                  </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`expense-dropdown-field ${
@@ -276,15 +283,25 @@ const Expense = () => {
                         <div className="expense-dropdown-grid">
                           <div className="expense-dropdown-item expense-amount-column">
                             <div className="expense-dropdown-label">AMOUNT</div>
-                            <div className="expense-dropdown-value">{expense.amount}</div>
+                            <div className="expense-dropdown-value">
+                              {expense.amount}
+                            </div>
                           </div>
                           <div className="expense-dropdown-item expense-vat-amount-column">
-                            <div className="expense-dropdown-label">VAT AMOUNT</div>
-                            <div className="expense-dropdown-value">{expense.vatAmount}</div>
+                            <div className="expense-dropdown-label">
+                              VAT AMOUNT
+                            </div>
+                            <div className="expense-dropdown-value">
+                              {expense.vatAmount}
+                            </div>
                           </div>
                           <div className="expense-dropdown-item expense-total-amount-column">
-                            <div className="expense-dropdown-label">TOTAL AMOUNT</div>
-                            <div className="expense-dropdown-value">{expense.totalAmount}</div>
+                            <div className="expense-dropdown-label">
+                              TOTAL AMOUNT
+                            </div>
+                            <div className="expense-dropdown-value">
+                              {expense.totalAmount}
+                            </div>
                           </div>
                         </div>
                         <div className="expense-dropdown-grid">
@@ -340,8 +357,10 @@ const Expense = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 expense-pagination-container">
         <span className="expense-pagination collection-list-pagination">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
+          Showing{" "}
+          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+          {filteredData.length} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto expense-pagination-buttons">
           <button
@@ -373,7 +392,9 @@ const Expense = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
+          {endPage < totalPages - 1 && (
+            <span className="px-2 flex items-center">...</span>
+          )}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
@@ -391,8 +412,6 @@ const Expense = () => {
           </button>
         </div>
       </div>
-      <AddExpenseModal isOpen={isAddModalOpen} onClose={closeAddModal} />
-      <UpdateExpenseModal isOpen={isUpdateModalOpen} onClose={closeUpdateModal} expenseData={selectedExpense} />
     </div>
   );
 };

@@ -7,16 +7,14 @@ import editicon from "../../assets/Images/Refund/edit-icon.svg";
 import printericon from "../../assets/Images/Refund/printer-icon.svg";
 import downloadactionicon from "../../assets/Images/Refund/download-action-icon.svg";
 import downarrow from "../../assets/Images/Refund/downarrow.svg";
-import AddRefundModal from "./AddRefundModal/AddRefundModal";
-import UpdateRefundModal from "./UpdateRefundModal/UpdateRefundModal";
+import { useModal } from "../../context/ModalContext";
 
 const Refund = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState(false);
+  const { openModal } = useModal();
   const itemsPerPage = 10;
 
   const demoData = [
@@ -96,8 +94,8 @@ const Refund = () => {
     setIsAddModalOpen(false);
   };
 
-  const openUpdateModal = () => {
-    setIsUpdateModalOpen(true);
+  const openUpdateModal = (refund) => {
+    openModal("update-refund", refund);
   };
 
   const closeUpdateModal = () => {
@@ -145,10 +143,14 @@ const Refund = () => {
           <div className="flex gap-[10px] refund-action-buttons w-full md:w-auto justify-start">
             <button
               className="flex items-center justify-center gap-2 h-[38px] rounded-md add-refund duration-200 w-[176px]"
-              onClick={openAddModal}
+              onClick={() => openModal("create-refund")}
             >
               Add Refund
-              <img src={plusicon} alt="plus icon" className="w-[15px] h-[15px]" />
+              <img
+                src={plusicon}
+                alt="plus icon"
+                className="w-[15px] h-[15px]"
+              />
             </button>
             <button className="flex items-center justify-center gap-2 h-[38px] rounded-md duration-200 download-btn w-[122px]">
               Download
@@ -183,10 +185,16 @@ const Refund = () => {
               >
                 <td className="px-5 text-left refund-data">{refund.id}</td>
                 <td className="px-5 text-left refund-data">{refund.date}</td>
-                <td className="pl-5 text-left refund-data">{refund.tenancyId}</td>
-                <td className="pl-5 text-left refund-data">{refund.tenantName}</td>
+                <td className="pl-5 text-left refund-data">
+                  {refund.tenancyId}
+                </td>
+                <td className="pl-5 text-left refund-data">
+                  {refund.tenantName}
+                </td>
                 <td className="px-5 text-left refund-data">{refund.amount}</td>
-                <td className="px-5 text-left refund-data">{refund.paymentMethod}</td>
+                <td className="px-5 text-left refund-data">
+                  {refund.paymentMethod}
+                </td>
                 <td className="px-5 text-left refund-data">
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] h-[28px] ${
@@ -230,9 +238,15 @@ const Refund = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="refund-table-row-head">
-              <th className="px-5 pl-[12px] text-left refund-thead refund-id-column">ID</th>
-              <th className="px-5 text-left refund-thead refund-date-column">DATE</th>
-              <th className="px-5 text-left refund-thead refund-tenancy-id-column">TENANCY ID</th>
+              <th className="px-5 pl-[12px] text-left refund-thead refund-id-column">
+                ID
+              </th>
+              <th className="px-5 text-left refund-thead refund-date-column">
+                DATE
+              </th>
+              <th className="px-5 text-left refund-thead refund-tenancy-id-column">
+                TENANCY ID
+              </th>
               <th className="text-right refund-thead"></th>
             </tr>
           </thead>
@@ -246,9 +260,15 @@ const Refund = () => {
                       : "refund-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 pl-[12px] text-left refund-data refund-id-column">{refund.id}</td>
-                  <td className="px-5 text-left refund-data refund-date-column">{refund.date}</td>
-                  <td className="px-5 text-left refund-data refund-tenancy-id-column">{refund.tenancyId}</td>
+                  <td className="px-5 pl-[12px] text-left refund-data refund-id-column">
+                    {refund.id}
+                  </td>
+                  <td className="px-5 text-left refund-data refund-date-column">
+                    {refund.date}
+                  </td>
+                  <td className="px-5 text-left refund-data refund-tenancy-id-column">
+                    {refund.tenancyId}
+                  </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`refund-dropdown-field ${
@@ -272,16 +292,26 @@ const Refund = () => {
                       <div className="refund-dropdown-content">
                         <div className="refund-dropdown-grid">
                           <div className="refund-dropdown-item refund-tenant-name-column">
-                            <div className="refund-dropdown-label">TENANT NAME</div>
-                            <div className="refund-dropdown-value">{refund.tenantName}</div>
+                            <div className="refund-dropdown-label">
+                              TENANT NAME
+                            </div>
+                            <div className="refund-dropdown-value">
+                              {refund.tenantName}
+                            </div>
                           </div>
                           <div className="refund-dropdown-item refund-amount-column">
                             <div className="refund-dropdown-label">AMOUNT</div>
-                            <div className="refund-dropdown-value">{refund.amount}</div>
+                            <div className="refund-dropdown-value">
+                              {refund.amount}
+                            </div>
                           </div>
                           <div className="refund-dropdown-item refund-payment-method-column">
-                            <div className="refund-dropdown-label">PAYMENT METHOD</div>
-                            <div className="refund-dropdown-value">{refund.paymentMethod}</div>
+                            <div className="refund-dropdown-label">
+                              PAYMENT METHOD
+                            </div>
+                            <div className="refund-dropdown-value">
+                              {refund.paymentMethod}
+                            </div>
                           </div>
                         </div>
                         <div className="refund-dropdown-grid">
@@ -337,8 +367,10 @@ const Refund = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 refund-pagination-container">
         <span className="refund-pagination collection-list-pagination">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
+          Showing{" "}
+          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+          {filteredData.length} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto refund-pagination-buttons">
           <button
@@ -370,7 +402,9 @@ const Refund = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
+          {endPage < totalPages - 1 && (
+            <span className="px-2 flex items-center">...</span>
+          )}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
@@ -388,8 +422,6 @@ const Refund = () => {
           </button>
         </div>
       </div>
-      <AddRefundModal isOpen={isAddModalOpen} onClose={closeAddModal} />
-      <UpdateRefundModal isOpen={isUpdateModalOpen} onClose={closeUpdateModal} />
     </div>
   );
 };

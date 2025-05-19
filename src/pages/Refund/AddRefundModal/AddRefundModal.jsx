@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import "./AddRefundModal.css";
 import { ChevronDown } from "lucide-react";
 import closeicon from "../../../assets/Images/Refund/close-icon.svg";
+import { useModal } from "../../../context/ModalContext";
 // import calendaricon from "../../../assets/Images/Refund/calendar-icon.svg";
 
-const AddRefundModal = ({ isOpen, onClose }) => {
+const AddRefundModal = () => {
+  const { modalState, closeModal } = useModal();
   const [form, setForm] = useState({
     selectTenancy: "",
     buildingName: "",
@@ -33,6 +35,34 @@ const AddRefundModal = ({ isOpen, onClose }) => {
   const [openDropdowns, setOpenDropdowns] = useState({
     charge: false,
   });
+
+  useEffect(() => {
+    if (modalState.isOpen) {
+      setForm({
+        selectTenancy: "",
+        buildingName: "",
+        unitName: "",
+        endDate: "",
+        paymentDate: "",
+        paymentMethod: "",
+        remarks: "",
+      });
+      setFormData({
+        refundItems: [
+          {
+            charge: "",
+            description: "",
+            date: "",
+            amount: "",
+            vat: "",
+            paidAmount: "",
+            amountRefund: "",
+            total: "0",
+          },
+        ],
+      });
+    }
+  }, [modalState.isOpen]);
 
   const updateForm = (key, value) => {
     setForm((prev) => ({
@@ -78,52 +108,25 @@ const AddRefundModal = ({ isOpen, onClose }) => {
     ) {
       console.log("New Refund Added: ", form);
       console.log("Refund Items: ", formData.refundItems);
-      onClose();
+      closeModal();
     } else {
       console.log("Please fill all required fields");
     }
   };
 
-  useEffect(() => {
-    if (isOpen) {
-      setForm({
-        selectTenancy: "",
-        buildingName: "",
-        unitName: "",
-        endDate: "",
-        paymentDate: "",
-        paymentMethod: "",
-        remarks: "",
-      });
-      setFormData({
-        refundItems: [
-          {
-            charge: "",
-            description: "",
-            date: "",
-            amount: "",
-            vat: "",
-            paidAmount: "",
-            amountRefund: "",
-            total: "0",
-          },
-        ],
-      });
-    }
-  }, [isOpen]);
-
-  if (!isOpen) return null;
+  // Only render for "create-invoice" type
+  if (!modalState.isOpen || modalState.type !== "create-refund") {
+    return null;
+  }
 
   return (
     <div className="add-refund-modal-wrapper">
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 add-refund-modal-overlay">
         <div className="bg-white rounded-md w-[1006px] shadow-lg p-1 add-refund-modal-container">
           <div className="flex justify-between items-center md:p-6 mt-2">
-            <h2 className="text-[#201D1E] add-refund-head">
-              Create Refund
-            </h2>
+            <h2 className="text-[#201D1E] add-refund-head">Create Refund</h2>
             <button
-              onClick={onClose}
+              onClick={closeModal}
               className="add-refund-close-btn hover:bg-gray-100 duration-200"
             >
               <img src={closeicon} alt="close" className="w-[15px] h-[15px]" />
@@ -134,9 +137,7 @@ const AddRefundModal = ({ isOpen, onClose }) => {
             <div className="grid gap-6 add-refund-modal-grid">
               {/* First row */}
               <div className="space-y-2">
-                <label className="block add-refund-label">
-                  Select Tenancy
-                </label>
+                <label className="block add-refund-label">Select Tenancy</label>
                 <div className="relative">
                   <select
                     value={form.selectTenancy}
@@ -172,9 +173,7 @@ const AddRefundModal = ({ isOpen, onClose }) => {
               </div>
 
               <div className="space-y-2">
-                <label className="block add-refund-label">
-                  Building Name*
-                </label>
+                <label className="block add-refund-label">Building Name*</label>
                 <input
                   type="text"
                   value={form.buildingName}
@@ -304,7 +303,11 @@ const AddRefundModal = ({ isOpen, onClose }) => {
                                 placeholder="mm/dd/yyyy"
                                 value={item.date}
                                 onChange={(e) =>
-                                  handleItemChange(index, "date", e.target.value)
+                                  handleItemChange(
+                                    index,
+                                    "date",
+                                    e.target.value
+                                  )
                                 }
                                 className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 !text-gray-400 refund-modal-table-input"
                               />
@@ -322,7 +325,11 @@ const AddRefundModal = ({ isOpen, onClose }) => {
                                 placeholder="Enter Amount"
                                 value={item.amount}
                                 onChange={(e) =>
-                                  handleItemChange(index, "amount", e.target.value)
+                                  handleItemChange(
+                                    index,
+                                    "amount",
+                                    e.target.value
+                                  )
                                 }
                                 className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 refund-modal-table-input"
                               />
@@ -463,7 +470,11 @@ const AddRefundModal = ({ isOpen, onClose }) => {
                               placeholder="Enter Amount"
                               value={item.amount}
                               onChange={(e) =>
-                                handleItemChange(index, "amount", e.target.value)
+                                handleItemChange(
+                                  index,
+                                  "amount",
+                                  e.target.value
+                                )
                               }
                               className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-modal-mobile-table-input"
                             />
@@ -522,9 +533,7 @@ const AddRefundModal = ({ isOpen, onClose }) => {
 
               {/* Third row */}
               <div className="space-y-2">
-                <label className="block add-refund-label">
-                  Payment Date*
-                </label>
+                <label className="block add-refund-label">Payment Date*</label>
                 <div className="relative">
                   <input
                     type="date"

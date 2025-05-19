@@ -3,8 +3,10 @@ import "./UpdateCollectionModal.css";
 import { ChevronDown } from "lucide-react";
 import closeicon from "../../../assets/Images/Collection/close-icon.svg";
 import calendaricon from "../../../assets/Images/Collection/calendar-icon.svg";
+import { useModal } from "../../../context/ModalContext";
 
-const UpdateCollectionModal = ({ isOpen, onClose, selectedRow }) => {
+const UpdateCollectionModal = () => {
+  const { modalState, closeModal } = useModal();
   const [form, setForm] = useState({
     selectTenancy: "",
     buildingName: "",
@@ -33,6 +35,80 @@ const UpdateCollectionModal = ({ isOpen, onClose, selectedRow }) => {
   const [openDropdowns, setOpenDropdowns] = useState({
     chargeType: false,
   });
+
+  // Reset form state when modal opens or data changes
+  useEffect(() => {
+    if (modalState.isOpen && modalState.data) {
+      setForm({
+        selectTenancy: modalState.data.selectTenancy || "",
+        buildingName: modalState.data.buildingName || "",
+        unitName: modalState.data.unitName || "",
+        endDate: modalState.data.endDate || "",
+        paymentDate: modalState.data.paymentDate || "",
+        paymentMethod: modalState.data.paymentMethod || "",
+        remarks: modalState.data.remarks || "",
+      });
+      setFormData({
+        collectionItems: modalState.data.collectionItems?.length
+          ? modalState.data.collectionItems.map((item) => ({
+              chargeType: item.chargeType || "",
+              description: item.description || "",
+              date: item.date || "",
+              amount: item.amount || "",
+              vat: item.vat || "",
+              balance: item.balance || "",
+              amountPaid: item.amountPaid || "",
+              total: item.total || "0",
+            }))
+          : [
+              {
+                chargeType: "",
+                description: "",
+                date: "",
+                amount: "",
+                vat: "",
+                balance: "",
+                amountPaid: "",
+                total: "0",
+              },
+            ],
+      });
+    } else {
+      // Reset form when modal is closed or no data
+      setForm({
+        selectTenancy: "",
+        buildingName: "",
+        unitName: "",
+        endDate: "",
+        paymentDate: "",
+        paymentMethod: "",
+        remarks: "",
+      });
+      setFormData({
+        collectionItems: [
+          {
+            chargeType: "",
+            description: "",
+            date: "",
+            amount: "",
+            vat: "",
+            balance: "",
+            amountPaid: "",
+            total: "0",
+          },
+        ],
+      });
+    }
+  }, [modalState.isOpen, modalState.data]);
+
+  // Only render for "update-collection" type and valid data
+  if (
+    !modalState.isOpen ||
+    modalState.type !== "update-collection" ||
+    !modalState.data
+  ) {
+    return null;
+  }
 
   const updateForm = (key, value) => {
     setForm((prev) => ({
@@ -78,52 +154,11 @@ const UpdateCollectionModal = ({ isOpen, onClose, selectedRow }) => {
     ) {
       console.log("Collection Updated: ", form);
       console.log("Collection Items: ", formData.collectionItems);
-      onClose();
+      closeModal();
     } else {
       console.log("Please fill all required fields");
     }
   };
-
-  useEffect(() => {
-    if (isOpen && selectedRow) {
-      setForm({
-        selectTenancy: selectedRow.selectTenancy || "",
-        buildingName: selectedRow.buildingName || "",
-        unitName: selectedRow.unitName || "",
-        endDate: selectedRow.endDate || "",
-        paymentDate: selectedRow.paymentDate || "",
-        paymentMethod: selectedRow.paymentMethod || "",
-        remarks: selectedRow.remarks || "",
-      });
-      setFormData({
-        collectionItems: selectedRow.collectionItems?.length
-          ? selectedRow.collectionItems.map((item) => ({
-              chargeType: item.chargeType || "",
-              description: item.description || "",
-              date: item.date || "",
-              amount: item.amount || "",
-              vat: item.vat || "",
-              balance: item.balance || "",
-              amountPaid: item.amountPaid || "",
-              total: item.total || "0",
-            }))
-          : [
-              {
-                chargeType: "",
-                description: "",
-                date: "",
-                amount: "",
-                vat: "",
-                balance: "",
-                amountPaid: "",
-                total: "0",
-              },
-            ],
-      });
-    }
-  }, [isOpen, selectedRow]);
-
-  if (!isOpen) return null;
 
   return (
     <div className="financial-collection-update-modal-wrapper">
@@ -134,7 +169,7 @@ const UpdateCollectionModal = ({ isOpen, onClose, selectedRow }) => {
               Update Collection
             </h2>
             <button
-              onClick={onClose}
+              onClick={closeModal}
               className="financial-collection-update-close-btn hover:bg-gray-100 duration-200"
             >
               <img src={closeicon} alt="close" className="w-[15px] h-[15px]" />
