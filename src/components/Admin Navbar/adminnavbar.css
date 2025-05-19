@@ -100,11 +100,21 @@
 
 /* === Desktop View (min-width: 481px) === */
 @media (min-width: 481px) {
-  .RentBiz-Logo,
+  .mobile-page-title,
   .mobile-menu,
-  .back-arrow,
-  .mobile-page-title {
+  .mobile-slide-menu,
+  .RentBiz-Logo,
+  .back-arrow {
     display: none;
+  }
+
+  /* Desktop-specific styles */
+  .navbar-head {
+    display: block;
+  }
+
+  .navbar-right-side {
+    display: flex;
   }
 }
 
@@ -136,7 +146,7 @@
   .RentBiz-Logo {
     height: 55.955px;
     width: 91px;
-    display: none; /* Hidden by default */
+    display: none;
   }
 
   .back-arrow {
@@ -164,6 +174,16 @@
 
   .dashboard-nav .mobile-page-title,
   .dashboard-nav .back-arrow {
+    display: none;
+  }
+
+  /* Show mobile-page-title and back-arrow when modal is open on dashboard */
+  .dashboard-nav.modal-open .mobile-page-title,
+  .dashboard-nav.modal-open .back-arrow {
+    display: block;
+  }
+
+  .dashboard-nav.modal-open .RentBiz-Logo {
     display: none;
   }
 

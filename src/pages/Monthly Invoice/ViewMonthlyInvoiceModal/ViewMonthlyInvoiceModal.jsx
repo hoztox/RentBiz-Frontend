@@ -1,9 +1,12 @@
-import React from "react";
 import "./ViewMonthlyInvoiceModal.css";
 import closeicon from "../../../assets/Images/Monthly Invoice/close-icon.svg";
+import { useModal } from "../../../context/ModalContext";
 
-const ViewMonthlyInvoiceModal = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
+const ViewMonthlyInvoiceModal = () => {
+  const { modalState, closeModal} = useModal();
+
+  // Only render for "view-monthly-invoice"
+  if (!modalState.isOpen || modalState.type !== "view-monthly-invoice") return null;
 
   return (
     <div className="modal-overlay">
@@ -11,7 +14,7 @@ const ViewMonthlyInvoiceModal = ({ isOpen, onClose }) => {
         <div className="flex justify-between items-center md:mb-6">
           <h2 className="view-monthly-invoice-modal-head">Monthly Invoice View</h2>
           <button
-            onClick={onClose}
+            onClick={closeModal}
             className="view-monthly-invoice-modal-close-btn hover:bg-gray-100 duration-200"
           >
             <img src={closeicon} alt="Close" className="w-[15px] h-[15px]" />

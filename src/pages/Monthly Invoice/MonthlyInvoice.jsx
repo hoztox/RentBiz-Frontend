@@ -6,16 +6,14 @@ import downloadicon from "../../assets/Images/Monthly Invoice/download-icon.svg"
 import deleteicon from "../../assets/Images/Monthly Invoice/delete-icon.svg";
 import viewicon from "../../assets/Images/Monthly Invoice/view-icon.svg";
 import downarrow from "../../assets/Images/Monthly Invoice/downarrow.svg";
-import AddMonthlyInvoiceModal from "./AddMonthlyInvoiceModal/AddMonthlyInvoiceModal";
-import ViewMonthlyInvoiceModal from "./ViewMonthlyInvoiceModal/ViewMonthlyInvoiceModal";
+import { useModal } from "../../context/ModalContext";
 
 const MonthlyInvoice = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isOpenAddModal, setIsOpenAddModal] = useState(false);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
+  const { openModal } = useModal();
   const itemsPerPage = 10;
 
   const demoData = [
@@ -80,22 +78,6 @@ const MonthlyInvoice = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const openAddModal = () => {
-    setIsOpenAddModal(true)
-  }
-
-  const closeAddModal = () => {
-    setIsOpenAddModal(false)
-  }
-
-  const openViewModal = () => {
-    setIsViewModalOpen(true);
-  }
-
-  const closeViewModal = () => {
-    setIsViewModalOpen(false);
-  }
-
   const toggleRowExpand = (id) => {
     setExpandedRows((prev)=>({
       ...prev,
@@ -137,7 +119,7 @@ const MonthlyInvoice = () => {
           <div className="flex gap-[10px] mi-action-buttons-container w-full md:w-auto justify-start">
             <button
               className="flex items-center justify-center gap-2 h-[38px] rounded-md mi-add-btn duration-200 w-[176px]"
-              onClick={openAddModal}
+              onClick={()=>openModal("create-monthly-invoice")}
             >
               Add New Invoice
               <img src={plusicon} alt="plus icon" className="relative right-[5px] md:right-0 w-[15px] h-[15px]" />
@@ -178,7 +160,7 @@ const MonthlyInvoice = () => {
                 <td className="pl-5 text-left mi-data">{invoice.tenantName}</td>
                 <td className="px-5 text-left mi-data">{invoice.amountDue}</td>
                 <td className="pl-14 text-center pr-5 pt-2">
-                  <button onClick={openViewModal}>
+                  <button onClick={()=>openModal("view-monthly-invoice")}>
                     <img
                       src={invoice.view}
                       alt="View"
@@ -258,7 +240,7 @@ const MonthlyInvoice = () => {
                           <div className="mi-dropdown-content-item w-[25%]">
                             <div className="mi-dropdown-label">VIEW</div>
                             <div className="mi-dropdown-value">
-                              <button onClick={openViewModal}>
+                              <button onClick={()=>openModal("view-monthly-invoice")}>
                                 <img
                                   src={invoice.view}
                                   alt="View"
@@ -289,14 +271,18 @@ const MonthlyInvoice = () => {
           </tbody>
         </table>
       </div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 mi-pagination-container">
-        <span className="mi-collection-list-pagination mi-pagination-text">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
+
+      {/* Pagination Section */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
+        <span className="collection-list-pagination">
+          Showing{" "}
+          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+          {filteredData.length} entries
         </span>
-        <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto mi-pagination-buttons">
+        <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer mi-pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
@@ -304,7 +290,7 @@ const MonthlyInvoice = () => {
           </button>
           {startPage > 1 && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 mi-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(1)}
             >
               1
@@ -314,7 +300,7 @@ const MonthlyInvoice = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 mi-page-no-btns ${
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
                 currentPage === startPage + i
                   ? "bg-[#1458A2] text-white"
                   : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
@@ -324,17 +310,19 @@ const MonthlyInvoice = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
+          {endPage < totalPages - 1 && (
+            <span className="px-2 flex items-center">...</span>
+          )}
           {endPage < totalPages && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 mi-page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               onClick={() => setCurrentPage(totalPages)}
             >
               {totalPages}
             </button>
           )}
           <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer mi-pagination-btn"
+            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(currentPage + 1)}
           >
@@ -342,8 +330,6 @@ const MonthlyInvoice = () => {
           </button>
         </div>
       </div>
-      <AddMonthlyInvoiceModal isOpen={isOpenAddModal} onClose={closeAddModal} />
-      <ViewMonthlyInvoiceModal isOpen={isViewModalOpen} onClose={closeViewModal} />
     </div>
   );
 };

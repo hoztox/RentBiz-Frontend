@@ -70,7 +70,7 @@ const mobileRouteTitles = {
   "/admin/upcoming-collection": "Upcoming Collection Report",
   "/admin/collection-report": "Collection Report",
   "/admin/income-expense-report": "Income-Expense Report",
-  default: "Admin"
+  default: "Admin",
 };
 
 const modalTitles = {
@@ -81,8 +81,8 @@ const modalTitles = {
   "tenancy-view": "Tenancy View",
   "create-unit-type-master": "Create New Unit Type Master",
   "update-unit-type-master": "Update Unit Type Master",
-  "create-id-type-master":"Create New ID Type Master",
-  "update-id-type-master":"Update ID Type Master",
+  "create-id-type-master": "Create New ID Type Master",
+  "update-id-type-master": "Update ID Type Master",
   "create-charge-code-type": "Create New Charge Code Master",
   "update-charge-code-type": "Update Charge Code Master",
   "create-charges-master": "Create New Charges Master",
@@ -94,21 +94,20 @@ const modalTitles = {
   "create-additional-charges": "Create New Additional Charges",
   "update-additional-charges": "Update Additional Charges",
   "create-invoice": "Create New Invoice",
-  "view-invoice": "Invoice View"
-}
+  "view-invoice": "Invoice View",
+  "create-monthly-invoice": "Create New Monthly Invoice",
+  "view-monthly-invoice": "Monthly Invoice View",
+};
 
 const AdminNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("English");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  // const [isUserModalOpen, setIsUserModalOpen] = useState(false);
-  // const [isCreateTenantModalOpen, setIsCreateTenantModalOpen] = useState(false);
-  // const [isTenancyModalOpen, setIsTenancyModalOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState("");
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-  const { modalState, closeModal} = useModal();
+  const { modalState, closeModal } = useModal();
 
   useEffect(() => {
     setCurrentPath(location.pathname);
@@ -117,7 +116,9 @@ const AdminNavbar = () => {
   const isDashboard = currentPath === "/admin/dashboard";
 
   const getPageTitle = (isMobile = false) => {
-    if (isMobile && modalState.isOpen) {
+    // Prioritize modal titles when modal is open
+    if (modalState.isOpen && modalState.type) {
+      console.log("Rendering modal title:", modalTitles[modalState.type]);
       return modalTitles[modalState.type] || mobileRouteTitles.default;
     }
 
@@ -126,13 +127,6 @@ const AdminNavbar = () => {
 
     // Check for exact route match
     if (titles[path]) return titles[path];
-
-      // Handle nested routes (optional, uncomment if needed)
-    // if (path.startsWith("/admin/buildings")) return titles["/admin/buildings"];
-    // if (path.startsWith("/admin/units")) return titles["/admin/units"];
-    // if (path.startsWith("/admin/tenants")) return titles["/admin/tenants"];
-    // if (path.startsWith("/admin/tenancy")) return titles["/admin/tenancy-master"];
-    // if (path.startsWith("/admin/masters")) return titles["/admin/masters-unit-type"];
 
     // Fallback for unknown routes
     return titles.default || "Admin";
@@ -151,7 +145,7 @@ const AdminNavbar = () => {
     if (savedPath && !currentPath) {
       setCurrentPath(savedPath);
     }
-  });
+  }, []);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -166,31 +160,6 @@ const AdminNavbar = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  // const openUserModal = () => {
-  //   setIsUserModalOpen(true);
-  // };
-
-  // const closeUserModal = () => {
-  //   setIsUserModalOpen(false);
-  // };
-
-  // const openCreateTenantModal = () => {
-  //   setIsCreateTenantModalOpen(true);
-  // };
-
-  // const closeCreateTenentModal = () => {
-  //   setIsCreateTenantModalOpen(false);
-  // };
-
-  // const openTenancyModal = () => {
-  //   setIsTenancyModalOpen(true);
-  // };
-
-  // const closeTenancyModal = () => {
-  //   setIsTenancyModalOpen(false);
-  // };
-
-  
   const handleBackClick = () => {
     if (modalState.isOpen) {
       closeModal();
@@ -214,6 +183,15 @@ const AdminNavbar = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Debug modal state and rendering
+  useEffect(() => {
+    console.log("Modal State:", modalState);
+    console.log("Current Path:", currentPath);
+    console.log("Rendering:", modalState.isOpen ? "Back Arrow" : isDashboard ? "Logo" : "Back Arrow");
+    console.log("Desktop Title:", getPageTitle(false));
+    console.log("Mobile Title:", getPageTitle(true));
+  }, [modalState.isOpen, modalState.type, currentPath]);
 
   return (
     <>
@@ -244,9 +222,11 @@ const AdminNavbar = () => {
             )}
           </div>
 
-          {/* Center Section: Page Title (non-dashboard pages or modals in mobile) */}
+          {/* Center Section: Page Title (mobile view) */}
           {(modalState.isOpen || !isDashboard) && (
-            <h1 className="mobile-page-title">{getPageTitle(true)}</h1>
+            <h1 className="mobile-page-title" aria-live="polite">
+              {getPageTitle(true)}
+            </h1>
           )}
 
           {/* Desktop Page Title */}

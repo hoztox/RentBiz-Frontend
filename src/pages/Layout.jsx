@@ -23,6 +23,8 @@ import AddChargesModal from "./Additional Charges/AddChargesModal/AddChargesModa
 import UpdateAdditionalCharges from "./Additional Charges/UpdateChargesModal/UpdateAdditionalCharges";
 import AddInvoiceModal from "./Invoice/AddInvoiceModal/AddInvoiceModal";
 import ViewInvoiceModal from "./Invoice/ViewInvoiceModal/ViewInvoiceModal";
+import AddMonthlyInvoiceModal from "./Monthly Invoice/AddMonthlyInvoiceModal/AddMonthlyInvoiceModal";
+import ViewMonthlyInvoiceModal from "./Monthly Invoice/ViewMonthlyInvoiceModal/ViewMonthlyInvoiceModal";
 
 const Layout = () => {
   const { modalState } = useModal();
@@ -58,6 +60,8 @@ const Layout = () => {
       {modalState.isOpen && modalState.type === "update-additional-charges" && <UpdateAdditionalCharges />}
       {modalState.isOpen && modalState.type === "create-invoice" && <AddInvoiceModal />}
       {modalState.isOpen && modalState.type === "view-invoice" && <ViewInvoiceModal />}
+      {modalState.isOpen && modalState.type === "create-monthly-invoice" && <AddMonthlyInvoiceModal />}
+      {modalState.isOpen && modalState.type === "view-monthly-invoice" && <ViewMonthlyInvoiceModal />}
     </div>
   );
 };

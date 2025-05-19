@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "./AddMonthlyInvoiceModal.css";
 import { ChevronDown } from "lucide-react";
-import calendaricon from "../../../assets/Images/Monthly Invoice/calendar-icon.svg";
+// import calendaricon from "../../../assets/Images/Monthly Invoice/calendar-icon.svg";
 import closeicon from "../../../assets/Images/Monthly Invoice/close-icon.svg";
+import { useModal } from "../../../context/ModalContext";
 
-const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
+const AddMonthlyInvoiceModal = () => {
+  const { modalState, closeModal} = useModal();
   const [formData, setFormData] = useState({
     dueDate: "",
     invoiceDate: "",
@@ -30,7 +32,7 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
   });
 
   useEffect(() => {
-    if (isOpen) {
+    if (modalState.isOpen) {
       setFormData({
         dueDate: "",
         invoiceDate: "",
@@ -48,7 +50,7 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
         ],
       });
     }
-  }, [isOpen]);
+  }, [modalState.isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -75,10 +77,14 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
   };
 
   const handleSave = () => {
-    onClose();
+    console.log("Monthly Invoice Data: ", formData)
+    closeModal();
   };
 
-  if (!isOpen) return null;
+  // Only render for "create-monthly-invoice" type
+  if (!modalState.isOpen || modalState.type !== "create-monthly-invoice") {
+    return null;
+  }
 
   return (
     <div className="modal-overlay">
@@ -88,7 +94,7 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
             Create New Monthly Invoice
           </h2>
           <button
-            onClick={onClose}
+            onClick={closeModal}
             className="monthly-invoice-modal-close-btn hover:bg-gray-100 duration-200"
           >
             <img src={closeicon} alt="close" className="w-[15px] h-[15px]" />
@@ -105,7 +111,7 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
                 placeholder="dd/mm/yyyy"
                 value={formData.dueDate}
                 onChange={handleChange}
-                className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 monthly-invoice-modal-input"
+                className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 text-gray-400 monthly-invoice-modal-input"
               />
               <div className="absolute inset-y-0 right-1 flex items-center pr-3 pointer-events-none">
                 {/* <img src={calendaricon} alt="Calendar" className="w-5 h-5" /> */}
@@ -124,7 +130,7 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
                 placeholder="mm/dd/yyyy"
                 value={formData.invoiceDate}
                 onChange={handleChange}
-                className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 monthly-invoice-modal-input appearance-none"
+                className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 text-gray-400 monthly-invoice-modal-input appearance-none"
               />
               <div className="absolute inset-y-0 right-1 flex items-center pr-3 pointer-events-none">
                 {/* <img src={calendaricon} alt="Calendar" className="w-5 h-5" /> */}
@@ -234,19 +240,19 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
                     </td>
                     <td className="px-[10px] py-[5px] w-[136px] relative">
                       <input
-                        type="text"
+                        type="date"
                         placeholder="mm/dd/yyyy"
                         value={item.date}
                         onChange={(e) =>
                           handleItemChange(index, "date", e.target.value)
                         }
-                        className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 monthly-invoice-modal-table-input"
+                        className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 !text-gray-400 monthly-invoice-modal-table-input"
                       />
-                      <img
+                      {/* <img
                         src={calendaricon}
                         alt="Calendar"
                         className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                      />
+                      /> */}
                     </td>
                     <td className="px-[10px] py-[5px] w-[118px]">
                       <input
@@ -387,19 +393,19 @@ const AddMonthlyInvoiceModal = ({ isOpen, onClose }) => {
                 <div className="grid grid-cols-2 border-b border-[#E9E9E9]">
                   <div className="px-[10px] py-[10px] relative">
                     <input
-                      type="text"
+                      type="date"
                       placeholder="mm/dd/yyyy"
                       value={item.date}
                       onChange={(e) =>
                         handleItemChange(index, "date", e.target.value)
                       }
-                      className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 monthly-invoice-modal-table-input"
+                      className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 !text-gray-400 monthly-invoice-modal-table-input"
                     />
-                    <img
+                    {/* <img
                       src={calendaricon}
                       alt="Calendar"
                       className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                    />
+                    /> */}
                   </div>
                   <div className="px-[10px] py-[10px]">
                     <input
