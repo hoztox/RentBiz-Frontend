@@ -6,16 +6,12 @@ import downloadicon from "../../assets/Images/Invoice/download-icon.svg";
 import deleteicon from "../../assets/Images/Invoice/delete-icon.svg";
 import viewicon from "../../assets/Images/Invoice/view-icon.svg";
 import downarrow from "../../assets/Images/Invoice/downarrow.svg";
-import AddInvoiceModal from "./AddInvoiceModal/AddInvoiceModal";
-import ViewInvoiceModal from "./ViewInvoiceModal/ViewInvoiceModal";
 import { useModal } from "../../context/ModalContext";
 
 const Invoice = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
   const { openModal } = useModal();
   const itemsPerPage = 10;
@@ -81,22 +77,6 @@ const Invoice = () => {
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
-
-  const openAddModal = () => {
-    setIsAddModalOpen(true);
-  };
-
-  const closeAddModal = () => {
-    setIsAddModalOpen(false);
-  };
-
-  const openViewModal = () => {
-    setIsViewModalOpen(true);
-  };
-
-  const closeViewModal = () => {
-    setIsViewModalOpen(false);
-  };
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -350,8 +330,6 @@ const Invoice = () => {
           </button>
         </div>
       </div>
-      <AddInvoiceModal isOpen={isAddModalOpen} onClose={closeAddModal} />
-      <ViewInvoiceModal isOpen={isViewModalOpen} onClose={closeViewModal} />
     </div>
   );
 };
