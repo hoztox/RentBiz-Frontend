@@ -245,11 +245,8 @@ const BuildingInfoForm = ({ onNext }) => {
       </div>
 
       {/* Submit Button */}
-      <div className="mt-6 text-right">
-        <button
-          type="submit"
-          className="w-[150px] h-[38px] next-btn duration-300"
-        >
+      <div className="next-btn-container mt-6 text-right">
+        <button type="submit" className="next-btn duration-300">
           Next
         </button>
       </div>

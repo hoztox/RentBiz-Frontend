@@ -1,0 +1,57 @@
+/* HorizontalFormTimeline.css */
+
+.mobile-timeline-card {
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.mobile-timeline-card.active {
+  border-color: #3b82f6;
+}
+
+.mobile-timeline-card.completed {
+  background-color: #f9fafb;
+}
+
+.step-number {
+  transition: all 0.3s ease;
+}
+
+.step-number.active {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.step-number.completed {
+  background-color: #e5e7eb;
+}
+
+.start-button {
+  transition: all 0.2s ease;
+}
+
+.start-button:hover {
+  background-color: #2563eb;
+}
+
+/* Building illustration animation */
+.building-line {
+  animation: grow 1.5s ease-out forwards;
+  transform-origin: bottom;
+}
+
+@keyframes grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 360px) {
+  .step-description {
+    font-size: 0.7rem;
+  }
+}

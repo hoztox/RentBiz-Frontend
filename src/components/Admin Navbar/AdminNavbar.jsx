@@ -67,6 +67,9 @@ const mobileRouteTitles = {
   "/admin/upcoming-collection": "Upcoming Collection Report",
   "/admin/collection-report": "Collection Report",
   "/admin/income-expense-report": "Income-Expense Report",
+  "/admin/create-building": "Create New Building",
+  "/admin/upload-documents": "Upload Documents",
+  "/admin/submitted": "Submitted",
   default: "Admin",
 };
 

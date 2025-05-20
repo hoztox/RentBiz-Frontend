@@ -136,7 +136,7 @@ const BuildingInfoForm = ({ onNext }) => {
         </div>
 
         {/* Submit Button */}
-        <div className="mt-[29px] col-span-1 text-right">
+        <div className="next-btn-container mt-[29px] col-span-1 text-right">
           <button
             type="submit"
             className="w-[150px] h-[38px] next-btn duration-300"

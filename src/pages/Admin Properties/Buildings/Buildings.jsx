@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./buildings.css";
 import { ChevronDown } from "lucide-react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import plusicon from "../../../assets/Images/Admin Buildings/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Buildings/download-icon.svg";
 import editicon from "../../../assets/Images/Admin Buildings/edit-icon.svg";
@@ -18,8 +19,18 @@ const Buildings = () => {
   const [expandedRows, setExpandedRows] = useState({});
   const itemsPerPage = 10;
 
+  const navigate = useNavigate(); // Initialize useNavigate hook
+
+  // Function to check if the screen width is below 480px
+  const isMobileView = () => window.innerWidth < 480;
+
   const openBuildingModal = () => {
-    setBuildingModalOpen(true);
+    // Check if in mobile view (screen width < 480px)
+    if (isMobileView()) {
+      navigate("/admin/building-timeline"); // Navigate to building-timeline route
+    } else {
+      setBuildingModalOpen(true); // Open modal for desktop view
+    }
   };
 
   const openEditBuildingModal = () => {
@@ -93,10 +104,10 @@ const Buildings = () => {
       building.status.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalPages = Math.ceil(filteredData.length / 10);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const paginatedData = filteredData.slice(
-    (currentPage - 1) * 10,
-    currentPage * 10
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   const maxPageButtons = 5;
@@ -128,9 +139,6 @@ const Buildings = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                // className={`absolute md:right-2 right-4 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
-                //   }`}
-
                 className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
                   isSelectOpen ? "rotate-180" : "rotate-0"
                 }`}
@@ -308,7 +316,7 @@ const Buildings = () => {
                           <div className="bldg-grid-item bldg-action-column w-[20%]">
                             <div className="bldg-dropdown-label">ACTION</div>
                             <div className="bldg-dropdown-value bldg-flex bldg-items-center bldg-gap-2">
-                              <button>
+                              <button onClick={openEditBuildingModal}>
                                 <img
                                   src={editicon}
                                   alt="Edit"

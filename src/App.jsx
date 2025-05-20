@@ -31,6 +31,10 @@ import ReportCollection from "./pages/ReportCollection/ReportCollection";
 import IncomeExpenseReport from "./pages/IncomeExpenseReport/IncomeExpenseReport";
 import ChargeCodeType from "./pages/Admin Masters/Charge Code Type/ChargeCodeType";
 import { ModalProvider } from "./context/ModalContext";
+import HorizontalFormTimeline from "./pages/Admin Properties/Buildings/Add Building Modal/HorizontalFormTimeline";
+import ResponsiveBuildingInfoForm from "./pages/Admin Properties/Buildings/Add Building Modal/Create Building/ResponsiveBuildingInfoForm";
+import ResponsiveDocumentForm from "./pages/Admin Properties/Buildings/Add Building Modal/Upload Documents/ResponsiveDocumentForm";
+import SubmissionConfirmationResponsive from "./pages/Admin Properties/Buildings/Add Building Modal/Submit/SubmissionConfirmationResponsive";
 
 const App = () => {
   return (
@@ -72,6 +76,10 @@ const App = () => {
             path="income-expense-report"
             element={<IncomeExpenseReport />}
           />
+          <Route path="building-timeline" element={<HorizontalFormTimeline />} />
+          <Route path="create-building" element={<ResponsiveBuildingInfoForm />} />
+          <Route path="upload-documents" element={<ResponsiveDocumentForm />} />
+          <Route path="submitted" element={<SubmissionConfirmationResponsive />} />
         </Route>
       </Routes>
     </BrowserRouter>
