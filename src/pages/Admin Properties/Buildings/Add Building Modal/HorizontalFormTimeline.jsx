@@ -118,7 +118,7 @@ const HorizontalFormTimeline = () => {
                   }`}
                 >
                   {completedSteps.includes(step.id) ? (
-                    <img src={tickIcon} alt="Tick" className="w-4 h-4" />
+                    <img src={tickIcon} alt="Tick" className="w-4 h-3" />
                   ) : (
                     step.id
                   )}
