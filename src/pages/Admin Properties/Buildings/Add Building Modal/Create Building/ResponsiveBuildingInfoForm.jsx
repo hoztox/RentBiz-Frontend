@@ -230,7 +230,7 @@ const ResponsiveBuildingInfoForm = () => {
         </div>
       </div>
 
-      <div className="next-btn-container mt-6 text-right">
+      <div className="next-btn-container mt-6 text-right mb-[80px]">
         <button type="submit" className="next-btn duration-300">
           Next
         </button>
