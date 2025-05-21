@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import "./submissionConfirmation.css";
+import "./submissionconfirmation.css";
 import success from "../../../../../assets/Images/Admin Buildings/success.png";
 import successtick from "../../../../../assets/Images/Admin Buildings/success_tick.png";
 import { useNavigate } from "react-router-dom";

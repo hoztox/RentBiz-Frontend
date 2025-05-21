@@ -10,7 +10,7 @@ const SubmissionConfirmationResponsive = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       navigate("/admin/building-timeline");
-    }, 5000); // 5000ms = 5 seconds
+    }, 3000); // 3000ms = 3 seconds
 
     return () => clearTimeout(timer); // Cleanup timer on component unmount
   }, [navigate]);
