@@ -67,6 +67,7 @@ const mobileRouteTitles = {
   "/admin/upcoming-collection": "Upcoming Collection Report",
   "/admin/collection-report": "Collection Report",
   "/admin/income-expense-report": "Income-Expense Report",
+  "/admin/building-timeline": "",
   "/admin/create-building": "Create New Building",
   "/admin/upload-documents": "Upload Documents",
   "/admin/submitted": "Submitted",
@@ -121,21 +122,23 @@ const AdminNavbar = () => {
 
   const isDashboard = currentPath === "/admin/dashboard";
 
-  const getPageTitle = (isMobile = false) => {
-    // Prioritize modal titles when modal is open
-    if (modalState.isOpen && modalState.type) {
-      return modalTitles[modalState.type] || mobileRouteTitles.default;
-    }
+const getPageTitle = (isMobile = false) => {
+  // Prioritize modal titles when modal is open
+  if (modalState.isOpen && modalState.type) {
+    return modalTitles[modalState.type] || mobileRouteTitles.default;
+  }
 
-    const path = currentPath;
-    const titles = isMobile ? mobileRouteTitles : routeTitles;
+  const path = currentPath;
+  const titles = isMobile ? mobileRouteTitles : routeTitles;
 
-    // Check for exact route match
-    if (titles[path]) return titles[path];
+  // Check for exact route match and allow empty string to be returned
+  if (path in titles) {
+    return titles[path] !== undefined ? titles[path] : "";
+  }
 
-    // Fallback for unknown routes
-    return titles.default || "Admin";
-  };
+  // Fallback for unknown routes
+  return titles.default || "Admin";
+};
 
   // Store current path in localstorage when it changes
   useEffect(() => {

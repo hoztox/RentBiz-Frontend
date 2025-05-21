@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
-import './buildinginfoform.css'
+import React, { useState } from "react";
+import "./buildinginfoform.css";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const ResponsiveBuildingInfoForm = () => {
-    const [formState, setFormState] = useState({
+  const [formState, setFormState] = useState({
     buildingNo: "",
     plotNo: "",
     buildingName: "",
@@ -42,10 +42,17 @@ const ResponsiveBuildingInfoForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Form submitted:", formState);
-    navigate("/admin/building-timeline")
+    // Save completion state and active card in localStorage
+    localStorage.setItem("completedSteps", JSON.stringify([1])); // Mark "Create Building" (id: 1) as completed
+    localStorage.setItem("activeCard", "2"); // Set "Upload Documents" (id: 2) as active
+    navigate("/admin/building-timeline");
   };
+
   return (
-    <form onSubmit={handleSubmit} className="flex-1 building-info-form-container">
+    <form
+      onSubmit={handleSubmit}
+      className="flex-1 building-info-form-container"
+    >
       <div className="grid grid-cols-1 gap-5">
         <div className="col-span-1">
           <label className="block building-info-form-label">Building No*</label>
@@ -72,7 +79,9 @@ const ResponsiveBuildingInfoForm = () => {
         </div>
 
         <div className="col-span-1">
-          <label className="block building-info-form-label">Building Name*</label>
+          <label className="block building-info-form-label">
+            Building Name*
+          </label>
           <input
             type="text"
             name="buildingName"
@@ -203,7 +212,9 @@ const ResponsiveBuildingInfoForm = () => {
         </div>
 
         <div className="col-span-1">
-          <label className="block building-info-form-label">Near By Landmark</label>
+          <label className="block building-info-form-label">
+            Near By Landmark
+          </label>
           <input
             type="text"
             name="nearByLandmark"
@@ -215,15 +226,12 @@ const ResponsiveBuildingInfoForm = () => {
       </div>
 
       <div className="next-btn-container mt-6 text-right">
-        <button
-          type="submit"
-          className="next-btn duration-300"
-        >
+        <button type="submit" className="next-btn duration-300">
           Next
         </button>
       </div>
     </form>
-  )
-}
+  );
+};
 
-export default ResponsiveBuildingInfoForm
+export default ResponsiveBuildingInfoForm;

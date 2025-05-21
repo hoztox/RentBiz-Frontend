@@ -35,6 +35,7 @@ import HorizontalFormTimeline from "./pages/Admin Properties/Buildings/Add Build
 import ResponsiveBuildingInfoForm from "./pages/Admin Properties/Buildings/Add Building Modal/Create Building/ResponsiveBuildingInfoForm";
 import ResponsiveDocumentForm from "./pages/Admin Properties/Buildings/Add Building Modal/Upload Documents/ResponsiveDocumentForm";
 import SubmissionConfirmationResponsive from "./pages/Admin Properties/Buildings/Add Building Modal/Submit/SubmissionConfirmationResponsive";
+import BuildingsReset from "./pages/Admin Properties/Buildings/Add Building Modal/BuildingsReset";
 
 const App = () => {
   return (
@@ -80,6 +81,7 @@ const App = () => {
           <Route path="create-building" element={<ResponsiveBuildingInfoForm />} />
           <Route path="upload-documents" element={<ResponsiveDocumentForm />} />
           <Route path="submitted" element={<SubmissionConfirmationResponsive />} />
+          <Route path="buildings-reset" element={<BuildingsReset />} />
         </Route>
       </Routes>
     </BrowserRouter>

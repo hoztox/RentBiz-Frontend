@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ChevronDown, Calendar, Paperclip, Eye, X } from "lucide-react";
 import DocumentUploadModal from "./DocumentUploadModal/DocumentUploadModal";
 import "./documentform.css";
+import { useNavigate } from "react-router-dom";
 
 const ResponsiveDocumentForm = () => {
   const [documents, setDocuments] = useState([
@@ -15,6 +16,7 @@ const ResponsiveDocumentForm = () => {
     },
   ]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -50,6 +52,12 @@ const ResponsiveDocumentForm = () => {
   const handleConfirmModal = () => {
     setIsModalOpen(false);
     console.log("Form submitted with documents:", documents);
+    // Update completedSteps to include "Upload Documents" (id: 2) and "Submitted" (id: 3)
+    const currentCompletedSteps = JSON.parse(localStorage.getItem('completedSteps')) || [];
+    const updatedCompletedSteps = [...new Set([...currentCompletedSteps, 2, 3])]; // Add ids 2 and 3
+    localStorage.setItem('completedSteps', JSON.stringify(updatedCompletedSteps));
+    localStorage.setItem('activeCard', 'null'); // No active card after submission
+    navigate("/admin/submitted"); // Navigate to SubmissionConfirmationResponsive
   };
 
   // Map documents to the format expected by DocumentUploadModal
