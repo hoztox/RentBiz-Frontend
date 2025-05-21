@@ -260,6 +260,7 @@ const ResponsiveDocumentForm = () => {
               <button
                 type="button"
                 className="text-[#201D1E] bg-white hover:bg-[#201D1E] hover:text-white back-button duration-200"
+                onClick={()=> navigate("/admin/building-timeline")}
               >
                 Back
               </button>
