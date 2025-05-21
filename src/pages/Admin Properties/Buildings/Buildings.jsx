@@ -34,7 +34,11 @@ const Buildings = () => {
   };
 
   const openEditBuildingModal = () => {
-    setEditBuildingModalOpen(true);
+      if (isMobileView()) {
+      navigate("/admin/update-building-timeline"); 
+    } else {
+      setBuildingModalOpen(true); // Open modal for desktop view
+    }
   };
 
   const closeBuildingModal = () => {

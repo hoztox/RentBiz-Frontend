@@ -36,6 +36,10 @@ import ResponsiveBuildingInfoForm from "./pages/Admin Properties/Buildings/Add B
 import ResponsiveDocumentForm from "./pages/Admin Properties/Buildings/Add Building Modal/Upload Documents/ResponsiveDocumentForm";
 import SubmissionConfirmationResponsive from "./pages/Admin Properties/Buildings/Add Building Modal/Submit/SubmissionConfirmationResponsive";
 import BuildingsReset from "./pages/Admin Properties/Buildings/Add Building Modal/BuildingsReset";
+import UpdateHorizontalFormTimeline from "./pages/Admin Properties/Buildings/EditBuildingModal/UpdateHorizontalFormTimeline";
+import ResponsiveUpdateBuildingInfoForm from "./pages/Admin Properties/Buildings/EditBuildingModal/UpdateBuilding/ResponsiveUpdateBuildingInfoForm";
+import ResponsiveUpdateDocumentForm from "./pages/Admin Properties/Buildings/EditBuildingModal/Upload Documents/ResponsiveUpdateDocumentForm";
+import UpdateSubmissionConfirmResponsive from "./pages/Admin Properties/Buildings/EditBuildingModal/Submit/UpdateSubmissionConfirmResponsive";
 
 const App = () => {
   return (
@@ -82,6 +86,10 @@ const App = () => {
           <Route path="upload-documents" element={<ResponsiveDocumentForm />} />
           <Route path="submitted" element={<SubmissionConfirmationResponsive />} />
           <Route path="buildings-reset" element={<BuildingsReset />} />
+          <Route path="update-building-timeline" element={<UpdateHorizontalFormTimeline />} />
+          <Route path="update-building" element={<ResponsiveUpdateBuildingInfoForm />} />
+          <Route path="update-building-upload-documents" element={<ResponsiveUpdateDocumentForm />} />
+          <Route path="update-building-submitted" element={<UpdateSubmissionConfirmResponsive />} />
         </Route>
       </Routes>
     </BrowserRouter>
