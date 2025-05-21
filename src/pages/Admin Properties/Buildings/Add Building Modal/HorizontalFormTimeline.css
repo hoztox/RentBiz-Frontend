@@ -26,6 +26,7 @@
 
 .timeline-card.completed {
   border: 1.5px solid #23bf8d;
+  background-color: #E6F9F2;
 }
 
 .timeline-card:not(.active):not(.completed) {
@@ -77,7 +78,11 @@
 }
 
 .timeline-title.completed {
-  color: #23bf8d;
+  color: #138F67;
+}
+
+.timeline-description.completed {
+  color: #138F67;
 }
 
 .completed-text {

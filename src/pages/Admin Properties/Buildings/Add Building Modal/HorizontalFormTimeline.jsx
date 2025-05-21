@@ -147,7 +147,13 @@ const HorizontalFormTimeline = () => {
                       </button>
                     ) : null}
                   </div>
-                  <p className="timeline-description">{step.description}</p>
+                  <p className={`timeline-description ${
+                        completedSteps.includes(step.id)
+                          ? "completed"
+                          : activeCard === step.id
+                          ? "active"
+                          : ""
+                      }`}>{step.description}</p>
                 </div>
               </div>
             </div>
