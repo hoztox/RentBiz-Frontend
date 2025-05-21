@@ -12,6 +12,13 @@
   border-radius: 6px;
 }
 
+.res-remove-btn {
+  font-family: "Inter Tight";
+  width: 31px;
+  height: 38px;
+  border-radius: 6px;
+}
+
 .back-button {
   font-family: "Inter Tight";
   border-radius: 6px;
@@ -36,6 +43,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.res-add-btn {
+  font-family: "Inter Tight";
+  border-radius: 6px;
+  border: 1px solid #201d1e;
 }
 
 .documents-inputs {
@@ -69,6 +82,10 @@
 }
 
 .add-button:hover .add-icon {
+  filter: brightness(0) saturate(100%) invert(78%) sepia(100%) saturate(0%) hue-rotate(201deg) brightness(108%) contrast(103%);
+}
+
+.res-add-btn:hover .add-icon {
   filter: brightness(0) saturate(100%) invert(78%) sepia(100%) saturate(0%) hue-rotate(201deg) brightness(108%) contrast(103%);
 }
 
