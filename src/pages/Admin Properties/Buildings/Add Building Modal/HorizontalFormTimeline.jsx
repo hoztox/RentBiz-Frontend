@@ -95,7 +95,7 @@ const HorizontalFormTimeline = () => {
         </div>
 
         {/* Steps cards */}
-        <div className="space-y-4 bg-[#EEF6FD] p-5 rounded-[6px] mb-[10px]">
+        <div className="space-y-4 bg-[#EEF6FD] p-5 rounded-[6px] mb-[80px]">
           {steps.map((step) => (
             <div
               key={step.id}
