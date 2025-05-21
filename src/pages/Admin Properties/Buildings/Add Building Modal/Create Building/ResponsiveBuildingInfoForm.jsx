@@ -61,6 +61,7 @@ const ResponsiveBuildingInfoForm = () => {
             name="buildingNo"
             value={formState.buildingNo}
             onChange={handleInputChange}
+            placeholder="1"
             className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
             required
           />
@@ -73,6 +74,7 @@ const ResponsiveBuildingInfoForm = () => {
             name="plotNo"
             value={formState.plotNo}
             onChange={handleInputChange}
+            placeholder="1"
             className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
             required
           />
@@ -87,6 +89,7 @@ const ResponsiveBuildingInfoForm = () => {
             name="buildingName"
             value={formState.buildingName}
             onChange={handleInputChange}
+            placeholder="Lorem ipsum dolor"
             className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
             required
           />
@@ -98,6 +101,7 @@ const ResponsiveBuildingInfoForm = () => {
             name="address"
             value={formState.address}
             onChange={handleInputChange}
+            placeholder="Boulevard Downtown Dubai, PO Box 111969 Dubai, UAE"
             className="w-full building-info-form-inputs resize-none focus:border-gray-300 duration-200"
             required
           />
@@ -109,20 +113,46 @@ const ResponsiveBuildingInfoForm = () => {
             name="description"
             value={formState.description}
             onChange={handleInputChange}
-            rows="2"
+            placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit.  Morbi orci ante, scelerisque"
             className="w-full building-info-form-inputs resize-none focus:border-gray-300 duration-200"
           />
         </div>
 
         <div className="col-span-1">
           <label className="block building-info-form-label">Remarks</label>
-          <textarea
+          <input
             name="remarks"
             value={formState.remarks}
             onChange={handleInputChange}
-            rows="2"
+            placeholder="Lorem ipsum dolor"
             className="w-full building-info-form-inputs resize-none focus:border-gray-300 duration-200"
           />
+        </div>
+
+        <div className="col-span-1">
+          <label className="block building-info-form-label">Status*</label>
+          <div className="relative">
+            <select
+              name="status"
+              value={formState.status}
+              onChange={handleInputChange}
+              onFocus={() => setIsSelectFocused(true)}
+              onBlur={() => setIsSelectFocused(false)}
+              className="w-full appearance-none building-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer"
+              required
+            >
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+              <option value="Pending">Pending</option>
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <ChevronDown
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
+                  isSelectFocused ? "rotate-180" : ""
+                }`}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="col-span-1">
@@ -186,32 +216,6 @@ const ResponsiveBuildingInfoForm = () => {
         </div>
 
         <div className="col-span-1">
-          <label className="block building-info-form-label">Status*</label>
-          <div className="relative">
-            <select
-              name="status"
-              value={formState.status}
-              onChange={handleInputChange}
-              onFocus={() => setIsSelectFocused(true)}
-              onBlur={() => setIsSelectFocused(false)}
-              className="w-full appearance-none building-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer"
-              required
-            >
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-              <option value="Pending">Pending</option>
-            </select>
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-              <ChevronDown
-                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
-                  isSelectFocused ? "rotate-180" : ""
-                }`}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="col-span-1">
           <label className="block building-info-form-label">
             Near By Landmark
           </label>
@@ -220,6 +224,7 @@ const ResponsiveBuildingInfoForm = () => {
             name="nearByLandmark"
             value={formState.nearByLandmark}
             onChange={handleInputChange}
+            placeholder="Lorem ipsum dolor"
             className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
           />
         </div>
