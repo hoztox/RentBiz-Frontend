@@ -29,7 +29,7 @@ const UpdateFormtimelineResponsive = () => {
     );
   }, [completedSteps, activeCard]);
 
-  // Update activeCard to the next incomplete step when completedSteps changes
+  // Update activeCard to the next incomplete step when   completedSteps changes
   useEffect(() => {
     const nextStep = [1, 2, 3, 4].find((id) => !completedSteps.includes(id));
     setActiveCard(nextStep || null);
