@@ -52,7 +52,7 @@ import ResponsiveTenantInfoForm from "./pages/Admin Tenants/CreateTenantModal/Cr
 import TenantDocumentFormResponsive from "./pages/Admin Tenants/CreateTenantModal/UploadDocuments/TenantDocumentFormResponsive";
 import TenantSubmitConfirmResponsive from "./pages/Admin Tenants/CreateTenantModal/Submit/TenantSubmitConfirmResponsive";
 import TenantsReset from "./pages/Admin Tenants/CreateTenantModal/TenantsReset";
-import UpdateFormTimelineResponsive from "./pages/Admin Properties/Units/Edit Unit Modal/UpdateFormtimelineResponsive";
+import UpdateFormtimelineResponsive from "./pages/Admin Properties/Units/Edit Unit Modal/UpdateFormtimelineResponsive";
 import UpdateUnitBuildingInfoResponsive from "./pages/Admin Properties/Units/Edit Unit Modal/Select Building/UpdateUnitBuildingInfoResponsive";
 import UpdateUnitInfoFormResponsive from "./pages/Admin Properties/Units/Edit Unit Modal/Update Unit/UpdateUnitInfoFormResponsive";
 import UpdateUnitDocumentFormResponsive from "./pages/Admin Properties/Units/Edit Unit Modal/Upload Documents/UpdateUnitDocumentFormResponsive";
@@ -118,7 +118,7 @@ const App = () => {
           <Route path="unit-submitted" element={<UnitSubmitPageResponsive />} />
           <Route path="unit-reset" element={<UnitsResets />} />
 
-          <Route path="update-unit-timeline" element={<UpdateFormTimelineResponsive />} />
+          <Route path="update-unit-timeline" element={<UpdateFormtimelineResponsive />} />
           <Route path="update-select-building-form" element={<UpdateUnitBuildingInfoResponsive />} />
           <Route path="update-unit" element={<UpdateUnitInfoFormResponsive />} />
           <Route path="update-unit-upload-documents" element={<UpdateUnitDocumentFormResponsive />} />
