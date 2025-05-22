@@ -41,12 +41,16 @@ const ResponsiveUpdateBuildingInfoForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formState);
+    console.log("Update Form submitted:", formState);
     // Save completion state and active card in localStorage
-    localStorage.setItem("completedSteps", JSON.stringify([1])); // Mark "Create Building" (id: 1) as completed
-    localStorage.setItem("activeCard", "2"); // Set "Upload Documents" (id: 2) as active
+    const completedSteps = [1]; // Mark "Update Building" (id: 1) as completed
+    console.log("Setting update_building_completedSteps:", completedSteps);
+    console.log("Setting update_building_activeCard: 2");
+    localStorage.setItem("update_building_completedSteps", JSON.stringify(completedSteps));
+    localStorage.setItem("update_building_activeCard", "2"); // Set "Upload Documents" (id: 2) as active
     navigate("/admin/update-building-timeline");
   };
+  
   return (
     <form
       onSubmit={handleSubmit}

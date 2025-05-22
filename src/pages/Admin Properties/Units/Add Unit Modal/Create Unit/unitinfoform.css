@@ -1,3 +1,10 @@
+.unit-info-form-container {
+  width: 100%;
+  max-width: 100vw;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
 .unit-info-form-label {
   margin-bottom: 10px;
   font-family: "Inter Tight";
@@ -8,9 +15,10 @@
   color: #201d1e;
 }
 
-.building-info-form-inputs::placeholder {
+.unit-info-form-inputs::placeholder {
   font-family: "Inter Tight";
   font-size: 15px;
+  color: #8a898b;
 }
 
 .unit-info-form-inputs {
@@ -33,6 +41,20 @@
   height: 38px;
   border-radius: 6px;
   border: 1px solid #201d1e;
+  background-color: white;
+  color: #201d1e;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-button:hover {
+  background-color: #201d1e;
+  color: white;
 }
 
 .next-btn {
@@ -45,6 +67,11 @@
   font-weight: 500;
   line-height: 18px;
   letter-spacing: 0.43px;
+  width: 150px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .next-btn:hover {
@@ -60,4 +87,60 @@ input[type="number"]::-webkit-inner-spin-button {
 
 input[type="number"] {
   -moz-appearance: textfield; /* Firefox */
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 480px) {
+  .unit-info-form-container {
+    background-color: white;
+    padding: 0px;
+  }
+
+  .grid {
+    grid-template-columns: 1 Money; /* Single column for mobile */
+  }
+
+  .unit-info-form-inputs {
+    max-width: calc(100vw - 40px); /* Account for 20px padding on each side */
+  }
+
+  .back-button,
+  .next-btn {
+    max-width: calc(100vw - 40px);
+    width: 150px;
+    height: 38px;
+  }
+
+  .next-btn-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+  }
+}
+
+/* Desktop Styles */
+@media (min-width: 768px) {
+  .unit-info-form-container {
+    max-width: 800px; /* Adjust as needed for desktop */
+    background-color: white;
+  }
+
+  .grid {
+    grid-template-columns: repeat(
+      2,
+      1fr
+    ); /* Restore 2-column grid for desktop */
+  }
+
+  .back-button,
+  .next-btn {
+    width: 150px;
+    height: 38px;
+  }
+
+  .next-btn-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+  }
 }

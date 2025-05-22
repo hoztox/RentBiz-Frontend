@@ -8,7 +8,7 @@ import viewIcon from "../../../../../assets/Images/Admin Buildings/viewfile-icon
 import closeIcon from "../../../../../assets/Images/Admin Units/close-icon-white.svg";
 import plusIcon from "../../../../../assets/Images/Admin Units/plus-icon-black.svg";
 
-const ResponsiveDocumentForm = () => {
+const UnitDocumentsFormResponsive = () => {
   const [documents, setDocuments] = useState([
     {
       id: 1,
@@ -60,18 +60,18 @@ const ResponsiveDocumentForm = () => {
   const handleConfirmModal = () => {
     setIsModalOpen(false);
     console.log("Form submitted with documents:", documents);
-    // Update building_completedSteps to include "Upload Documents" (id: 2) and "Submitted" (id: 3)
+    // Update unit_completedSteps to include "Upload Documents" (id: 3) and "Submitted" (id: 4)
     const currentCompletedSteps =
-      JSON.parse(localStorage.getItem("building_completedSteps")) || [];
+      JSON.parse(localStorage.getItem("unit_completedSteps")) || [];
     const updatedCompletedSteps = [
-      ...new Set([...currentCompletedSteps, 2, 3]),
-    ]; // Add ids 2 and 3
+      ...new Set([...currentCompletedSteps, 3, 4]),
+    ]; // Add ids 3 and 4
     localStorage.setItem(
-      "building_completedSteps",
+      "unit_completedSteps",
       JSON.stringify(updatedCompletedSteps)
     );
-    localStorage.setItem("building_activeCard", "null"); // No active card after submission
-    navigate("/admin/buildings-reset"); // Navigate to BuildingsReset
+    localStorage.setItem("unit_activeCard", "null"); // No active card after submission
+    navigate("/admin/unit-reset"); // Navigate to UnitsReset
   };
 
   // Map documents to the format expected by DocumentUploadModal
@@ -82,7 +82,7 @@ const ResponsiveDocumentForm = () => {
   }));
 
   return (
-    <div className="w-full flex flex-col h-full p-[5px] bg-white font-sans">
+    <div className="w-full flex flex-col h-full p-[5px] bg-white">
       <div className="flex-1 flex flex-col">
         <div className="flex-1 overflow-y-auto">
           {documents.map((doc) => (
@@ -168,13 +168,15 @@ const ResponsiveDocumentForm = () => {
                       </div>
                       <div className="md:col-span-3"></div>
                     </div>
-                    {/* Row 3: Upload Files & View Doc with Close Button */}
-                    <div className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-5">
-                      <div className="col-span-1 md:col-span-1">
-                        <div className="relative">
-                          <label className="block documents-label">
-                            Upload Files
-                          </label>
+                    {/* Row 3: Upload Files with Close Button */}
+                    <div className="col-span-1 md:col-span-1">
+                      <label className="block documents-label mb-1">
+                        Upload Files
+                      </label>
+
+                      <div className="flex items-center space-x-2">
+                        {/* Upload input (unchanged style, now full width) */}
+                        <div className="relative flex-1">
                           <input
                             type="file"
                             className="hidden documents-inputs"
@@ -190,7 +192,7 @@ const ResponsiveDocumentForm = () => {
                           />
                           <label
                             htmlFor={`fileInput-${doc.id}`}
-                            className="flex items-center justify-between documents-inputs cursor-pointer w-[161px] !py-2"
+                            className="flex items-center justify-between documents-inputs cursor-pointer w-full !py-2"
                           >
                             <span className="text-[#4B465C60] text-sm truncate">
                               {doc.files.length > 0
@@ -204,37 +206,20 @@ const ResponsiveDocumentForm = () => {
                             />
                           </label>
                         </div>
+
+                        {/* Remove Button (unchanged style) */}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveDocument(doc.id)}
+                          className="p-2 bg-[#E44747] hover:bg-[#d43939] res-remove-btn flex justify-center items-center duration-200"
+                        >
+                          <img
+                            src={closeIcon}
+                            className="h-4 w-4"
+                            alt="remove"
+                          />
+                        </button>
                       </div>
-                      <div className="col-span-1 md:col-span-1">
-                        <label className="block documents-label mb-2">
-                          View Doc
-                        </label>
-                        <div className="flex gap-2">
-                          <div
-                            className="flex items-center justify-between flex-grow p-3 border border-gray-200 rounded-md text-gray-500 documents-inputs"
-                            style={{ width: "calc(100% - 40px)" }}
-                          >
-                            <span className="text-sm">View File</span>
-                            <img
-                              src={viewIcon}
-                              alt="view"
-                              className="ml-2 h-5 w-5 files-icon"
-                            />
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveDocument(doc.id)}
-                            className="p-2 bg-[#E44747] hover:bg-[#d43939] res-remove-btn flex justify-center items-center duration-200"
-                          >
-                            <img
-                              src={closeIcon}
-                              className="h-4 w-4"
-                              alt="remove"
-                            />
-                          </button>
-                        </div>
-                      </div>
-                      <div className="md:col-span-3"></div>
                     </div>
                   </>
                 )}
@@ -264,7 +249,7 @@ const ResponsiveDocumentForm = () => {
               <button
                 type="button"
                 className="text-[#201D1E] bg-white hover:bg-[#201D1E] hover:text-white back-button duration-200"
-                onClick={() => navigate("/admin/building-timeline")}
+                onClick={() => navigate("/admin/unit-timeline")}
               >
                 Back
               </button>
@@ -289,4 +274,4 @@ const ResponsiveDocumentForm = () => {
   );
 };
 
-export default ResponsiveDocumentForm;
+export default UnitDocumentsFormResponsive;

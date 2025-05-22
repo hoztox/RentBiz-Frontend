@@ -1,41 +1,48 @@
 import React, { useState, useEffect } from "react";
-import "./HorizontalFormTimeline.css";
-import bgimg from "../../../../assets/Images/Admin Buildings/modal-img.svg";
-import tickIcon from "../../../../assets/Images/Admin Buildings/tick-icon.svg";
+import "./HorizontalUnitFormTimeline.css";
+import bgimg from "../../../../assets/Images/Admin Units/modal-img.svg";
+import tickIcon from "../../../../assets/Images/Admin Units/tick-icon.svg";
 import { useNavigate } from "react-router-dom";
 
-const HorizontalFormTimeline = () => {
+const HorizontalUnitFormTimeline = () => {
   const navigate = useNavigate();
 
   // Initialize state from localStorage
   const [completedSteps, setCompletedSteps] = useState(
-    JSON.parse(localStorage.getItem("building_completedSteps")) || []
+    JSON.parse(localStorage.getItem("unit_completedSteps")) || []
   );
   const [activeCard, setActiveCard] = useState(
-    localStorage.getItem("building_activeCard") === "null"
+    localStorage.getItem("unit_activeCard") === "null"
       ? null
-      : parseInt(localStorage.getItem("building_activeCard")) || 1
+      : parseInt(localStorage.getItem("unit_activeCard")) || 1
   );
 
   // Update localStorage when completedSteps or activeCard changes
   useEffect(() => {
-    localStorage.setItem("building_completedSteps", JSON.stringify(completedSteps));
+    localStorage.setItem("unit_completedSteps", JSON.stringify(completedSteps));
     localStorage.setItem(
-      "building_activeCard",
+      "unit_activeCard",
       activeCard === null ? "null" : activeCard.toString()
     );
   }, [completedSteps, activeCard]);
 
+  // Update activeCard to the next incomplete step when completedSteps changes
+  useEffect(() => {
+    const nextStep = [1, 2, 3, 4].find((id) => !completedSteps.includes(id));
+    setActiveCard(nextStep || null);
+  }, [completedSteps]);
+
   // Navigate to /admin/buildings-reset after 3 seconds if all steps are completed
   useEffect(() => {
     if (
-      completedSteps.length === 3 &&
+      completedSteps.length === 4 &&
       completedSteps.includes(1) &&
       completedSteps.includes(2) &&
-      completedSteps.includes(3)
+      completedSteps.includes(3) &&
+      completedSteps.includes(4)
     ) {
       const timer = setTimeout(() => {
-        navigate("/admin/buildings-reset");
+        navigate("/admin/unit-reset");
       }, 3000); // 3 seconds
       return () => clearTimeout(timer); // Cleanup timer on unmount
     }
@@ -44,24 +51,31 @@ const HorizontalFormTimeline = () => {
   const steps = [
     {
       id: 1,
-      name: "Create Building",
+      name: "Select Building",
       description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi orci ante, scelerisque",
-      route: "/admin/create-building",
+      route: "/admin/unit-select-building-form",
     },
     {
       id: 2,
-      name: "Upload Documents",
+      name: "Create Unit",
       description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi orci ante, scelerisque",
-      route: "/admin/upload-documents",
+      route: "/admin/unit-create-unit-form",
     },
     {
       id: 3,
+      name: "Upload Documents",
+      description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi orci ante, scelerisque",
+      route: "/admin/unit-upload-documents",
+    },
+    {
+      id: 4,
       name: "Submitted",
       description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi orci ante, scelerisque",
-      route: "/submitted",
+      route: "/unit-submitted",
     },
   ];
 
@@ -147,13 +161,17 @@ const HorizontalFormTimeline = () => {
                       </button>
                     ) : null}
                   </div>
-                  <p className={`timeline-description ${
-                        completedSteps.includes(step.id)
-                          ? "completed"
-                          : activeCard === step.id
-                          ? "active"
-                          : ""
-                      }`}>{step.description}</p>
+                  <p
+                    className={`timeline-description ${
+                      completedSteps.includes(step.id)
+                        ? "completed"
+                        : activeCard === step.id
+                        ? "active"
+                        : ""
+                    }`}
+                  >
+                    {step.description}
+                  </p>
                 </div>
               </div>
             </div>
@@ -164,4 +182,4 @@ const HorizontalFormTimeline = () => {
   );
 };
 
-export default HorizontalFormTimeline;
+export default HorizontalUnitFormTimeline;

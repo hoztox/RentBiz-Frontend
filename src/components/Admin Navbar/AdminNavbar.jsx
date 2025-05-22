@@ -75,6 +75,11 @@ const mobileRouteTitles = {
   "/admin/update-building": "Update Building",
   "/admin/update-building-upload-documents": "Upload Documents",
   "/admin/update-building-submitted": "Submitted",
+  "/admin/unit-timeline": "",
+  "/admin/unit-select-building-form": "Select Building",
+  "/admin/unit-create-unit-form": "Create New Unit",
+  "/admin/unit-upload-documents": "Upload Documents",
+  "/admin/unit-submitted": "Submitted",
   default: "Admin",
 };
 

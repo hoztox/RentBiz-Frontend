@@ -43,8 +43,8 @@ const ResponsiveBuildingInfoForm = () => {
     e.preventDefault();
     console.log("Form submitted:", formState);
     // Save completion state and active card in localStorage
-    localStorage.setItem("completedSteps", JSON.stringify([1])); // Mark "Create Building" (id: 1) as completed
-    localStorage.setItem("activeCard", "2"); // Set "Upload Documents" (id: 2) as active
+    localStorage.setItem("building_completedSteps", JSON.stringify([1])); // Mark "Create Building" (id: 1) as completed
+    localStorage.setItem("building_activeCard", "2"); // Set "Upload Documents" (id: 2) as active
     navigate("/admin/building-timeline");
   };
 

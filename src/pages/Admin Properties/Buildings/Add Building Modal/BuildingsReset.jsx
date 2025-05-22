@@ -5,9 +5,9 @@ const BuildingsReset = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Clear localStorage
-    localStorage.removeItem('completedSteps');
-    localStorage.removeItem('activeCard');
+    // Clear localStorage keys for building timeline
+    localStorage.removeItem("building_completedSteps");
+    localStorage.removeItem("building_activeCard");
     // Navigate to /admin/buildings
     navigate("/admin/buildings", { replace: true });
   }, [navigate]);

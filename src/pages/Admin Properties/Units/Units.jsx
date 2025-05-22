@@ -8,6 +8,7 @@ import deletesicon from "../../../assets/Images/Admin Units/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Units/downarrow.svg";
 import AddUnitModal from "./Add Unit Modal/AddUnitModal";
 import EditUnitModal from "./Edit Unit Modal/EditUnitModal";
+import { useNavigate } from "react-router-dom";
 
 const Units = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -18,9 +19,20 @@ const Units = () => {
   const [expandedRows, setExpandedRows] = useState({});
   const itemsPerPage = 10;
 
+  const navigate = useNavigate();
+
+  // Function to check if the screen width is below 480px
+  const isMobileView = () => window.innerWidth < 480;
+
   const openUnitModal = () => {
-    setUnitModalOpen(true);
+      // Check if in mobile view (screen width < 480px)
+    if (isMobileView()) {
+      navigate("/admin/unit-timeline"); // Navigate to building-timeline route
+    } else {
+      setUnitModalOpen(true); // Open modal for desktop view
+    }
   };
+  
 
   const closeUnitModal = () => {
     setUnitModalOpen(false);

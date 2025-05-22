@@ -60,19 +60,21 @@ const ResponsiveUpdateDocumentForm = () => {
   const handleConfirmModal = () => {
     setIsModalOpen(false);
     console.log("Form submitted with documents:", documents);
-    // Update completedSteps to include "Upload Documents" (id: 2) and "Submitted" (id: 3)
+    // Update update_building_completedSteps to include "Upload Documents" (id: 2) and "Submitted" (id: 3)
     const currentCompletedSteps =
-      JSON.parse(localStorage.getItem("completedSteps")) || [];
+      JSON.parse(localStorage.getItem("update_building_completedSteps")) || [];
     const updatedCompletedSteps = [
       ...new Set([...currentCompletedSteps, 2, 3]),
     ]; // Add ids 2 and 3
+    console.log("Setting update_building_completedSteps:", updatedCompletedSteps);
+    console.log("Setting update_building_activeCard: null");
     localStorage.setItem(
-      "completedSteps",
+      "update_building_completedSteps",
       JSON.stringify(updatedCompletedSteps)
     );
-    localStorage.setItem("activeCard", "null"); // No active card after submission
-    navigate(""); // Navigate to SubmissionConfirmationResponsive
-  };
+    localStorage.setItem("update_building_activeCard", "null"); // No active card after submission
+    navigate("/admin/update-building-reset"); // Navigate to SubmissionConfirmationResponsive
+  }
 
   // Map documents to the format expected by DocumentUploadModal
   const modalDocuments = documents.map((doc, index) => ({

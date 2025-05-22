@@ -1,3 +1,10 @@
+.building-info-form-container {
+  width: 100%;
+  max-width: 100vw;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
 .building-info-form-label {
   margin-bottom: 10px;
   font-family: "Inter Tight";
@@ -11,6 +18,7 @@
 .building-info-form-inputs::placeholder {
   font-family: "Inter Tight";
   font-size: 15px;
+  color: #8a898b;
 }
 
 .building-info-form-inputs {
@@ -37,6 +45,9 @@
   font-weight: 500;
   line-height: 18px;
   letter-spacing: 0.43px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .next-btn:hover {
@@ -52,4 +63,57 @@ input[type="number"]::-webkit-inner-spin-button {
 
 input[type="number"] {
   -moz-appearance: textfield; /* Firefox */
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 480px) {
+  .building-info-form-container {
+    background-color: white;
+    padding: 0px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr; /* Single column for mobile */
+  }
+
+  .building-info-form-inputs {
+    max-width: calc(100vw - 40px); /* Account for 20px padding on each side */
+    background-color: #f8f9fa;
+  }
+
+  .next-btn {
+    max-width: calc(100vw - 40px);
+    width: 150px;
+    height: 38px;
+  }
+
+  .next-btn-container {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+/* Desktop Styles */
+@media (min-width: 768px) {
+  .building-info-form-container {
+    max-width: 800px; /* Adjust as needed for desktop */
+    background-color: white;
+  }
+
+  .grid {
+    grid-template-columns: repeat(
+      2,
+      1fr
+    ); /* Restore 2-column grid for desktop */
+  }
+
+  .next-btn {
+    width: 150px;
+    height: 38px;
+  }
+
+  .next-btn-container {
+    display: flex;
+    justify-content: flex-end;
+  }
 }
