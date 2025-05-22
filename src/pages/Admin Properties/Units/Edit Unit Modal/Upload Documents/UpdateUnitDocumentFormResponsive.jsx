@@ -1,84 +1,84 @@
-import React, { useState } from "react";
-import { ChevronDown } from "lucide-react";
-import DocumentUploadModal from "./DocumentUploadModal/DocumentUploadModal";
+import React, { useState } from 'react'
 import "./documentform.css";
 import { useNavigate } from "react-router-dom";
-import documentIcon from "../../../../../assets/Images/Admin Units/document-icon.svg";
+import { ChevronDown } from "lucide-react";
 import closeIcon from "../../../../../assets/Images/Admin Units/close-icon-white.svg";
 import plusIcon from "../../../../../assets/Images/Admin Units/plus-icon-black.svg";
+import documentIcon from "../../../../../assets/Images/Admin Units/document-icon.svg";
+import DocumentUploadModal from './DocumentUploadModal/DocumentUploadModal';
 
-const UnitDocumentsFormResponsive = () => {
-  const [documents, setDocuments] = useState([
-    {
-      id: 1,
-      type: "",
-      number: "0123456789",
-      issueDate: "10/01/2024",
-      expiryDate: "10/01/2024",
-      files: [],
-    },
-  ]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const navigate = useNavigate();
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsModalOpen(true);
-  };
-
-  const handleAddDocument = () => {
-    const newDoc = {
-      id: documents.length + 1,
-      type: "",
-      number: "",
-      issueDate: "",
-      expiryDate: "",
-      files: [],
-    };
-    setDocuments([...documents, newDoc]);
-  };
-
-  const handleRemoveDocument = (id) => {
-    if (documents.length > 1) {
-      setDocuments(documents.filter((doc) => doc.id !== id));
-    } else {
-      console.log("Cannot remove the last document set.");
-    }
-  };
-
-  const handleChange = (id, field, value) => {
-    setDocuments((prevDocs) =>
-      prevDocs.map((doc) => (doc.id === id ? { ...doc, [field]: value } : doc))
-    );
-  };
-
-  const handleCancelModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleConfirmModal = () => {
-    setIsModalOpen(false);
-    console.log("Form submitted with documents:", documents);
-    // Update unit_completedSteps to include "Upload Documents" (id: 3) and "Submitted" (id: 4)
-    const currentCompletedSteps =
-      JSON.parse(localStorage.getItem("unit_completedSteps")) || [];
-    const updatedCompletedSteps = [
-      ...new Set([...currentCompletedSteps, 3, 4]),
-    ]; // Add ids 3 and 4
-    localStorage.setItem(
-      "unit_completedSteps",
-      JSON.stringify(updatedCompletedSteps)
-    );
-    localStorage.setItem("unit_activeCard", "null"); // No active card after submission
-    navigate("/admin/unit-reset"); // Navigate to UnitsReset
-  };
-
-  // Map documents to the format expected by DocumentUploadModal
-  const modalDocuments = documents.map((doc, index) => ({
-    name: `${doc.type || "Document"} ${doc.number || index + 1}`,
-    type: doc.files.length > 0 ? doc.files[0].type.split("/")[0] : "file",
-    thumbnail: doc.files.length > 0 ? URL.createObjectURL(doc.files[0]) : null,
-  }));
+const UpdateUnitDocumentFormResponsive = () => {
+    const [documents, setDocuments] = useState([
+        {
+          id: 1,
+          type: "",
+          number: "0123456789",
+          issueDate: "10/01/2024",
+          expiryDate: "10/01/2024",
+          files: [],
+        },
+      ]);
+      const [isModalOpen, setIsModalOpen] = useState(false);
+      const navigate = useNavigate();
+    
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        setIsModalOpen(true);
+      };
+    
+      const handleAddDocument = () => {
+        const newDoc = {
+          id: documents.length + 1,
+          type: "",
+          number: "",
+          issueDate: "",
+          expiryDate: "",
+          files: [],
+        };
+        setDocuments([...documents, newDoc]);
+      };
+    
+      const handleRemoveDocument = (id) => {
+        if (documents.length > 1) {
+          setDocuments(documents.filter((doc) => doc.id !== id));
+        } else {
+          console.log("Cannot remove the last document set.");
+        }
+      };
+    
+      const handleChange = (id, field, value) => {
+        setDocuments((prevDocs) =>
+          prevDocs.map((doc) => (doc.id === id ? { ...doc, [field]: value } : doc))
+        );
+      };
+    
+      const handleCancelModal = () => {
+        setIsModalOpen(false);
+      };
+    
+      const handleConfirmModal = () => {
+        setIsModalOpen(false);
+        console.log("Form submitted with documents:", documents);
+        // Update unit_completedSteps to include "Upload Documents" (id: 3) and "Submitted" (id: 4)
+        const currentCompletedSteps =
+          JSON.parse(localStorage.getItem("updateUnit_completedSteps")) || [];
+        const updatedCompletedSteps = [
+          ...new Set([...currentCompletedSteps, 3, 4]),
+        ]; // Add ids 3 and 4
+        localStorage.setItem(
+          "updateUnit_completedSteps",
+          JSON.stringify(updatedCompletedSteps)
+        );
+        localStorage.setItem("unit_activeCard", "null"); // No active card after submission
+        navigate("/admin/update-unit-reset"); // Navigate to UnitsReset
+      };
+    
+      // Map documents to the format expected by DocumentUploadModal
+      const modalDocuments = documents.map((doc, index) => ({
+        name: `${doc.type || "Document"} ${doc.number || index + 1}`,
+        type: doc.files.length > 0 ? doc.files[0].type.split("/")[0] : "file",
+        thumbnail: doc.files.length > 0 ? URL.createObjectURL(doc.files[0]) : null,
+      }));
 
   return (
     <div className="w-full flex flex-col h-full p-[5px] bg-white">
@@ -270,7 +270,7 @@ const UnitDocumentsFormResponsive = () => {
         />
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default UnitDocumentsFormResponsive;
+export default UpdateUnitDocumentFormResponsive

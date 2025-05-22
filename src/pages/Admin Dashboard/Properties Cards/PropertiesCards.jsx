@@ -42,7 +42,7 @@ const PropertiesCards = () => {
     <div className="p-5 rounded-md border border-[#E9E9E9] w-[60%] properties-cards">
       <h2 className="properties-head pb-[15px]">Properties</h2>
 
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-[17px]">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:!grid-cols-4 gap-[17px]">
         {propertyData.map((item, index) => (
           <div key={index} className={`${item.backgroundColor} p-3 rounded-[10px] w-full h-auto flex flex-col`}>
             <div className="flex items-start justify-between mb-3">

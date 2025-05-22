@@ -15,7 +15,7 @@ const Units = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [unitModalOpen, setUnitModalOpen] = useState(false);
-  const [updateUnitModalOpen, setUpdateUnitModalOpen] = useState(false)
+  const [updateUnitModalOpen, setUpdateUnitModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
   const itemsPerPage = 10;
 
@@ -25,26 +25,29 @@ const Units = () => {
   const isMobileView = () => window.innerWidth < 480;
 
   const openUnitModal = () => {
-      // Check if in mobile view (screen width < 480px)
+    // Check if in mobile view (screen width < 480px)
     if (isMobileView()) {
       navigate("/admin/unit-timeline"); // Navigate to building-timeline route
     } else {
       setUnitModalOpen(true); // Open modal for desktop view
     }
   };
-  
 
   const closeUnitModal = () => {
     setUnitModalOpen(false);
   };
 
   const openUpdateUnitModal = () => {
-    setUpdateUnitModalOpen(true)
-  }
+    if (isMobileView()) {
+      navigate("/admin/update-unit-timeline");
+    } else {
+      setUpdateUnitModalOpen(true);
+    }
+  };
 
   const closeUpdateUnitModal = () => {
-    setUpdateUnitModalOpen(false)
-  }
+    setUpdateUnitModalOpen(false);
+  };
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -282,7 +285,9 @@ const Units = () => {
           <thead>
             <tr className="unit-table-row-head">
               <th className="px-5 text-left unit-thead unit-id-column">ID</th>
-              <th className="px-5 text-left unit-thead unit-date-column">DATE</th>
+              <th className="px-5 text-left unit-thead unit-date-column">
+                DATE
+              </th>
               <th className="px-5 text-right unit-thead"></th>
             </tr>
           </thead>
@@ -296,8 +301,12 @@ const Units = () => {
                       : "unit-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left unit-data unit-id-column">{unit.id}</td>
-                  <td className="px-5 text-left unit-data unit-date-column">{unit.date}</td>
+                  <td className="px-5 text-left unit-data unit-id-column">
+                    {unit.id}
+                  </td>
+                  <td className="px-5 text-left unit-data unit-date-column">
+                    {unit.date}
+                  </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`unit-dropdown-field ${
@@ -322,21 +331,29 @@ const Units = () => {
                         <div className="unit-grid">
                           <div className="unit-grid-item">
                             <div className="unit-dropdown-label">NAME</div>
-                            <div className="unit-dropdown-value">{unit.name}</div>
+                            <div className="unit-dropdown-value">
+                              {unit.name}
+                            </div>
                           </div>
                           <div className="unit-grid-item">
                             <div className="unit-dropdown-label">BUILDING</div>
-                            <div className="unit-dropdown-value">{unit.building}</div>
+                            <div className="unit-dropdown-value">
+                              {unit.building}
+                            </div>
                           </div>
                         </div>
                         <div className="unit-grid">
                           <div className="unit-grid-item">
                             <div className="unit-dropdown-label">ADDRESS</div>
-                            <div className="unit-dropdown-value">{unit.address}</div>
+                            <div className="unit-dropdown-value">
+                              {unit.address}
+                            </div>
                           </div>
                           <div className="unit-grid-item">
                             <div className="unit-dropdown-label">TYPE</div>
-                            <div className="unit-dropdown-value">{unit.type}</div>
+                            <div className="unit-dropdown-value">
+                              {unit.type}
+                            </div>
                           </div>
                         </div>
                         <div className="unit-grid">
@@ -385,8 +402,10 @@ const Units = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 unit-pagination-container">
         <span className="unit-pagination collection-list-pagination">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
+          Showing{" "}
+          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+          {filteredData.length} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto unit-pagination-buttons">
           <button
@@ -418,7 +437,9 @@ const Units = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
+          {endPage < totalPages - 1 && (
+            <span className="px-2 flex items-center">...</span>
+          )}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
@@ -437,12 +458,12 @@ const Units = () => {
         </div>
       </div>
       {/* Add & Update Modals */}
-      <AddUnitModal
-        open={unitModalOpen}
-        onClose={closeUnitModal}
-      />
+      <AddUnitModal open={unitModalOpen} onClose={closeUnitModal} />
 
-      <EditUnitModal open={updateUnitModalOpen} onClose={closeUpdateUnitModal} />
+      <EditUnitModal
+        open={updateUnitModalOpen}
+        onClose={closeUpdateUnitModal}
+      />
     </div>
   );
 };
