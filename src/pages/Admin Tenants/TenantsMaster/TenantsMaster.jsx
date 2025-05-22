@@ -8,6 +8,7 @@ import deletesicon from "../../../assets/Images/Admin Tenants/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenants/downarrow.svg";
 import CreateTenantModal from "../CreateTenantModal/CreateTenantModal";
 import EditTenantModal from "../EditTenantModal/EditTenantModal";
+import { useNavigate } from "react-router-dom";
 
 const TenantsMaster = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -18,9 +19,18 @@ const TenantsMaster = () => {
   const [expandedRows, setExpandedRows] = useState({});
   const itemsPerPage = 10;
 
+  const navigate = useNavigate();
+
+  const isMobileView = () => window.innerWidth < 480;
+
   const openCreateTenantModal = () => {
-    setCreateTenantModalOpen(true);
+      if (isMobileView()) {
+      navigate("/admin/tenant-timeline"); 
+    } else {
+      setCreateTenantModalOpen(true); // Open modal for desktop view
+    }
   };
+  
 
   const closeCreateTenantModal = () => {
     setCreateTenantModalOpen(false);

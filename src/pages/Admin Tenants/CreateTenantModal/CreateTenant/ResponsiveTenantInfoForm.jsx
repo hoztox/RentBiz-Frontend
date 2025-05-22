@@ -3,9 +3,9 @@ import "./tenantinfoform.css";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { ChevronDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-const TenantInfoForm = ({ onNext }) => {
-  // Form state
+const ResponsiveTenantInfoForm = () => {
   const [formState, setFormState] = useState({
     name: "",
     nationality: "",
@@ -27,10 +27,10 @@ const TenantInfoForm = ({ onNext }) => {
     remarks: "",
   });
 
+  const navigate = useNavigate();
+
   const [mobno, setMobno] = useState("");
   const [altMobno, setAltMobno] = useState("");
-
-  // Track focus state for each dropdown separately
   const [focusedField, setFocusedField] = useState(null);
 
   const handleChange = (value) => {
@@ -49,39 +49,34 @@ const TenantInfoForm = ({ onNext }) => {
     });
   };
 
-  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
     setFormState({
       ...formState,
       [name]: value,
     });
   };
 
-  // Function to handle focus on select elements
   const handleSelectFocus = (fieldName) => {
     setFocusedField(fieldName);
   };
 
-  // Function to handle blur on select elements
   const handleSelectBlur = () => {
     setFocusedField(null);
   };
 
-  // Function to handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Form submission logic would go here
     console.log("Form submitted:", formState);
-
-    // Call the onNext prop to move to the next page
-    if (onNext) onNext(formState);
+    // Save completion state and active card in localStorage
+    localStorage.setItem("tenant_completedSteps", JSON.stringify([1])); // Mark "Create Tenant" (id: 1) as completed
+    localStorage.setItem("tenant_activeCard", "2"); // Set "Upload Documents" (id: 2) as active
+    navigate("/admin/tenant-timeline");
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex-1">
-      <div className="grid grid-cols-2 gap-5">
+    <form onSubmit={handleSubmit} className="flex-1 tenant-info-form-container">
+      <div className="grid grid-cols-1 gap-5">
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Name*</label>
           <input
@@ -89,6 +84,7 @@ const TenantInfoForm = ({ onNext }) => {
             name="name"
             value={formState.name}
             onChange={handleInputChange}
+            placeholder="John Doe"
             className="w-full tenant-info-form-inputs focus:border-gray-300 duration-200"
             required
           />
@@ -107,7 +103,9 @@ const TenantInfoForm = ({ onNext }) => {
               required
             >
               <option value="">Choose</option>
-              <option value="dubai">Dubai</option>
+              <option value="UAE">UAE</option>
+              <option value="USA">USA</option>
+              {/* Add more options as needed */}
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
@@ -119,7 +117,6 @@ const TenantInfoForm = ({ onNext }) => {
           </div>
         </div>
 
-        {/* mobile Number */}
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Mobile Number*</label>
           <PhoneInput
@@ -139,7 +136,7 @@ const TenantInfoForm = ({ onNext }) => {
 
         <div className="col-span-1">
           <label className="block tenant-info-form-label">
-            Alternative Mobile Number*
+            Alternative Mobile Number
           </label>
           <PhoneInput
             country={"ae"}
@@ -147,7 +144,7 @@ const TenantInfoForm = ({ onNext }) => {
             value={altMobno}
             onChange={handleAltChange}
             inputProps={{
-              required: true,
+              required: false,
             }}
             containerClass="phone-input-container"
             inputClass="tenant-info-form-inputs phone-input"
@@ -163,34 +160,32 @@ const TenantInfoForm = ({ onNext }) => {
             name="email"
             value={formState.email}
             onChange={handleInputChange}
+            placeholder="example@domain.com"
             className="w-full tenant-info-form-inputs focus:border-gray-300 duration-200"
             required
           />
         </div>
-        <div></div>
 
-        {/* Description */}
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Description</label>
           <textarea
             name="description"
             value={formState.description}
             onChange={handleInputChange}
-            placeholder=""
-            rows="2"
+            placeholder="Tenant description"
+            rows="4"
             className="w-full tenant-info-form-inputs resize-none focus:border-gray-300 duration-200"
           />
         </div>
 
-        {/* Address */}
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Address*</label>
           <textarea
-            type="text"
             name="address"
             value={formState.address}
             onChange={handleInputChange}
-            placeholder=""
+            placeholder="Boulevard Downtown Dubai, UAE"
+            rows="4"
             className="w-full tenant-info-form-inputs resize-none focus:border-gray-300 duration-200"
             required
           />
@@ -209,7 +204,8 @@ const TenantInfoForm = ({ onNext }) => {
               required
             >
               <option value="">Choose</option>
-              <option value="1">Type 1</option>
+              <option value="Individual">Individual</option>
+              <option value="Company">Company</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
@@ -230,6 +226,7 @@ const TenantInfoForm = ({ onNext }) => {
             name="license_no"
             value={formState.license_no}
             onChange={handleInputChange}
+            placeholder="123456789"
             className="w-full tenant-info-form-inputs focus:border-gray-300 duration-200"
             required
           />
@@ -248,7 +245,8 @@ const TenantInfoForm = ({ onNext }) => {
               required
             >
               <option value="">Choose</option>
-              <option value="1">ID 1</option>
+              <option value="Passport">Passport</option>
+              <option value="National ID">National ID</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
@@ -267,6 +265,7 @@ const TenantInfoForm = ({ onNext }) => {
             name="id_no"
             value={formState.id_no}
             onChange={handleInputChange}
+            placeholder="123456789"
             className="w-full tenant-info-form-inputs focus:border-gray-300 duration-200"
             required
           />
@@ -283,7 +282,6 @@ const TenantInfoForm = ({ onNext }) => {
             required
           />
         </div>
-        <div></div>
 
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Sponsor Name*</label>
@@ -292,6 +290,7 @@ const TenantInfoForm = ({ onNext }) => {
             name="sponsor_name"
             value={formState.sponsor_name}
             onChange={handleInputChange}
+            placeholder="Sponsor Name"
             className="w-full tenant-info-form-inputs focus:border-gray-300 duration-200"
             required
           />
@@ -312,7 +311,8 @@ const TenantInfoForm = ({ onNext }) => {
               required
             >
               <option value="">Choose</option>
-              <option value="1">ID 1</option>
+              <option value="Passport">Passport</option>
+              <option value="National ID">National ID</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
@@ -333,6 +333,7 @@ const TenantInfoForm = ({ onNext }) => {
             name="sponsor_id_no"
             value={formState.sponsor_id_no}
             onChange={handleInputChange}
+            placeholder="123456789"
             className="w-full tenant-info-form-inputs focus:border-gray-300 duration-200"
             required
           />
@@ -352,7 +353,6 @@ const TenantInfoForm = ({ onNext }) => {
           />
         </div>
 
-        {/* Status */}
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Status*</label>
           <div className="relative">
@@ -379,7 +379,6 @@ const TenantInfoForm = ({ onNext }) => {
           </div>
         </div>
 
-        {/* Remarks */}
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Remarks</label>
           <input
@@ -387,18 +386,14 @@ const TenantInfoForm = ({ onNext }) => {
             name="remarks"
             value={formState.remarks}
             onChange={handleInputChange}
-            placeholder=""
+            placeholder="Additional remarks"
             className="w-full tenant-info-form-inputs focus:border-gray-300 duration-200"
           />
         </div>
       </div>
 
-      {/* Submit Button */}
-      <div className="next-btn-container mt-6 text-right">
-        <button
-          type="submit"
-          className="w-[150px] h-[38px] next-btn duration-300"
-        >
+      <div className="next-btn-container mt-6 text-right mb-[80px]">
+        <button type="submit" className="next-btn duration-300">
           Next
         </button>
       </div>
@@ -406,4 +401,4 @@ const TenantInfoForm = ({ onNext }) => {
   );
 };
 
-export default TenantInfoForm;
+export default ResponsiveTenantInfoForm;

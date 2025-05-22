@@ -80,6 +80,10 @@ const mobileRouteTitles = {
   "/admin/unit-create-unit-form": "Create New Unit",
   "/admin/unit-upload-documents": "Upload Documents",
   "/admin/unit-submitted": "Submitted",
+  "/admin/tenant-timeline": "",
+  "/admin/create-tenant": "Create New Tenant",
+  "/admin/tenant-upload-documents": "Upload Documents",
+  "/admin/tenant-submitted": "Submitted",
   default: "Admin",
 };
 
