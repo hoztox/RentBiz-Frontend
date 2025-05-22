@@ -53,6 +53,7 @@
 }
 
 /* Mobile responsiveness for screens below 480px */
+
 @media (max-width: 480px) {
   .submit-confirm-box {
     width: 90vw;
@@ -79,5 +80,11 @@
 
   .submit-confirm-text {
     gap: 0.5rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .submit-confirm-box {
+    height: 110vw;
   }
 }

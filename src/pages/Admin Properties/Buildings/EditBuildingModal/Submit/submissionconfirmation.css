@@ -81,3 +81,9 @@
     gap: 0.5rem;
   }
 }
+
+@media (max-width: 360px) {
+  .submit-confirm-box {
+    height: 110vw;
+  }
+}

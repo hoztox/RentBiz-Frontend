@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import "./submissionconfirmation.css";
 import { useNavigate } from "react-router-dom";
-import success from "../../../../../assets/Images/Admin Units/success.png";
+import success from "../../../../../assets/Images/Admin Units/success.svg";
 import successtick from "../../../../../assets/Images/Admin Buildings/success_tick.png";
 
 const UnitSubmitPageResponsive = () => {
