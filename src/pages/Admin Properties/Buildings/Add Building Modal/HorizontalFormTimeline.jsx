@@ -87,7 +87,7 @@ const HorizontalFormTimeline = () => {
         </div>
       </div>
 
-      <div className="relative top-[160px]">
+      <div className="relative top-[120px]">
         {/* Welcome text */}
         <div className="text-center mb-6">
           <p className="welcome-text">Hi Charlotte, let's walk</p>

@@ -88,11 +88,11 @@ const UpdateHorizontalFormTimeline = () => {
         </div>
       </div>
 
-      <div className="relative top-[160px]">
+      <div className="relative top-[120px]">
         {/* Welcome text */}
         <div className="text-center mb-6">
           <p className="welcome-text">Hi Charlotte, let's walk</p>
-          <p className="welcome-text">you through updating your building</p>
+          <p className="welcome-text">you through your building</p>
         </div>
 
         {/* Steps cards */}

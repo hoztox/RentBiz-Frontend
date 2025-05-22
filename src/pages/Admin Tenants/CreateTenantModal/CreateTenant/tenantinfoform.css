@@ -168,10 +168,10 @@ input[type="number"] {
     max-width: 800px;
     background-color: white;
   }
-
+/* 
   .grid {
     grid-template-columns: repeat(2, 1fr);
-  }
+  } */
 
   .next-btn-container {
     display: flex;
