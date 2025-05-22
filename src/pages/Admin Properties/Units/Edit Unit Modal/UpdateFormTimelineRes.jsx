@@ -4,7 +4,7 @@ import bgimg from "../../../../assets/Images/Admin Units/modal-img.svg";
 import tickIcon from "../../../../assets/Images/Admin Units/tick-icon.svg";
 import { useNavigate } from "react-router-dom";
 
-const UpdateFormtimelineResponsive = () => {
+const UpdateFormTimelineRes = () => {
   const navigate = useNavigate();
 
   // Initialize state from localStorage with unique keys
@@ -185,5 +185,4 @@ const UpdateFormtimelineResponsive = () => {
   );
 };
 
-export default UpdateFormtimelineResponsive;
-
+export default UpdateFormTimelineRes;

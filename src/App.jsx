@@ -57,7 +57,7 @@ import UpdateUnitInfoFormResponsive from "./pages/Admin Properties/Units/Edit Un
 import UpdateUnitDocumentFormResponsive from "./pages/Admin Properties/Units/Edit Unit Modal/Upload Documents/UpdateUnitDocumentFormResponsive";
 import UpdateUnitSubmitPageResponsive from "./pages/Admin Properties/Units/Edit Unit Modal/Submit/UpdateUnitSubmitPageResponsive";
 import UpdateUnitsReset from "./pages/Admin Properties/Units/Edit Unit Modal/UpdateUnitsReset";
-import UpdateFormtimelineResponsive from "./pages/Admin Properties/Units/Edit Unit Modal/UpdateFormtimelineResponsive";
+import UpdateFormTimelineRes from "./pages/Admin Properties/Units/Edit Unit Modal/UpdateFormTimelineRes";
 
 const App = () => {
   return (
@@ -118,7 +118,7 @@ const App = () => {
           <Route path="unit-submitted" element={<UnitSubmitPageResponsive />} />
           <Route path="unit-reset" element={<UnitsResets />} />
 
-          <Route path="update-unit-timeline" element={<UpdateFormtimelineResponsive />} />
+          <Route path="update-unit-timeline" element={<UpdateFormTimelineRes />} />
           <Route path="update-select-building-form" element={<UpdateUnitBuildingInfoResponsive />} />
           <Route path="update-unit" element={<UpdateUnitInfoFormResponsive />} />
           <Route path="update-unit-upload-documents" element={<UpdateUnitDocumentFormResponsive />} />
