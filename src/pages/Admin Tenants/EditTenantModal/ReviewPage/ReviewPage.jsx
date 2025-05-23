@@ -1,5 +1,6 @@
 import "./reviewpage.css";
 import DocumentView from "./DocumentView";
+import { useState } from "react";
 
 const ReviewPage = ({ onNext, onBack }) => {
   const [buildingData] = useState({
@@ -10,7 +11,7 @@ const ReviewPage = ({ onNext, onBack }) => {
     trade_license_no: "TD1232",
     id_no: "ID12",
     sponsor_name: "Test",
-    sponsor_id_no: "SPID12",
+    sponsor_id_no: "SPID2",
     status: "Active",
     nationality: "Indian",
     alternative_mob_no: "9988776655",

@@ -1,7 +1,7 @@
 // SubmissionConfirmation.jsx
 import React from 'react';
 import "./submissionconfirmation.css";
-import success from "../../../../../assets/Images/Admin Buildings/success.png"
+import success from "../../../../../assets/Images/Admin Units/success.svg"
 import successtick from "../../../../../assets/Images/Admin Buildings/success_tick.png"
 
 const SubmissionConfirmation = () => {

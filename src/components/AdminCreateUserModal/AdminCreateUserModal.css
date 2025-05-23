@@ -118,7 +118,7 @@
   font-size: 15px;
   font-weight: 400;
   font-family: "Inter Tight";
-  color: #cfcfcf;
+  color: #cfcfcf !important;
   appearance: none;
   outline: none;
 }
@@ -127,7 +127,7 @@
   font-family: "Inter Tight";
   font-size: 15px;
   font-weight: 400;
-  color: #201d1e;
+  color: #201d1e; 
 }
 
 @media(max-width: 480px){
@@ -182,6 +182,14 @@
   background-color: #2892CE;
 }
 
+/* Error state for inputs */
+.input-style.border-red-500 {
+  border-color: #dc2626 !important;
+}
+
+.input-style.focus\:border-red-500:focus {
+  border-color: #dc2626 !important;
+}
 
 @media (max-width: 480px) {
   .create-user-button {

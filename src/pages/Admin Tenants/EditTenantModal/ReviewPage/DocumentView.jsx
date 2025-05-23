@@ -5,6 +5,7 @@ import img2 from "../../../../assets/Images/Admin Tenants/img2.jpg";
 import img3 from "../../../../assets/Images/Admin Tenants/img3.jpg";
 import img4 from "../../../../assets/Images/Admin Tenants/img4.jpg";
 import img5 from "../../../../assets/Images/Admin Tenants/img5.jpg";
+import { useState } from "react";
 
 const DocumentView = ({ documents = [] }) => {
   const [currentPage] = useState(0);
@@ -30,7 +31,7 @@ const DocumentView = ({ documents = [] }) => {
   return (
     <div className="flex flex-col w-full">
       <h1 className="documents-head pb-5">Documents</h1>
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+      <div className="grid grid-cols-1 md:!grid-cols-5 gap-4 mb-4">
         {visibleDocuments.map((doc, index) => (
           <div key={index} className="flex flex-col">
             <div className="bg-gray-100 rounded-md overflow-hidden cursor-pointer">

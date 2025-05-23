@@ -31,7 +31,7 @@ const DocumentsView = ({ documents = [] }) => {
   return (
     <div className="flex flex-col w-full">
       <h1 className="documents-head pb-5">Documents</h1>
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+      <div className="grid grid-cols-1 md:!grid-cols-5 gap-4 mb-4">
         {visibleDocuments.map((doc, index) => (
           <div key={index} className="flex flex-col">
             <div className="bg-gray-100 rounded-md overflow-hidden cursor-pointer">

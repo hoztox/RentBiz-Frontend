@@ -1,18 +1,31 @@
 import "./AdminLogin.css";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast, Toaster } from "react-hot-toast";
+import axios from "axios";
+import { BASE_URL } from "../../utils/config";
+import { IoEye, IoEyeOff } from "react-icons/io5";
+
 import logo from "../../assets/Images/Admin Login/RentBizLogo.svg";
 import slide1 from "../../assets/Images/Admin Login/Slide1.jpg";
 import slide2 from "../../assets/Images/Admin Login/slide2.jpg";
 import slide3 from "../../assets/Images/Admin Login/Slide1.jpg";
-import viewIcon from "../../assets/Images/Admin Login/ViewIcon.svg";
+// import viewIcon from "../../assets/Images/Admin Login/ViewIcon.svg";
 import inActiveSliderIcon from "../../assets/Images/Admin Login/inActiveSliderIcon.svg";
 import activeSliderIcon from "../../assets/Images/Admin Login/activeSliderIcon.svg";
-import { useNavigate } from "react-router-dom";
+
+// Import the error modal component (you'll need to create this or import from the first component)
+// import CompanyLoginErrorModal from "./Modal/CompanyLoginErrorModal";
 
 const slides = [slide1, slide2, slide3];
 
 const AdminLogin = () => {
   const [current, setCurrent] = useState(0);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,12 +35,89 @@ const AdminLogin = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleLogin = () => {
-    navigate("/admin/dashboard");
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!username || !password) {
+      toast.error("Username and Password are required");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await axios.post(`${BASE_URL}/company/company-login/`, {
+        username,
+        password,
+      });
+
+      console.log("Login Success:", response.data);
+
+      if (response.status === 200) {
+        const {
+          access,
+          refresh,
+          id,
+          email_address,
+          company_name,
+          role,
+          ...userData
+        } = response.data;
+
+        // Setting id as company_id since the response does not have company_id
+        const company_id = id;
+
+        console.log("Access Token:", access);
+        console.log("Refresh Token:", refresh);
+        console.log("Company ID:", company_id);
+        console.log("User Data:", userData);
+
+        localStorage.setItem("accessToken", access);
+        localStorage.setItem("refreshToken", refresh);
+        localStorage.setItem("role", role);
+
+        if (role === "company" && company_id) {
+          localStorage.setItem("company_id", company_id);
+          localStorage.setItem("company_name", company_name);
+          localStorage.setItem("email_address", email_address);
+          Object.keys(userData).forEach((key) => {
+            localStorage.setItem(
+              `company_${key}`,
+              JSON.stringify(userData[key])
+            );
+          });
+
+          localStorage.removeItem("user_id");
+
+          console.log("Navigating to /admin/dashboard");
+          setTimeout(() => navigate("/admin/dashboard"), 100);
+        } else if (role === "user") {
+          localStorage.setItem("user_id", id);
+
+          Object.keys(userData).forEach((key) => {
+            localStorage.setItem(`user_${key}`, JSON.stringify(userData[key]));
+          });
+
+          localStorage.removeItem("company_id");
+
+          console.log("Navigating to /user/dashboard");
+          setTimeout(() => navigate("/company/dashboard"), 100);
+        }
+      }
+    } catch (error) {
+      console.error("Login Error:", error.response?.data || error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-white">
+      <Toaster position="top-center" />
+
       <div className="login-container flex flex-col md:flex-row items-center">
         {/* Image section - full width on mobile, left side on desktop */}
         <div className="image-section w-full md:w-1/2">
@@ -98,36 +188,53 @@ const AdminLogin = () => {
           <h2 className="right-section-heading mb-8 text-[#201D1E] text-4xl hidden md:block">
             Welcome Back to RentBiz!
           </h2>
-          <form className="w-full space-y-4 md:space-y-7 max-w-[445px]">
+
+          <form
+            className="w-full space-y-4 md:space-y-7 max-w-[445px]"
+            onSubmit={handleSubmit}
+          >
             <div>
-              <label className="text-[#606060] input-label">
-                Email address*
-              </label>
+              <label className="text-[#606060] input-label">Username*</label>
               <input
-                type="email"
-                placeholder="tetst@gmail.com"
+                type="text"
+                placeholder="Enter your username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="focus:outline-none focus:ring-2 focus:ring-gray-700 input-field w-full mt-2"
+                required
               />
             </div>
+
             <div>
               <label className="text-[#606060] input-label">Password*</label>
               <div className="relative mb-4 md:mb-1">
                 <input
-                  type="password"
-                  placeholder="tetst@gmail.com"
+                  type={passwordVisible ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="focus:outline-none focus:ring-2 focus:ring-gray-700 input-field w-full mt-2"
+                  required
                 />
-                <span className="absolute inset-y-0 right-5 top-[11px] md:top-[13px] flex items-center text-gray-400 cursor-pointer">
-                  <img src={viewIcon} alt="" className="w-5 h-5" />
+                <span
+                  className="absolute inset-y-0 right-5 top-[11px] md:top-[13px] flex items-center text-gray-400 cursor-pointer"
+                  onClick={togglePasswordVisibility}
+                >
+                  {passwordVisible ? (
+                    <IoEyeOff size={20} />
+                  ) : (
+                    <IoEye size={20} />
+                  )}
                 </span>
               </div>
             </div>
+
             <button
               type="submit"
-              onClick={handleLogin}
-              className="w-full bg-[#1458A2] hover:bg-[#104880] duration-200 text-white py-2 rounded-full login-btn"
+              disabled={loading}
+              className="w-full bg-[#1458A2] hover:bg-[#104880] duration-200 text-white py-2 rounded-full login-btn disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              LOGIN
+              {loading ? "Logging in..." : "LOGIN"}
             </button>
           </form>
         </div>

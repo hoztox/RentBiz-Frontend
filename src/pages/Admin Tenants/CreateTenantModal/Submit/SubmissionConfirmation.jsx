@@ -7,7 +7,7 @@ const SubmissionConfirmation = () => {
   return (
     <div className="flex items-center justify-center">
       <div className="bg-white rounded-3xl shadow-md w-[513px] h-[396px] mt-[5rem]">
-        <div className="flex flex-col justify-center items-center gap-[33px] mb-[25px]">
+        <div className="flex flex-col justify-center items-center gap-[33px] mt-[30px] mb-[25px]">
           <img src={success} alt="Success" />
           <img src={successtick} alt="Succes Tick" />
         </div>
