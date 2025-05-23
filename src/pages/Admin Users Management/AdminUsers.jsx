@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { ChevronDown } from "lucide-react";
+import { toast, Toaster } from "react-hot-toast";
 import plusicon from "../../assets/Images/Admin Users Management/plus-icon.svg";
 import downloadicon from "../../assets/Images/Admin Users Management/download-icon.svg";
 import editicon from "../../assets/Images/Admin Users Management/edit-icon.svg";
@@ -7,32 +9,150 @@ import deletesicon from "../../assets/Images/Admin Users Management/delete-icon.
 import "./AdminUsers.css";
 import downarrow from "../../assets/Images/Admin Users Management/downarrow.svg";
 import { useModal } from "../../context/ModalContext";
+import { BASE_URL } from "../../utils/config";
+import UserDeleteModal from "./UserDeleteModal/UserDeleteModal";
 
 const AdminUsers = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  const { openModal } = useModal(); // Use ModalContext
+  const [users, setUsers] = useState([]);
   const [expandedRows, setExpandedRows] = useState({});
-  const [toggleStates, setToggleStates] = useState({
-    "01": false,
-    "02": false,
-    "03": false,
-    "04": false,
-    "05": false,
-    "06": false,
-    "07": false,
-    "08": false,
-    "09": false,
-    10: false,
-  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { openModal, refreshCounter } = useModal();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State for delete modal
+  const [userIdToDelete, setUserIdToDelete] = useState(null); // State for user ID to delete
+  const itemsPerPage = 10;
 
-  const handleToggle = (id) => {
-    setToggleStates((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+  const getUserCompanyId = () => {
+    const storedCompanyId = localStorage.getItem("company_id");
+    if (storedCompanyId) return storedCompanyId;
+    const userRole = localStorage.getItem("role");
+    if (userRole === "user") {
+      const userData = localStorage.getItem("user_company_id");
+      if (userData) {
+        try {
+          return JSON.parse(userData);
+        } catch (e) {
+          console.error("Error parsing user company ID:", e);
+          return null;
+        }
+      }
+    }
+    return null;
+  };
+
+  const companyId = getUserCompanyId();
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (!companyId) {
+        setError("Company ID not found. Please log in again.");
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axios.get(`${BASE_URL}/company/users/company/${companyId}/`);
+        const userData = Array.isArray(response.data)
+          ? response.data
+          : response.data.results || [];
+        setUsers(userData);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        setError("Failed to load users. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUsers();
+  }, [companyId, refreshCounter]);
+
+  const handleEditUser = (user) => {
+    console.log("User data passed to modal:", user);
+    openModal("user-update", {
+      id: user.id,
+      name: user.name,
+      username: user.username,
+      user_role: user.user_role,
+      profile_image: user.company_logo || null,
+    });
+  };
+
+  const handleToggle = async (id) => {
+    if (!companyId) {
+      setError("Company ID not found. Please log in again.");
+      toast.error("Company ID not found. Please log in again.");
+      return;
+    }
+
+    const user = users.find((u) => u.id === id);
+    if (!user) {
+      setError("User not found. Please try again.");
+      toast.error("User not found. Please try again.");
+      return;
+    }
+
+    const newStatus = user.status === "active" ? "blocked" : "active";
+
+    setUsers((prev) =>
+      prev.map((u) => (u.id === id ? { ...u, status: newStatus } : u))
+    );
+
+    try {
+      const response = await axios.put(`${BASE_URL}/company/users/${id}/`, {
+        status: newStatus,
+      });
+
+      if (response.data.status !== newStatus) {
+        throw new Error("Status update failed on the server.");
+      }
+      toast.success(`User ${newStatus} successfully.`);
+    } catch (error) {
+      console.error("Error updating user status:", error);
+      const errorMessage = error.response?.data?.message || "Failed to update user status. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+
+      setUsers((prev) =>
+        prev.map((u) => (u.id === id ? { ...u, status: user.status } : u))
+      );
+    }
+  };
+
+  const handleDelete = (id) => {
+    if (!companyId) {
+      setError("Company ID not found. Please log in again.");
+      toast.error("Company ID not found. Please log in again.");
+      return;
+    }
+    setUserIdToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!userIdToDelete) return;
+
+    try {
+      await axios.delete(`${BASE_URL}/company/users/${userIdToDelete}/`);
+      setUsers((prev) => prev.filter((u) => u.id !== userIdToDelete));
+      toast.success("User deleted successfully.");
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      const errorMessage = error.response?.data?.message || "Failed to delete user. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsDeleteModalOpen(false);
+      setUserIdToDelete(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteModalOpen(false);
+    setUserIdToDelete(null);
   };
 
   const toggleRowExpand = (id) => {
@@ -42,97 +162,18 @@ const AdminUsers = () => {
     }));
   };
 
-  const demoData = [
-    {
-      id: "01",
-      date: "09 Sept 2024",
-      name: "Anonymous",
-      username: "Test",
-      role: "Manager",
-      status: "Active",
-    },
-    {
-      id: "02",
-      date: "10 Sept 2024",
-      name: "Anonymous",
-      username: "Test",
-      role: "Manager",
-      status: "Active",
-    },
-    {
-      id: "03",
-      date: "11 Sept 2024",
-      name: "Anonymous",
-      username: "Test",
-      role: "Manager",
-      status: "Active",
-    },
-    {
-      id: "04",
-      date: "12 Sept 2024",
-      name: "Anonymous",
-      username: "Test",
-      role: "Manager",
-      status: "Active",
-    },
-    {
-      id: "05",
-      date: "13 Sept 2024",
-      name: "Anonymous",
-      username: "Test",
-      role: "Manager",
-      status: "Active",
-    },
-    {
-      id: "06",
-      date: "13 Sept 2024",
-      name: "Anonymous",
-      username: "Test",
-      role: "Manager",
-      status: "Active",
-    },
-    {
-      id: "07",
-      date: "13 Sept 2024",
-      name: "Anonymous",
-      username: "Test",
-      role: "Manager",
-      status: "Active",
-    },
-    {
-      id: "08",
-      date: "13 Sept 2024",
-      name: "Anonymous",
-      username: "Test",
-      role: "Manager",
-      status: "Active",
-    },
-    {
-      id: "09",
-      date: "13 Sept 2024",
-      name: "Anonymous",
-      username: "Test",
-      role: "Manager",
-      status: "Active",
-    },
-    {
-      id: "10",
-      date: "13 Sept 2024",
-      name: "Anonymous",
-      username: "Test",
-      role: "Manager",
-      status: "Active",
-    },
-  ];
+  const isBlocked = (id) => users.find((u) => u.id === id)?.status === "blocked";
 
-  const filteredData = demoData.filter(
-    (user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.status.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredData = Array.isArray(users)
+    ? users.filter(
+        (user) =>
+          (user.name?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+          (user.username?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+          (user.id.toString().toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+          (user.user_role?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+          (user.status?.toLowerCase().includes(searchTerm.toLowerCase()) || false)
+      )
+    : [];
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const paginatedData = filteredData.slice(
@@ -155,8 +196,17 @@ const AdminUsers = () => {
     );
   };
 
+  if (loading) {
+    return <div className="p-5">Loading users...</div>;
+  }
+
+  if (error) {
+    return <div className="p-5 text-red-500">{error}</div>;
+  }
+
   return (
     <div className="border border-[#E9E9E9] rounded-md user-table">
+      <Toaster />
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] user-table-header">
         <h1 className="users-head">Users</h1>
         <div className="flex flex-col md:flex-row gap-[10px] user-inputs-container">
@@ -227,52 +277,68 @@ const AdminUsers = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedData.map((user, index) => (
-              <tr
-                key={index}
-                className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
-              >
-                <td className="px-5 text-left user-data">{user.id}</td>
-                <td className="px-5 text-left user-data">{user.date}</td>
-                <td className="pl-5 text-left user-data">{user.name}</td>
-                <td className="px-5 text-left user-data">{user.username}</td>
-                <td className="pl-12 pr-5 text-left user-data">{user.role}</td>
-                <td className="px-5 text-left user-data">
-                  <span
-                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
-                      user.status === "Active"
-                        ? "bg-[#e1ffea] text-[#28C76F]"
-                        : "bg-[#FFE1E1] text-[#C72828]"
-                    }`}
-                  >
-                    {user.status}
-                  </span>
-                </td>
-                <td className="px-5 text-left user-data">
-                  <ToggleSwitch
-                    id={user.id}
-                    isActive={toggleStates[user.id] || false}
-                    onChange={handleToggle}
-                  />
-                </td>
-                <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={() => openModal("user-update", user)}>
-                    <img
-                      src={editicon}
-                      alt="Edit"
-                      className="w-[18px] h-[18px] action-btn duration-200"
-                    />
-                  </button>
-                  <button>
-                    <img
-                      src={deletesicon}
-                      alt="Deletes"
-                      className="w-[18px] h-[18px] action-btn duration-200"
-                    />
-                  </button>
+            {paginatedData.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="px-5 py-4 text-center">
+                  No users found.
                 </td>
               </tr>
-            ))}
+            ) : (
+              paginatedData.map((user, index) => (
+                <tr
+                  key={index}
+                  className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
+                >
+                  <td className="px-5 text-left user-data">{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                  <td className="px-5 text-left user-data">
+                    {user.created_at
+                      ? new Date(user.created_at).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "N/A"}
+                  </td>
+                  <td className="pl-5 text-left user-data">{user.name || "N/A"}</td>
+                  <td className="px-5 text-left user-data">{user.username || "N/A"}</td>
+                  <td className="pl-12 pr-5 text-left user-data">{user.user_role || "N/A"}</td>
+                  <td className="px-5 text-left user-data">
+                    <span
+                      className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
+                        user.status === "active"
+                          ? "bg-[#e1ffea] text-[#28C76F]"
+                          : "bg-[#FFE1E1] text-[#C72828]"
+                      }`}
+                    >
+                      {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                    </span>
+                  </td>
+                  <td className="px-5 text-left user-data">
+                    <ToggleSwitch
+                      id={user.id}
+                      isActive={isBlocked(user.id)}
+                      onChange={handleToggle}
+                    />
+                  </td>
+                  <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
+                    <button onClick={() => handleEditUser(user)}>
+                      <img
+                        src={editicon}
+                        alt="Edit"
+                        className="w-[18px] h-[18px] action-btn duration-200"
+                      />
+                    </button>
+                    <button onClick={() => handleDelete(user.id)}>
+                      <img
+                        src={deletesicon}
+                        alt="Delete"
+                        className="w-[18px] h-[18px] action-btn duration-200"
+                      />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -291,109 +357,121 @@ const AdminUsers = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedData.map((user, index) => (
-              <React.Fragment key={index}>
-                <tr
-                  className={`${
-                    expandedRows[user.id]
-                      ? "mobile-no-border"
-                      : "mobile-with-border"
-                  } border-b border-[#E9E9E9] h-[57px]`}
-                >
-                  <td className="px-5 text-left user-data">{user.id}</td>
-                  <td className="px-5 text-left user-data">{user.date}</td>
-                  <td className="py-4 flex items-center justify-end h-[57px]">
-                    <div
-                      className={`user-dropdown-field ${
-                        expandedRows[user.id] ? "active" : ""
-                      }`}
-                      onClick={() => toggleRowExpand(user.id)}
-                    >
-                      <img
-                        src={downarrow}
-                        alt="drop-down-arrow"
-                        className={`user-dropdown-img ${
-                          expandedRows[user.id] ? "text-white" : ""
+            {paginatedData.length === 0 ? (
+              <tr>
+                <td colSpan={3} className="px-5 py-4 text-center">
+                  No users found.
+                </td>
+              </tr>
+            ) : (
+              paginatedData.map((user, index) => (
+                <React.Fragment key={index}>
+                  <tr
+                    className={`${
+                      expandedRows[user.id]
+                        ? "mobile-no-border"
+                        : "mobile-with-border"
+                    } border-b border-[#E9E9E9] h-[57px]`}
+                  >
+                    <td className="px-5 text-left user-data">{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                    <td className="px-5 text-left user-data">
+                      {user.created_at
+                        ? new Date(user.created_at).toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })
+                        : "N/A"}
+                    </td>
+                    <td className="py-4 flex items-center justify-end h-[57px]">
+                      <div
+                        className={`user-dropdown-field ${
+                          expandedRows[user.id] ? "active" : ""
                         }`}
-                      />
-                    </div>
-                  </td>
-                </tr>
-                {expandedRows[user.id] && (
-                  <tr className="mobile-with-border border-b border-[#E9E9E9]">
-                    <td colSpan={3} className="px-5">
-                      <div className="user-dropdown-content">
-                        <div className="user-grid">
-                          <div className="user-grid-item w-[33.33%]">
-                            <div className="dropdown-label">NAME</div>
-                            <div className="dropdown-value">{user.name}</div>
-                          </div>
-                          <div className="user-grid-item w-[35.33%]">
-                            <div className="dropdown-label">USERNAME</div>
-                            <div className="dropdown-value">
-                              {user.username}
-                            </div>
-                          </div>
-                          <div className="user-grid-item w-[20%]">
-                            <div className="dropdown-label">ROLE</div>
-                            <div className="dropdown-value">{user.role}</div>
-                          </div>
-                        </div>
-                        <div className="user-grid">
-                          <div className="user-grid-item w-[33.33%]">
-                            <div className="dropdown-label !mb-[10px]">
-                              STATUS
-                            </div>
-                            <div className="dropdown-value">
-                              <span
-                                className={`px-[10px] py-[5px] w-[53px] h-[24px] rounded-[4px] user-status ${
-                                  user.status === "Active"
-                                    ? "bg-[#e1ffea] text-[#28C76F]"
-                                    : "bg-[#FFE1E1] text-[#C72828] !pr-[0px] !pl-[5px]"
-                                }`}
-                              >
-                                {user.status}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="user-grid-item w-[35.33%]">
-                            <div className="dropdown-label">BLOCK</div>
-                            <div className="dropdown-value flex items-center gap-2 mt-[10px]">
-                              <ToggleSwitch
-                                id={user.id}
-                                isActive={toggleStates[user.id] || false}
-                                onChange={handleToggle}
-                              />
-                            </div>
-                          </div>
-                          <div className="user-grid-item w-[20%]">
-                            <div className="dropdown-label">ACTION</div>
-                            <div className="dropdown-value flex items-center gap-[15px] ml-[5px] mt-[10px]">
-                              <button
-                                onClick={() => openModal("user-update", user)}
-                              >
-                                <img
-                                  src={editicon}
-                                  alt="Edit"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
-                                />
-                              </button>
-                              <button>
-                                <img
-                                  src={deletesicon}
-                                  alt="Deletes"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
-                                />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
+                        onClick={() => toggleRowExpand(user.id)}
+                      >
+                        <img
+                          src={downarrow}
+                          alt="drop-down-arrow"
+                          className={`user-dropdown-img ${
+                            expandedRows[user.id] ? "text-white" : ""
+                          }`}
+                        />
                       </div>
                     </td>
                   </tr>
-                )}
-              </React.Fragment>
-            ))}
+                  {expandedRows[user.id] && (
+                    <tr className="mobile-with-border border-b border-[#E9E9E9]">
+                      <td colSpan={3} className="px-5">
+                        <div className="user-dropdown-content">
+                          <div className="user-grid">
+                            <div className="user-grid-item w-[33.33%]">
+                              <div className="dropdown-label">NAME</div>
+                              <div className="dropdown-value">{user.name || "N/A"}</div>
+                            </div>
+                            <div className="user-grid-item w-[35.33%]">
+                              <div className="dropdown-label">USERNAME</div>
+                              <div className="dropdown-value">{user.username || "N/A"}</div>
+                            </div>
+                            <div className="user-grid-item w-[20%]">
+                              <div className="dropdown-label">ROLE</div>
+                              <div className="dropdown-value">{user.user_role || "N/A"}</div>
+                            </div>
+                          </div>
+                          <div className="user-grid">
+                            <div className="user-grid-item w-[33.33%]">
+                              <div className="dropdown-label !mb-[10px]">
+                                STATUS
+                              </div>
+                              <div className="dropdown-value">
+                                <span
+                                  className={`px-[10px] py-[5px] w-[53px] h-[24px] rounded-[4px] user-status ${
+                                    user.status === "active"
+                                      ? "bg-[#e1ffea] text-[#28C76F]"
+                                      : "bg-[#FFE1E1] text-[#C72828] !pr-[0px] !pl-[5px]"
+                                  }`}
+                                >
+                                  {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="user-grid-item w-[35.33%]">
+                              <div className="dropdown-label">BLOCK</div>
+                              <div className="dropdown-value flex items-center gap-2 mt-[10px]">
+                                <ToggleSwitch
+                                  id={user.id}
+                                  isActive={isBlocked(user.id)}
+                                  onChange={handleToggle}
+                                />
+                              </div>
+                            </div>
+                            <div className="user-grid-item w-[20%]">
+                              <div className="dropdown-label">ACTION</div>
+                              <div className="dropdown-value flex items-center gap-[15px] ml-[5px] mt-[10px]">
+                                <button onClick={() => handleEditUser(user)}>
+                                  <img
+                                    src={editicon}
+                                    alt="Edit"
+                                    className="w-[18px] h-[18px] action-btn duration-200"
+                                  />
+                                </button>
+                                <button onClick={() => handleDelete(user.id)}>
+                                  <img
+                                    src={deletesicon}
+                                    alt="Delete"
+                                    className="w-[18px] h-[18px] action-btn duration-200"
+                                  />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -455,6 +533,12 @@ const AdminUsers = () => {
           </button>
         </div>
       </div>
+
+      <UserDeleteModal
+        isOpen={isDeleteModalOpen}
+        onCancel={handleCancelDelete}
+        onDelete={handleConfirmDelete}
+      />
     </div>
   );
 };

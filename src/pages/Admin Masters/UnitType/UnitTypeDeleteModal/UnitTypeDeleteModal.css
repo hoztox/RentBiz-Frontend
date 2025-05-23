@@ -1,0 +1,65 @@
+.modal-box {
+  display: flex;
+  width: 380px;
+  height: 432px;
+  padding: 31px 30px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  border-radius: 6px;
+}
+
+.modal-bg {
+  display: flex;
+  width: 312px;
+  height: 225px;
+  padding: 29px 43px 28.327px 44px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+  background: #f0f8ff;
+}
+
+.modal-content {
+  font-family: "Inter Tight";
+  margin-top: 20px;
+}
+
+.modal-content h2 {
+  font-size: 21px;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: 0;
+}
+
+.modal-content p {
+  margin-top: 9px;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 21px;
+  letter-spacing: 0px;
+}
+
+.cancel-btn {
+  width: 150px;
+  height: 38px;
+  border-radius: 6px;
+  border: 1px solid #201d1e;
+  font-family: "Inter Tight";
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+}
+
+.modal-delete-btn {
+  width: 150px;
+  height: 38px;
+  border-radius: 6px;
+  font-family: "Inter Tight";
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+}

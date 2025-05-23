@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import "./AdminCreateUserModal.css";
 import cancelIcon from "../../assets/Images/Admin Create Modal/cancelIcon.svg";
 import addImageIcon from "../../assets/Images/Admin Create Modal/addImageIcon.svg";
@@ -9,11 +9,35 @@ import { BASE_URL } from "../../utils/config";
 import axios from "axios";
 
 const AdminCreateUserModal = () => {
-  const { modalState, closeModal } = useModal();
+  const { modalState, closeModal, triggerRefresh } = useModal();
   const [isLoading, setIsLoading] = useState(false);
   const [isRoleSelectOpen, setIsRoleSelectOpen] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const fileInputRef = useRef(null);
 
   const navigate = useNavigate();
+
+  const getUserCompanyId = () => {
+    // First check if company_id is stored directly
+    const storedCompanyId = localStorage.getItem("company_id");
+    if (storedCompanyId) return storedCompanyId;
+    // If user data exists with company_id
+    const userRole = localStorage.getItem("role");
+    if (userRole === "user") {
+      // Try to get company_id from user data that was stored during login
+      const userData = localStorage.getItem("user_company_id");
+      if (userData) {
+        try {
+          return JSON.parse(userData);  // Ensure it's valid JSON
+        } catch (e) {
+          console.error("Error parsing user company ID:", e);
+          return null;
+        }
+      }
+    }
+    return null;
+  };
 
   // Form state - updated to match backend model
   const [formData, setFormData] = useState({
@@ -47,6 +71,39 @@ const AdminCreateUserModal = () => {
       setFieldErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
+
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select a valid image file');
+        return;
+      }
+
+      // Validate file size (optional - e.g., max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        alert('File size should be less than 5MB');
+        return;
+      }
+
+      setProfileImage(file);
+
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setImagePreview(event.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+
 
   const validateFields = () => {
     const errors = {};
@@ -111,32 +168,40 @@ const AdminCreateUserModal = () => {
 
     try {
       // Prepare data for backend
-      const submitData = {
-        name: formData.name,
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-        confirm_password: formData.confirm_password,
-        user_role: formData.user_role || null,
-      };
+      const companyId = getUserCompanyId();
+      
+      // Create FormData for file upload
+      const formDataToSend = new FormData();
+      formDataToSend.append('company_id', companyId);
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('username', formData.username);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('password', formData.password);
+      formDataToSend.append('confirm_password', formData.confirm_password);
+      formDataToSend.append('user_role', formData.user_role || null);
+      
+      // Add company logo if selected
+      if (profileImage) {
+        formDataToSend.append('company_logo', profileImage);
+      }
 
       // API call to create user
       const response = await axios.post(
-        `${BASE_URL}/users/create`,
-        submitData,
+        `${BASE_URL}/company/users/create/`,
+        formDataToSend,
         {
           headers: {
-            "Content-Type": "application/json",
-            // Add authorization header if needed
-            // 'Authorization': `Bearer ${token}`
+            "Content-Type": "multipart/form-data",
           },
         }
       );
 
       if (response.status === 200 || response.status === 201) {
         alert("User created successfully!");
+        triggerRefresh();
         closeModal();
         navigate("/admin/users-manage");
+        console.log("User Created", response.data)
 
         // Reset form and errors
         setFormData({
@@ -154,6 +219,11 @@ const AdminCreateUserModal = () => {
           password: "",
           confirm_password: "",
         });
+        setProfileImage(null);
+        setImagePreview(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
       }
     } catch (error) {
       console.error("Error creating user:", error);
@@ -197,15 +267,39 @@ const AdminCreateUserModal = () => {
         {/* Profile Image Section */}
         <div className="absolute top-[50px] md:top-[71px] left-1/2 transform -translate-x-1/2 flex justify-center">
           <div className="relative top-[-30px] w-[100px] md:w-[123px] h-[100px] md:h-[123px] bg-[#F3F3F3] rounded-full border overflow-hidden">
+            {/* Display uploaded image preview */}
+            {imagePreview && (
+              <img 
+                src={imagePreview} 
+                alt="Profile preview" 
+                className="w-full h-full object-cover rounded-full"
+              />
+            )}
+            
+            {/* Always show the bottom section with upload option */}
             <div className="absolute bottom-0 left-0 right-0 h-[30px] md:h-[37px] bg-[#201D1E] rounded-b-full"></div>
-            <div className="absolute bottom-[6px] md:bottom-[8px] left-1/2 transform -translate-x-1/2">
+            <div 
+              className="absolute bottom-[6px] md:bottom-[8px] left-1/2 transform -translate-x-1/2 cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={handleImageClick}
+            >
               <img
                 src={addImageIcon}
                 alt="Add image"
-                className="h-[18px] md:h-[22px] w-[18px] md:w-[22px] cursor-pointer"
+                className="h-[18px] md:h-[22px] w-[18px] md:w-[22px]"
               />
             </div>
-            <input type="file" className="hidden" accept="image/*" />
+            
+            {/* Remove image button - only show when image is selected */}
+          
+            
+            {/* Hidden file input */}
+            <input 
+              type="file" 
+              accept="image/*" 
+              ref={fileInputRef}
+              onChange={handleImageUpload}
+              className="hidden"
+            />
           </div>
         </div>
 
@@ -300,8 +394,9 @@ const AdminCreateUserModal = () => {
               onBlur={() => setIsRoleSelectOpen(false)}
             >
               <option value="">Select Role</option>
-              <option value="Manager">Manager</option>
+              <option value="Admin">Admin</option>
               <option value="Sales">Sales</option>
+              <option value="Store">Store</option>
             </select>
 
             <ChevronDown
