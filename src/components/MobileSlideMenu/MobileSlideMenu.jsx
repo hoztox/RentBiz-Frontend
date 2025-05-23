@@ -21,12 +21,17 @@ import tenancyReport from "../../assets/Images/Admin Sidebar/tenancy report.svg"
 import upcomingCollection from "../../assets/Images/Admin Sidebar/upcoming collection.svg";
 import reportCollection from "../../assets/Images/Admin Sidebar/report collection.svg";
 import incomeExpense from "../../assets/Images/Admin Sidebar/income-expense.svg";
+import logout from "../../assets/Images/Admin Sidebar/logout-icon.svg"
 import closeicon from "../../assets/Images/Admin Navbar/close-icon.svg";
 
 const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
   const [activeItem, setActiveItem] = useState("Dashboard");
   const navigate = useNavigate();
   const { openModal } = useModal();
+
+  const openCreateTenant = () => {
+    navigate("/admin/tenant-timeline");
+  };
 
   const [expandedMenus, setExpandedMenus] = useState({
     Users: false,
@@ -293,7 +298,7 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
                   }`}
                   onClick={() => {
                     setActiveItem("Create Tenant");
-                    openModal("tenant-create");
+                    openCreateTenant();
                     toggleMobileMenu();
                   }}
                 >
@@ -758,6 +763,30 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
                   className="w-[18px] sidebar-icon"
                 />
                 <p className="pb-[2px] menu-text">Income/Expense</p>
+              </div>
+              <div className="border-t border-[#E8E8E8] mb-6"></div>
+            </div>
+
+            {/* Logout */}
+            <div className="mx-5">
+              <div
+                className={`flex items-center py-[7px] px-3 mb-5 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
+                  activeItem === "Logout"
+                    ? "menu-active"
+                    : "text-gray-700 hover:bg-gray-200"
+                }`}
+                onClick={() =>
+                  handleNonDropdownClick(
+                    "Logout",
+                  )
+                }
+              >
+                <img
+                  src={logout}
+                  alt="Logout"
+                  className="w-[18px] sidebar-icon"
+                />
+                <p className="pb-[2px] menu-text">Logout</p>
               </div>
             </div>
           </div>

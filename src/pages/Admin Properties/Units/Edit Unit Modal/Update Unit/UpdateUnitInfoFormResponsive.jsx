@@ -131,7 +131,7 @@ const UpdateUnitInfoFormResponsive = ({ onNext }) => {
           />
         </div>
 
-        {/* Address */}
+        {/* Description */}
         <div className="col-span-1">
           <label className="block unit-info-form-label">Description*</label>
           <textarea
@@ -139,13 +139,13 @@ const UpdateUnitInfoFormResponsive = ({ onNext }) => {
             name="description"
             value={formState.description}
             onChange={handleInputChange}
-            placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit.  Morbi orci ante, scelerisque faucibus condimentum"
+            placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
             className="w-full unit-info-form-inputs focus:border-gray-300 resize-none duration-200"
             required
           />
         </div>
 
-        {/* Description */}
+        {/* Address */}
         <div className="col-span-1">
           <label className="block unit-info-form-label">Address*</label>
           <textarea

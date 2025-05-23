@@ -42,7 +42,7 @@ const DocumentUploadModal = ({
 
   const handleConfirm = () => {
     onConfirm(); // Call the original onConfirm function
-    navigate("/admin/unit-submitted"); // Navigate to the submitted page
+    navigate("/admin/update-unit-submitted"); // Navigate to the submitted page
   };
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

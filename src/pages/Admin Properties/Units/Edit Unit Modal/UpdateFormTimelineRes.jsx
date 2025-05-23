@@ -78,7 +78,7 @@ const UpdateFormTimelineRes = () => {
       name: "Submitted",
       description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi orci ante, scelerisque",
-      route: "/admin/update-unit-submitted",
+      route: "",
     },
   ];
 

@@ -228,7 +228,7 @@ const Units = () => {
             <tr className="border-b border-[#E9E9E9] h-[57px]">
               <th className="px-5 text-left unit-thead">ID</th>
               <th className="px-5 text-left unit-thead w-[12%]">DATE</th>
-              <th className="pl-5 text-left unit-thead w-[15%]">NAME</th>
+              <th className="pl-5 text-left unit-thead w-[10%]">NAME</th>
               <th className="pl-5 text-left unit-thead w-[15%]">BUILDING</th>
               <th className="px-5 text-left unit-thead">ADDRESS</th>
               <th className="pl-12 pr-5 text-left unit-thead w-[12%]">TYPE</th>

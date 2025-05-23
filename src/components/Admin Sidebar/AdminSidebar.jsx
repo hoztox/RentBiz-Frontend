@@ -20,8 +20,7 @@ import tenancyReport from "../../assets/Images/Admin Sidebar/tenancy report.svg"
 import upcomingCollection from "../../assets/Images/Admin Sidebar/upcoming collection.svg";
 import reportCollection from "../../assets/Images/Admin Sidebar/report collection.svg";
 import incomeExpense from "../../assets/Images/Admin Sidebar/income-expense.svg";
-import AdminCreateUserModal from "../AdminCreateUserModal/AdminCreateUserModal";
-import CreateTenancyModal from "../../pages/Admin Tenancy/CreateTenancy/CreateTenancyModal";
+import logout from "../../assets/Images/Admin Sidebar/logout-icon.svg"
 import CreateTenantModal from "../../pages/Admin Tenants/CreateTenantModal/CreateTenantModal";
 import { useModal } from "../../context/ModalContext";
 
@@ -88,19 +87,6 @@ const AdminSidebar = () => {
     setIsCreateTenantModalOpen(false);
     setActiveItem("Tenants Master");
   };
-
-  // Create Tenancy Modal
-  // const [isTenancyModalOpen, setIsTenancyModalOpen] = useState(false);
-
-  // const openTenancyModal = () => {
-  //   setIsTenancyModalOpen(true);
-  //   setActiveItem("Tenancy Master");
-  // };
-
-  // const closeTenancyModal = () => {
-  //   setIsTenancyModalOpen(false);
-  //   setActiveItem("Tenancy Master");
-  // };
 
   return (
     <div className="flex flex-col admin-sidebar">
@@ -756,17 +742,38 @@ const AdminSidebar = () => {
             />
             <p className="pb-[2px] menu-text">Income/Expense</p>
           </div>
+        <div className="border-t border-[#E8E8E8] mb-6"></div>
+        </div>
+
+        <div className="mx-5">
+          <div
+              className={`flex items-center py-[7px] px-3 mb-5 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
+                activeItem === "Logout"
+                  ? "menu-active"
+                  : "text-gray-700 hover:bg-gray-200"
+              }`}
+              onClick={() =>
+              handleNonDropdownClick(
+                "Logout",  
+              )
+            }
+            >
+            <img
+              src={logout}
+              alt="Logout"
+              className="w-[18px] sidebar-icon"
+            />
+            <p className="pb-[2px] menu-text">Logout</p>
+          </div>
         </div>
       </div>
 
+      
       {/* Create Tenant Modal */}
       <CreateTenantModal
         open={isCreateTenantModalOpen}
         onClose={closeCreateTenantModal}
       />
-
-      {/* Create Tenancy Modal */}
-      {/* <CreateTenancyModal /> */}
 
       {/* Footer */}
       <div className="mx-5 border-t border-[#E8E8E8] text-start py-6 side-footer-text ">
