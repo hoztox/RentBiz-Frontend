@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import closeicon from "../../../../../assets/Images/Admin Units/close-icon.svg";
-import FromTimeline from "../FromTimeline";
+import FormTimeline from "../FromTimeline";
 import BuildingInfoForm from "../Select Building/BuildingInfoForm";
 import UnitInfoForm from "../Create Unit/UnitInfoForm";
 import DocumentsForm from "../Upload Documents/DocumentsForm";
@@ -9,7 +9,11 @@ import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 
 const UnitFormFlow = ({ onClose }) => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    building: null,
+    unit: null,
+    documents: null,
+  });
   const [formProgress, setFormProgress] = useState({
     selectBuilding: 0,
     createUnit: 0,
@@ -38,20 +42,34 @@ const UnitFormFlow = ({ onClose }) => {
       submitted: 0,
     };
 
-    if (currentPageIndex >= 1) newProgress.createBuilding = 100;
-    if (currentPageIndex >= 2) newProgress.uploadDocuments = 100;
+    if (currentPageIndex >= 1) newProgress.selectBuilding = 100;
+    if (currentPageIndex >= 2) newProgress.createUnit = 100;
+    if (currentPageIndex >= 3) newProgress.uploadDocuments = 100;
+    if (currentPageIndex >= 4) newProgress.review = 100;
 
-    if (currentPageIndex === 0 && formData.buildingNo) {
-      const requiredFields = [
-        "buildingNo",
-        "plotNo",
-        "buildingName",
-        "address",
-      ];
-      const filledFields = requiredFields.filter((field) =>
-        formData[field]?.trim()
+    if (currentPageIndex === 0 && formData.building) {
+      const requiredFields = ["building"];
+      const filledFields = requiredFields.filter(
+        (field) => formData.building[field]
       ).length;
-      newProgress.createBuilding = Math.min(
+      newProgress.selectBuilding = Math.min(
+        100,
+        (filledFields / requiredFields.length) * 100
+      );
+    }
+
+    if (currentPageIndex === 1 && formData.unit) {
+      const requiredFields = [
+        "unit_name",
+        "unit_type",
+        "address",
+        "premise_no",
+        "unit_status",
+      ];
+      const filledFields = requiredFields.filter(
+        (field) => formData.unit[field]
+      ).length;
+      newProgress.createUnit = Math.min(
         100,
         (filledFields / requiredFields.length) * 100
       );
@@ -61,69 +79,83 @@ const UnitFormFlow = ({ onClose }) => {
   }, [currentPageIndex, formData]);
 
   const handleNextPage = (pageData) => {
-    // Start animation
     setAnimating(true);
+    setFormData((prevData) => ({
+      ...prevData,
+      [currentPageIndex === 0 ? "building" : currentPageIndex === 1 ? "unit" : "documents"]: pageData,
+    }));
 
-    // Update form data immediately
-    setFormData((prevData) => ({ ...prevData, ...pageData }));
-
-    // Delay the page change to allow for animation
     setTimeout(() => {
       setCurrentPageIndex((prev) => prev + 1);
       setAnimating(false);
-    }, 500); // Match this with your CSS transition duration
+    }, 500);
   };
 
-  const handlePreviousPage = () => {
+  const handlePreviousPage = (pageData) => {
     setAnimating(true);
+    if (pageData) {
+      setFormData((prevData) => ({
+        ...prevData,
+        [currentPageIndex === 2 ? "documents" : "unit"]: pageData,
+      }));
+    }
 
     setTimeout(() => {
-      setCurrentPageIndex((prev) => Math.max(prev - 1, 0)); // prevent going below 0
+      setCurrentPageIndex((prev) => Math.max(prev - 1, 0));
       setAnimating(false);
     }, 500);
   };
 
   const handleClose = () => {
     setCurrentPageIndex(0);
-    setFormData({});
-    setFormProgress({ createBuilding: 0, uploadDocuments: 0, submitted: 0 });
-    onClose(); // Call parent-provided close handler
+    setFormData({ building: null, unit: null, documents: null });
+    setFormProgress({
+      selectBuilding: 0,
+      createUnit: 0,
+      uploadDocuments: 0,
+      review: 0,
+      submitted: 0,
+    });
+    onClose();
   };
 
   const pageComponents = [
-    <BuildingInfoForm key="building" onNext={handleNextPage} />,
+    <BuildingInfoForm
+      key="building"
+      onNext={handleNextPage}
+      initialData={formData.building}
+    />,
     <UnitInfoForm
       key="info"
       onNext={handleNextPage}
       onBack={handlePreviousPage}
+      initialData={formData.unit}
     />,
     <DocumentsForm
       key="docs"
       onNext={handleNextPage}
       onBack={handlePreviousPage}
+      initialData={formData.documents}
     />,
     <UnitReview
       key="review"
+      formData={formData}
       onNext={handleNextPage}
       onBack={handlePreviousPage}
     />,
-    <SubmissionConfirmation key="confirm" formData={formData} />,
+    <SubmissionConfirmation key="confirm" formData={formData} onClose={handleClose} />,
   ];
 
   return (
     <div className="flex">
-      {/* Left Side - Timeline */}
       <div className="w-[350px] pr-[53px]">
-        <FromTimeline
+        <FormTimeline
           key={currentPageIndex}
           currentStep={currentPageIndex + 1}
           progress={formProgress}
         />
       </div>
-
-      {/* Right Side - Form Steps & Modal Header */}
       <div className="w-full h-[780px] px-[33px] pt-[50px] pb-[40px] overflow-y-scroll">
-        {/* Modal Header */}
         <div className="building-modal-header flex justify-between items-center mb-[41px]">
           <h3 className="building-modal-title">{currentTitle}</h3>
           <button
@@ -133,13 +165,9 @@ const UnitFormFlow = ({ onClose }) => {
             <img src={closeicon} alt="Close" className="w-[15px] h-[15px]" />
           </button>
         </div>
-
-        {/* Current Form Page with Animation */}
         <div
           className={`transition-all duration-500 ease-in-out ${
-            animating
-              ? "opacity-0 transform translate-x-10"
-              : "opacity-100 transform translate-x-0"
+            animating ? "opacity-0 transform translate-x-10" : "opacity-100 transform translate-x-0"
           }`}
         >
           {pageComponents[currentPageIndex]}

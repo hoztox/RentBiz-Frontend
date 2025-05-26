@@ -21,6 +21,7 @@ const Buildings = () => {
   const [expandedRows, setExpandedRows] = useState({});
   const [buildings, setBuildings] = useState([]); // Initialize as empty array
   const [loading, setLoading] = useState(true);
+  const [selectedBuildingId, setSelectedBuildingId] = useState(null);
   const [error, setError] = useState(null);
   const itemsPerPage = 10;
   const navigate = useNavigate();
@@ -130,6 +131,11 @@ const Buildings = () => {
     }
   };
 
+  const handleEditClick = (buildingId) => {
+    setSelectedBuildingId(buildingId);
+    openEditBuildingModal(true);
+  };
+
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
@@ -235,12 +241,10 @@ const Buildings = () => {
                   </span>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={openEditBuildingModal}>
-                    <img
-                      src={editicon}
+                  <button onClick={() => handleEditClick(building.id)}>
+                    <img src={editicon}
                       alt="Edit"
-                      className="w-[18px] h-[18px] bldg-action-btn duration-200"
-                    />
+                      className="w-[18px] h-[18px] bldg-action-btn duration-200" />
                   </button>
                   <button onClick={() => deleteBuilding(building.id)}>
                     <img
@@ -427,6 +431,7 @@ const Buildings = () => {
       <EditBuildingModal
         open={editbuildingModalOpen}
         onClose={closeEditBuildingModal}
+        buildingId={selectedBuildingId}
       />
     </div>
   );
