@@ -26,24 +26,24 @@ const Buildings = () => {
   const navigate = useNavigate();
 
   const getUserCompanyId = () => {
-  const role = localStorage.getItem("role")?.toLowerCase();
+    const role = localStorage.getItem("role")?.toLowerCase();
 
-  if (role === "company") {
-    // When a company logs in, their own ID is stored as company_id
-    return localStorage.getItem("company_id");
-  } else if (role === "user" || role === "admin") {
-    // When a user logs in, company_id is directly stored
-    try {
-      const userCompanyId = localStorage.getItem("company_id");
-      return userCompanyId ? JSON.parse(userCompanyId) : null;
-    } catch (e) {
-      console.error("Error parsing user company ID:", e);
-      return null;
+    if (role === "company") {
+      // When a company logs in, their own ID is stored as company_id
+      return localStorage.getItem("company_id");
+    } else if (role === "user" || role === "admin") {
+      // When a user logs in, company_id is directly stored
+      try {
+        const userCompanyId = localStorage.getItem("company_id");
+        return userCompanyId ? JSON.parse(userCompanyId) : null;
+      } catch (e) {
+        console.error("Error parsing user company ID:", e);
+        return null;
+      }
     }
-  }
 
-  return null;
-};
+    return null;
+  };
 
   const companyId = getUserCompanyId();
 
@@ -92,10 +92,10 @@ const Buildings = () => {
         setBuildings(data);
         setLoading(false);
         console.log("building", response.data);
-        
+
       } catch (err) {
         setError("Failed to fetch buildings data", err);
-        setLoading(false); 
+        setLoading(false);
       }
     };
 
@@ -116,6 +116,19 @@ const Buildings = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  const deleteBuilding = async (buildingId) => {
+    if (window.confirm("Are you sure you want to delete this building?")) {
+      try {
+        const response = await axios.delete(`${BASE_URL}/company/buildings/${buildingId}/`);
+        if (response.status === 204) {
+          setBuildings(buildings.filter(building => building.id !== buildingId));
+        }
+      } catch (err) {
+        console.error("Failed to delete building", err);
+      }
+    }
+  };
 
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
@@ -149,9 +162,8 @@ const Buildings = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
+                  }`}
               />
             </div>
           </div>
@@ -212,13 +224,12 @@ const Buildings = () => {
                 <td className="pl-12 pr-5 text-left bldg-data">N/A</td>
                 <td className="px-5 text-left bldg-data">
                   <span
-                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
-                      building.status === "active"
-                        ? "bg-[#e1ffea] text-[#28C76F]"
-                        : building.status === "inactive"
+                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${building.status === "active"
+                      ? "bg-[#e1ffea] text-[#28C76F]"
+                      : building.status === "inactive"
                         ? "bg-[#FFE1E1] text-[#C72828]"
                         : "bg-[#FFF4E1] text-[#FFA500]"
-                    }`}
+                      }`}
                   >
                     {building.status.charAt(0).toUpperCase() + building.status.slice(1)}
                   </span>
@@ -231,7 +242,7 @@ const Buildings = () => {
                       className="w-[18px] h-[18px] bldg-action-btn duration-200"
                     />
                   </button>
-                  <button>
+                  <button onClick={() => deleteBuilding(building.id)}>
                     <img
                       src={deletesicon}
                       alt="Deletes"
@@ -259,11 +270,10 @@ const Buildings = () => {
             {paginatedData.map((building, index) => (
               <React.Fragment key={index}>
                 <tr
-                  className={`${
-                    expandedRows[building.building_no]
-                      ? "bldg-mobile-no-border"
-                      : "bldg-mobile-with-border"
-                  } border-b border-[#E9E9E9] h-[57px]`}
+                  className={`${expandedRows[building.building_no]
+                    ? "bldg-mobile-no-border"
+                    : "bldg-mobile-with-border"
+                    } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left bldg-data bldg-id-column">
                     {(currentPage - 1) * itemsPerPage + index + 1}
@@ -277,17 +287,15 @@ const Buildings = () => {
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
-                      className={`bldg-dropdown-field ${
-                        expandedRows[building.building_no] ? "active" : ""
-                      }`}
+                      className={`bldg-dropdown-field ${expandedRows[building.building_no] ? "active" : ""
+                        }`}
                       onClick={() => toggleRowExpand(building.building_no)}
                     >
                       <img
                         src={downarrow}
                         alt="drop-down-arrow"
-                        className={`bldg-dropdown-img ${
-                          expandedRows[building.building_no] ? "text-white" : ""
-                        }`}
+                        className={`bldg-dropdown-img ${expandedRows[building.building_no] ? "text-white" : ""
+                          }`}
                       />
                     </div>
                   </td>
@@ -323,13 +331,12 @@ const Buildings = () => {
                             <div className="bldg-dropdown-label">STATUS</div>
                             <div className="bldg-dropdown-value">
                               <span
-                                className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] bldg-status ${
-                                  building.status === "active"
-                                    ? "bg-[#e1ffea] text-[#28C76F]"
-                                    : building.status === "inactive"
+                                className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] bldg-status ${building.status === "active"
+                                  ? "bg-[#e1ffea] text-[#28C76F]"
+                                  : building.status === "inactive"
                                     ? "bg-[#FFE1E1] text-[#C72828]"
                                     : "bg-[#FFF4E1] text-[#FFA500]"
-                                }`}
+                                  }`}
                               >
                                 {building.status.charAt(0).toUpperCase() + building.status.slice(1)}
                               </span>
@@ -349,7 +356,7 @@ const Buildings = () => {
                                 <img
                                   src={deletesicon}
                                   alt="Deletes"
-                                  className="w-[18px] h-[18px] bldg-action-btn duration-200 ml-3"
+                                  className="w-[18px] h-[18px] bldg-action-btn duration-200"
                                 />
                               </button>
                             </div>
@@ -389,11 +396,10 @@ const Buildings = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
-                currentPage === startPage + i
-                  ? "bg-[#1458A2] text-white"
-                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-              }`}
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${currentPage === startPage + i
+                ? "bg-[#1458A2] text-white"
+                : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+                }`}
               onClick={() => setCurrentPage(startPage + i)}
             >
               {startPage + i}

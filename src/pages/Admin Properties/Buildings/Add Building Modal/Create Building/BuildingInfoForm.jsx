@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./buildinginfoform.css";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
@@ -17,7 +17,8 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
       land_mark: "",
     }
   );
-
+  const [companyId, setCompanyId] = useState(null);
+  const [userId, setUserId] = useState(null);
   const [isSelectFocused, setIsSelectFocused] = useState(false);
 
   const handleInputChange = (e) => {
@@ -40,52 +41,49 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
     });
   };
 
-const getUserCompanyId = () => {
-  const role = localStorage.getItem("role")?.toLowerCase();
+  const getUserCompanyId = () => {
+    const role = localStorage.getItem("role")?.toLowerCase();
+    const storedCompanyId = localStorage.getItem("company_id");
 
-  if (role === "company") {
-    // When a company logs in, their own ID is stored as company_id
-    return localStorage.getItem("company_id");
-  } else if (role === "user" || role === "admin") {
-    // When a user logs in, company_id is directly stored
-    try {
-      const userCompanyId = localStorage.getItem("company_id");
-      return userCompanyId ? JSON.parse(userCompanyId) : null;
-    } catch (e) {
-      console.error("Error parsing user company ID:", e);
-      return null;
+    console.log("Role:", role);
+    console.log("Raw company_id from localStorage:", storedCompanyId);
+
+    if (role === "company") {
+      return storedCompanyId;
+    } else if (role === "user" || role === "admin") {
+      return storedCompanyId;
     }
-  }
 
-  return null;
-};
+    return null;
+  };
 
+  const getRelevantUserId = () => {
+    const role = localStorage.getItem("role")?.toLowerCase();
 
-const getRelevantUserId = () => {
-  const role = localStorage.getItem("role")?.toLowerCase();
+    if (role === "user" || role === "admin") {
+      const userId = localStorage.getItem("user_id");
+      if (userId) return userId;
+    }
 
-  if (role === "user" || role === "admin") {
-    const userId = localStorage.getItem("user_id");
-    if (userId) return userId;
-  }
+    return null;
+  };
 
-  if (role === "company") {
-    const companyId = localStorage.getItem("company_id");
-    if (companyId) return companyId;
-  }
+  useEffect(() => {
+    const cid = getUserCompanyId();
+    const uid = getRelevantUserId();
 
-  return null;
-};
+    console.log("Company ID (inside useEffect):", cid);
+    console.log("User ID (inside useEffect):", uid);
 
-
-  const companyId = getUserCompanyId();
-  const userId = getRelevantUserId();
+    setCompanyId(cid);
+    setUserId(uid);
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const tempData = {
       company: companyId,
-      user: userId,
+      user: userId || null,
       building_name: formState.building_name || null,
       building_no: formState.building_no || null,
       plot_no: formState.plot_no || null,
@@ -104,9 +102,6 @@ const getRelevantUserId = () => {
   return (
     <form onSubmit={handleSubmit} className="flex-1">
       <div className="grid grid-cols-2 gap-5">
-        {/* Company */}
-
-
         {/* Building No */}
         <div className="col-span-1">
           <label className="block building-info-form-label">Building No*</label>
@@ -265,8 +260,9 @@ const getRelevantUserId = () => {
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
-                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${isSelectFocused ? "rotate-180" : ""
-                  }`}
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
+                  isSelectFocused ? "rotate-180" : ""
+                }`}
               />
             </div>
           </div>
