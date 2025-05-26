@@ -58,12 +58,28 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
     return null;
   };
 
+  const getRelevantUserId = () => {
+    const userRole = localStorage.getItem("role");
+
+    if (userRole === "user") {
+      const userId = localStorage.getItem("user_id");
+      if (userId) return userId;
+    }
+
+    const companyId = localStorage.getItem("company_id");
+    if (companyId) return companyId;
+
+    return null;
+  };
+
   const companyId = getUserCompanyId();
+  const userId = getRelevantUserId();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const tempData = {
       company: companyId,
+      user: userId,
       building_name: formState.building_name || null,
       building_no: formState.building_no || null,
       plot_no: formState.plot_no || null,

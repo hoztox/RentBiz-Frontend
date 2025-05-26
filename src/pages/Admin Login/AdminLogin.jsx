@@ -40,79 +40,87 @@ const AdminLogin = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!username || !password) {
-      toast.error("Username and Password are required");
-      return;
-    }
+  if (!username || !password) {
+    toast.error("Username and Password are required");
+    return;
+  }
 
-    try {
-      setLoading(true);
-      const response = await axios.post(`${BASE_URL}/company/company-login/`, {
+  try {
+    setLoading(true);
+
+    const response = await axios.post(`${BASE_URL}/company/company-login/`, {
+      username,
+      password,
+    });
+
+    console.log("Login Success:", response.data);
+
+    if (response.status === 200) {
+      const {
+        access,
+        refresh,
+        id,
+        email,
+        company_id,
         username,
-        password,
-      });
+        name,
+        role: displayRole, // This is user_role like "Admin"
+        ...userData
+      } = response.data;
 
-      console.log("Login Success:", response.data);
+      // Decode JWT to extract normalized role (either "user" or "company")
+      const decodedAccess = JSON.parse(atob(access.split('.')[1]));
+      const normalizedRole = decodedAccess.role;
 
-      if (response.status === 200) {
-        const {
-          access,
-          refresh,
-          id,
-          email_address,
-          company_name,
-          role,
-          ...userData
-        } = response.data;
+      localStorage.setItem("accessToken", access);
+      localStorage.setItem("refreshToken", refresh);
+      localStorage.setItem("role", normalizedRole); // store normalized role
+      localStorage.setItem("user_display_role", displayRole); // optionally keep display role (e.g., Admin)
 
-        // Setting id as company_id since the response does not have company_id
-        const company_id = id;
+      if (normalizedRole === "company") {
+        localStorage.setItem("company_id", company_id);
+        localStorage.setItem("email", email);
+        localStorage.setItem("username", username);
+        localStorage.setItem("name", name);
 
-        console.log("Access Token:", access);
-        console.log("Refresh Token:", refresh);
-        console.log("Company ID:", company_id);
-        console.log("User Data:", userData);
+        Object.keys(userData).forEach((key) => {
+          localStorage.setItem(`company_${key}`, JSON.stringify(userData[key]));
+        });
 
-        localStorage.setItem("accessToken", access);
-        localStorage.setItem("refreshToken", refresh);
-        localStorage.setItem("role", role);
+        localStorage.removeItem("user_id");
 
-        if (role === "company" && company_id) {
-          localStorage.setItem("company_id", company_id);
-          localStorage.setItem("company_name", company_name);
-          localStorage.setItem("email_address", email_address);
-          Object.keys(userData).forEach((key) => {
-            localStorage.setItem(
-              `company_${key}`,
-              JSON.stringify(userData[key])
-            );
-          });
+        console.log("Navigating to /admin/dashboard");
+        setTimeout(() => navigate("/admin/dashboard"), 100);
+      } else if (normalizedRole === "user") {
+        localStorage.setItem("user_id", id);
+        localStorage.setItem("email", email);
+        localStorage.setItem("username", username);
+        localStorage.setItem("name", name);
+        localStorage.setItem("company_id", company_id);
 
-          localStorage.removeItem("user_id");
+        Object.keys(userData).forEach((key) => {
+          localStorage.setItem(`user_${key}`, JSON.stringify(userData[key]));
+        });
 
-          console.log("Navigating to /admin/dashboard");
-          setTimeout(() => navigate("/admin/dashboard"), 100);
-        } else if (role === "user") {
-          localStorage.setItem("user_id", id);
+        localStorage.removeItem("company_id");
 
-          Object.keys(userData).forEach((key) => {
-            localStorage.setItem(`user_${key}`, JSON.stringify(userData[key]));
-          });
-
-          localStorage.removeItem("company_id");
-
-          console.log("Navigating to /user/dashboard");
-          setTimeout(() => navigate("/company/dashboard"), 100);
-        }
+        console.log("Navigating to /admin/dashboard");
+        setTimeout(() => navigate("/admin/dashboard"), 100);
+      } else {
+        toast.error("Unknown role detected.");
+        console.warn("Unhandled role from token:", normalizedRole);
       }
-    } catch (error) {
-      console.error("Login Error:", error.response?.data || error);
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (error) {
+    console.error("Login Error:", error.response?.data || error.message);
+    toast.error("Login failed. Please check your credentials.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-white">

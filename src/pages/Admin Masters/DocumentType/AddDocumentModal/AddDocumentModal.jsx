@@ -37,6 +37,20 @@ const AddDocumentModal = ({
     return null;
   };
 
+  const getRelevantUserId = () => {
+    const userRole = localStorage.getItem("role");
+
+    if (userRole === "user") {
+      const userId = localStorage.getItem("user_id");
+      if (userId) return userId;
+    }
+
+    const companyId = localStorage.getItem("company_id");
+    if (companyId) return companyId;
+
+    return null;
+  };
+
   //  const companyId = getUserCompanyId();
 
   // Only render for "create-document-type-master" type
@@ -61,8 +75,10 @@ const AddDocumentModal = ({
 
     try {
       const companyId = getUserCompanyId();
+      const userId = getRelevantUserId();
 
       const payload = {
+        user: userId,
         company: companyId,
         title: title
       };
