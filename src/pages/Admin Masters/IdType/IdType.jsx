@@ -55,17 +55,23 @@ const IdType = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(`${BASE_URL}/company/id_type/company/${companyId}`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const idData = Array.isArray(response.data) ? response.data : response.data.results || [];
+      const response = await axios.get(
+        `${BASE_URL}/company/id_type/company/${companyId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const idData = Array.isArray(response.data)
+        ? response.data
+        : response.data.results || [];
       setIdTypes(idData);
     } catch (err) {
       console.error("Error fetching ID types:", err);
       const errorMessage =
-        err.response?.data?.message || "Failed to fetch ID types. Please try again.";
+        err.response?.data?.message ||
+        "Failed to fetch ID types. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
       setIdTypes([]);
@@ -101,7 +107,8 @@ const IdType = () => {
     } catch (error) {
       console.error("Error deleting ID type:", error);
       const errorMessage =
-        error.response?.data?.message || "Failed to delete ID type. Please try again.";
+        error.response?.data?.message ||
+        "Failed to delete ID type. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -282,7 +289,9 @@ const IdType = () => {
               <thead>
                 <tr className="border-b border-[#E9E9E9] h-[57px]">
                   <th className="px-4 py-3 text-left idtype-thead">ID</th>
-                  <th className="px-4 py-3 text-left idtype-thead">ENTRY DATE</th>
+                  <th className="px-4 py-3 text-left idtype-thead">
+                    ENTRY DATE
+                  </th>
                   <th className="px-4 py-3 text-left idtype-thead">TITLE</th>
                   <th className="px-4 py-3 text-right idtype-thead">ACTION</th>
                 </tr>
@@ -367,7 +376,7 @@ const IdType = () => {
                 ID
               </th>
               <th className="px-5 w-[47%] text-left idtype-thead idtype-entry-date-column">
-                ENTRY DATE
+                TITLE
               </th>
               <th className="px-5 text-right idtype-thead"></th>
             </tr>
@@ -393,7 +402,7 @@ const IdType = () => {
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
                     <td className="px-3 text-left idtype-data idtype-entry-date-column">
-                      {formatDate(idType.created_at)}
+                      {idType.title || "N/A"}
                     </td>
                     <td className="py-4 flex items-center justify-end h-[57px]">
                       <div
@@ -418,9 +427,9 @@ const IdType = () => {
                         <div className="idtype-dropdown-content">
                           <div className="idtype-grid">
                             <div className="idtype-grid-items">
-                              <div className="dropdown-label">TITLE</div>
+                              <div className="dropdown-label">ENTRY DATE</div>
                               <div className="dropdown-value">
-                                {idType.title || "N/A"}
+                                {formatDate(idType.created_at)}
                               </div>
                             </div>
                             <div className="idtype-grid-items">
@@ -464,9 +473,13 @@ const IdType = () => {
       {filteredData.length > 0 && (
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
           <span className="collection-list-pagination">
-            Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-            {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length}{" "}
-            entries
+            Showing{" "}
+            {Math.min(
+              (currentPage - 1) * itemsPerPage + 1,
+              filteredData.length
+            )}{" "}
+            to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+            {filteredData.length} entries
           </span>
           <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
             <button

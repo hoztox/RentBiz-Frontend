@@ -510,7 +510,7 @@ const Charges = () => {
                     ID
                   </th>
                   <th className="px-5 w-[47%] text-left charges-thead charges-date-column">
-                    DATE
+                    NAME
                   </th>
                   <th className="px-5 text-right charges-thead"></th>
                 </tr>
@@ -529,7 +529,8 @@ const Charges = () => {
                         {(currentPage - 1) * itemsPerPage + index + 1}
                       </td>
                       <td className="px-5 text-left charges-data charges-date-column">
-                        {formatDate(charge.created_at)}
+                        {charge.name}
+                        
                       </td>
                       <td className="py-4 flex items-center justify-end h-[57px]">
                         <div
@@ -554,8 +555,8 @@ const Charges = () => {
                           <div className="charges-dropdown-content">
                             <div className="charges-grid">
                               <div className="charges-grid-items">
-                                <div className="dropdown-label">NAME</div>
-                                <div className="dropdown-value">{charge.name}</div>
+                                <div className="dropdown-label">DATE</div>
+                                <div className="dropdown-value">{formatDate(charge.created_at)}</div>
                               </div>
                               <div className="charges-grid-items">
                                 <div className="dropdown-label">CHARGE TYPE</div>

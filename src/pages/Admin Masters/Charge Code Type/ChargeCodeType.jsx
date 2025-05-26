@@ -345,7 +345,7 @@ const ChargeCodeType = () => {
                     ID
                   </th>
                   <th className="px-5 w-[47%] text-left idtype-thead idtype-entry-date-column">
-                    ENTRY DATE
+                   TITLE
                   </th>
                   <th className="px-5 text-right idtype-thead"></th>
                 </tr>
@@ -364,7 +364,7 @@ const ChargeCodeType = () => {
                          {(currentPage - 1) * itemsPerPage + index + 1}
                       </td>
                       <td className="px-3 text-left idtype-data idtype-entry-date-column">
-                         {formatDate(chargecodetype.created_at)}
+                             {chargecodetype.title}
                       </td>
                       <td className="py-4 flex items-center justify-end h-[57px]">
                         <div
@@ -391,9 +391,10 @@ const ChargeCodeType = () => {
                           <div className="idtype-dropdown-content">
                             <div className="idtype-grid">
                               <div className="idtype-grid-items">
-                                <div className="dropdown-label">TITLE</div>
+                                <div className="dropdown-label">ENTRY DATE</div>
                                 <div className="dropdown-value">
-                                  {chargecodetype.title}
+                                  {formatDate(chargecodetype.created_at)}
+                              
                                 </div>
                               </div>
                               <div className="idtype-grid-items">

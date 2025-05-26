@@ -349,7 +349,7 @@ const DocumentType = () => {
                 ID
               </th>
               <th className="px-5 w-[47%] text-left doctype-thead doctype-entry-date-column">
-                ENTRY DATE
+                TITLE
               </th>
               <th className="px-5 text-right doctype-thead"></th>
             </tr>
@@ -375,7 +375,7 @@ const DocumentType = () => {
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
                     <td className="px-3 text-left doctype-data doctype-entry-date-column">
-                      {formatDate(docType.created_at)}
+                     {docType.title || "N/A"}
                     </td>
                     <td className="py-4 flex items-center justify-end h-[57px]">
                       <div
@@ -400,9 +400,10 @@ const DocumentType = () => {
                         <div className="doctype-dropdown-content">
                           <div className="doctype-grid">
                             <div className="doctype-grid-items">
-                              <div className="dropdown-label">TITLE</div>
+                              <div className="dropdown-label">ENTRY DATE</div>
                               <div className="dropdown-value">
-                                {docType.title || "N/A"}
+                                 {formatDate(docType.created_at)}
+                                
                               </div>
                             </div>
                             <div className="doctype-grid-items">
