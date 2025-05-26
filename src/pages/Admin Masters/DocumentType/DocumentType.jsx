@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "./DocumentType.css";
 import { ChevronDown } from "lucide-react";
+import { toast, Toaster } from "react-hot-toast";
 import plusicon from "../../../assets/Images/Admin Masters/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Masters/download-icon.svg";
 import editicon from "../../../assets/Images/Admin Masters/edit-icon.svg";
@@ -8,34 +10,130 @@ import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
 import buildingimg from "../../../assets/Images/Admin Masters/building-img.svg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
+import { BASE_URL } from "../../../utils/config";
+import DeleteDocumentTypeModal from "./DeleteDocumentTypeModal/DeleteDocumentTypeModal";
 
 const DocumentType = () => {
+  const { openModal, refreshCounter } = useModal();
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
-  const { openModal } = useModal();
+  const [docTypes, setDocTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [docTypeIdToDelete, setDocTypeIdToDelete] = useState(null);
   const itemsPerPage = 10;
 
-  const demoData = [
-    { id: "01", date: "09 Sept 2024", name: "Trade License" },
-    { id: "02", date: "09 Sept 2024", name: "Nationality ID" },
-    { id: "03", date: "09 Sept 2024", name: "Trade License" },
-    { id: "04", date: "09 Sept 2024", name: "Nationality ID" },
-    { id: "05", date: "09 Sept 2024", name: "Contract" },
-    { id: "06", date: "09 Sept 2024", name: "Nationality ID" },
-    { id: "07", date: "09 Sept 2024", name: "Nationality ID" },
-    { id: "08", date: "09 Sept 2024", name: "Nationality ID" },
-    { id: "09", date: "09 Sept 2024", name: "Permit" },
-    { id: "10", date: "09 Sept 2024", name: "Nationality ID" },
-  ];
+  const getUserCompanyId = () => {
+    const role = localStorage.getItem("role")?.toLowerCase();
+    if (role === "company") {
+      return localStorage.getItem("company_id");
+    } else if (role === "user" || role === "admin") {
+      try {
+        const userCompanyId = localStorage.getItem("company_id");
+        return userCompanyId ? JSON.parse(userCompanyId) : null;
+      } catch (e) {
+        console.error("Error parsing user company ID:", e);
+        return null;
+      }
+    }
+    return null;
+  };
 
-  const filteredData = demoData.filter(
-    (document) =>
-      document.date.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      document.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      document.id.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const companyId = getUserCompanyId();
+
+  // Fetch document types from backend
+  const fetchDocTypes = async () => {
+    if (!companyId) {
+      setError("Company ID not found. Please log in again.");
+      setLoading(false);
+      toast.error("Company ID not found. Please log in again.");
+      return;
+    }
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await axios.get(`${BASE_URL}/company/doc_type/company/${companyId}`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const docData = Array.isArray(response.data) ? response.data : response.data.results || [];
+      setDocTypes(docData);
+    } catch (err) {
+      console.error("Error fetching document types:", err);
+      const errorMessage =
+        err.response?.data?.message || "Failed to fetch document types. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      setDocTypes([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle delete confirmation
+  const handleDelete = (id) => {
+    if (!companyId) {
+      setError("Company ID not found. Please log in again.");
+      toast.error("Company ID not found. Please log in again.");
+      return;
+    }
+    setDocTypeIdToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!docTypeIdToDelete) return;
+    try {
+      await axios.delete(`${BASE_URL}/company/doc_type/${docTypeIdToDelete}/`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      setDocTypes((prev) => prev.filter((item) => item.id !== docTypeIdToDelete));
+      toast.success("Document Type deleted successfully.");
+      if (paginatedData.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
+    } catch (error) {
+      console.error("Error deleting document type:", error);
+      const errorMessage =
+        error.response?.data?.message || "Failed to delete document type. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setIsDeleteModalOpen(false);
+      setDocTypeIdToDelete(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteModalOpen(false);
+    setDocTypeIdToDelete(null);
+  };
+
+  // Format date helper function
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  // Filter data based on search term
+  const filteredData = docTypes.filter((docType) => {
+    const searchLower = searchTerm.toLowerCase();
+    const createdDate = formatDate(docType.created_at);
+    return (
+      createdDate.toLowerCase().includes(searchLower) ||
+      docType.title?.toLowerCase().includes(searchLower)
+    );
+  });
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const paginatedData = filteredData.slice(
@@ -47,8 +145,15 @@ const DocumentType = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const openUpdateModal = (document) => {
-    openModal("update-document-type-master", document);
+  useEffect(() => {
+    fetchDocTypes();
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [companyId, currentPage, searchTerm, refreshCounter]);
+
+  const openUpdateModal = (docType) => {
+    openModal("update-document-type-master", docType);
   };
 
   const toggleRowExpand = (id) => {
@@ -58,8 +163,38 @@ const DocumentType = () => {
     }));
   };
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="border border-gray-200 rounded-md doctype-table">
+        <div className="flex justify-center items-center h-64">
+          <div className="text-lg">Loading document types...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="border border-gray-200 rounded-md doctype-table">
+        <div className="flex flex-col justify-center items-center h-64 gap-4">
+          <div className="text-lg text-red-600">{error}</div>
+          <button
+            onClick={fetchDocTypes}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="border border-gray-200 rounded-md doctype-table">
+      <Toaster />
+
       {/* Header Section */}
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] doctype-table-header">
         <h1 className="doctype-head">Document Type Masters</h1>
@@ -70,7 +205,8 @@ const DocumentType = () => {
               placeholder="Search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 doctype-search"
+              className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md md:w-[302px] focus:border-gray-300 duration-200 doctype-search"
+              disabled={loading}
             />
             <div className="relative w-[40%] md:w-auto">
               <select
@@ -79,6 +215,7 @@ const DocumentType = () => {
                 className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 doctype-selection"
                 onFocus={() => setIsSelectOpen(true)}
                 onBlur={() => setIsSelectOpen(false)}
+                disabled={loading}
               >
                 <option value="showing">Showing</option>
                 <option value="all">All</option>
@@ -94,6 +231,7 @@ const DocumentType = () => {
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md doctype-add-new-master duration-200"
               onClick={() => openModal("create-document-type-master")}
+              disabled={loading}
             >
               Add New Master
               <img
@@ -102,7 +240,10 @@ const DocumentType = () => {
                 className="relative right-[5px] md:right-0 w-[15px] h-[15px]"
               />
             </button>
-            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 doctype-download-btn">
+            <button
+              className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 doctype-download-btn"
+              disabled={loading}
+            >
               Download
               <img
                 src={downloadicon}
@@ -119,56 +260,72 @@ const DocumentType = () => {
         <div className="flex gap-4 p-5">
           {/* Table Section */}
           <div className="w-[60%] border border-gray-200 rounded-md">
-            <table className="w-full">
+            <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-[#E9E9E9] h-[57px]">
                   <th className="px-4 py-3 text-left doctype-thead">ID</th>
-                  <th className="px-4 py-3 text-left doctype-thead">DATE</th>
-                  <th className="px-4 py-3 text-left doctype-thead">NAME</th>
+                  <th className="px-4 py-3 text-left doctype-thead">ENTRY DATE</th>
+                  <th className="px-4 py-3 text-left doctype-thead">TITLE</th>
                   <th className="px-4 py-3 text-right doctype-thead">ACTION</th>
                 </tr>
               </thead>
               <tbody>
-                {paginatedData.map((document, index) => {
-                  const isLastItemOnPage = index === paginatedData.length - 1;
-                  const shouldRemoveBorder =
-                    isLastItemOnPage && paginatedData.length === itemsPerPage;
-
-                  return (
-                    <tr
-                      key={document.id}
-                      className={`h-[57px] hover:bg-gray-50 cursor-pointer ${
-                        shouldRemoveBorder ? "" : "border-b border-[#E9E9E9]"
-                      }`}
+                {paginatedData.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="px-5 py-8 text-center text-gray-500"
                     >
-                      <td className="px-5 text-left doctype-data">
-                        {document.id}
-                      </td>
-                      <td className="px-5 text-left doctype-data">
-                        {document.date}
-                      </td>
-                      <td className="pl-5 text-left doctype-data">
-                        {document.name}
-                      </td>
-                      <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                        <button onClick={() => openUpdateModal(document)}>
-                          <img
-                            src={editicon}
-                            alt="Edit"
-                            className="w-[18px] h-[18px] action-btn duration-200"
-                          />
-                        </button>
-                        <button>
-                          <img
-                            src={deleteicon}
-                            alt="Delete"
-                            className="w-[18px] h-[18px] action-btn duration-200"
-                          />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
+                      No document types found
+                    </td>
+                  </tr>
+                ) : (
+                  paginatedData.map((docType, index) => {
+                    const isLastItemOnPage = index === paginatedData.length - 1;
+                    const shouldRemoveBorder =
+                      isLastItemOnPage && paginatedData.length === itemsPerPage;
+                    return (
+                      <tr
+                        key={docType.id}
+                        className={`h-[57px] hover:bg-gray-50 cursor-pointer ${
+                          shouldRemoveBorder ? "" : "border-b border-[#E9E9E9]"
+                        }`}
+                      >
+                        <td className="px-5 text-left doctype-data">
+                          {(currentPage - 1) * itemsPerPage + index + 1}
+                        </td>
+                        <td className="px-5 text-left doctype-data">
+                          {formatDate(docType.created_at)}
+                        </td>
+                        <td className="pl-5 text-left doctype-data w-[22%]">
+                          {docType.title || "N/A"}
+                        </td>
+                        <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
+                          <button
+                            onClick={() => openUpdateModal(docType)}
+                            disabled={loading}
+                          >
+                            <img
+                              src={editicon}
+                              alt="Edit"
+                              className="w-[18px] h-[18px] action-btn duration-200"
+                            />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(docType.id)}
+                            disabled={loading}
+                          >
+                            <img
+                              src={deleteicon}
+                              alt="Delete"
+                              className="w-[18px] h-[18px] action-btn duration-200"
+                            />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
               </tbody>
             </table>
           </div>
@@ -191,142 +348,170 @@ const DocumentType = () => {
               <th className="px-5 w-[52%] text-left doctype-thead doctype-id-column">
                 ID
               </th>
-              <th className="px-5 w-[47%] text-left doctype-thead doctype-date-column">
-                DATE
+              <th className="px-5 w-[47%] text-left doctype-thead doctype-entry-date-column">
+                ENTRY DATE
               </th>
               <th className="px-5 text-right doctype-thead"></th>
             </tr>
           </thead>
           <tbody>
-            {paginatedData.map((document) => (
-              <React.Fragment key={document.id}>
-                <tr
-                  className={`${
-                    expandedRows[document.id]
-                      ? "mobile-no-border"
-                      : "mobile-with-border"
-                  } border-b border-[#E9E9E9] h-[57px]`}
-                >
-                  <td className="px-5 text-left doctype-data">{document.id}</td>
-                  <td className="px-5 text-left doctype-data doctype-date-column">
-                    {document.date}
-                  </td>
-                  <td className="py-4 flex items-center justify-end h-[57px]">
-                    <div
-                      className={`doctype-dropdown-field ${
-                        expandedRows[document.id] ? "active" : ""
-                      }`}
-                      onClick={() => toggleRowExpand(document.id)}
-                    >
-                      <img
-                        src={downarrow}
-                        alt="drop-down-arrow"
-                        className={`doctype-dropdown-img ${
-                          expandedRows[document.id] ? "text-white" : ""
+            {paginatedData.length === 0 ? (
+              <tr>
+                <td colSpan={3} className="px-5 py-8 text-center text-gray-500">
+                  No document types found
+                </td>
+              </tr>
+            ) : (
+              paginatedData.map((docType, index) => (
+                <React.Fragment key={docType.id}>
+                  <tr
+                    className={`${
+                      expandedRows[docType.id]
+                        ? "mobile-no-border"
+                        : "mobile-with-border"
+                    } border-b border-[#E9E9E9] h-[57px]`}
+                  >
+                    <td className="px-5 text-left doctype-data">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </td>
+                    <td className="px-3 text-left doctype-data doctype-entry-date-column">
+                      {formatDate(docType.created_at)}
+                    </td>
+                    <td className="py-4 flex items-center justify-end h-[57px]">
+                      <div
+                        className={`doctype-dropdown-field ${
+                          expandedRows[docType.id] ? "active" : ""
                         }`}
-                      />
-                    </div>
-                  </td>
-                </tr>
-                {expandedRows[document.id] && (
-                  <tr className="mobile-with-border border-b border-[#E9E9E9]">
-                    <td colSpan={3} className="px-5">
-                      <div className="doctype-dropdown-content">
-                        <div className="doctype-grid">
-                          <div className="doctype-grid-items">
-                            <div className="dropdown-label">NAME</div>
-                            <div className="dropdown-value">
-                              {document.name}
-                            </div>
-                          </div>
-                          <div className="doctype-grid-items">
-                            <div className="dropdown-label">ACTION</div>
-                            <div className="dropdown-value flex items-center gap-4 p-1">
-                              <button onClick={() => openUpdateModal(document)}>
-                                <img
-                                  src={editicon}
-                                  alt="Edit"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
-                                />
-                              </button>
-                              <button>
-                                <img
-                                  src={deleteicon}
-                                  alt="Delete"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
-                                />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
+                        onClick={() => toggleRowExpand(docType.id)}
+                      >
+                        <img
+                          src={downarrow}
+                          alt="drop-down-arrow"
+                          className={`doctype-dropdown-img ${
+                            expandedRows[docType.id] ? "text-white" : ""
+                          }`}
+                        />
                       </div>
                     </td>
                   </tr>
-                )}
-              </React.Fragment>
-            ))}
+                  {expandedRows[docType.id] && (
+                    <tr className="mobile-with-border border-b border-[#E9E9E9]">
+                      <td colSpan={3} className="px-5">
+                        <div className="doctype-dropdown-content">
+                          <div className="doctype-grid">
+                            <div className="doctype-grid-items">
+                              <div className="dropdown-label">TITLE</div>
+                              <div className="dropdown-value">
+                                {docType.title || "N/A"}
+                              </div>
+                            </div>
+                            <div className="doctype-grid-items">
+                              <div className="dropdown-label">ACTION</div>
+                              <div className="dropdown-value flex items-center gap-2 p-1 ml-[5px]">
+                                <button
+                                  onClick={() => openUpdateModal(docType)}
+                                  disabled={loading}
+                                >
+                                  <img
+                                    src={editicon}
+                                    alt="Edit"
+                                    className="w-[18px] h-[18px] action-btn duration-200"
+                                  />
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(docType.id)}
+                                  disabled={loading}
+                                >
+                                  <img
+                                    src={deleteicon}
+                                    alt="Delete"
+                                    className="w-[18px] h-[18px] ml-[5px] action-btn duration-200"
+                                  />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Pagination */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
-        <span className="collection-list-pagination">
-          Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-          {filteredData.length} entries
-        </span>
-        <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
-          <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(currentPage - 1)}
-          >
-            Previous
-          </button>
-          {startPage > 1 && (
+      {filteredData.length > 0 && (
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
+          <span className="collection-list-pagination">
+            Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
+            {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length}{" "}
+            entries
+          </span>
+          <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
-              onClick={() => setCurrentPage(1)}
+              className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+              disabled={currentPage === 1 || loading}
+              onClick={() => setCurrentPage(currentPage - 1)}
             >
-              1
+              Previous
             </button>
-          )}
-          {startPage > 2 && <span className="px-2 flex items-center">...</span>}
-          {[...Array(endPage - startPage + 1)].map((_, i) => (
+            {startPage > 1 && (
+              <button
+                className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+                onClick={() => setCurrentPage(1)}
+                disabled={loading}
+              >
+                1
+              </button>
+            )}
+            {startPage > 2 && (
+              <span className="px-2 flex items-center">...</span>
+            )}
+            {[...Array(endPage - startPage + 1)].map((_, i) => (
+              <button
+                key={startPage + i}
+                className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+                  currentPage === startPage + i
+                    ? "bg-[#1458A2] text-white"
+                    : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+                }`}
+                onClick={() => setCurrentPage(startPage + i)}
+                disabled={loading}
+              >
+                {startPage + i}
+              </button>
+            ))}
+            {endPage < totalPages - 1 && (
+              <span className="px-2 flex items-center">...</span>
+            )}
+            {endPage < totalPages && (
+              <button
+                className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={loading}
+              >
+                {totalPages}
+              </button>
+            )}
             <button
-              key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
-                currentPage === startPage + i
-                  ? "bg-[#1458A2] text-white"
-                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-              }`}
-              onClick={() => setCurrentPage(startPage + i)}
+              className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+              disabled={currentPage === totalPages || loading}
+              onClick={() => setCurrentPage(currentPage + 1)}
             >
-              {startPage + i}
+              Next
             </button>
-          ))}
-          {endPage < totalPages - 1 && (
-            <span className="px-2 flex items-center">...</span>
-          )}
-          {endPage < totalPages && (
-            <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
-              onClick={() => setCurrentPage(totalPages)}
-            >
-              {totalPages}
-            </button>
-          )}
-          <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(currentPage + 1)}
-          >
-            Next
-          </button>
+          </div>
         </div>
-      </div>
+      )}
+
+      <DeleteDocumentTypeModal
+        isOpen={isDeleteModalOpen}
+        onCancel={handleCancelDelete}
+        onDelete={handleConfirmDelete}
+      />
     </div>
   );
 };

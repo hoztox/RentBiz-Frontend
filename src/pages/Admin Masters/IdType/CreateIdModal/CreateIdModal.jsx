@@ -1,61 +1,163 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import "./CreateIdModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { useModal } from "../../../../context/ModalContext";
+import { BASE_URL } from "../../../../utils/config";
 
 const CreateIdModal = () => {
   const { modalState, closeModal } = useModal();
-  const [name, setName] = useState("");
+  const [title, setTitle] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [fieldError, setFieldError] = useState(null);
 
   // Reset form state when modal opens
   useEffect(() => {
-    if (modalState.isOpen) {
-      setName("");
+    if (modalState.isOpen && modalState.type === "create-id-type-master") {
+      setTitle("");
+      setError(null);
+      setFieldError(null);
     }
-  }, [modalState.isOpen]);
+  }, [modalState.isOpen, modalState.type]);
 
   // Only render for "create-id-type-master" type
   if (!modalState.isOpen || modalState.type !== "create-id-type-master") {
     return null;
   }
 
-  const handleSave = () => {
-    if (!name) {
-      alert("Please fill the name field");
+  const getUserCompanyId = () => {
+    const role = localStorage.getItem("role")?.toLowerCase();
+
+    if (role === "company") {
+      // When a company logs in, their own ID is stored as company_id
+      return localStorage.getItem("company_id");
+    } else if (role === "user" || role === "admin") {
+      // When a user logs in, company_id is directly stored
+      try {
+        const userCompanyId = localStorage.getItem("company_id");
+        return userCompanyId ? JSON.parse(userCompanyId) : null;
+      } catch (e) {
+        console.error("Error parsing user company ID:", e);
+        return null;
+      }
+    }
+
+    return null;
+  };
+
+  const getRelevantUserId = () => {
+  const role = localStorage.getItem("role")?.toLowerCase();
+
+  if (role === "user" || role === "admin") {
+    const userId = localStorage.getItem("user_id");
+    if (userId) return userId;
+  }
+
+  if (role === "company") {
+    const companyId = localStorage.getItem("company_id");
+    if (companyId) return companyId;
+  }
+
+  return null;
+};
+
+  const handleSave = async () => {
+    if (!title) {
+      setFieldError("Please fill the Title field");
       return;
     }
-    console.log("New ID Type Created: ", name);
-    closeModal();
+
+    setLoading(true);
+    setError(null);
+    setFieldError(null);
+
+    try {
+      const companyId = getUserCompanyId();
+      const userId = getRelevantUserId();
+      console.log("Request payload:", { title, companyId, userId });
+
+      if (!companyId) {
+        throw new Error("Company ID is missing or invalid");
+      }
+
+      const response = await axios.post(
+        `${BASE_URL}/company/id_type/create/`,
+        {
+          title,
+          company: companyId,
+          user: userId,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status !== 200 && response.status !== 201) {
+        throw new Error("Failed to create ID type");
+      }
+
+      console.log("New ID Type Created: ", response.data);
+      closeModal();
+    } catch (err) {
+      console.error("Error:", err.response?.data || err.message);
+      setError(
+        "Failed to save ID type: " +
+          (err.response?.data?.detail ||
+            err.response?.data?.company_id ||
+            err.message)
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
-      <div className="create-id-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[262px] p-6">
-        <h2 className="modal-head mt-4 mb-6">Create New ID Type Master</h2>
-        <button
-          onClick={closeModal}
-          className="absolute top-6 right-6 close-btn duration-200"
-        >
-          <img src={closeicon} alt="close" className="w-4 h-4" />
-        </button>
-
-        <div className="mb-6">
-          <label className="block pt-2 modal-label">Name</label>
-          <input
-            type="text"
-            className="w-full border border-[#E9E9E9] rounded-md mt-1 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500 input-style"
-            placeholder="Enter Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="create-id-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[262px] p-6"
+      >
+        <div className="flex justify-between items-center md:mb-6">
+          <h2 className="modal-head">Create New ID Type Master</h2>
+          <button
+            onClick={closeModal}
+            className="close-btn hover:bg-gray-100 duration-200"
+            aria-label="Close modal"
+          >
+            <img src={closeicon} alt="close" className="w-4 h-4" />
+          </button>
         </div>
 
-        <div className="flex justify-end">
+        <div className="mb-6">
+          <label className="block pt-2 tenancy-modal-label">Title*</label>
+          <input
+            type="text"
+            className={`input-style border transition-colors duration-200 ${
+              fieldError
+                ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                : "border-gray-300 focus:ring-gray-700 focus:border-gray-700"
+            }`}
+            placeholder="Enter Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            disabled={loading}
+          />
+          <div className="text-sm mt-1" style={{ minHeight: "20px" }}>
+            {fieldError && <span className="text-[#dc2626]">{fieldError}</span>}
+          </div>
+        </div>
+
+        <div className="flex justify-end mt-[-15px]">
           <button
             onClick={handleSave}
             className="bg-[#2892CE] hover:bg-[#2276a7] text-white rounded w-[150px] h-[38px] modal-save-btn duration-200"
+            aria-label="Save ID type"
+            disabled={loading}
           >
-            Save
+            {loading ? "Saving..." : "Save"}
           </button>
         </div>
       </div>

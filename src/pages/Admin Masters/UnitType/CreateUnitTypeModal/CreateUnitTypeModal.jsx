@@ -27,24 +27,40 @@ const CreateUnitTypeModal = () => {
   }
 
   const getUserCompanyId = () => {
-  const role = localStorage.getItem("role")?.toLowerCase();
+    const role = localStorage.getItem("role")?.toLowerCase();
 
-  if (role === "company") {
-    // When a company logs in, their own ID is stored as company_id
-    return localStorage.getItem("company_id");
-  } else if (role === "user" || role === "admin") {
-    // When a user logs in, company_id is directly stored
-    try {
-      const userCompanyId = localStorage.getItem("company_id");
-      return userCompanyId ? JSON.parse(userCompanyId) : null;
-    } catch (e) {
-      console.error("Error parsing user company ID:", e);
-      return null;
+    if (role === "company") {
+      // When a company logs in, their own ID is stored as company_id
+      return localStorage.getItem("company_id");
+    } else if (role === "user" || role === "admin") {
+      // When a user logs in, company_id is directly stored
+      try {
+        const userCompanyId = localStorage.getItem("company_id");
+        return userCompanyId ? JSON.parse(userCompanyId) : null;
+      } catch (e) {
+        console.error("Error parsing user company ID:", e);
+        return null;
+      }
     }
-  }
 
-  return null;
-};
+    return null;
+  };
+
+  const getRelevantUserId = () => {
+    const role = localStorage.getItem("role")?.toLowerCase();
+
+    if (role === "user" || role === "admin") {
+      const userId = localStorage.getItem("user_id");
+      if (userId) return userId;
+    }
+
+    if (role === "company") {
+      const companyId = localStorage.getItem("company_id");
+      if (companyId) return companyId;
+    }
+
+    return null;
+  };
 
   const handleSave = async () => {
     if (!title) {
@@ -57,7 +73,8 @@ const CreateUnitTypeModal = () => {
     setFieldError(null);
     try {
       const companyId = getUserCompanyId();
-      console.log("Request payload:", { title, companyId });
+      const userId = getRelevantUserId();
+      console.log("Request payload:", { title, companyId, userId });
 
       if (!companyId) {
         throw new Error("Company ID is missing or invalid");
@@ -68,6 +85,7 @@ const CreateUnitTypeModal = () => {
         {
           title,
           company: companyId,
+          user: userId,
         },
         {
           headers: {
@@ -80,7 +98,7 @@ const CreateUnitTypeModal = () => {
         throw new Error("Failed to create unit type");
       }
 
-      console.log("New Unit Type Created: ", { title, companyId });
+      console.log("New Unit Type Created: ", { title, companyId, userId });
       closeModal();
     } catch (err) {
       console.error("Error:", err.response?.data || err.message);

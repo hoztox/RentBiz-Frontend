@@ -55,7 +55,9 @@ const AdminUsers = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(`${BASE_URL}/company/users/company/${companyId}/`);
+        const response = await axios.get(
+          `${BASE_URL}/company/users/company/${companyId}/`
+        );
         const userData = Array.isArray(response.data)
           ? response.data
           : response.data.results || [];
@@ -112,7 +114,9 @@ const AdminUsers = () => {
       toast.success(`User ${newStatus} successfully.`);
     } catch (error) {
       console.error("Error updating user status:", error);
-      const errorMessage = error.response?.data?.message || "Failed to update user status. Please try again.";
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to update user status. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
 
@@ -141,7 +145,9 @@ const AdminUsers = () => {
       toast.success("User deleted successfully.");
     } catch (error) {
       console.error("Error deleting user:", error);
-      const errorMessage = error.response?.data?.message || "Failed to delete user. Please try again.";
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to delete user. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -162,16 +168,22 @@ const AdminUsers = () => {
     }));
   };
 
-  const isBlocked = (id) => users.find((u) => u.id === id)?.status === "blocked";
+  const isBlocked = (id) =>
+    users.find((u) => u.id === id)?.status === "blocked";
 
   const filteredData = Array.isArray(users)
     ? users.filter(
         (user) =>
-          (user.name?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
-          (user.username?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
-          (user.id.toString().toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
-          (user.user_role?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
-          (user.status?.toLowerCase().includes(searchTerm.toLowerCase()) || false)
+          user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          false ||
+          user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          false ||
+          user.id.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+          false ||
+          user.user_role?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          false ||
+          user.status?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          false
       )
     : [];
 
@@ -289,7 +301,9 @@ const AdminUsers = () => {
                   key={index}
                   className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
                 >
-                  <td className="px-5 text-left user-data">{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                  <td className="px-5 text-left user-data">
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </td>
                   <td className="px-5 text-left user-data">
                     {user.created_at
                       ? new Date(user.created_at).toLocaleDateString("en-GB", {
@@ -299,9 +313,15 @@ const AdminUsers = () => {
                         })
                       : "N/A"}
                   </td>
-                  <td className="pl-5 text-left user-data">{user.name || "N/A"}</td>
-                  <td className="px-5 text-left user-data">{user.username || "N/A"}</td>
-                  <td className="pl-12 pr-5 text-left user-data">{user.user_role || "N/A"}</td>
+                  <td className="pl-5 text-left user-data">
+                    {user.name || "N/A"}
+                  </td>
+                  <td className="px-5 text-left user-data">
+                    {user.username || "N/A"}
+                  </td>
+                  <td className="pl-12 pr-5 text-left user-data">
+                    {user.user_role || "N/A"}
+                  </td>
                   <td className="px-5 text-left user-data">
                     <span
                       className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
@@ -310,7 +330,8 @@ const AdminUsers = () => {
                           : "bg-[#FFE1E1] text-[#C72828]"
                       }`}
                     >
-                      {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                      {user.status.charAt(0).toUpperCase() +
+                        user.status.slice(1)}
                     </span>
                   </td>
                   <td className="px-5 text-left user-data">
@@ -350,9 +371,7 @@ const AdminUsers = () => {
               <th className="px-5 w-[38%] text-left user-thead user-id-column">
                 ID
               </th>
-              <th className="px-5 w-[60%] text-left user-thead">
-                CREATED DATE
-              </th>
+              <th className="px-5 w-[60%] text-left user-thead">NAME</th>
               <th className="px-5 text-right user-thead"></th>
             </tr>
           </thead>
@@ -373,15 +392,11 @@ const AdminUsers = () => {
                         : "mobile-with-border"
                     } border-b border-[#E9E9E9] h-[57px]`}
                   >
-                    <td className="px-5 text-left user-data">{(currentPage - 1) * itemsPerPage + index + 1}</td>
                     <td className="px-5 text-left user-data">
-                      {user.created_at
-                        ? new Date(user.created_at).toLocaleDateString("en-GB", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          })
-                        : "N/A"}
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </td>
+                    <td className="px-5 text-left user-data">
+                      {user.name || "N/A"}
                     </td>
                     <td className="py-4 flex items-center justify-end h-[57px]">
                       <div
@@ -406,16 +421,30 @@ const AdminUsers = () => {
                         <div className="user-dropdown-content">
                           <div className="user-grid">
                             <div className="user-grid-item w-[33.33%]">
-                              <div className="dropdown-label">NAME</div>
-                              <div className="dropdown-value">{user.name || "N/A"}</div>
+                              <div className="dropdown-label">CREATED DATE</div>
+                              <div className="dropdown-value">
+                                {user.created_at
+                                  ? new Date(
+                                      user.created_at
+                                    ).toLocaleDateString("en-GB", {
+                                      day: "2-digit",
+                                      month: "short",
+                                      year: "numeric",
+                                    })
+                                  : "N/A"}
+                              </div>
                             </div>
                             <div className="user-grid-item w-[35.33%]">
                               <div className="dropdown-label">USERNAME</div>
-                              <div className="dropdown-value">{user.username || "N/A"}</div>
+                              <div className="dropdown-value">
+                                {user.username || "N/A"}
+                              </div>
                             </div>
                             <div className="user-grid-item w-[20%]">
                               <div className="dropdown-label">ROLE</div>
-                              <div className="dropdown-value">{user.user_role || "N/A"}</div>
+                              <div className="dropdown-value">
+                                {user.user_role || "N/A"}
+                              </div>
                             </div>
                           </div>
                           <div className="user-grid">
@@ -431,7 +460,8 @@ const AdminUsers = () => {
                                       : "bg-[#FFE1E1] text-[#C72828] !pr-[0px] !pl-[5px]"
                                   }`}
                                 >
-                                  {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                                  {user.status.charAt(0).toUpperCase() +
+                                    user.status.slice(1)}
                                 </span>
                               </div>
                             </div>
