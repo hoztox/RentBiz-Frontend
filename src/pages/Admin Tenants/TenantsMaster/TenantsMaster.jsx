@@ -52,10 +52,11 @@ const TenantsMaster = () => {
     const fetchTenants = async () => {
       try {
         const companyId = getUserCompanyId();
-        const response = await axios.get(`${BASE_URL}/company/tenant/company/${companyId}/`);
+        const response = await axios.get(
+          `${BASE_URL}/company/tenant/company/${companyId}/`
+        );
         setTenants(response.data);
-        console.log('tenantssss', response.data);
-        
+        console.log("tenantssss", response.data);
       } catch (error) {
         console.error("Error fetching tenants:", error);
       }
@@ -153,8 +154,9 @@ const TenantsMaster = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
-                  }`}
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
+                  isSelectOpen ? "rotate-180" : "rotate-0"
+                }`}
               />
             </div>
           </div>
@@ -202,7 +204,9 @@ const TenantsMaster = () => {
                 key={tenant.code}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-5 text-left tenant-data">{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                <td className="px-5 text-left tenant-data">
+                  {(currentPage - 1) * itemsPerPage + index + 1}
+                </td>
                 <td className="px-5 text-left tenant-data">
                   {new Date(tenant.created_at).toLocaleDateString("en-GB", {
                     day: "2-digit",
@@ -210,18 +214,19 @@ const TenantsMaster = () => {
                     year: "numeric",
                   })}
                 </td>
-                <td className="pl-5 text-left tenant-data">{tenant.tenant_name}</td>
                 <td className="pl-5 text-left tenant-data">
-                  {tenant.phone}
+                  {tenant.tenant_name}
                 </td>
+                <td className="pl-5 text-left tenant-data">{tenant.phone}</td>
                 <td className="px-5 text-left tenant-data">
                   <span
-                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] tenant-status ${tenant.status === "Active"
-                        ? "bg-[#E6F5EC] text-[#1C7D4D]"       
+                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] tenant-status ${
+                      tenant.status === "Active"
+                        ? "bg-[#E6F5EC] text-[#1C7D4D]"
                         : tenant.status === "Inactive"
-                          ? "bg-[#FDEAEA] text-[#D1293D]"       
-                          : "bg-[#FFF8E1] text-[#A67C00]"      
-                      }`}
+                        ? "bg-[#FDEAEA] text-[#D1293D]"
+                        : "bg-[#FFF8E1] text-[#A67C00]"
+                    }`}
                   >
                     {tenant.status}
                   </span>
@@ -259,7 +264,7 @@ const TenantsMaster = () => {
                 ID
               </th>
               <th className="px-3 text-left tenant-thead date-column w-[50%]">
-                DATE
+                NAME
               </th>
               <th className="px-5 text-right tenant-thead"></th>
             </tr>
@@ -268,30 +273,29 @@ const TenantsMaster = () => {
             {paginatedData.map((tenant) => (
               <React.Fragment key={tenant.code}>
                 <tr
-                  className={`${expandedRows[tenant.code]
-                    ? "mobile-no-border"
-                    : "mobile-with-border"
-                    } border-b border-[#E9E9E9] h-[57px]`}
+                  className={`${
+                    expandedRows[tenant.code]
+                      ? "mobile-no-border"
+                      : "mobile-with-border"
+                  } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left tenant-data">{tenant.code}</td>
                   <td className="px-3 text-left tenant-data date-column">
-                    {new Date(tenant.created_at).toLocaleDateString("en-GB", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
+                    {tenant.tenant_name}
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
-                      className={`tenant-dropdown-field ${expandedRows[tenant.code] ? "active" : ""
-                        }`}
+                      className={`tenant-dropdown-field ${
+                        expandedRows[tenant.code] ? "active" : ""
+                      }`}
                       onClick={() => toggleRowExpand(tenant.code)}
                     >
                       <img
                         src={downarrow}
                         alt="drop-down-arrow"
-                        className={`tenant-dropdown-img ${expandedRows[tenant.code] ? "text-white" : ""
-                          }`}
+                        className={`tenant-dropdown-img ${
+                          expandedRows[tenant.code] ? "text-white" : ""
+                        }`}
                       />
                     </div>
                   </td>
@@ -302,9 +306,16 @@ const TenantsMaster = () => {
                       <div className="tenant-dropdown-content">
                         <div className="tenant-grid">
                           <div className="tenant-grid-item">
-                            <div className="dropdown-label">NAME</div>
+                            <div className="dropdown-label">DATE</div>
                             <div className="dropdown-value w-[95px]">
-                              {tenant.tenant_name}
+                              {new Date(tenant.created_at).toLocaleDateString(
+                                "en-GB",
+                                {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                }
+                              )}
                             </div>
                           </div>
                           <div className="tenant-grid-item w-[61%]">
@@ -321,10 +332,11 @@ const TenantsMaster = () => {
                             <div className="dropdown-label">STATUS</div>
                             <div className="dropdown-value">
                               <span
-                                className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] tenant-status ${tenant.status === "Active"
-                                  ? "bg-[#E8EFF6] text-[#1458A2]"
-                                  : "bg-[#E6F5EC] text-[#1C7D4D]"
-                                  }`}
+                                className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] tenant-status ${
+                                  tenant.status === "Active"
+                                    ? "bg-[#E8EFF6] text-[#1458A2]"
+                                    : "bg-[#E6F5EC] text-[#1C7D4D]"
+                                }`}
                               >
                                 {tenant.status}
                               </span>
@@ -339,14 +351,18 @@ const TenantsMaster = () => {
                           <div className="tenant-grid-item w-[20%]">
                             <div className="dropdown-label">ACTION</div>
                             <div className="dropdown-value flex items-center gap-2 mt-[10px]">
-                              <button onClick={() => openUpdateTenantModal(tenant)}>
+                              <button
+                                onClick={() => openUpdateTenantModal(tenant)}
+                              >
                                 <img
                                   src={editicon}
                                   alt="Edit"
                                   className="w-[18px] h-[18px] action-btn duration-200"
                                 />
                               </button>
-                              <button onClick={() => handleDeleteTenant(tenant.id)}>
+                              <button
+                                onClick={() => handleDeleteTenant(tenant.id)}
+                              >
                                 <img
                                   src={deletesicon}
                                   alt="Delete"
@@ -394,10 +410,11 @@ const TenantsMaster = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${currentPage === startPage + i
-                ? "bg-[#1458A2] text-white"
-                : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-                }`}
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+                currentPage === startPage + i
+                  ? "bg-[#1458A2] text-white"
+                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+              }`}
               onClick={() => setCurrentPage(startPage + i)}
             >
               {startPage + i}

@@ -54,11 +54,6 @@ const CreateUnitTypeModal = () => {
       if (userId) return userId;
     }
 
-    if (role === "company") {
-      const companyId = localStorage.getItem("company_id");
-      if (companyId) return companyId;
-    }
-
     return null;
   };
 

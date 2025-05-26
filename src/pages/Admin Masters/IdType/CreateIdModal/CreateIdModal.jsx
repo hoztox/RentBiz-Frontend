@@ -47,20 +47,15 @@ const CreateIdModal = () => {
   };
 
   const getRelevantUserId = () => {
-  const role = localStorage.getItem("role")?.toLowerCase();
+    const role = localStorage.getItem("role")?.toLowerCase();
 
-  if (role === "user" || role === "admin") {
-    const userId = localStorage.getItem("user_id");
-    if (userId) return userId;
-  }
+    if (role === "user" || role === "admin") {
+      const userId = localStorage.getItem("user_id");
+      if (userId) return userId;
+    }
 
-  if (role === "company") {
-    const companyId = localStorage.getItem("company_id");
-    if (companyId) return companyId;
-  }
-
-  return null;
-};
+    return null;
+  };
 
   const handleSave = async () => {
     if (!title) {

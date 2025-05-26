@@ -399,7 +399,7 @@ const UnitType = () => {
                 ID
               </th>
               <th className="px-5 w-[47%] text-left unit-thead utype-entry-date-column">
-                ENTRY DATE
+                NAME
               </th>
               <th className="px-5 text-right unit-thead"></th>
             </tr>
@@ -425,7 +425,7 @@ const UnitType = () => {
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
                     <td className="px-5 text-left unit-data utype-entry-date-column">
-                      {formatDate(unit.created_at)}
+                      {unit.title || "N/A"}
                     </td>
                     <td className="py-4 flex items-center justify-end h-[57px]">
                       <div
@@ -450,9 +450,9 @@ const UnitType = () => {
                         <div className="unit-dropdown-content">
                           <div className="utype-grid">
                             <div className="utype-grid-items">
-                              <div className="utype-dropdown-label">NAME</div>
+                              <div className="utype-dropdown-label">ENTRY DATE</div>
                               <div className="utype-dropdown-value">
-                                {unit.title || "N/A"}
+                                {formatDate(unit.created_at)}
                               </div>
                             </div>
                             <div className="utype-grid-items">

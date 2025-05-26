@@ -87,13 +87,16 @@ const Buildings = () => {
       try {
         const companyId = getUserCompanyId();
         setLoading(true);
-        const response = await axios.get(`${BASE_URL}/company/buildings/company/${companyId}/`);
+        const response = await axios.get(
+          `${BASE_URL}/company/buildings/company/${companyId}/`
+        );
         // Ensure response.data is an array
-        const data = Array.isArray(response.data) ? response.data : response.data.results || [];
+        const data = Array.isArray(response.data)
+          ? response.data
+          : response.data.results || [];
         setBuildings(data);
         setLoading(false);
         console.log("building", response.data);
-
       } catch (err) {
         setError("Failed to fetch buildings data", err);
         setLoading(false);
@@ -106,9 +109,15 @@ const Buildings = () => {
   // Filter buildings based on search term
   const filteredData = buildings.filter(
     (building) =>
-      (building.building_no?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (building.building_name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (building.building_address?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (building.building_no?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase()
+      ) ||
+      (building.building_name?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase()
+      ) ||
+      (building.building_address?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase()
+      ) ||
       (building.status?.toLowerCase() || "").includes(searchTerm.toLowerCase())
   );
 
@@ -121,9 +130,13 @@ const Buildings = () => {
   const deleteBuilding = async (buildingId) => {
     if (window.confirm("Are you sure you want to delete this building?")) {
       try {
-        const response = await axios.delete(`${BASE_URL}/company/buildings/${buildingId}/`);
+        const response = await axios.delete(
+          `${BASE_URL}/company/buildings/${buildingId}/`
+        );
         if (response.status === 204) {
-          setBuildings(buildings.filter(building => building.id !== buildingId));
+          setBuildings(
+            buildings.filter((building) => building.id !== buildingId)
+          );
         }
       } catch (err) {
         console.error("Failed to delete building", err);
@@ -168,8 +181,9 @@ const Buildings = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
-                  }`}
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
+                  isSelectOpen ? "rotate-180" : "rotate-0"
+                }`}
               />
             </div>
           </div>
@@ -217,7 +231,9 @@ const Buildings = () => {
                 key={index}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-5 text-left bldg-data">{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                <td className="px-5 text-left bldg-data">
+                  {(currentPage - 1) * itemsPerPage + index + 1}
+                </td>
                 <td className="px-5 text-left bldg-data">
                   {new Date(building.created_at).toLocaleDateString("en-GB", {
                     day: "2-digit",
@@ -225,26 +241,34 @@ const Buildings = () => {
                     year: "numeric",
                   })}
                 </td>
-                <td className="pl-5 text-left bldg-data">{building.building_name || "Unnamed Building"}</td>
-                <td className="px-5 text-left bldg-data">{building.building_address || "N/A"}</td>
+                <td className="pl-5 text-left bldg-data">
+                  {building.building_name || "Unnamed Building"}
+                </td>
+                <td className="px-5 text-left bldg-data">
+                  {building.building_address || "N/A"}
+                </td>
                 <td className="pl-12 pr-5 text-left bldg-data">N/A</td>
                 <td className="px-5 text-left bldg-data">
                   <span
-                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${building.status === "active"
-                      ? "bg-[#e1ffea] text-[#28C76F]"
-                      : building.status === "inactive"
+                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
+                      building.status === "active"
+                        ? "bg-[#e1ffea] text-[#28C76F]"
+                        : building.status === "inactive"
                         ? "bg-[#FFE1E1] text-[#C72828]"
                         : "bg-[#FFF4E1] text-[#FFA500]"
-                      }`}
+                    }`}
                   >
-                    {building.status.charAt(0).toUpperCase() + building.status.slice(1)}
+                    {building.status.charAt(0).toUpperCase() +
+                      building.status.slice(1)}
                   </span>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
                   <button onClick={() => handleEditClick(building.id)}>
-                    <img src={editicon}
+                    <img
+                      src={editicon}
                       alt="Edit"
-                      className="w-[18px] h-[18px] bldg-action-btn duration-200" />
+                      className="w-[18px] h-[18px] bldg-action-btn duration-200"
+                    />
                   </button>
                   <button onClick={() => deleteBuilding(building.id)}>
                     <img
@@ -265,7 +289,7 @@ const Buildings = () => {
             <tr className="bldg-table-row-head">
               <th className="px-5 text-left bldg-thead bldg-id-column">ID</th>
               <th className="px-5 text-left bldg-thead bldg-date-column">
-                DATE
+                NAME
               </th>
               <th className="px-5 text-right bldg-thead"></th>
             </tr>
@@ -274,32 +298,31 @@ const Buildings = () => {
             {paginatedData.map((building, index) => (
               <React.Fragment key={index}>
                 <tr
-                  className={`${expandedRows[building.building_no]
-                    ? "bldg-mobile-no-border"
-                    : "bldg-mobile-with-border"
-                    } border-b border-[#E9E9E9] h-[57px]`}
+                  className={`${
+                    expandedRows[building.building_no]
+                      ? "bldg-mobile-no-border"
+                      : "bldg-mobile-with-border"
+                  } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left bldg-data bldg-id-column">
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </td>
                   <td className="px-5 text-left bldg-data bldg-date-column">
-                    {new Date(building.created_at).toLocaleDateString("en-GB", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
+                   {building.building_name || "N/A"}
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
-                      className={`bldg-dropdown-field ${expandedRows[building.building_no] ? "active" : ""
-                        }`}
+                      className={`bldg-dropdown-field ${
+                        expandedRows[building.building_no] ? "active" : ""
+                      }`}
                       onClick={() => toggleRowExpand(building.building_no)}
                     >
                       <img
                         src={downarrow}
                         alt="drop-down-arrow"
-                        className={`bldg-dropdown-img ${expandedRows[building.building_no] ? "text-white" : ""
-                          }`}
+                        className={`bldg-dropdown-img ${
+                          expandedRows[building.building_no] ? "text-white" : ""
+                        }`}
                       />
                     </div>
                   </td>
@@ -310,9 +333,16 @@ const Buildings = () => {
                       <div className="bldg-dropdown-content">
                         <div className="bldg-grid">
                           <div className="bldg-grid-item w-[45%]">
-                            <div className="bldg-dropdown-label">NAME</div>
+                            <div className="bldg-dropdown-label">DATE</div>
                             <div className="bldg-dropdown-value">
-                              {building.building_name || "Unnamed Building"}
+                              {new Date(building.created_at).toLocaleDateString(
+                                "en-GB",
+                                {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                }
+                              )}
                             </div>
                           </div>
                           <div className="bldg-grid-item w-[60%]">
@@ -327,22 +357,22 @@ const Buildings = () => {
                             <div className="bldg-dropdown-label">
                               NO. OF UNITS
                             </div>
-                            <div className="bldg-dropdown-value">
-                              N/A
-                            </div>
+                            <div className="bldg-dropdown-value">N/A</div>
                           </div>
                           <div className="bldg-grid-item w-[27%]">
                             <div className="bldg-dropdown-label">STATUS</div>
                             <div className="bldg-dropdown-value">
                               <span
-                                className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] bldg-status ${building.status === "active"
-                                  ? "bg-[#e1ffea] text-[#28C76F]"
-                                  : building.status === "inactive"
+                                className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] bldg-status ${
+                                  building.status === "active"
+                                    ? "bg-[#e1ffea] text-[#28C76F]"
+                                    : building.status === "inactive"
                                     ? "bg-[#FFE1E1] text-[#C72828]"
                                     : "bg-[#FFF4E1] text-[#FFA500]"
-                                  }`}
+                                }`}
                               >
-                                {building.status.charAt(0).toUpperCase() + building.status.slice(1)}
+                                {building.status.charAt(0).toUpperCase() +
+                                  building.status.slice(1)}
                               </span>
                             </div>
                           </div>
@@ -377,8 +407,10 @@ const Buildings = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 bldg-pagination-container">
         <span className="bldg-pagination bldg-collection-list-pagination">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
+          Showing{" "}
+          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+          {filteredData.length} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto bldg-pagination-buttons">
           <button
@@ -400,16 +432,19 @@ const Buildings = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${currentPage === startPage + i
-                ? "bg-[#1458A2] text-white"
-                : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-                }`}
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+                currentPage === startPage + i
+                  ? "bg-[#1458A2] text-white"
+                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+              }`}
               onClick={() => setCurrentPage(startPage + i)}
             >
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
+          {endPage < totalPages - 1 && (
+            <span className="px-2 flex items-center">...</span>
+          )}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
