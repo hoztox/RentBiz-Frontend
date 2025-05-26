@@ -167,9 +167,7 @@ const UnitInfoForm = ({ onNext, onBack, initialData }) => {
                 ))
               ) : (
                 <>
-                  <option value="1">Shop</option>
-                  <option value="2">Apartment</option>
-                  <option value="3">Office</option>
+                  No unit types available. Please add.
                 </>
               )}
             </select>

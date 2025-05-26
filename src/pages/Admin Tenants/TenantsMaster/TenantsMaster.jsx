@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "./TenantsMaster.css";
 import { ChevronDown } from "lucide-react";
 import plusicon from "../../../assets/Images/Admin Tenants/plus-icon.svg";
@@ -9,6 +10,7 @@ import downarrow from "../../../assets/Images/Admin Tenants/downarrow.svg";
 import CreateTenantModal from "../CreateTenantModal/CreateTenantModal";
 import EditTenantModal from "../EditTenantModal/EditTenantModal";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL } from "../../../utils/config";
 
 const TenantsMaster = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -17,17 +19,55 @@ const TenantsMaster = () => {
   const [createTenantModalOpen, setCreateTenantModalOpen] = useState(false);
   const [updateTenantModalOpen, setUpdateTenantModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
+  const [tenants, setTenants] = useState([]);
+  const [selectedTenant, setSelectedTenant] = useState(null);
   const itemsPerPage = 10;
 
   const navigate = useNavigate();
 
   const isMobileView = () => window.innerWidth < 480;
 
+  const getUserCompanyId = () => {
+    const role = localStorage.getItem("role")?.toLowerCase();
+
+    if (role === "company") {
+      // When a company logs in, their own ID is stored as company_id
+      return localStorage.getItem("company_id");
+    } else if (role === "user" || role === "admin") {
+      // When a user logs in, company_id is directly stored
+      try {
+        const userCompanyId = localStorage.getItem("company_id");
+        return userCompanyId ? JSON.parse(userCompanyId) : null;
+      } catch (e) {
+        console.error("Error parsing user company ID:", e);
+        return null;
+      }
+    }
+
+    return null;
+  };
+
+  // Fetch tenants from the backend
+  useEffect(() => {
+    const fetchTenants = async () => {
+      try {
+        const companyId = getUserCompanyId();
+        const response = await axios.get(`${BASE_URL}/company/tenant/company/${companyId}/`);
+        setTenants(response.data);
+        console.log('tenantssss', response.data);
+        
+      } catch (error) {
+        console.error("Error fetching tenants:", error);
+      }
+    };
+    fetchTenants();
+  }, []);
+
   const openCreateTenantModal = () => {
     if (isMobileView()) {
       navigate("/admin/tenant-timeline");
     } else {
-      setCreateTenantModalOpen(true); // Open modal for desktop view
+      setCreateTenantModalOpen(true);
     }
   };
 
@@ -35,16 +75,27 @@ const TenantsMaster = () => {
     setCreateTenantModalOpen(false);
   };
 
-  const openUpdateTenantModal = () => {
+  const openUpdateTenantModal = (tenant) => {
     if (isMobileView()) {
-      navigate("/admin/edit-tenant-timeline");
+      navigate("/admin/edit-tenant-timeline", { state: { tenant } });
     } else {
+      setSelectedTenant(tenant);
       setUpdateTenantModalOpen(true);
     }
   };
 
   const closeUpdateTenantModal = () => {
     setUpdateTenantModalOpen(false);
+    setSelectedTenant(null);
+  };
+
+  const handleDeleteTenant = async (tenantId) => {
+    try {
+      await axios.delete(`${BASE_URL}/company/tenant/${tenantId}/`);
+      setTenants(tenants.filter((tenant) => tenant.code !== tenantId));
+    } catch (error) {
+      console.error("Error deleting tenant:", error);
+    }
   };
 
   const toggleRowExpand = (id) => {
@@ -54,48 +105,17 @@ const TenantsMaster = () => {
     }));
   };
 
-  const demoData = [
-    {
-      id: "#U24090012",
-      date: "09 Sept 2024",
-      name: "Ladies Saloon",
-      contact: "968123123, oman@oman.com",
-      status: "Active",
-      type: "NATIONALITY ID",
-    },
-    {
-      id: "#U24090013",
-      date: "10 Sept 2024",
-      name: "Ladies Saloon",
-      contact: "968123123, oman@oman.com",
-      status: "Active",
-      type: "NATIONALITY ID",
-    },
-    {
-      id: "#U24090014",
-      date: "11 Sept 2024",
-      name: "Ladies Saloon",
-      contact: "968123123, oman@oman.com",
-      status: "Active",
-      type: "NATIONALITY ID",
-    },
-    {
-      id: "#U24090015",
-      date: "12 Sept 2024",
-      name: "Ladies Saloon",
-      contact: "968123123, oman@oman.com",
-      status: "Inactive",
-      type: "NATIONALITY ID",
-    },
-  ];
-
-  const filteredData = demoData.filter(
+  // Filter tenants based on search term
+  const filteredData = tenants.filter(
     (tenant) =>
-      tenant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenant.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenant.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenant.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenant.status.toLowerCase().includes(searchTerm.toLowerCase())
+      tenant.tenant_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tenant.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tenant.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tenant.tenant_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tenant.status?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tenant.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tenant.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tenant.id_type?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -133,9 +153,8 @@ const TenantsMaster = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
+                  }`}
               />
             </div>
           </div>
@@ -178,41 +197,51 @@ const TenantsMaster = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedData.map((tenant) => (
+            {paginatedData.map((tenant, index) => (
               <tr
-                key={tenant.id}
+                key={tenant.code}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-5 text-left tenant-data">{tenant.id}</td>
-                <td className="px-5 text-left tenant-data">{tenant.date}</td>
-                <td className="pl-5 text-left tenant-data">{tenant.name}</td>
-                <td className="pl-5 text-left tenant-data">{tenant.contact}</td>
+                <td className="px-5 text-left tenant-data">{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                <td className="px-5 text-left tenant-data">
+                  {new Date(tenant.created_at).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </td>
+                <td className="pl-5 text-left tenant-data">{tenant.tenant_name}</td>
+                <td className="pl-5 text-left tenant-data">
+                  {tenant.phone}
+                </td>
                 <td className="px-5 text-left tenant-data">
                   <span
-                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
-                      tenant.status === "Active"
-                        ? "bg-[#e1ffea] text-[#28C76F]"
-                        : "bg-[#FFE1E1] text-[#C72828]"
-                    }`}
+                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] tenant-status ${tenant.status === "Active"
+                        ? "bg-[#E6F5EC] text-[#1C7D4D]"       
+                        : tenant.status === "Inactive"
+                          ? "bg-[#FDEAEA] text-[#D1293D]"       
+                          : "bg-[#FFF8E1] text-[#A67C00]"      
+                      }`}
                   >
                     {tenant.status}
                   </span>
                 </td>
+
                 <td className="pl-12 pr-5 text-left tenant-data">
-                  {tenant.type}
+                  {tenant.id_type?.title || "N/A"}
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={openUpdateTenantModal}>
+                  <button onClick={() => openUpdateTenantModal(tenant)}>
                     <img
                       src={editicon}
                       alt="Edit"
                       className="w-[18px] h-[18px] action-btn duration-200"
                     />
                   </button>
-                  <button>
+                  <button onClick={() => handleDeleteTenant(tenant.id)}>
                     <img
                       src={deletesicon}
-                      alt="Deletes"
+                      alt="Delete"
                       className="w-[18px] h-[18px] action-btn duration-200"
                     />
                   </button>
@@ -237,36 +266,37 @@ const TenantsMaster = () => {
           </thead>
           <tbody>
             {paginatedData.map((tenant) => (
-              <React.Fragment key={tenant.id}>
+              <React.Fragment key={tenant.code}>
                 <tr
-                  className={`${
-                    expandedRows[tenant.id]
-                      ? "mobile-no-border"
-                      : "mobile-with-border"
-                  } border-b border-[#E9E9E9] h-[57px]`}
+                  className={`${expandedRows[tenant.code]
+                    ? "mobile-no-border"
+                    : "mobile-with-border"
+                    } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left tenant-data">{tenant.id}</td>
+                  <td className="px-5 text-left tenant-data">{tenant.code}</td>
                   <td className="px-3 text-left tenant-data date-column">
-                    {tenant.date}
+                    {new Date(tenant.created_at).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
-                      className={`tenant-dropdown-field ${
-                        expandedRows[tenant.id] ? "active" : ""
-                      }`}
-                      onClick={() => toggleRowExpand(tenant.id)}
+                      className={`tenant-dropdown-field ${expandedRows[tenant.code] ? "active" : ""
+                        }`}
+                      onClick={() => toggleRowExpand(tenant.code)}
                     >
                       <img
                         src={downarrow}
                         alt="drop-down-arrow"
-                        className={`tenant-dropdown-img ${
-                          expandedRows[tenant.id] ? "text-white" : ""
-                        }`}
+                        className={`tenant-dropdown-img ${expandedRows[tenant.code] ? "text-white" : ""
+                          }`}
                       />
                     </div>
                   </td>
                 </tr>
-                {expandedRows[tenant.id] && (
+                {expandedRows[tenant.code] && (
                   <tr className="mobile-with-border border-b border-[#E9E9E9]">
                     <td colSpan={3} className="px-5">
                       <div className="tenant-dropdown-content">
@@ -274,13 +304,15 @@ const TenantsMaster = () => {
                           <div className="tenant-grid-item">
                             <div className="dropdown-label">NAME</div>
                             <div className="dropdown-value w-[95px]">
-                              {tenant.name}
+                              {tenant.tenant_name}
                             </div>
                           </div>
                           <div className="tenant-grid-item w-[61%]">
                             <div className="dropdown-label">CONTACTS</div>
                             <div className="dropdown-value w-[113px]">
-                              {tenant.contact}
+                              {tenant.phone && tenant.email
+                                ? `${tenant.phone}, ${tenant.email}`
+                                : tenant.phone || tenant.email || "N/A"}
                             </div>
                           </div>
                         </div>
@@ -289,11 +321,10 @@ const TenantsMaster = () => {
                             <div className="dropdown-label">STATUS</div>
                             <div className="dropdown-value">
                               <span
-                                className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] tenant-status ${
-                                  tenant.status === "Active"
-                                    ? "bg-[#e1ffea] text-[#28C76F]"
-                                    : "bg-[#FFE1E1] text-[#C72828]"
-                                }`}
+                                className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] tenant-status ${tenant.status === "Active"
+                                  ? "bg-[#E8EFF6] text-[#1458A2]"
+                                  : "bg-[#E6F5EC] text-[#1C7D4D]"
+                                  }`}
                               >
                                 {tenant.status}
                               </span>
@@ -301,22 +332,24 @@ const TenantsMaster = () => {
                           </div>
                           <div className="tenant-grid-item w-[38%]">
                             <div className="dropdown-label">ID TYPE</div>
-                            <div className="dropdown-value">{tenant.type}</div>
+                            <div className="dropdown-value">
+                              {tenant.id_type?.name || "N/A"}
+                            </div>
                           </div>
                           <div className="tenant-grid-item w-[20%]">
                             <div className="dropdown-label">ACTION</div>
                             <div className="dropdown-value flex items-center gap-2 mt-[10px]">
-                              <button onClick={openUpdateTenantModal}>
+                              <button onClick={() => openUpdateTenantModal(tenant)}>
                                 <img
                                   src={editicon}
                                   alt="Edit"
                                   className="w-[18px] h-[18px] action-btn duration-200"
                                 />
                               </button>
-                              <button>
+                              <button onClick={() => handleDeleteTenant(tenant.id)}>
                                 <img
                                   src={deletesicon}
-                                  alt="Deletes"
+                                  alt="Delete"
                                   className="w-[18px] h-[18px] action-btn duration-200"
                                 />
                               </button>
@@ -361,11 +394,10 @@ const TenantsMaster = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
-                currentPage === startPage + i
-                  ? "bg-[#1458A2] text-white"
-                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-              }`}
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${currentPage === startPage + i
+                ? "bg-[#1458A2] text-white"
+                : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+                }`}
               onClick={() => setCurrentPage(startPage + i)}
             >
               {startPage + i}
@@ -392,7 +424,7 @@ const TenantsMaster = () => {
         </div>
       </div>
 
-      {/* Create Tenant Modal /> */}
+      {/* Create Tenant Modal */}
       <CreateTenantModal
         open={createTenantModalOpen}
         onClose={closeCreateTenantModal}
@@ -402,6 +434,7 @@ const TenantsMaster = () => {
       <EditTenantModal
         open={updateTenantModalOpen}
         onClose={closeUpdateTenantModal}
+        tenant={selectedTenant}
       />
     </div>
   );

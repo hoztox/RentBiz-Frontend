@@ -1,83 +1,186 @@
-import React, { useState } from 'react'
-import './documentsform.css'
-import { ChevronDown } from 'lucide-react';
-import documentIcon from '../../../../assets/Images/Admin Tenants/document-icon.svg'
-// import calendarIcon from '../../../../assets/Images/Admin Tenants/calendar-icon.svg'
-import closeIcon from '../../../../assets/Images/Admin Tenants/close-icon-white.svg'
-import plusIcon from "../../../../assets/Images/Admin Tenants/plus-icon-black.svg"
+import { useState, useEffect } from "react";
+import "./documentsform.css";
+import { ChevronDown } from "lucide-react";
+import documentIcon from "../../../../assets/Images/Admin Tenants/document-icon.svg";
+import closeIcon from "../../../../assets/Images/Admin Tenants/close-icon-white.svg";
+import plusIcon from "../../../../assets/Images/Admin Tenants/plus-icon-black.svg";
+import axios from "axios";
+import { BASE_URL } from "../../../../utils/config";
 
-const DocumentsForm = ({ onNext, onBack }) => {
-  const [documents, setDocuments] = useState([
-      {
-        id: 1,
-        type: "",
-        number: "",
-        issueDate: "",
-        expiryDate: "",
-        files: [],
-      },
-    ]);
-  
-    const handleSubmit = (e) => {
-      e.preventDefault();
-      onNext({ documentsUploaded: true });
+const DocumentsForm = ({ onNext, onBack, initialData }) => {
+  const safeInitialDocuments = Array.isArray(initialData?.documents)
+    ? initialData.documents
+    : Array.isArray(initialData?.documents?.tenant_comp)
+      ? initialData.documents.tenant_comp
+      : [];
+
+  const [documents, setDocuments] = useState(
+    safeInitialDocuments.length > 0
+      ? safeInitialDocuments.map((doc, index) => ({
+        id: index + 1,
+        doc_type: doc.doc_type || "",
+        number: doc.number || "",
+        issued_date: doc.issued_date || "",
+        expiry_date: doc.expiry_date || "",
+        upload_file: doc.upload_file || [],
+      }))
+      : [
+        {
+          id: 1,
+          doc_type: "",
+          number: "",
+          issued_date: "",
+          expiry_date: "",
+          upload_file: [],
+        },
+      ]
+  );
+  const [docTypes, setDocTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const getUserCompanyId = () => {
+    const role = localStorage.getItem("role")?.toLowerCase();
+    const storedCompanyId = localStorage.getItem("company_id");
+
+    console.log("Role:", role);
+    console.log("Raw company_id from localStorage:", storedCompanyId);
+
+    if (role === "company") {
+      return storedCompanyId;
+    } else if (role === "user" || role === "admin") {
+      return storedCompanyId;
+    }
+
+    return null;
+  };
+
+  useEffect(() => {
+    const fetchDocTypes = async () => {
+      setLoading(true);
+      try {
+        const companyId = getUserCompanyId();
+        const response = await axios.get(`${BASE_URL}/company/doc_type/company/${companyId}`);
+        setDocTypes(Array.isArray(response.data) ? response.data : []);
+        setError(null);
+      } catch (error) {
+        console.error("Error fetching document types:", error);
+        setError("Failed to load document types. Using default options.");
+        setDocTypes([]);
+      } finally {
+        setLoading(false);
+      }
     };
-  
-    const handleAddDocument = () => {
-      const newDoc = {
-        id: documents.length + 1,
-        type: "",
-        number: "",
-        issueDate: "",
-        expiryDate: "",
-        files: [],
-      };
-      setDocuments([...documents, newDoc]);
+    fetchDocTypes();
+  }, []);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const validDocuments = documents.filter(
+      (doc) =>
+        doc.doc_type &&
+        doc.number &&
+        doc.issued_date &&
+        doc.expiry_date &&
+        doc.upload_file?.length > 0
+    );
+
+    if (documents.length > 0 && validDocuments.length === 0) {
+      setError("Please fill all required document fields or remove incomplete documents.");
+      return;
+    }
+
+    const tempData = {
+      tenant_comp: validDocuments.map((doc) => ({
+        doc_type: parseInt(doc.doc_type) || null,
+        number: doc.number || null,
+        issued_date: doc.issued_date || null,
+        expiry_date: doc.expiry_date || null,
+        upload_file: doc.upload_file || [],
+      })),
     };
-  
-    const handleRemoveDocument = (id) => {
-      setDocuments(documents.filter((doc) => doc.id !== id));
+    console.log("Temporarily saved documents data:", tempData);
+    onNext(tempData);
+  };
+
+  const handleBack = () => {
+    const tempData = {
+      tenant_comp: documents.map((doc) => ({
+        doc_type: parseInt(doc.doc_type) || null,
+        number: doc.number || null,
+        issued_date: doc.issued_date || null,
+        expiry_date: doc.expiry_date || null,
+        upload_file: doc.upload_file || [],
+      })),
     };
-  
-    const handleChange = (id, field, value) => {
-      setDocuments((prevDocs) =>
-        prevDocs.map((doc) =>
-          doc.id === id ? { ...doc, [field]: value } : doc
-        )
-      );
+    console.log("Passing documents data back:", tempData);
+    onBack(tempData);
+  };
+
+  const handleAddDocument = () => {
+    const newDoc = {
+      id: documents.length + 1,
+      doc_type: "",
+      number: "",
+      issued_date: "",
+      expiry_date: "",
+      upload_file: [],
     };
+    setDocuments([...documents, newDoc]);
+  };
+
+  const handleRemoveDocument = (id) => {
+    setDocuments(documents.filter((doc) => doc.id !== id));
+  };
+
+  const handleChange = (id, field, value) => {
+    setDocuments((prevDocs) =>
+      prevDocs.map((doc) =>
+        doc.id === id ? { ...doc, [field]: value } : doc
+      )
+    );
+  };
 
   return (
     <div className="w-full flex flex-col h-full">
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
+        {error && <p className="text-red-500 mb-4">{error}</p>}
         <div className="flex-1 overflow-y-auto">
-          {/* Document List */}
+          {loading && <p>Loading document types...</p>}
           <div>
             {documents.map((doc) => (
               <div key={doc.id} className="border-b first:pt-0 py-5">
                 <div className="flex gap-[10px] justify-between">
-                  {/* Document Type */}
                   <div>
                     <label className="block documents-label">Doc.Type</label>
                     <div className="relative">
                       <select
                         className="appearance-none documents-inputs w-[226px] cursor-pointer"
-                        value={doc.type}
+                        value={doc.doc_type}
                         onChange={(e) =>
-                          handleChange(doc.id, "type", e.target.value)
+                          handleChange(doc.id, "doc_type", e.target.value)
                         }
+                        disabled={loading}
                       >
                         <option value="">Select Document</option>
-                        <option value="License">License</option>
-                        <option value="Certificate">Certificate</option>
-                        <option value="Permit">Permit</option>
+                        {docTypes.map((type) => (
+                          <option key={type.id} value={type.id}>
+                            {type.title}
+                          </option>
+                        ))}
+                        {docTypes.length === 0 && !loading && (
+                          <>
+                            <option value="1">License</option>
+                            <option value="2">Certificate</option>
+                            <option value="3">Permit</option>
+                          </>
+                        )}
                       </select>
                       <ChevronDown className="absolute right-2 top-[12px] h-4 w-4 text-[#000000] pointer-events-none" />
                     </div>
                   </div>
 
-                  {/* Conditional Fields */}
-                  {doc.type && (
+                  {doc.doc_type && (
                     <>
                       <div>
                         <label className="block documents-label">Number</label>
@@ -98,9 +201,9 @@ const DocumentsForm = ({ onNext, onBack }) => {
                           <input
                             type="date"
                             className="documents-inputs w-[149px] appearance-none outline-none cursor-pointer"
-                            value={doc.issueDate}
+                            value={doc.issued_date}
                             onChange={(e) =>
-                              handleChange(doc.id, "issueDate", e.target.value)
+                              handleChange(doc.id, "issued_date", e.target.value)
                             }
                           />
                         </div>
@@ -112,9 +215,9 @@ const DocumentsForm = ({ onNext, onBack }) => {
                           <input
                             type="date"
                             className="documents-inputs w-[150px] appearance-none outline-none cursor-pointer"
-                            value={doc.expiryDate}
+                            value={doc.expiry_date}
                             onChange={(e) =>
-                              handleChange(doc.id, "expiryDate", e.target.value)
+                              handleChange(doc.id, "expiry_date", e.target.value)
                             }
                           />
                         </div>
@@ -128,7 +231,7 @@ const DocumentsForm = ({ onNext, onBack }) => {
                           id={`fileInput-${doc.id}`}
                           multiple
                           onChange={(e) =>
-                            handleChange(doc.id, "files", Array.from(e.target.files))
+                            handleChange(doc.id, "upload_file", Array.from(e.target.files))
                           }
                         />
                         <label
@@ -136,8 +239,8 @@ const DocumentsForm = ({ onNext, onBack }) => {
                           className="flex items-center justify-between documents-inputs cursor-pointer w-[161px] !py-2"
                         >
                           <span className="text-[#4B465C60] text-sm truncate">
-                            {doc.files.length > 0
-                              ? `${doc.files.length} file(s)`
+                            {doc.upload_file.length > 0
+                              ? `${doc.upload_file.length} file(s)`
                               : "Attach Files"}
                           </span>
                           <img
@@ -164,7 +267,6 @@ const DocumentsForm = ({ onNext, onBack }) => {
             ))}
           </div>
 
-          {/* Add Document Button */}
           <div className="py-4 flex justify-end">
             <button
               type="button"
@@ -177,12 +279,11 @@ const DocumentsForm = ({ onNext, onBack }) => {
           </div>
         </div>
 
-        {/* Navigation Buttons */}
         <div className="flex justify-end gap-4 pt-[35px] border-t mt-auto">
           <button
             type="button"
             className="text-[#201D1E] bg-white hover:bg-[#201D1E] hover:text-white back-button duration-200"
-            onClick={onBack}
+            onClick={handleBack}
           >
             Back
           </button>
@@ -195,7 +296,7 @@ const DocumentsForm = ({ onNext, onBack }) => {
         </div>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default DocumentsForm
+export default DocumentsForm;

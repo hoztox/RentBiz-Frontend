@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import closeicon from "../../../../assets/Images/Admin Tenants/close-icon.svg";
 import FormTimeline from "../FormTimeline";
 import TenantInfoForm from "../CreateTenant/TenantInfoForm";
@@ -8,7 +8,10 @@ import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 
 const TenantFormFlow = ({ onClose }) => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    tenant: null,
+    documents: null,
+  });
   const [formProgress, setFormProgress] = useState({
     tenantDetails: 0,
     uploadDocuments: 0,
@@ -24,20 +27,33 @@ const TenantFormFlow = ({ onClose }) => {
   const currentTitle = pageTitles[currentPageIndex];
 
   useEffect(() => {
-    const newProgress = { tenantDetails: 0, uploadDocuments: 0, submitted: 0 };
+    const newProgress = { tenantDetails: 0, uploadDocuments: 0, review: 0, submitted: 0 };
 
     if (currentPageIndex >= 1) newProgress.tenantDetails = 100;
     if (currentPageIndex >= 2) newProgress.uploadDocuments = 100;
+    if (currentPageIndex >= 3) newProgress.review = 100;
 
-    if (currentPageIndex === 0 && formData.buildingNo) {
+    if (currentPageIndex === 0 && formData.tenant) {
       const requiredFields = [
-        "buildingNo",
-        "plotNo",
-        "buildingName",
+        "tenant_name",
+        "nationality",
+        "phone",
+        "alternative_phone",
+        "email",
         "address",
+        "tenant_type",
+        "license_no",
+        "id_type",
+        "id_number",
+        "id_validity_date",
+        "sponser_name",
+        "sponser_id_type",
+        "sponser_id_number",
+        "sponser_id_validity_date",
+        "status",
       ];
-      const filledFields = requiredFields.filter((field) =>
-        formData[field]?.trim()
+      const filledFields = requiredFields.filter(
+        (field) => formData.tenant[field]
       ).length;
       newProgress.tenantDetails = Math.min(
         100,
@@ -50,37 +66,50 @@ const TenantFormFlow = ({ onClose }) => {
 
   const handleNextPage = (pageData) => {
     setAnimating(true);
-    setFormData((prevData) => ({ ...prevData, ...pageData }));
+    setFormData((prevData) => ({
+      ...prevData,
+      [currentPageIndex === 0 ? "tenant" : "documents"]: pageData,
+    }));
 
-    // Delay the page change to allow for animation
     setTimeout(() => {
       setCurrentPageIndex((prev) => prev + 1);
       setAnimating(false);
-    }, 500); // Match this with your CSS transition duration
+    }, 500);
   };
 
-  const handlePreviousPage = () => {
+  const handlePreviousPage = (pageData) => {
     setAnimating(true);
+    if (pageData) {
+      setFormData((prevData) => ({
+        ...prevData,
+        documents: pageData,
+      }));
+    }
 
     setTimeout(() => {
-      setCurrentPageIndex((prev) => Math.max(prev - 1, 0)); // prevent going below 0
+      setCurrentPageIndex((prev) => Math.max(prev - 1, 0));
       setAnimating(false);
     }, 500);
   };
 
   const handleClose = () => {
     setCurrentPageIndex(0);
-    setFormData({});
-    setFormProgress({ tenantDetails: 0, uploadDocuments: 0, submitted: 0 });
-    onClose(); // Call parent-provided close handler
+    setFormData({ tenant: null, documents: null });
+    setFormProgress({ tenantDetails: 0, uploadDocuments: 0, review: 0, submitted: 0 });
+    onClose();
   };
 
   const pageComponents = [
-    <TenantInfoForm key="info" onNext={handleNextPage} />,
+    <TenantInfoForm
+      key="info"
+      onNext={handleNextPage}
+      initialData={formData.tenant}
+    />,
     <DocumentsForm
       key="docs"
       onNext={handleNextPage}
       onBack={handlePreviousPage}
+      initialData={formData.documents}
     />,
     <ReviewPage
       key="review"
@@ -88,7 +117,11 @@ const TenantFormFlow = ({ onClose }) => {
       onNext={handleNextPage}
       onBack={handlePreviousPage}
     />,
-    <SubmissionConfirmation key="confirm" formData={formData} />,
+    <SubmissionConfirmation
+      key="confirm"
+      formData={formData}
+      onClose={handleClose}
+    />,
   ];
 
   return (
