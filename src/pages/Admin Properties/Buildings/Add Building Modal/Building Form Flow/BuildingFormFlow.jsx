@@ -126,7 +126,7 @@ const BuildingFormFlow = ({ onClose }) => {
       </div>
 
       {/* Right Side - Form Steps & Modal Header */}
-      <div className="w-full h-[780px] px-[33px] pt-[50px] pb-[40px] overflow-y-scroll">
+      <div className="w-full h-[780px] px-[26px] pt-[50px] pb-[40px] overflow-y-scroll">
         {/* Modal Header with Dynamic Title */}
         <div className="building-modal-header flex justify-between items-center mb-[35px]">
           <h3 className="building-modal-title">{currentTitle}</h3>

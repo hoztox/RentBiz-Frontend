@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./buildings.css";
 import { ChevronDown } from "lucide-react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import plusicon from "../../../assets/Images/Admin Buildings/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Buildings/download-icon.svg";
+import downarrow from "../../../assets/Images/Admin Buildings/downarrow.svg";
 import editicon from "../../../assets/Images/Admin Buildings/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Buildings/delete-icon.svg";
 import AddBuildingModal from "./Add Building Modal/AddBuildingModal";
-import downarrow from "../../../assets/Images/Admin Buildings/downarrow.svg";
 import EditBuildingModal from "./EditBuildingModal/EditBuildingModal";
+import { BASE_URL } from "../../../utils/config";
 
 const Buildings = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -17,27 +19,47 @@ const Buildings = () => {
   const [buildingModalOpen, setBuildingModalOpen] = useState(false);
   const [editbuildingModalOpen, setEditBuildingModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
+  const [buildings, setBuildings] = useState([]); // Initialize as empty array
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const itemsPerPage = 10;
+  const navigate = useNavigate();
 
-  const navigate = useNavigate(); // Initialize useNavigate hook
+  const getUserCompanyId = () => {
+    const storedCompanyId = localStorage.getItem("company_id");
+    if (storedCompanyId) return storedCompanyId;
+    const userRole = localStorage.getItem("role");
+    if (userRole === "user") {
+      const userData = localStorage.getItem("user_company_id");
+      if (userData) {
+        try {
+          return JSON.parse(userData);
+        } catch (e) {
+          console.error("Error parsing user company ID:", e);
+          return null;
+        }
+      }
+    }
+    return null;
+  };
 
-  // Function to check if the screen width is below 480px
+  const companyId = getUserCompanyId();
+
   const isMobileView = () => window.innerWidth < 480;
 
   const openBuildingModal = () => {
-    // Check if in mobile view (screen width < 480px)
     if (isMobileView()) {
-      navigate("/admin/building-timeline"); // Navigate to building-timeline route
+      navigate("/admin/building-timeline");
     } else {
-      setBuildingModalOpen(true); // Open modal for desktop view
+      setBuildingModalOpen(true);
     }
   };
 
   const openEditBuildingModal = () => {
-      if (isMobileView()) {
-      navigate("/admin/update-building-timeline"); 
+    if (isMobileView()) {
+      navigate("/admin/update-building-timeline");
     } else {
-      setBuildingModalOpen(true); // Open modal for desktop view
+      setEditBuildingModalOpen(true);
     }
   };
 
@@ -56,56 +78,33 @@ const Buildings = () => {
     }));
   };
 
-  const demoData = [
-    {
-      id: "B24090001",
-      date: "09 Sept 2024",
-      name: "Emaar Square Area",
-      address: "Boulevard Downtown Dubai, PO Box 111969 Dubai, UAE",
-      units: "12 Shops",
-      status: "Active",
-    },
-    {
-      id: "B24090002",
-      date: "10 Sept 2024",
-      name: "Marina Bay",
-      address: "Dubai Marina, PO Box 112233 Dubai, UAE",
-      units: "8 Shops",
-      status: "Active",
-    },
-    {
-      id: "B24090003",
-      date: "11 Sept 2024",
-      name: "Palm Jumeirah",
-      address: "Palm Jumeirah, PO Box 113344 Dubai, UAE",
-      units: "15 Shops",
-      status: "Active",
-    },
-    {
-      id: "B24090004",
-      date: "12 Sept 2024",
-      name: "Downtown View",
-      address: "Downtown Dubai, PO Box 114455 Dubai, UAE",
-      units: "10 Shops",
-      status: "Inactive",
-    },
-    {
-      id: "B24090005",
-      date: "13 Sept 2024",
-      name: "JBR Walk",
-      address: "Jumeirah Beach Residences, PO Box 115566 Dubai, UAE",
-      units: "20 Shops",
-      status: "Active",
-    },
-  ];
+  // Fetch buildings data from API
+  useEffect(() => {
+    const fetchBuildings = async () => {
+      try {
+        const companyId = getUserCompanyId();
+        setLoading(true);
+        const response = await axios.get(`${BASE_URL}/company/buildings/company/${companyId}/`);
+        // Ensure response.data is an array
+        const data = Array.isArray(response.data) ? response.data : response.data.results || [];
+        setBuildings(data);
+        setLoading(false);
+      } catch (err) {
+        setError("Failed to fetch buildings data", err);
+        setLoading(false);
+      }
+    };
 
-  const filteredData = demoData.filter(
+    fetchBuildings();
+  }, [companyId]);
+
+  // Filter buildings based on search term
+  const filteredData = buildings.filter(
     (building) =>
-      building.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      building.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      building.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      building.units.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      building.status.toLowerCase().includes(searchTerm.toLowerCase())
+      (building.building_no?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (building.building_name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (building.building_address?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (building.status?.toLowerCase() || "").includes(searchTerm.toLowerCase())
   );
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -117,6 +116,9 @@ const Buildings = () => {
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div className="border border-[#E9E9E9] rounded-md bldg-table">
@@ -193,22 +195,28 @@ const Buildings = () => {
                 key={index}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-5 text-left bldg-data">{building.id}</td>
-                <td className="px-5 text-left bldg-data">{building.date}</td>
-                <td className="pl-5 text-left bldg-data">{building.name}</td>
-                <td className="px-5 text-left bldg-data">{building.address}</td>
-                <td className="pl-12 pr-5 text-left bldg-data">
-                  {building.units}
+                <td className="px-5 text-left bldg-data">{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                <td className="px-5 text-left bldg-data">
+                  {new Date(building.created_at).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
                 </td>
+                <td className="pl-5 text-left bldg-data">{building.building_name || "Unnamed Building"}</td>
+                <td className="px-5 text-left bldg-data">{building.building_address || "N/A"}</td>
+                <td className="pl-12 pr-5 text-left bldg-data">N/A</td>
                 <td className="px-5 text-left bldg-data">
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
-                      building.status === "Active"
+                      building.status === "active"
                         ? "bg-[#e1ffea] text-[#28C76F]"
-                        : "bg-[#FFE1E1] text-[#C72828]"
+                        : building.status === "inactive"
+                        ? "bg-[#FFE1E1] text-[#C72828]"
+                        : "bg-[#FFF4E1] text-[#FFA500]"
                     }`}
                   >
-                    {building.status}
+                    {building.status.charAt(0).toUpperCase() + building.status.slice(1)}
                   </span>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
@@ -248,35 +256,39 @@ const Buildings = () => {
               <React.Fragment key={index}>
                 <tr
                   className={`${
-                    expandedRows[building.id]
+                    expandedRows[building.building_no]
                       ? "bldg-mobile-no-border"
                       : "bldg-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left bldg-data bldg-id-column">
-                    {building.id}
+                    {(currentPage - 1) * itemsPerPage + index + 1}
                   </td>
                   <td className="px-5 text-left bldg-data bldg-date-column">
-                    {building.date}
+                    {new Date(building.created_at).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`bldg-dropdown-field ${
-                        expandedRows[building.id] ? "active" : ""
+                        expandedRows[building.building_no] ? "active" : ""
                       }`}
-                      onClick={() => toggleRowExpand(building.id)}
+                      onClick={() => toggleRowExpand(building.building_no)}
                     >
                       <img
                         src={downarrow}
                         alt="drop-down-arrow"
                         className={`bldg-dropdown-img ${
-                          expandedRows[building.id] ? "text-white" : ""
+                          expandedRows[building.building_no] ? "text-white" : ""
                         }`}
                       />
                     </div>
                   </td>
                 </tr>
-                {expandedRows[building.id] && (
+                {expandedRows[building.building_no] && (
                   <tr className="bldg-mobile-with-border border-b border-[#E9E9E9]">
                     <td colSpan={3} className="px-5">
                       <div className="bldg-dropdown-content">
@@ -284,13 +296,13 @@ const Buildings = () => {
                           <div className="bldg-grid-item w-[45%]">
                             <div className="bldg-dropdown-label">NAME</div>
                             <div className="bldg-dropdown-value">
-                              {building.name}
+                              {building.building_name || "Unnamed Building"}
                             </div>
                           </div>
                           <div className="bldg-grid-item w-[60%]">
                             <div className="bldg-dropdown-label">ADDRESS</div>
                             <div className="bldg-dropdown-value">
-                              {building.address}
+                              {building.building_address || "N/A"}
                             </div>
                           </div>
                         </div>
@@ -300,7 +312,7 @@ const Buildings = () => {
                               NO. OF UNITS
                             </div>
                             <div className="bldg-dropdown-value">
-                              {building.units}
+                              N/A
                             </div>
                           </div>
                           <div className="bldg-grid-item w-[27%]">
@@ -308,12 +320,14 @@ const Buildings = () => {
                             <div className="bldg-dropdown-value">
                               <span
                                 className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] bldg-status ${
-                                  building.status === "Active"
+                                  building.status === "active"
                                     ? "bg-[#e1ffea] text-[#28C76F]"
-                                    : "bg-[#FFE1E1] text-[#C72828]"
+                                    : building.status === "inactive"
+                                    ? "bg-[#FFE1E1] text-[#C72828]"
+                                    : "bg-[#FFF4E1] text-[#FFA500]"
                                 }`}
                               >
-                                {building.status}
+                                {building.status.charAt(0).toUpperCase() + building.status.slice(1)}
                               </span>
                             </div>
                           </div>
