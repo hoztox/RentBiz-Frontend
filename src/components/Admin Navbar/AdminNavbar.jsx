@@ -89,6 +89,10 @@ const mobileRouteTitles = {
   "/admin/create-tenant": "Create New Tenant",
   "/admin/tenant-upload-documents": "Upload Documents",
   "/admin/tenant-submitted": "Submitted",
+  "/admin/edit-tenant-timeline": "",
+  "/admin/edit-create-tenant": "Update Tenant",
+  "/admin/edit-tenant-upload-docs": "Upload Documents",
+  "/admin/edit-tenant-submitted": "Submitted",
   default: "Admin",
 };
 

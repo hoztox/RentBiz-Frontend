@@ -84,7 +84,9 @@ const CreateUnitTypeModal = () => {
       console.error("Error:", err.response?.data || err.message);
       setError(
         "Failed to save unit type: " +
-          (err.response?.data?.detail || err.response?.data?.company_id || err.message)
+          (err.response?.data?.detail ||
+            err.response?.data?.company_id ||
+            err.message)
       );
     } finally {
       setLoading(false);
@@ -108,22 +110,28 @@ const CreateUnitTypeModal = () => {
           </button>
         </div>
 
-        {error && <div className="text-red-500 mb-4">{error}</div>}
+        {/* {error && <div className="text-red-500 mb-4">{error}</div>} */}
 
         <div className="mb-6">
           <label className="block pt-2 tenancy-modal-label">Title*</label>
           <input
             type="text"
-            className="w-full border border-[#E9E9E9] rounded-md mt-1 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-gray-500 input-style"
+            className={`input-style border transition-colors duration-200 ${
+              fieldError
+                ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                : "border-gray-300 focus:ring-gray-700 focus:border-gray-700"
+            }`}
             placeholder="Enter Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             disabled={loading}
           />
-          {fieldError && <div className="text-red-500 text-sm mt-1">{fieldError}</div>}
+          <div className="text-sm mt-1" style={{ minHeight: "20px" }}>
+            {fieldError && <span className="text-[#dc2626]">{fieldError}</span>}
+          </div>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end mt-[-15px]">
           <button
             onClick={handleSave}
             className="bg-[#2892CE] hover:bg-[#2276a7] text-white rounded w-[150px] h-[38px] modal-save-btn duration-200"

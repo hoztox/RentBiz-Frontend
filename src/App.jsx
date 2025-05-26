@@ -58,6 +58,11 @@ import UpdateUnitDocumentFormResponsive from "./pages/Admin Properties/Units/Edi
 import UpdateUnitSubmitPageResponsive from "./pages/Admin Properties/Units/Edit Unit Modal/Submit/UpdateUnitSubmitPageResponsive";
 import UpdateUnitsReset from "./pages/Admin Properties/Units/Edit Unit Modal/UpdateUnitsReset";
 import UpdateFormTimelineRes from "./pages/Admin Properties/Units/Edit Unit Modal/UpdateFormTimelineRes";
+import EditTenantFormTimelineRes from "./pages/Admin Tenants/EditTenantModal/EditTenantFormTimelineRes";
+import ResUpdateTenantInfoForm from "./pages/Admin Tenants/EditTenantModal/UpdateTenant/ResUpdateTenantInfoForm";
+import EditTenantDocFormRes from "./pages/Admin Tenants/EditTenantModal/UploadDocuments/EditTenantDocFormRes";
+import SubmissionConfirmationRes from "./pages/Admin Tenants/EditTenantModal/Submit/SubmissionConfirmationRes";
+import EditTenantsReset from "./pages/Admin Tenants/EditTenantModal/EditTenantsReset";
 
 const App = () => {
   return (
@@ -130,6 +135,12 @@ const App = () => {
           <Route path="tenant-upload-documents" element={<TenantDocumentFormResponsive />} />
           <Route path="tenant-submitted" element={<TenantSubmitConfirmResponsive />} />
           <Route path="tenant-reset" element={<TenantsReset />} />
+
+          <Route path="edit-tenant-timeline" element={<EditTenantFormTimelineRes />} />
+          <Route path="edit-create-tenant" element={<ResUpdateTenantInfoForm />} />
+          <Route path="edit-tenant-upload-docs" element={<EditTenantDocFormRes />} />
+          <Route path="edit-tenant-submitted" element={<SubmissionConfirmationRes />} />
+          <Route path="edit-tenant-reset" element={<EditTenantsReset />} />
         </Route>
       </Routes>
     </BrowserRouter>

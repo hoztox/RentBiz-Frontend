@@ -15,7 +15,7 @@ const TenantsMaster = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [createTenantModalOpen, setCreateTenantModalOpen] = useState(false);
-  const [updateTenantModalOpen, setUpdateTenantModalOpen] = useState(false)
+  const [updateTenantModalOpen, setUpdateTenantModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
   const itemsPerPage = 10;
 
@@ -24,25 +24,28 @@ const TenantsMaster = () => {
   const isMobileView = () => window.innerWidth < 480;
 
   const openCreateTenantModal = () => {
-      if (isMobileView()) {
-      navigate("/admin/tenant-timeline"); 
+    if (isMobileView()) {
+      navigate("/admin/tenant-timeline");
     } else {
       setCreateTenantModalOpen(true); // Open modal for desktop view
     }
   };
-  
 
   const closeCreateTenantModal = () => {
     setCreateTenantModalOpen(false);
   };
 
   const openUpdateTenantModal = () => {
-    setUpdateTenantModalOpen(true);
-  }
+    if (isMobileView()) {
+      navigate("/admin/edit-tenant-timeline");
+    } else {
+      setUpdateTenantModalOpen(true);
+    }
+  };
 
   const closeUpdateTenantModal = () => {
-    setUpdateTenantModalOpen(false)
-  }
+    setUpdateTenantModalOpen(false);
+  };
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -226,7 +229,9 @@ const TenantsMaster = () => {
               <th className="px-5 text-left tenant-thead tenant-id-column w-[36%]">
                 ID
               </th>
-              <th className="px-3 text-left tenant-thead date-column w-[50%]">DATE</th>
+              <th className="px-3 text-left tenant-thead date-column w-[50%]">
+                DATE
+              </th>
               <th className="px-5 text-right tenant-thead"></th>
             </tr>
           </thead>
@@ -388,10 +393,16 @@ const TenantsMaster = () => {
       </div>
 
       {/* Create Tenant Modal /> */}
-      <CreateTenantModal open={createTenantModalOpen} onClose={closeCreateTenantModal} />
+      <CreateTenantModal
+        open={createTenantModalOpen}
+        onClose={closeCreateTenantModal}
+      />
 
       {/* Update Tenant Modal */}
-      <EditTenantModal open={updateTenantModalOpen} onClose={closeUpdateTenantModal} />
+      <EditTenantModal
+        open={updateTenantModalOpen}
+        onClose={closeUpdateTenantModal}
+      />
     </div>
   );
 };

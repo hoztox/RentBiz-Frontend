@@ -65,6 +65,10 @@ input::placeholder {
   justify-content: center;
 }
 
+.input-error {
+  border: 1px solid #dc2626 !important;
+}
+
 /* Responsive Styles */
 .create-unit-modal-container {
   width: 100%;
