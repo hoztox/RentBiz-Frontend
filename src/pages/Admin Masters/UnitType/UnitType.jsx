@@ -28,22 +28,24 @@ const UnitType = () => {
   const itemsPerPage = 10;
 
   const getUserCompanyId = () => {
-    const storedCompanyId = localStorage.getItem("company_id");
-    if (storedCompanyId) return storedCompanyId;
-    const userRole = localStorage.getItem("role");
-    if (userRole === "user") {
-      const userData = localStorage.getItem("user_company_id");
-      if (userData) {
-        try {
-          return JSON.parse(userData);
-        } catch (e) {
-          console.error("Error parsing user company ID:", e);
-          return null;
-        }
-      }
+  const role = localStorage.getItem("role")?.toLowerCase();
+
+  if (role === "company") {
+    // When a company logs in, their own ID is stored as company_id
+    return localStorage.getItem("company_id");
+  } else if (role === "user" || role === "admin") {
+    // When a user logs in, company_id is directly stored
+    try {
+      const userCompanyId = localStorage.getItem("company_id");
+      return userCompanyId ? JSON.parse(userCompanyId) : null;
+    } catch (e) {
+      console.error("Error parsing user company ID:", e);
+      return null;
     }
-    return null;
-  };
+  }
+
+  return null;
+};
 
   const companyId = getUserCompanyId();
 

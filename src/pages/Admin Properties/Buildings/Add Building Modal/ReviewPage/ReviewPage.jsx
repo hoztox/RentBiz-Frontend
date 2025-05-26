@@ -20,97 +20,115 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
   console.log("Documents:", documents);
 
   const handleNext = async () => {
-  setLoading(true);
-  setError(null);
+    setLoading(true);
+    setError(null);
 
-  // Validate required fields
-  const requiredFields = [
-    "building_no",
-    "plot_no",
-    "building_name",
-    "building_address",
-    "company",
-    "status",
-  ];
-  const missingFields = requiredFields.filter((field) => !building[field]);
-  if (missingFields.length > 0) {
-    setError(`Please fill required fields: ${missingFields.join(", ")}`);
-    setLoading(false);
-    return;
-  }
-
-  // Validate documents
-  if (documents.length > 0) {
-    const invalidDocs = documents.filter(
-      (doc) =>
-        !doc.doc_type ||
-        !doc.number ||
-        !doc.issued_date ||
-        !doc.expiry_date ||
-        !doc.upload_file?.length
-    );
-    if (invalidDocs.length > 0) {
-      setError("All documents must have doc_type, number, dates, and at least one file.");
+    // Validate required fields
+    const requiredFields = [
+      "building_no",
+      "plot_no",
+      "building_name",
+      "building_address",
+      "company",
+      "status",
+    ];
+    const missingFields = requiredFields.filter((field) => !building[field]);
+    if (missingFields.length > 0) {
+      setError(`Please fill required fields: ${missingFields.join(", ")}`);
       setLoading(false);
       return;
     }
-  }
 
-  try {
-    // Prepare payload for backend
-    const payload = {
-      ...building,
-      build_comp: documents || [],
-    };
-
-    // Create FormData for multipart file upload
-    const formDataWithFiles = new FormData();
-    Object.entries(payload).forEach(([key, value]) => {
-      if (key === "build_comp") {
-        value.forEach((doc, index) => {
-          // Use dot notation for DRF compatibility
-          formDataWithFiles.append(`build_comp[${index}].doc_type`, doc.doc_type || "");
-          formDataWithFiles.append(`build_comp[${index}].number`, doc.number || "");
-          formDataWithFiles.append(`build_comp[${index}].issued_date`, doc.issued_date || "");
-          formDataWithFiles.append(`build_comp[${index}].expiry_date`, doc.expiry_date || "");
-          // Send only the first file since DocumentType.upload_file is a single FileField
-          if (Array.isArray(doc.upload_file) && doc.upload_file.length > 0) {
-            formDataWithFiles.append(`build_comp[${index}].upload_file`, doc.upload_file[0]);
-          }
-        });
-      } else {
-        formDataWithFiles.append(key, value ?? "");
+    // Validate documents
+    if (documents.length > 0) {
+      const invalidDocs = documents.filter(
+        (doc) =>
+          !doc.doc_type ||
+          !doc.number ||
+          !doc.issued_date ||
+          !doc.expiry_date ||
+          !doc.upload_file?.length
+      );
+      if (invalidDocs.length > 0) {
+        setError("All documents must have doc_type, number, dates, and at least one file.");
+        setLoading(false);
+        return;
       }
-    });
-
-    // Log FormData contents for debugging
-    console.log("FormData contents:");
-    for (const [key, value] of formDataWithFiles.entries()) {
-      console.log(`${key}:`, value);
     }
 
-    // Send POST request to backend
-    const response = await axios.post(
-      `${BASE_URL}/company/buildings/create/`,
-      formDataWithFiles,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      }
-    );
+    try {
+      // Prepare payload for backend
+      const payload = {
+        ...building,
+        build_comp: documents || [],
+      };
 
-    console.log("Successfully created building:", response.data);
-    onNext({ formData, response: response.data });
-  } catch (err) {
-    console.error("Error creating building:", err);
-    setError(
-      `Failed to save building: ${
-        err.response?.data?.message || err.message
-      }`
-    );
-  } finally {
-    setLoading(false);
-  }
-};
+      // Create FormData for multipart file upload
+      const formDataWithFiles = new FormData();
+      Object.entries(payload).forEach(([key, value]) => {
+        if (key === "build_comp") {
+          value.forEach((doc, index) => {
+            // Try nested structure
+            if (Array.isArray(doc.upload_file)) {
+              doc.upload_file.forEach((file, fileIndex) => {
+                formDataWithFiles.append(
+                  `build_comp[${index}][upload_file][${fileIndex}]`,
+                  file
+                );
+              });
+            }
+            formDataWithFiles.append(
+              `build_comp[${index}][doc_type]`,
+              doc.doc_type || ""
+            );
+            formDataWithFiles.append(
+              `build_comp[${index}][number]`,
+              doc.number || ""
+            );
+            formDataWithFiles.append(
+              `build_comp[${index}][issued_date]`,
+              doc.issued_date || ""
+            );
+            formDataWithFiles.append(
+              `build_comp[${index}][expiry_date]`,
+              doc.expiry_date || ""
+            );
+          });
+        } else {
+          formDataWithFiles.append(key, value ?? "");
+        }
+      });
+
+      // Log FormData contents for debugging
+      console.log("FormData contents:");
+      for (const [key, value] of formDataWithFiles.entries()) {
+        console.log(`${key}:`, value);
+      }
+
+      // Send POST request to backend
+      const response = await axios.post(
+        `${BASE_URL}/company/buildings/create/`,
+        formDataWithFiles,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      console.log("Successfully created building:", response.data);
+      // Navigate to SubmissionConfirmation
+      onNext({ formData, response: response.data });
+    } catch (err) {
+      console.error("Error creating building:", err);
+      setError(
+        `Failed to save building: ${
+          err.response?.data?.message || err.message
+        }`
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleBack = () => {
     // Ensure formData.documents is correctly structured
     const backData = {

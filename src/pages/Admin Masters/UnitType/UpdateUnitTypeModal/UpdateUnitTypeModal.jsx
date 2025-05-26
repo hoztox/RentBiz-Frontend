@@ -15,20 +15,24 @@ const UpdateUnitTypeModal = () => {
 
   // Function to get company ID based on user role
   const getUserCompanyId = () => {
-    const role = localStorage.getItem("role");
-    if (role === "company") {
-      return localStorage.getItem("company_id");
-    } else if (role === "user") {
-      try {
-        const userCompanyId = localStorage.getItem("user_company_id");
-        return userCompanyId ? JSON.parse(userCompanyId) : null;
-      } catch (e) {
-        console.error("Error parsing user company ID:", e);
-        return null;
-      }
+  const role = localStorage.getItem("role")?.toLowerCase();
+
+  if (role === "company") {
+    // When a company logs in, their own ID is stored as company_id
+    return localStorage.getItem("company_id");
+  } else if (role === "user" || role === "admin") {
+    // When a user logs in, company_id is directly stored
+    try {
+      const userCompanyId = localStorage.getItem("company_id");
+      return userCompanyId ? JSON.parse(userCompanyId) : null;
+    } catch (e) {
+      console.error("Error parsing user company ID:", e);
+      return null;
     }
-    return null;
-  };
+  }
+
+  return null;
+};
 
   // Reset form state when modal opens or unit data changes
   useEffect(() => {

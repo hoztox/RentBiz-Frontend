@@ -39,7 +39,7 @@ const AdminLogin = () => {
     setPasswordVisible(!passwordVisible);
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
 
   if (!username || !password) {
@@ -61,60 +61,43 @@ const AdminLogin = () => {
       const {
         access,
         refresh,
+        role,
         id,
-        email,
         company_id,
-        username,
-        name,
-        role: displayRole, // This is user_role like "Admin"
-        ...userData
+        ...restData
       } = response.data;
 
-      // Decode JWT to extract normalized role (either "user" or "company")
-      const decodedAccess = JSON.parse(atob(access.split('.')[1]));
-      const normalizedRole = decodedAccess.role;
+      console.log("Access Token:", access);
+      console.log("Refresh Token:", refresh);
+      console.log("Role:", role);
 
       localStorage.setItem("accessToken", access);
       localStorage.setItem("refreshToken", refresh);
-      localStorage.setItem("role", normalizedRole); // store normalized role
-      localStorage.setItem("user_display_role", displayRole); // optionally keep display role (e.g., Admin)
+      localStorage.setItem("role", role);
+
+      const normalizedRole = role.toLowerCase();
 
       if (normalizedRole === "company") {
-        localStorage.setItem("company_id", company_id);
-        localStorage.setItem("email", email);
-        localStorage.setItem("username", username);
-        localStorage.setItem("name", name);
-
-        Object.keys(userData).forEach((key) => {
-          localStorage.setItem(`company_${key}`, JSON.stringify(userData[key]));
+        localStorage.setItem("company_id", id); // id is company_id for company login
+        Object.entries(restData).forEach(([key, value]) => {
+          localStorage.setItem(`company_${key}`, JSON.stringify(value));
         });
-
         localStorage.removeItem("user_id");
-
-        console.log("Navigating to /admin/dashboard");
-        setTimeout(() => navigate("/admin/dashboard"), 100);
-      } else if (normalizedRole === "user") {
-        localStorage.setItem("user_id", id);
-        localStorage.setItem("email", email);
-        localStorage.setItem("username", username);
-        localStorage.setItem("name", name);
-        localStorage.setItem("company_id", company_id);
-
-        Object.keys(userData).forEach((key) => {
-          localStorage.setItem(`user_${key}`, JSON.stringify(userData[key]));
+        navigate("/admin/dashboard");
+      } else if (normalizedRole === "user" || normalizedRole === "admin") {
+        localStorage.setItem("user_id", id); // id is user_id for user login
+        if (company_id) localStorage.setItem("company_id", company_id);
+        Object.entries(restData).forEach(([key, value]) => {
+          localStorage.setItem(`user_${key}`, JSON.stringify(value));
         });
-
-        localStorage.removeItem("company_id");
-
-        console.log("Navigating to /admin/dashboard");
-        setTimeout(() => navigate("/admin/dashboard"), 100);
+        localStorage.removeItem("company_name");
+        navigate("/admin/dashboard");
       } else {
-        toast.error("Unknown role detected.");
-        console.warn("Unhandled role from token:", normalizedRole);
+        toast.error("Unknown role, login failed");
       }
     }
   } catch (error) {
-    console.error("Login Error:", error.response?.data || error.message);
+    console.error("Login Error:", error.response?.data || error);
     toast.error("Login failed. Please check your credentials.");
   } finally {
     setLoading(false);

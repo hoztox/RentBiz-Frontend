@@ -37,19 +37,19 @@ const AddDocumentModal = ({
     return null;
   };
 
-  const getRelevantUserId = () => {
-    const userRole = localStorage.getItem("role");
+  // const getRelevantUserId = () => {
+  //   const userRole = localStorage.getItem("role");
 
-    if (userRole === "user") {
-      const userId = localStorage.getItem("user_id");
-      if (userId) return userId;
-    }
+  //   if (userRole === "user") {
+  //     const userId = localStorage.getItem("user_id");
+  //     if (userId) return userId;
+  //   }
 
-    const companyId = localStorage.getItem("company_id");
-    if (companyId) return companyId;
+  //   const companyId = localStorage.getItem("company_id");
+  //   if (companyId) return companyId;
 
-    return null;
-  };
+  //   return null;
+  // };
 
   //  const companyId = getUserCompanyId();
 
@@ -75,10 +75,10 @@ const AddDocumentModal = ({
 
     try {
       const companyId = getUserCompanyId();
-      const userId = getRelevantUserId();
+      // const userId = getRelevantUserId();
 
       const payload = {
-        user: userId,
+        // user: userId,
         company: companyId,
         title: title
       };
