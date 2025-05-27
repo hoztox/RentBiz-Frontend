@@ -4,7 +4,7 @@ import { BASE_URL } from "../../../../../utils/config";
 import DocumentsView from "./DocumentsView";
 import "./reviewpage.css";
 
-const ReviewPage = ({ formData, onBack, onNext, onBuildingCreated }) => {
+const ReviewPage = ({ formData, onBack, onNext }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -97,7 +97,6 @@ const ReviewPage = ({ formData, onBack, onNext, onBuildingCreated }) => {
         }
       );
       console.log("Successfully created building:", response.data);
-      onBuildingCreated(); // Trigger the refresh callback
       onNext({ formData, response: response.data }); // Proceed to SubmissionConfirmation
     } catch (err) {
       console.error("Error creating building:", err);

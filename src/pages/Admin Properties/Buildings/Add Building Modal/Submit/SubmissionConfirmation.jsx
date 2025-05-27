@@ -1,12 +1,11 @@
-// SubmissionConfirmation.jsx
 import React from 'react';
 import "./submissionconfirmation.css";
-import success from "../../../../../assets/Images/Admin Buildings/success.png"
-import successtick from "../../../../../assets/Images/Admin Buildings/success_tick.png"
+import success from "../../../../../assets/Images/Admin Buildings/success.png";
+import successtick from "../../../../../assets/Images/Admin Buildings/success_tick.png";
 
 const SubmissionConfirmation = () => {
   return (
-      <div className="submit-confirm-container">
+    <div className="submit-confirm-container">
       <div className="submit-confirm-box">
         <div className="submit-confirm-images">
           <img src={success} alt="Success" className="submit-success-img" />
@@ -22,4 +21,5 @@ const SubmissionConfirmation = () => {
     </div>
   );
 };
+
 export default SubmissionConfirmation;

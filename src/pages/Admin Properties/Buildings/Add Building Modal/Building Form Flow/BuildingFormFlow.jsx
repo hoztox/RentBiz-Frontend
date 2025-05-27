@@ -36,7 +36,10 @@ const BuildingFormFlow = ({ onClose, onBuildingCreated }) => {
 
     if (currentPageIndex >= 1) newProgress.createBuilding = 100;
     if (currentPageIndex >= 2) newProgress.uploadDocuments = 100;
-    if (currentPageIndex >= 3) newProgress.review = 100;
+    if (currentPageIndex >= 3) {
+      newProgress.review = 100;
+      newProgress.submitted = 100;
+    }
 
     if (currentPageIndex === 0 && formData.building) {
       const requiredFields = [
@@ -66,7 +69,7 @@ const BuildingFormFlow = ({ onClose, onBuildingCreated }) => {
     }));
 
     setTimeout(() => {
-      setCurrentPageIndex((prev) => prev + 1);
+      setCurrentPageIndex((prev) => prev + 1); // Progress to next page, including SubmissionConfirmation
       setAnimating(false);
     }, 500);
   };
@@ -87,6 +90,10 @@ const BuildingFormFlow = ({ onClose, onBuildingCreated }) => {
   };
 
   const handleClose = () => {
+    if (currentPageIndex === 3) {
+      // Only trigger refresh if closing from SubmissionConfirmation
+      onBuildingCreated();
+    }
     setCurrentPageIndex(0);
     setFormData({ building: null, documents: null });
     setFormProgress({ createBuilding: 0, uploadDocuments: 0, review: 0, submitted: 0 });
@@ -110,9 +117,11 @@ const BuildingFormFlow = ({ onClose, onBuildingCreated }) => {
       formData={formData}
       onNext={handleNextPage}
       onBack={handlePreviousPage}
-      onBuildingCreated={onBuildingCreated} // Pass the callback to ReviewPage
     />,
-    <SubmissionConfirmation key="confirm" formData={formData} onClose={handleClose} />,
+    <SubmissionConfirmation
+      key="confirm"
+      formData={formData}
+    />,
   ];
 
   return (

@@ -8,7 +8,7 @@ import ReviewPage from "../ReviewPage/ReviewPage";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 import { BASE_URL } from "../../../../../utils/config";
 
-const BuildingFormFlow = ({ onClose, buildingId }) => {
+const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated }) => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [formData, setFormData] = useState({
     building: null,
@@ -68,8 +68,11 @@ const BuildingFormFlow = ({ onClose, buildingId }) => {
               : [],
           },
         });
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching building data:", error);
+        setError("Failed to load building data.");
+        setLoading(false);
       }
     };
     fetchBuildingData();
@@ -85,12 +88,15 @@ const BuildingFormFlow = ({ onClose, buildingId }) => {
 
     if (currentPageIndex >= 1) newProgress.updateBuilding = 100;
     if (currentPageIndex >= 2) newProgress.uploadDocuments = 100;
-    if (currentPageIndex >= 3) newProgress.review = 100;
+    if (currentPageIndex >= 3) {
+      newProgress.review = 100;
+      newProgress.submitted = 100;
+    }
 
     if (currentPageIndex === 0 && formData.building) {
       const requiredFields = [
         "building_no",
-        "plot_no", // Corrected typo
+        "plot_no",
         "building_name",
         "building_address",
         "company",
@@ -131,7 +137,7 @@ const BuildingFormFlow = ({ onClose, buildingId }) => {
       setFormData((prevData) => {
         const newData = {
           ...prevData,
-          documents: { documents: pageData.documents || [] }, // Ensure object structure
+          documents: { documents: pageData.documents || [] },
         };
         console.log("BuildingFormFlow: Updated formData on back:", newData);
         return newData;
@@ -144,6 +150,10 @@ const BuildingFormFlow = ({ onClose, buildingId }) => {
   };
 
   const handleClose = () => {
+    if (currentPageIndex === 3) {
+      // Trigger refresh only when closing from SubmissionConfirmation
+      onBuildingCreated();
+    }
     setCurrentPageIndex(0);
     setFormData({ building: null, documents: { documents: [] } });
     setFormProgress({
@@ -156,23 +166,9 @@ const BuildingFormFlow = ({ onClose, buildingId }) => {
     onClose();
   };
 
-  // if (loading) {
-  //   return (
-  //     <div className="text-center p-5">
-  //       <svg className="animate-spin h-5 w-5 mx-auto" viewBox="0 0 24 24">
-  //         <circle
-  //           cx="12"
-  //           cy="12"
-  //           r="10"
-  //           stroke="currentColor"
-  //           strokeWidth="4"
-  //           fill="none"
-  //         />
-  //       </svg>
-  //       Loading building data...
-  //     </div>
-  //   );
-  // }
+  if (loading) {
+    return <div className="p-4">Loading building data...</div>;
+  }
 
   if (error) {
     return <div className="text-red-500 p-4">{error}</div>;
@@ -233,7 +229,6 @@ const BuildingFormFlow = ({ onClose, buildingId }) => {
               <SubmissionConfirmation
                 key="confirm"
                 formData={formData}
-                onClose={handleClose}
               />,
             ][currentPageIndex]
           }
