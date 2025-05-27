@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "./TenancyRenewal.css";
 import { ChevronDown } from "lucide-react";
 import downloadicon from "../../../assets/Images/Admin Tenancy/download-icon.svg";
@@ -6,6 +7,7 @@ import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Tenancy/delete-icon.svg";
 import viewicon from "../../../assets/Images/Admin Tenancy/view-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenants/downarrow.svg";
+import { BASE_URL } from "../../../utils/config";
 import { useModal } from "../../../context/ModalContext";
 
 const TenancyRenewal = () => {
@@ -13,70 +15,58 @@ const TenancyRenewal = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
+  const [tenancies, setTenancies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { openModal } = useModal();
   const itemsPerPage = 10;
 
-  const demoData = [
-    {
-      id: "#TC0018-1",
-      tenant: "Furniture shop",
-      building: "DANAT ALZAHIA",
-      unit: "SHOP10",
-      months: "66",
-      renew: "Click to Renew",
-      endDate: "09 Sept 2024",
-      view: viewicon,
-    },
-    {
-      id: "#TC0018-2",
-      tenant: "Furniture shop",
-      building: "DANAT ALZAHIA",
-      unit: "SHOP10",
-      months: "66",
-      renew: "Click to Renew",
-      endDate: "09 Sept 2024",
-      view: viewicon,
-    },
-    {
-      id: "#TC0018-3",
-      tenant: "Furniture shop",
-      building: "DANAT ALZAHIA",
-      unit: "SHOP10",
-      months: "66",
-      renew: "Click to Renew",
-      endDate: "09 Sept 2024",
-      view: viewicon,
-    },
-    {
-      id: "#TC0018-4",
-      tenant: "Furniture shop",
-      building: "DANAT ALZAHIA",
-      unit: "SHOP10",
-      months: "66",
-      renew: "Click to Renew",
-      endDate: "09 Sept 2024",
-      view: viewicon,
-    },
-    {
-      id: "#TC0018-5",
-      tenant: "Furniture shop",
-      building: "DANAT ALZAHIA",
-      unit: "SHOP10",
-      months: "66",
-      renew: "Click to Renew",
-      endDate: "09 Sept 2024",
-      view: viewicon,
-    },
-  ];
+  const getUserCompanyId = () => {
+    const role = localStorage.getItem("role")?.toLowerCase();
 
-  const filteredData = demoData.filter(
+    if (role === "company") {
+      return localStorage.getItem("company_id");
+    } else if (role === "user" || role === "admin") {
+      try {
+        const userCompanyId = localStorage.getItem("company_id");
+        return userCompanyId ? JSON.parse(userCompanyId) : null;
+      } catch (e) {
+        console.error("Error parsing user company ID:", e);
+        return null;
+      }
+    }
+
+    return null;
+  };
+
+  // Fetch tenancy data using Axios
+  useEffect(() => {
+    const fetchTenancies = async () => {
+      try {
+        const companyId = getUserCompanyId();
+        setLoading(true);
+        const response = await axios.get(`${BASE_URL}/company/tenancies/company/${companyId}/`);
+        setTenancies(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.log("Error fetching tenancy data:", err);
+
+        setError("Failed to fetch tenancy data");
+        setLoading(false);
+      }
+    };
+    fetchTenancies();
+  }, []);
+
+  // Filter tenancies based on search term
+  const filteredData = tenancies.filter(
     (tenancy) =>
-      tenancy.tenant.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenancy.building.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenancy.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenancy.unit.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenancy.renew.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenancy.endDate.toLowerCase().includes(searchTerm.toLowerCase())
+      (tenancy.tenancy_code?.toLowerCase().includes(searchTerm.toLowerCase()) || "") ||
+      (tenancy.tenant?.tenant_name?.toLowerCase().includes(searchTerm.toLowerCase()) || "") ||
+      (tenancy.building?.building_name?.toLowerCase().includes(searchTerm.toLowerCase()) || "") ||
+      (tenancy.unit?.unit_name?.toLowerCase().includes(searchTerm.toLowerCase()) || "") ||
+      (tenancy.status?.toLowerCase().includes(searchTerm.toLowerCase()) || "") ||
+      (tenancy.end_date?.toLowerCase().includes(searchTerm.toLowerCase()) || "")
   );
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -96,10 +86,8 @@ const TenancyRenewal = () => {
     }));
   };
 
-  const handleRenewClick = (tenancy) => {
-    console.log("Renew clicked for tenancy:", tenancy);
-    // Add renewal logic here
-  };
+  if (loading) return <div className="p-5">Loading...</div>;
+  if (error) return <div className="p-5">{error}</div>;
 
   return (
     <div className="border border-[#E9E9E9] rounded-md tenancy-table">
@@ -126,9 +114,8 @@ const TenancyRenewal = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
+                  }`}
               />
             </div>
             <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 trenew-download-btn">
@@ -146,68 +133,63 @@ const TenancyRenewal = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-[#E9E9E9] h-[57px]">
-              <th className="px-5 text-left tenancy-thead">ID</th>
-              <th className="px-5 text-left tenancy-thead w-[12%]">NAME</th>
+              <th className="px-5 text-left tenancy-thead">Tenancy Code</th>
+              <th className="px-5 text-left tenancy-thead w-[12%]">Tenant</th>
               <th className="pl-5 text-left tenancy-thead w-[15%]">
-                BUILDING NAME
+                Building Name
               </th>
               <th className="pl-5 text-left tenancy-thead w-[12%]">
-                UNIT NAME
+                Unit Name
               </th>
-              <th className="px-5 text-left tenancy-thead">RENTAL MONTHS</th>
-              <th className="px-5 text-left tenancy-thead w-[12%]">END DATE</th>
-              <th className="px-5 text-center tenancy-thead w-[10%]">RENEW</th>
+              <th className="px-5 text-left tenancy-thead">Rental Months</th>
+              <th className="px-5 text-left tenancy-thead w-[12%]">End Date</th>
+              <th className="px-5 text-left tenancy-thead w-[12%]">Status</th>
+              <th className="px-5 text-center tenancy-thead w-[10%]">Renew</th>
               <th className="pl-12 pr-5 text-center tenancy-thead w-[10%]">
-                VIEW
+                View
               </th>
-              <th className="px-5 pr-6 text-right tenancy-thead">ACTION</th>
+              <th className="px-5 pr-6 text-right tenancy-thead">Action</th>
             </tr>
           </thead>
           <tbody>
             {paginatedData.map((tenancy) => (
               <tr
-                key={tenancy.id}
+                key={tenancy.tenancy_code}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-5 text-left tenancy-data">{tenancy.id}</td>
-                <td className="px-5 text-left tenancy-data">
-                  {tenancy.tenant}
-                </td>
-                <td className="pl-5 text-left tenancy-data">
-                  {tenancy.building}
-                </td>
-                <td className="pl-5 text-left tenancy-data">{tenancy.unit}</td>
+                <td className="px-5 text-left tenancy-data">{tenancy.tenancy_code}</td>
+                <td className="px-5 text-left tenancy-data">{tenancy.tenant?.tenant_name}</td>
+                <td className="pl-5 text-left tenancy-data">{tenancy.building?.building_name}</td>
+                <td className="pl-5 text-left tenancy-data">{tenancy.unit?.unit_name}</td>
                 <td className="px-5 tenancy-data">
                   <div className="w-[63%] flex justify-center">
-                    {tenancy.months}
+                    {tenancy.rental_months}
                   </div>
                 </td>
-                <td className="pl-5 text-left tenancy-data">
-                  {tenancy.endDate}
-                </td>
+                <td className="pl-5 text-left tenancy-data">{tenancy.end_date}</td>
+                <td className="px-5 text-left tenancy-data">{tenancy.status}</td>
                 <td className="px-5 text-center !text-[#1458a2] tenancy-data">
-                  <button
-                    onClick={() => handleRenewClick(tenancy)}
+                  <button onClick={() => openModal("tenancy-renewal")}
                     className="trenew-renew-btn"
                   >
-                    {tenancy.renew}
+                    Click to Renew
                   </button>
                 </td>
                 <td className="pl-14 text-center pr-5 pt-2">
                   <button onClick={() => openModal("tenancy-view")}>
                     <img
-                      src={tenancy.view}
+                      src={viewicon}
                       alt="View"
                       className="w-[30px] h-[24px] trenew-action-btn duration-200"
                     />
                   </button>
                 </td>
-                <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
+                <td className="pr-5 flex gap-[23px] items-center justify-end h-[57px]">
                   <button onClick={() => openModal("tenancy-update")}>
                     <img
                       src={editicon}
                       alt="Edit"
-                      className="w-[18px] h-[18px] trenew-action-btn duration-200"
+                      className="w-[18px] h-[18px] trenew-action-btn duration-200" 
                     />
                   </button>
                   <button>
@@ -228,48 +210,45 @@ const TenancyRenewal = () => {
           <thead>
             <tr className="tenancy-table-row-head">
               <th className="px-5 w-[50%] text-left tenancy-thead trenew-id-column">
-                ID
+                Tenancy Code
               </th>
               <th className="px-5 w-[50%] text-left tenancy-thead trenew-end-date-column">
-                NAME
+                Tenant
               </th>
               <th className="px-5 text-right tenancy-thead"></th>
             </tr>
           </thead>
           <tbody>
             {paginatedData.map((tenancy) => (
-              <React.Fragment key={tenancy.id}>
+              <React.Fragment key={tenancy.tenancy_code}>
                 <tr
-                  className={`${
-                    expandedRows[tenancy.id]
+                  className={`${expandedRows[tenancy.tenancy_code]
                       ? "trenew-mobile-no-border"
                       : "trenew-mobile-with-border"
-                  } border-b border-[#E9E9E9] h-[57px]`}
+                    } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left tenancy-data trenew-id-column">
-                    {tenancy.id}
+                    {tenancy.tenancy_code}
                   </td>
                   <td className="px-3 text-left tenancy-data trenew-end-date-column">
-                    {tenancy.tenant}
+                    {tenancy.tenant?.tenant_name}
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
-                      className={`tenancy-dropdown-field ${
-                        expandedRows[tenancy.id] ? "active" : ""
-                      }`}
-                      onClick={() => toggleRowExpand(tenancy.id)}
+                      className={`tenancy-dropdown-field ${expandedRows[tenancy.tenancy_code] ? "active" : ""
+                        }`}
+                      onClick={() => toggleRowExpand(tenancy.tenancy_code)}
                     >
                       <img
                         src={downarrow}
                         alt="drop-down-arrow"
-                        className={`tenancy-dropdown-img ${
-                          expandedRows[tenancy.id] ? "text-white" : ""
-                        }`}
+                        className={`tenancy-dropdown-img ${expandedRows[tenancy.tenancy_code] ? "text-white" : ""
+                          }`}
                       />
                     </div>
                   </td>
                 </tr>
-                {expandedRows[tenancy.id] && (
+                {expandedRows[tenancy.tenancy_code] && (
                   <tr className="trenew-mobile-with-border border-b border-[#E9E9E9]">
                     <td colSpan={3} className="px-5">
                       <div className="tenancy-dropdown-content">
@@ -279,7 +258,7 @@ const TenancyRenewal = () => {
                               BUILDING NAME
                             </div>
                             <div className="trenew-dropdown-value">
-                              {tenancy.building}
+                              {tenancy.building?.building_name}
                             </div>
                           </div>
                           <div className="trenew-grid-item w-[53%]">
@@ -287,7 +266,7 @@ const TenancyRenewal = () => {
                               UNIT NAME
                             </div>
                             <div className="trenew-dropdown-value">
-                              {tenancy.unit}
+                              {tenancy.unit?.unit_name}
                             </div>
                           </div>
                         </div>
@@ -297,7 +276,7 @@ const TenancyRenewal = () => {
                               RENTAL MONTHS
                             </div>
                             <div className="trenew-dropdown-value">
-                              {tenancy.months}
+                              {tenancy.rental_months}
                             </div>
                           </div>
                           <div className="trenew-grid-item w-[53%]">
@@ -305,7 +284,53 @@ const TenancyRenewal = () => {
                               END DATE
                             </div>
                             <div className="trenew-dropdown-value">
-                              {tenancy.endDate}
+                              {tenancy.end_date}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="trenew-grid">
+                          <div className="trenew-grid-item w-[40%]">
+                            <div className="trenew-dropdown-label">STATUS</div>
+                            <div className="trenew-dropdown-value">
+                              {tenancy.status}
+                            </div>
+                          </div>
+                          <div className="trenew-grid-item w-[53%]">
+                            <div className="trenew-dropdown-label">DEPOSIT</div>
+                            <div className="trenew-dropdown-value">
+                              {tenancy.deposit || "N/A"}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="trenew-grid">
+                          <div className="trenew-grid-item w-[40%]">
+                            <div className="trenew-dropdown-label">COMMISION</div>
+                            <div className="trenew-dropdown-value">
+                              {tenancy.commision || "N/A"}
+                            </div>
+                          </div>
+                          <div className="trenew-grid-item w-[53%]">
+                            <div className="trenew-dropdown-label">REMARKS</div>
+                            <div className="trenew-dropdown-value">
+                              {tenancy.remarks || "N/A"}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="trenew-grid">
+                          <div className="trenew-grid-item w-full">
+                            <div className="trenew-dropdown-label">ADDITIONAL CHARGES</div>
+                            <div className="trenew-dropdown-value">
+                              {tenancy.additional_charges?.length > 0 ? (
+                                <ul>
+                                  {tenancy.additional_charges.map((charge, index) => (
+                                    <li key={index}>
+                                      {charge.reason}: {charge.amount} (Due: {charge.due_date})
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                "None"
+                              )}
                             </div>
                           </div>
                         </div>
@@ -314,10 +339,9 @@ const TenancyRenewal = () => {
                             <div className="trenew-dropdown-label">RENEW</div>
                             <div className="trenew-dropdown-value !text-[#1458a2]">
                               <button
-                                onClick={() => handleRenewClick(tenancy)}
                                 className="trenew-renew-btn"
                               >
-                                {tenancy.renew}
+                                Click to Renew
                               </button>
                             </div>
                           </div>
@@ -326,7 +350,7 @@ const TenancyRenewal = () => {
                             <div className="trenew-dropdown-value">
                               <button onClick={() => openModal("tenancy-view")}>
                                 <img
-                                  src={tenancy.view}
+                                  src={viewicon}
                                   alt="View"
                                   className="w-[30px] h-[24px] trenew-action-btn duration-200"
                                 />
@@ -391,11 +415,10 @@ const TenancyRenewal = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
-                currentPage === startPage + i
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${currentPage === startPage + i
                   ? "bg-[#1458A2] text-white"
                   : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-              }`}
+                }`}
               onClick={() => setCurrentPage(startPage + i)}
             >
               {startPage + i}

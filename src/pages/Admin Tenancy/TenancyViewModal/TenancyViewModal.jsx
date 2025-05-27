@@ -215,7 +215,7 @@ const TenancyViewModal = () => {
                         onClick={() => toggleExpand(charge.id || index)}
                       >
                         <div className="px-[13px] py-[13px] text-[14px] view-tenancy-charges-tdata">{charge.id || index + 1}</div>
-                        <div className="px-[10px] py-[13px] w-[40%] text-[14px] view-tenancy-charges-tdata">{charge.charge_type?.charge_type_name || "N/A"}</div>
+                        <div className="px-[10px] py-[13px] w-[40%] text-[14px] view-tenancy-charges-tdata">{charge.charge_type_name || "N/A"}</div>
                         <div className="px-[10px] py-[13px] w-[35%] text-[14px] view-tenancy-charges-tdata">{charge.reason || "N/A"}</div>
                       </div>
 
