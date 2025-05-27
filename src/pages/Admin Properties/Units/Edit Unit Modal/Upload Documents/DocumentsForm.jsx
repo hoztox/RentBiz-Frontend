@@ -158,13 +158,6 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
                             {type.title}
                           </option>
                         ))}
-                        {docTypes.length === 0 && !loading && (
-                          <>
-                            <option value="1">License</option>
-                            <option value="2">Certificate</option>
-                            <option value="3">Permit</option>
-                          </>
-                        )}
                       </select>
                       <ChevronDown className="absolute right-2 top-[12px] h-4 w-4 text-[#000000] pointer-events-none" />
                     </div>
