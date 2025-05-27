@@ -29,17 +29,15 @@ const BuildingFormFlow = ({ onClose, buildingId }) => {
 
   useEffect(() => {
     const fetchBuildingData = async () => {
-      if (!buildingId) {
-        setError("Invalid or missing building ID.");
-        setLoading(false);
-        return;
-      }
-      
-      setLoading(true);
+      if (!buildingId) return;
       try {
         const response = await axios.get(
           `${BASE_URL}/company/buildings/${buildingId}/`,
-         
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
         );
         const buildingData = response.data;
         console.log("BuildingFormFlow: Fetched building data:", buildingData);
@@ -49,37 +47,29 @@ const BuildingFormFlow = ({ onClose, buildingId }) => {
             plot_no: buildingData.plot_no || "",
             building_name: buildingData.building_name || "",
             building_address: buildingData.building_address || "",
+            company: buildingData.company || "",
+            status: buildingData.status || "",
             description: buildingData.description || "",
-            remarks: buildingData.remarks || "",
-            status: buildingData.status || "active",
             latitude: buildingData.latitude || "",
             longitude: buildingData.longitude || "",
+            remarks: buildingData.remarks || "",
             land_mark: buildingData.land_mark || "",
-            company: buildingData.company || localStorage.getItem("company_id"),
-            user: buildingData.user || localStorage.getItem("user_id") || null,
           },
           documents: {
-            documents: buildingData.build_comp?.map((doc, index) => ({
-              id: index + 1,
-              doc_type: doc.doc_type || "",
-              number: doc.number || "",
-              issued_date: doc.issued_date || "",
-              expiry_date: doc.expiry_date || "",
-              upload_file: doc.upload_file ? [doc.upload_file] : [],
-            })) || [],
+            documents: Array.isArray(buildingData.build_comp)
+              ? buildingData.build_comp.map((doc, index) => ({
+                  id: index + 1,
+                  doc_type: doc.doc_type || "",
+                  number: doc.number || "",
+                  issued_date: doc.issued_date || "",
+                  expiry_date: doc.expiry_date || "",
+                  upload_file: doc.upload_file ? [doc.upload_file] : [],
+                }))
+              : [],
           },
         });
-        setError(null);
-      } catch (err) {
-        const errorMessage =
-          err.response?.status === 404
-            ? "Building not found."
-            : err.response?.data?.message ||
-              "Failed to load building data. Please try again.";
-        setError(errorMessage);
-        console.error("BuildingFormFlow: Error fetching building data:", err);
-      } finally {
-        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching building data:", error);
       }
     };
     fetchBuildingData();
@@ -135,23 +125,23 @@ const BuildingFormFlow = ({ onClose, buildingId }) => {
     }, 500);
   };
 
-const handlePreviousPage = (pageData) => {
-  setAnimating(true);
-  if (pageData) {
-    setFormData((prevData) => {
-      const newData = {
-        ...prevData,
-        documents: { documents: pageData.documents || [] }, // Ensure object structure
-      };
-      console.log("BuildingFormFlow: Updated formData on back:", newData);
-      return newData;
-    });
-  }
-  setTimeout(() => {
-    setCurrentPageIndex((prev) => Math.max(prev - 1, 0));
-    setAnimating(false);
-  }, 500);
-};
+  const handlePreviousPage = (pageData) => {
+    setAnimating(true);
+    if (pageData) {
+      setFormData((prevData) => {
+        const newData = {
+          ...prevData,
+          documents: { documents: pageData.documents || [] }, // Ensure object structure
+        };
+        console.log("BuildingFormFlow: Updated formData on back:", newData);
+        return newData;
+      });
+    }
+    setTimeout(() => {
+      setCurrentPageIndex((prev) => Math.max(prev - 1, 0));
+      setAnimating(false);
+    }, 500);
+  };
 
   const handleClose = () => {
     setCurrentPageIndex(0);
@@ -166,22 +156,32 @@ const handlePreviousPage = (pageData) => {
     onClose();
   };
 
-  if (loading) {
-    return (
-      <div className="text-center p-5">
-        <svg className="animate-spin h-5 w-5 mx-auto" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-        </svg>
-        Loading building data...
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="text-center p-5">
+  //       <svg className="animate-spin h-5 w-5 mx-auto" viewBox="0 0 24 24">
+  //         <circle
+  //           cx="12"
+  //           cy="12"
+  //           r="10"
+  //           stroke="currentColor"
+  //           strokeWidth="4"
+  //           fill="none"
+  //         />
+  //       </svg>
+  //       Loading building data...
+  //     </div>
+  //   );
+  // }
 
   if (error) {
     return <div className="text-red-500 p-4">{error}</div>;
   }
 
-  console.log("BuildingFormFlow: Passing initialData to BuildingInfoForm/ReviewPage:", formData);
+  console.log(
+    "BuildingFormFlow: Passing initialData to BuildingInfoForm/ReviewPage:",
+    formData
+  );
   return (
     <div className="flex">
       <div className="w-[350px] pr-[53px]">
@@ -208,33 +208,35 @@ const handlePreviousPage = (pageData) => {
               : "opacity-100 transform translate-x-0"
           }`}
         >
-          {[
-            <BuildingInfoForm
-              key="info"
-              onNext={handleNextPage}
-              initialData={formData.building}
-              buildingId={buildingId}
-            />,
-            <DocumentsForm
-              key="docs"
-              onNext={handleNextPage}
-              onBack={handlePreviousPage}
-              initialData={formData.documents}
-              buildingId={buildingId}
-            />,
-            <ReviewPage
-              key="review"
-              formData={formData}
-              onNext={handleNextPage}
-              onBack={handlePreviousPage}
-              buildingId={buildingId}
-            />,
-            <SubmissionConfirmation
-              key="confirm"
-              formData={formData}
-              onClose={handleClose}
-            />,
-          ][currentPageIndex]}
+          {
+            [
+              <BuildingInfoForm
+                key="info"
+                onNext={handleNextPage}
+                initialData={formData.building}
+                buildingId={buildingId}
+              />,
+              <DocumentsForm
+                key="docs"
+                onNext={handleNextPage}
+                onBack={handlePreviousPage}
+                initialData={formData.documents}
+                buildingId={buildingId}
+              />,
+              <ReviewPage
+                key="review"
+                formData={formData}
+                onNext={handleNextPage}
+                onBack={handlePreviousPage}
+                buildingId={buildingId}
+              />,
+              <SubmissionConfirmation
+                key="confirm"
+                formData={formData}
+                onClose={handleClose}
+              />,
+            ][currentPageIndex]
+          }
         </div>
       </div>
     </div>

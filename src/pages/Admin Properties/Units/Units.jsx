@@ -20,22 +20,19 @@ const Units = () => {
   const [updateUnitModalOpen, setUpdateUnitModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
   const [units, setUnits] = useState([]);
-  const [selectedUnit, setSelectedUnit] = useState(null);
+  const [selectedUnitId, setSelectedUnitId] = useState(null); // Changed to store unitId
   const itemsPerPage = 10;
 
   const navigate = useNavigate();
 
-  // Function to check if the screen width is below 480px
   const isMobileView = () => window.innerWidth < 480;
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
 
     if (role === "company") {
-      // When a company logs in, their own ID is stored as company_id
       return localStorage.getItem("company_id");
     } else if (role === "user" || role === "admin") {
-      // When a user logs in, company_id is directly stored
       try {
         const userCompanyId = localStorage.getItem("company_id");
         return userCompanyId ? JSON.parse(userCompanyId) : null;
@@ -44,20 +41,18 @@ const Units = () => {
         return null;
       }
     }
-
     return null;
   };
 
-  // Fetch units from the backend
   useEffect(() => {
     const fetchUnits = async () => {
       try {
         const companyId = getUserCompanyId();
         const response = await axios.get(
           `${BASE_URL}/company/units/company/${companyId}/`
-        ); // Replace with your API endpoint
+        );
         setUnits(response.data);
-        console.log("unitssss", response.data);
+        console.log("Units fetched:", response.data);
       } catch (error) {
         console.error("Error fetching units:", error);
       }
@@ -67,7 +62,7 @@ const Units = () => {
 
   const openUnitModal = () => {
     if (isMobileView()) {
-      navigate("/admin/unit-timeline");
+      navigate("/unit-timeline");
     } else {
       setUnitModalOpen(true);
     }
@@ -77,28 +72,32 @@ const Units = () => {
     setUnitModalOpen(false);
   };
 
-  const openUpdateUnitModal = (unit) => {
-    if (isMobileView()) {
-      navigate("/admin/update-unit-timeline", { state: { unit } });
-    } else {
-      setSelectedUnit(unit);
+  const handleEditUnitClick = (unitId) => {
+    console.log("Units: Selected unitId:", unitId);
+    setSelectedUnitId(unitId);
+    setTimeout(() => {
+      console.log("Units: Opening update modal with unitId:", unitId);
       setUpdateUnitModalOpen(true);
-    }
+    });
   };
 
   const closeUpdateUnitModal = () => {
     setUpdateUnitModalOpen(false);
-    setSelectedUnit(null);
+    setSelectedUnitId(null);
   };
 
-  const handleDeleteUnit = async (unitId) => {
-    try {
-      await axios.delete(`${BASE_URL}/company/units/${unitId}/`);
-      setUnits(units.filter((unit) => unit.code !== unitId));
-    } catch (error) {
-      console.error("Error deleting unit:", error);
-    }
-  };
+const handleDeleteUnit = async (unitId) => {
+  const confirmDelete = window.confirm("Are you sure you want to delete this unit?");
+  
+  if (!confirmDelete) return;
+
+  try {
+    await axios.delete(`${BASE_URL}/company/units/${unitId}/`);
+    setUnits(units.filter((unit) => unit.id !== unitId)); // Use id for filtering
+  } catch (error) {
+    console.error("Error deleting unit:", error);
+  }
+};
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -107,7 +106,6 @@ const Units = () => {
     }));
   };
 
-  // Filter units based on search term
   const filteredData = units.filter(
     (unit) =>
       unit.unit_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -152,8 +150,7 @@ const Units = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
-                  }`}
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"}`}
               />
             </div>
           </div>
@@ -200,9 +197,7 @@ const Units = () => {
                 key={unit.code}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-5 text-left unit-data">
-                  {unit.code}
-                </td>
+                <td className="px-5 text-left unit-data">{unit.code}</td>
                 <td className="px-5 text-left unit-data">
                   {new Date(unit.created_at).toLocaleDateString("en-GB", {
                     day: "2-digit",
@@ -220,24 +215,23 @@ const Units = () => {
                 </td>
                 <td className="px-5 text-left unit-data">
                   <span
-                    className={`px-[10px] py-[5px] h-[24px] rounded-[4px] unit-status ${unit.unit_status === "occupied"
+                    className={`px-[10px] py-[5px] h-[24px] rounded-[4px] unit-status ${
+                      unit.unit_status === "occupied"
                         ? "bg-[#D1E8FF] text-[#1A73E8] !w-[75px]"
                         : unit.unit_status === "renovation"
-                          ? "bg-[#FFF0F0] text-[#D32F2F] !w-[90px]"
-                          : unit.unit_status === "vacant"
-                            ? "bg-[#ebffea] text-[#18ac18] !w-[60px]"
-                            : unit.unit_status === "disputed"
-                              ? "bg-[#FDEDED] text-[#C62828] !w-[75px]"
-                              : ""
-                      }`}
+                        ? "bg-[#FFF0F0] text-[#D32F2F] !w-[90px]"
+                        : unit.unit_status === "vacant"
+                        ? "bg-[#ebffea] text-[#18ac18] !w-[60px]"
+                        : unit.unit_status === "disputed"
+                        ? "bg-[#FDEDED] text-[#C62828] !w-[75px]"
+                        : ""
+                    }`}
                   >
                     {unit.unit_status}
                   </span>
-
                 </td>
-
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={() => openUpdateUnitModal(unit)}>
+                  <button onClick={() => handleEditUnitClick(unit.id)}>
                     <img
                       src={editicon}
                       alt="Edit"
@@ -262,9 +256,7 @@ const Units = () => {
           <thead>
             <tr className="unit-table-row-head">
               <th className="px-5 text-left unit-thead unit-id-column">ID</th>
-              <th className="px-5 text-left unit-thead unit-date-column">
-                NAME
-              </th>
+              <th className="px-5 text-left unit-thead unit-date-column">NAME</th>
               <th className="px-5 text-right unit-thead"></th>
             </tr>
           </thead>
@@ -272,10 +264,11 @@ const Units = () => {
             {paginatedData.map((unit) => (
               <React.Fragment key={unit.code}>
                 <tr
-                  className={`${expandedRows[unit.code]
-                    ? "unit-mobile-no-border"
-                    : "unit-mobile-with-border"
-                    } border-b border-[#E9E9E9] h-[57px]`}
+                  className={`${
+                    expandedRows[unit.code]
+                      ? "unit-mobile-no-border"
+                      : "unit-mobile-with-border"
+                  } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left unit-data unit-id-column">
                     {unit.code}
@@ -285,15 +278,17 @@ const Units = () => {
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
-                      className={`unit-dropdown-field ${expandedRows[unit.code] ? "active" : ""
-                        }`}
+                      className={`unit-dropdown-field ${
+                        expandedRows[unit.code] ? "active" : ""
+                      }`}
                       onClick={() => toggleRowExpand(unit.code)}
                     >
                       <img
                         src={downarrow}
                         alt="drop-down-arrow"
-                        className={`unit-dropdown-img ${expandedRows[unit.code] ? "text-white" : ""
-                          }`}
+                        className={`unit-dropdown-img ${
+                          expandedRows[unit.code] ? "text-white" : ""
+                        }`}
                       />
                     </div>
                   </td>
@@ -342,26 +337,26 @@ const Units = () => {
                             <div className="unit-dropdown-label">STATUS</div>
                             <div className="unit-dropdown-value">
                               <span
-                                className={`px-[10px] py-[5px] h-[24px] rounded-[4px] unit-status ${unit.unit_status === "occupied"
-                                  ? "bg-[#D1E8FF] text-[#1A73E8] !w-[75px]"
-                                  : unit.unit_status === "renovation"
+                                className={`px-[10px] py-[5px] h-[24px] rounded-[4px] unit-status ${
+                                  unit.unit_status === "occupied"
+                                    ? "bg-[#D1E8FF] text-[#1A73E8] !w-[75px]"
+                                    : unit.unit_status === "renovation"
                                     ? "bg-[#FFF0F0] text-[#D32F2F] !w-[90px]"
                                     : unit.unit_status === "vacant"
-                                       ? "bg-[#ebffea] text-[#18ac18] !w-[60px]"
-                                      : unit.unit_status === "disputed"
-                                        ? "bg-[#FDEDED] text-[#C62828] !w-[75px]"
-                                        : ""
-                                  }`}
+                                    ? "bg-[#ebffea] text-[#18ac18] !w-[60px]"
+                                    : unit.unit_status === "disputed"
+                                    ? "bg-[#FDEDED] text-[#C72828] !w-[75px]"
+                                    : ""
+                                }`}
                               >
                                 {unit.unit_status}
                               </span>
-
                             </div>
                           </div>
                           <div className="unit-grid-item unit-action-column">
                             <div className="unit-dropdown-label">ACTION</div>
                             <div className="unit-dropdown-value unit-flex unit-items-center unit-gap-2">
-                              <button onClick={() => openUpdateUnitModal(unit)}>
+                              <button onClick={() => handleEditUnitClick(unit.id)}>
                                 <img
                                   src={editicon}
                                   alt="Edit"
@@ -414,10 +409,11 @@ const Units = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${currentPage === startPage + i
-                ? "bg-[#1458A2] text-white"
-                : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-                }`}
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+                currentPage === startPage + i
+                  ? "bg-[#1458A2] text-white"
+                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+              }`}
               onClick={() => setCurrentPage(startPage + i)}
             >
               {startPage + i}
@@ -443,12 +439,11 @@ const Units = () => {
           </button>
         </div>
       </div>
-      {/* Add & Update Modals */}
       <AddUnitModal open={unitModalOpen} onClose={closeUnitModal} />
       <EditUnitModal
         open={updateUnitModalOpen}
         onClose={closeUpdateUnitModal}
-        unit={selectedUnit}
+        unitId={selectedUnitId}
       />
     </div>
   );

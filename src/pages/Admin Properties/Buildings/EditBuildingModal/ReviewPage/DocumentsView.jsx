@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import "./documentview.css";
-import { File, FileText, Image } from "lucide-react";
+import { BASE_URL } from "../../../../../utils/config";
 
 const DocumentsView = ({ documents = [], docTypes = [] }) => {
-  // Ensure documents is an array
   const safeDocuments = Array.isArray(documents) ? documents : [];
   const [currentPage, setCurrentPage] = useState(0);
   const documentsPerPage = 5;
@@ -14,21 +13,30 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
   );
   const totalPages = Math.ceil(safeDocuments.length / documentsPerPage);
 
-  // Get document type name
   const getDocTypeName = (docType) => {
-    if (!docTypes.length) return docType || "N/A"; // Fallback if docTypes is empty
+    if (!docTypes.length) return docType || "N/A";
     const type = docTypes.find((t) => t.id === parseInt(docType));
     return type ? type.title : docType || "N/A";
   };
 
-  // Determine document type and icon
   const getDocumentInfo = (file) => {
-    if (!file) return { type: "unknown", name: "Unknown File" };
+    if (!file || typeof file === "string" && file.includes("The submitted data was not a file")) {
+      return { type: "unknown", name: "Invalid File" };
+    }
 
-    const extension = file.name ? file.name.split(".").pop().toLowerCase() : "";
-    const name = file.name || "Unnamed File";
+    let extension, name;
+    if (typeof file === "string") {
+      const fileName = file.split("/").pop();
+      extension = fileName.split(".").pop()?.toLowerCase() || "";
+      name = fileName;
+    } else if (file instanceof File) {
+      extension = file.name.split(".").pop()?.toLowerCase() || "";
+      name = file.name;
+    } else {
+      return { type: "unknown", name: "Unknown File" };
+    }
+
     let type;
-
     if (["jpg", "jpeg", "png", "gif"].includes(extension)) {
       type = "image";
     } else if (extension === "pdf") {
@@ -40,11 +48,9 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
     return { type, name };
   };
 
-  // Get icon with error handling
   const getDocumentIcon = (type) => {
     try {
-      // Avoid direct imports to test resolution
-      // const { File, FileText, Image } = require("lucide-react");
+      const { File, FileText, Image } = require("lucide-react");
       switch (type) {
         case "pdf":
           return <FileText className="text-blue-500" size={24} />;
@@ -59,7 +65,19 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
     }
   };
 
-  // Handle pagination
+  const getFileSource = (file) => {
+    if (!file || typeof file === "string" && file.includes("The submitted data was not a file")) {
+      return null;
+    }
+    if (file instanceof File) {
+      return URL.createObjectURL(file);
+    }
+    if (typeof file === "string") {
+      return file.startsWith("http") ? file : `${BASE_URL}${file.startsWith("/") ? "" : "/"}${file}`;
+    }
+    return null;
+  };
+
   const handleNextPage = () => {
     if (currentPage < totalPages - 1) {
       setCurrentPage(currentPage + 1);
@@ -83,7 +101,6 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
         <>
           <div className="md:grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
             {visibleDocuments.map((doc, index) => {
-              // Use the first file in upload_file for display
               const file = Array.isArray(doc.upload_file)
                 ? doc.upload_file[0]
                 : null;
@@ -93,17 +110,31 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
                     type: "unknown",
                     name: doc.number || `Document ${index + 1}`,
                   };
+              const fileSrc = getFileSource(file);
 
               return (
                 <div key={index} className="flex flex-col">
                   <div className="bg-gray-100 rounded-md overflow-hidden cursor-pointer">
                     <div className="relative bg-white">
-                      {type === "image" && file instanceof File ? (
+                      {type === "image" && fileSrc ? (
                         <img
-                          src={URL.createObjectURL(file)}
+                          src={fileSrc}
                           alt={name}
                           className="object-cover h-[220px] w-full"
-                          onLoad={(e) => URL.revokeObjectURL(e.target.src)} // Clean up URL
+                          onLoad={(e) => {
+                            if (file instanceof File) {
+                              URL.revokeObjectURL(e.target.src);
+                            }
+                          }}
+                          onError={(e) => {
+                            console.error("Failed to load image:", name);
+                            e.target.style.display = "none";
+                            e.target.parentNode.innerHTML = `
+                              <div class="w-full h-[220px] flex items-center justify-center bg-[#1458A2]">
+                                <span className="text-blue-500">📄</span>
+                              </div>
+                            `;
+                          }}
                         />
                       ) : (
                         <div className="w-full h-[220px] flex items-center justify-center bg-[#1458A2]">

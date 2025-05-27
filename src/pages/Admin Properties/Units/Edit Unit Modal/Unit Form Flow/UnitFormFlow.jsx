@@ -1,15 +1,21 @@
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import closeicon from "../../../../../assets/Images/Admin Units/close-icon.svg";
-import FormTimeline from "../FormTimeline"
-import BuildingInfoForm from "../Select Building/BuildingInfoForm"
+import FormTimeline from "../FormTimeline";
+import BuildingInfoForm from "../Select Building/BuildingInfoForm";
 import UnitInfoForm from "../Update Unit/UnitInfoForm";
-import DocumentsForm from "../Upload Documents/DocumentsForm"
-import UnitReview from "../ReviewPage/ReviewPage"
+import DocumentsForm from "../Upload Documents/DocumentsForm";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
+import axios from "axios";
+import { BASE_URL } from "../../../../../utils/config";
+import ReviewPage from "../ReviewPage/ReviewPage";
 
-const UnitFormFlow = ({ onClose }) => {
+const UnitFormFlow = ({ onClose, unitId }) => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({
+    building: null,
+    unit: null,
+    documents: null,
+  });
   const [formProgress, setFormProgress] = useState({
     selectBuilding: 0,
     createUnit: 0,
@@ -18,6 +24,8 @@ const UnitFormFlow = ({ onClose }) => {
     submitted: 0,
   });
   const [animating, setAnimating] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const pageTitles = [
     "Select Building",
@@ -27,8 +35,60 @@ const UnitFormFlow = ({ onClose }) => {
     "",
   ];
 
-  const currentTitle = pageTitles[currentPageIndex]
+  const currentTitle = pageTitles[currentPageIndex];
 
+  // Fetch unit data on component mount
+  useEffect(() => {
+    const fetchUnitData = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(`${BASE_URL}/company/units/${unitId}/`);
+        const unitData = response.data;
+        setFormData({
+          building: {
+            buildingId: unitData.building || "",
+            building_name: unitData.building_name || "",
+            description: unitData.building_description || "",
+            building_address: unitData.building_address || "",
+            building_no: unitData.building_no || "",
+            plot_no: unitData.plot_no || "",
+          },
+          unit: {
+            unit_name: unitData.unit_name || "",
+            unit_type: unitData.unit_type || "",
+            address: unitData.address || "",
+            description: unitData.description || "",
+            remarks: unitData.remarks || "",
+            no_of_bedrooms: unitData.no_of_bedrooms || "",
+            no_of_bathrooms: unitData.no_of_bathrooms || "",
+            premise_no: unitData.premise_no || "",
+            unit_status: unitData.unit_status || "active",
+            company: unitData.company || null,
+            user: unitData.user || null,
+          },
+          documents: {
+            documents: unitData.unit_comp?.map((doc, index) => ({
+              id: index + 1,
+              doc_type: doc.doc_type || "",
+              number: doc.number || "",
+              issued_date: doc.issued_date || "",
+              expiry_date: doc.expiry_date || "",
+              upload_file: doc.upload_file ? [doc.upload_file] : [],
+            })) || [],
+          },
+        });
+        setError(null);
+      } catch (error) {
+        console.error("Error fetching unit data:", error);
+        setError("Failed to load unit data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUnitData();
+  }, [unitId]);
+
+  // Update form progress
   useEffect(() => {
     const newProgress = {
       selectBuilding: 0,
@@ -38,20 +98,34 @@ const UnitFormFlow = ({ onClose }) => {
       submitted: 0,
     };
 
-    if (currentPageIndex >= 1) newProgress.createBuilding = 100;
-    if (currentPageIndex >= 2) newProgress.uploadDocuments = 100;
+    if (currentPageIndex >= 1) newProgress.selectBuilding = 100;
+    if (currentPageIndex >= 2) newProgress.createUnit = 100;
+    if (currentPageIndex >= 3) newProgress.uploadDocuments = 100;
+    if (currentPageIndex >= 4) newProgress.review = 100;
 
-    if (currentPageIndex === 0 && formData.buildingNo) {
-      const requiredFields = [
-        "buildingNo",
-        "plotNo",
-        "buildingName",
-        "address",
-      ];
-      const filledFields = requiredFields.filter((field) =>
-        formData[field]?.trim()
+    if (currentPageIndex === 0 && formData.building) {
+      const requiredFields = ["buildingId"];
+      const filledFields = requiredFields.filter(
+        (field) => formData.building[field]
       ).length;
-      newProgress.createBuilding = Math.min(
+      newProgress.selectBuilding = Math.min(
+        100,
+        (filledFields / requiredFields.length) * 100
+      );
+    }
+
+    if (currentPageIndex === 1 && formData.unit) {
+      const requiredFields = [
+        "unit_name",
+        "unit_type",
+        "address",
+        "premise_no",
+        "unit_status",
+      ];
+      const filledFields = requiredFields.filter(
+        (field) => formData.unit[field]
+      ).length;
+      newProgress.createUnit = Math.min(
         100,
         (filledFields / requiredFields.length) * 100
       );
@@ -61,58 +135,82 @@ const UnitFormFlow = ({ onClose }) => {
   }, [currentPageIndex, formData]);
 
   const handleNextPage = (pageData) => {
-    // Start animation
     setAnimating(true);
+    setFormData((prevData) => ({
+      ...prevData,
+      [currentPageIndex === 0 ? "building" : currentPageIndex === 1 ? "unit" : "documents"]: pageData,
+    }));
 
-    // Update form data immediately
-    setFormData((prevData) => ({ ...prevData, ...pageData }));
-
-    // Delay the page change to allow for animation
     setTimeout(() => {
       setCurrentPageIndex((prev) => prev + 1);
       setAnimating(false);
-    }, 500); // Match this with your CSS transition duration
+    }, 500);
   };
 
-  const handlePreviousPage = () => {
+  const handlePreviousPage = (pageData) => {
     setAnimating(true);
+    if (pageData) {
+      setFormData((prevData) => ({
+        ...prevData,
+        [currentPageIndex === 2 ? "documents" : "unit"]: pageData,
+      }));
+    }
 
     setTimeout(() => {
-      setCurrentPageIndex((prev) => Math.max(prev - 1, 0)); // prevent going below 0
+      setCurrentPageIndex((prev) => Math.max(prev - 1, 0));
       setAnimating(false);
     }, 500);
   };
 
   const handleClose = () => {
     setCurrentPageIndex(0);
-    setFormData({});
-    setFormProgress({ createBuilding: 0, uploadDocuments: 0, submitted: 0 });
-    onClose(); // Call parent-provided close handler
+    setFormData({ building: null, unit: null, documents: null });
+    setFormProgress({
+      selectBuilding: 0,
+      createUnit: 0,
+      uploadDocuments: 0,
+      review: 0,
+      submitted: 0,
+    });
+    onClose();
   };
 
   const pageComponents = [
-    <BuildingInfoForm key="building" onNext={handleNextPage} />,
+    <BuildingInfoForm
+      key="building"
+      onNext={handleNextPage}
+      initialData={formData.building}
+      unitId={unitId}
+    />,
     <UnitInfoForm
       key="info"
       onNext={handleNextPage}
       onBack={handlePreviousPage}
+      initialData={formData.unit}
+      unitId={unitId}
     />,
     <DocumentsForm
       key="docs"
       onNext={handleNextPage}
       onBack={handlePreviousPage}
+      initialData={formData.documents}
+      unitId={unitId}
     />,
-    <UnitReview
+    <ReviewPage
       key="review"
+      formData={formData}
       onNext={handleNextPage}
       onBack={handlePreviousPage}
+      unitId={unitId}
     />,
-    <SubmissionConfirmation key="confirm" formData={formData} />,
+    <SubmissionConfirmation key="confirm" formData={formData} onClose={handleClose} />,
   ];
+
+  if (loading) return <div>Loading unit data...</div>;
+  if (error) return <div className="text-red-500">{error}</div>;
 
   return (
     <div className="flex">
-      {/* Left Side - Timeline */}
       <div className="w-[350px] pr-[53px]">
         <FormTimeline
           key={currentPageIndex}
@@ -120,10 +218,7 @@ const UnitFormFlow = ({ onClose }) => {
           progress={formProgress}
         />
       </div>
-
-      {/* Right Side - Form Steps & Modal Header */}
       <div className="w-full h-[780px] px-[33px] pt-[50px] pb-[40px] overflow-y-scroll">
-        {/* Modal Header */}
         <div className="building-modal-header flex justify-between items-center mb-[41px]">
           <h3 className="building-modal-title">{currentTitle}</h3>
           <button
@@ -133,13 +228,9 @@ const UnitFormFlow = ({ onClose }) => {
             <img src={closeicon} alt="Close" className="w-[15px] h-[15px]" />
           </button>
         </div>
-
-        {/* Current Form Page with Animation */}
         <div
           className={`transition-all duration-500 ease-in-out ${
-            animating
-              ? "opacity-0 transform translate-x-10"
-              : "opacity-100 transform translate-x-0"
+            animating ? "opacity-0 transform translate-x-10" : "opacity-100 transform translate-x-0"
           }`}
         >
           {pageComponents[currentPageIndex]}

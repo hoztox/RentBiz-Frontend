@@ -61,7 +61,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
           !doc.number ||
           !doc.issued_date ||
           !doc.expiry_date ||
-          !doc.upload_file?.length
+          !doc.upload_file
       );
       if (invalidDocs.length > 0) {
         setError("All documents must have doc_type, number, dates, and at least one file.");
@@ -71,6 +71,36 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
     }
 
     try {
+      console.log("Documents array:", documents);
+      documents.forEach((doc, index) => {
+        console.log(`Document ${index} upload_file:`, doc.upload_file, typeof doc.upload_file);
+      });
+
+      const convertToBlob = async (fileData) => {
+        if (!fileData) {
+          console.warn("No file data provided");
+          return null;
+        }
+        if (fileData instanceof File || fileData instanceof Blob) {
+          return fileData;
+        }
+        if (typeof fileData === "string") {
+          try {
+            const response = await fetch(fileData);
+            if (!response.ok) {
+              throw new Error(`Failed to fetch file from ${fileData}: ${response.statusText}`);
+            }
+            const blob = await response.blob();
+            return new Blob([blob], { type: blob.type || "application/octet-stream" });
+          } catch (err) {
+            console.error(`Error converting string to blob: ${err.message}`);
+            return null;
+          }
+        }
+        console.warn("Invalid file data type:", typeof fileData, fileData);
+        return null;
+      };
+
       const payload = {
         ...building,
         build_comp: documents.map((doc) => ({
@@ -78,7 +108,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
           number: doc.number,
           issued_date: doc.issued_date,
           expiry_date: doc.expiry_date,
-          upload_file: doc.upload_file[0] || null,
+          upload_file: doc.upload_file || null,
         })),
       };
 
@@ -89,27 +119,38 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
         }
       });
 
-      payload.build_comp.forEach((doc, index) => {
-        formDataWithFiles.append(`build_comp[${index}][doc_type]`, doc.doc_type || "");
-        formDataWithFiles.append(`build_comp[${index}][number]`, doc.number || "");
-        formDataWithFiles.append(`build_comp[${index}][issued_date]`, doc.issued_date || "");
-        formDataWithFiles.append(`build_comp[${index}][expiry_date]`, doc.expiry_date || "");
-        if (doc.upload_file) {
-          formDataWithFiles.append(`build_comp[${index}][upload_file]`, doc.upload_file);
-        }
-      });
+      await Promise.all(
+        payload.build_comp.map(async (doc, index) => {
+          formDataWithFiles.append(`build_comp[${index}][doc_type]`, doc.doc_type || "");
+          formDataWithFiles.append(`build_comp[${index}][number]`, doc.number || "");
+          formDataWithFiles.append(`build_comp[${index}][issued_date]`, doc.issued_date || "");
+          formDataWithFiles.append(`build_comp[${index}][expiry_date]`, doc.expiry_date || "");
+          if (doc.upload_file) {
+            const file = Array.isArray(doc.upload_file) ? doc.upload_file[0] : doc.upload_file;
+            const fileBlob = await convertToBlob(file);
+            if (fileBlob) {
+              formDataWithFiles.append(
+                `build_comp[${index}][upload_file]`,
+                fileBlob,
+                fileBlob.name || `file-${index}`
+              );
+            } else {
+              console.warn(`Skipping invalid file for document ${index}`);
+            }
+          }
+        })
+      );
 
       console.log("FormData contents:");
       for (const [key, value] of formDataWithFiles.entries()) {
-        console.log(`${key}:`, value);
+        console.log(`${key}:`, value instanceof File ? `File: ${value.name}` : value);
       }
 
       const response = await axios.put(
-        `${BASE_URL}/company/buildings/update/${buildingId}/`,
+        `${BASE_URL}/company/buildings/${buildingId}/`,
         formDataWithFiles,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
@@ -130,7 +171,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
   const handleBack = () => {
     const backData = {
       ...formData,
-      documents: documents, // Pass documents array directly
+      documents: documents,
     };
     console.log("ReviewPage passing back:", backData);
     onBack(backData);
