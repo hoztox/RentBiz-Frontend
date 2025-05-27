@@ -53,7 +53,6 @@ const UnitReview = ({ formData, onNext, onBack }) => {
   const handleNext = async () => {
     setLoading(true);
     setError(null);
-
     const requiredFields = ["unit_name", "unit_type", "address", "premise_no", "unit_status"];
     const missingFields = requiredFields.filter((field) => !unit[field]);
     if (missingFields.length > 0) {
@@ -61,7 +60,6 @@ const UnitReview = ({ formData, onNext, onBack }) => {
       setLoading(false);
       return;
     }
-
     if (documents.length > 0) {
       const invalidDocs = documents.filter(
         (doc) =>
@@ -77,50 +75,45 @@ const UnitReview = ({ formData, onNext, onBack }) => {
         return;
       }
     }
-
     try {
-      const payload = {
-        ...unit,
-        building: building.buildingId || null,
-        unit_comp: documents.map((doc) => ({
-          doc_type: doc.doc_type,
-          number: doc.number,
-          issued_date: doc.issued_date,
-          expiry_date: doc.expiry_date,
-          upload_file: doc.upload_file[0] || null,
-        })),
-      };
-
       const formDataWithFiles = new FormData();
-      Object.entries(payload).forEach(([key, value]) => {
-        if (key !== "unit_comp") {
-          formDataWithFiles.append(key, value ?? "");
+      formDataWithFiles.append('company', parseInt(getUserCompanyId()));
+      formDataWithFiles.append('building', parseInt(building.buildingId) || '');
+      formDataWithFiles.append('address', unit.address || '');
+      formDataWithFiles.append('unit_name', unit.unit_name || '');
+      formDataWithFiles.append('unit_type', parseInt(unit.unit_type) || '');
+      formDataWithFiles.append('description', unit.description || '');
+      formDataWithFiles.append('remarks', unit.remarks || '');
+      formDataWithFiles.append('no_of_bedrooms', parseInt(unit.no_of_bedrooms) || 0);
+      formDataWithFiles.append('no_of_bathrooms', parseInt(unit.no_of_bathrooms) || 0);
+      formDataWithFiles.append('premise_no', unit.premise_no || '');
+      formDataWithFiles.append('unit_status', unit.unit_status || '');
+      const unitCompData = documents.map((doc, index) => ({
+        doc_type: parseInt(doc.doc_type),
+        number: doc.number || '',
+        issued_date: doc.issued_date || '',
+        expiry_date: doc.expiry_date || '',
+        file_index: index
+      }));
+      formDataWithFiles.append('unit_comp_json', JSON.stringify(unitCompData));
+      documents.forEach((doc, index) => {
+        if (doc.upload_file && doc.upload_file[0]) {
+          formDataWithFiles.append(`document_file_${index}`, doc.upload_file[0]);
         }
       });
-
-      payload.unit_comp.forEach((doc, index) => {
-        formDataWithFiles.append(`unit_comp[${index}][doc_type]`, doc.doc_type || "");
-        formDataWithFiles.append(`unit_comp[${index}][number]`, doc.number || "");
-        formDataWithFiles.append(`unit_comp[${index}][issued_date]`, doc.issued_date || "");
-        formDataWithFiles.append(`unit_comp[${index}][expiry_date]`, doc.expiry_date || "");
-        if (doc.upload_file) {
-          formDataWithFiles.append(`unit_comp[${index}][upload_file]`, doc.upload_file);
-        }
-      });
-
       console.log("FormData contents:");
       for (const [key, value] of formDataWithFiles.entries()) {
         console.log(`${key}:`, value);
       }
-
       const response = await axios.post(
         `${BASE_URL}/company/units/create/`,
         formDataWithFiles,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: {
+            "Content-Type": "multipart/form-data"
+          },
         }
       );
-
       console.log("Successfully created unit:", response.data);
       onNext({ formData, response: response.data });
     } catch (err) {

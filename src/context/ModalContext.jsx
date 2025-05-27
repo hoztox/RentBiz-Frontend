@@ -6,7 +6,8 @@ export const ModalProvider = ({ children }) => {
   const [modalState, setModalState] = useState({
     type: null, // e.g., "user-create", "user-update"
     isOpen: false,
-    data: null, // For passing user data
+    data: null,
+     // For passing user data
   });
   
   // Add refresh counter state

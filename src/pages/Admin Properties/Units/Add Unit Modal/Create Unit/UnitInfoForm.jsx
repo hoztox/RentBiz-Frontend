@@ -242,6 +242,7 @@ const UnitInfoForm = ({ onNext, onBack, initialData }) => {
               className="w-full appearance-none unit-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer"
               required
             >
+              <option value="">Choose</option>
               <option value="occupied">Occupied</option>
               <option value="renovation">Renovation</option>
               <option value="vacant">Vacant</option>

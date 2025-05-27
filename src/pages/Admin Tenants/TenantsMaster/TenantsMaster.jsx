@@ -199,13 +199,13 @@ const TenantsMaster = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedData.map((tenant, index) => (
+            {paginatedData.map((tenant) => (
               <tr
                 key={tenant.code}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
                 <td className="px-5 text-left tenant-data">
-                  {(currentPage - 1) * itemsPerPage + index + 1}
+                  {tenant.code}
                 </td>
                 <td className="px-5 text-left tenant-data">
                   {new Date(tenant.created_at).toLocaleDateString("en-GB", {

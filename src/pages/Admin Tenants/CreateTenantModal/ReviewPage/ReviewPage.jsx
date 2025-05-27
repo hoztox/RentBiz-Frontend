@@ -16,7 +16,6 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
   const handleNext = async () => {
     setLoading(true);
     setError(null);
-
     const requiredFields = [
       "tenant_name",
       "nationality",
@@ -40,7 +39,6 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
       setLoading(false);
       return;
     }
-
     if (documents.length > 0) {
       const invalidDocs = documents.filter(
         (doc) =>
@@ -56,13 +54,12 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
         return;
       }
     }
-
     try {
       const getValueOrEmpty = (value) => {
         return value === null || value === undefined ? "" : value;
       };
-
       const formDataWithFiles = new FormData();
+      // Add tenant data
       formDataWithFiles.append("company", tenant.company);
       formDataWithFiles.append("user", getValueOrEmpty(tenant.user));
       formDataWithFiles.append("tenant_name", tenant.tenant_name);
@@ -83,22 +80,28 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
       formDataWithFiles.append("sponser_id_validity_date", tenant.sponser_id_validity_date);
       formDataWithFiles.append("status", tenant.status);
       formDataWithFiles.append("remarks", getValueOrEmpty(tenant.remarks));
-
-      documents.forEach((doc, index) => {
-        formDataWithFiles.append(`tenant_comp[${index}][doc_type]`, doc.doc_type);
-        formDataWithFiles.append(`tenant_comp[${index}][number]`, doc.number);
-        formDataWithFiles.append(`tenant_comp[${index}][issued_date]`, doc.issued_date);
-        formDataWithFiles.append(`tenant_comp[${index}][expiry_date]`, doc.expiry_date);
-        if (doc.upload_file && doc.upload_file[0]) {
-          formDataWithFiles.append(`tenant_comp[${index}][upload_file]`, doc.upload_file[0]);
-        }
-      });
-
+      // Prepare documents in the format backend expects
+      if (documents.length > 0) {
+        const documentData = documents.map((doc, index) => ({
+          doc_type: doc.doc_type,
+          number: doc.number,
+          issued_date: doc.issued_date,
+          expiry_date: doc.expiry_date,
+          file_index: index // This tells backend which file corresponds to this document
+        }));
+        // Add document JSON data
+        formDataWithFiles.append("document_comp_json", JSON.stringify(documentData));
+        // Add document files with the expected naming convention
+        documents.forEach((doc, index) => {
+          if (doc.upload_file && doc.upload_file[0]) {
+            formDataWithFiles.append(`document_file_${index}`, doc.upload_file[0]);
+          }
+        });
+      }
       console.log("FormData contents:");
       for (const [key, value] of formDataWithFiles.entries()) {
         console.log(`${key}:`, value instanceof File ? `File: ${value.name}` : value);
       }
-
       const response = await axios.post(
         `${BASE_URL}/company/tenant/create/`,
         formDataWithFiles,

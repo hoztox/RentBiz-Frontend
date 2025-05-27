@@ -152,9 +152,8 @@ const Units = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
+                  }`}
               />
             </div>
           </div>
@@ -196,13 +195,13 @@ const Units = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedData.map((unit, index) => (
+            {paginatedData.map((unit) => (
               <tr
                 key={unit.code}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
                 <td className="px-5 text-left unit-data">
-                  {(currentPage - 1) * itemsPerPage + index + 1}
+                  {unit.code}
                 </td>
                 <td className="px-5 text-left unit-data">
                   {new Date(unit.created_at).toLocaleDateString("en-GB", {
@@ -213,7 +212,7 @@ const Units = () => {
                 </td>
                 <td className="pl-5 text-left unit-data">{unit.unit_name}</td>
                 <td className="pl-5 text-left unit-data">
-                  {unit.building?.name || "N/A"}
+                  {unit.building?.building_name || "N/A"}
                 </td>
                 <td className="px-5 text-left unit-data">{unit.address}</td>
                 <td className="pl-12 pr-5 text-left unit-data">
@@ -221,16 +220,20 @@ const Units = () => {
                 </td>
                 <td className="px-5 text-left unit-data">
                   <span
-                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] unit-status ${
-                      unit.unit_status === "active"
-                        ? "bg-[#E6F5EC] text-[#1C7D4D]"
-                        : unit.unit_status === "inactive"
-                        ? "bg-[#FDEAEA] text-[#D1293D]"
-                        : "bg-[#FFF8E1] text-[#A67C00]"
-                    }`}
+                    className={`px-[10px] py-[5px] h-[24px] rounded-[4px] unit-status ${unit.unit_status === "occupied"
+                        ? "bg-[#D1E8FF] text-[#1A73E8] !w-[75px]"
+                        : unit.unit_status === "renovation"
+                          ? "bg-[#FFF0F0] text-[#D32F2F] !w-[90px]"
+                          : unit.unit_status === "vacant"
+                            ? "bg-[#ebffea] text-[#18ac18] !w-[60px]"
+                            : unit.unit_status === "disputed"
+                              ? "bg-[#FDEDED] text-[#C62828] !w-[75px]"
+                              : ""
+                      }`}
                   >
                     {unit.unit_status}
                   </span>
+
                 </td>
 
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
@@ -269,11 +272,10 @@ const Units = () => {
             {paginatedData.map((unit) => (
               <React.Fragment key={unit.code}>
                 <tr
-                  className={`${
-                    expandedRows[unit.code]
-                      ? "unit-mobile-no-border"
-                      : "unit-mobile-with-border"
-                  } border-b border-[#E9E9E9] h-[57px]`}
+                  className={`${expandedRows[unit.code]
+                    ? "unit-mobile-no-border"
+                    : "unit-mobile-with-border"
+                    } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left unit-data unit-id-column">
                     {unit.code}
@@ -283,17 +285,15 @@ const Units = () => {
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
-                      className={`unit-dropdown-field ${
-                        expandedRows[unit.code] ? "active" : ""
-                      }`}
+                      className={`unit-dropdown-field ${expandedRows[unit.code] ? "active" : ""
+                        }`}
                       onClick={() => toggleRowExpand(unit.code)}
                     >
                       <img
                         src={downarrow}
                         alt="drop-down-arrow"
-                        className={`unit-dropdown-img ${
-                          expandedRows[unit.code] ? "text-white" : ""
-                        }`}
+                        className={`unit-dropdown-img ${expandedRows[unit.code] ? "text-white" : ""
+                          }`}
                       />
                     </div>
                   </td>
@@ -319,7 +319,7 @@ const Units = () => {
                           <div className="unit-grid-item">
                             <div className="unit-dropdown-label">BUILDING</div>
                             <div className="unit-dropdown-value">
-                              {unit.building?.name || "N/A"}
+                              {unit.building?.building_name || "N/A"}
                             </div>
                           </div>
                         </div>
@@ -342,16 +342,20 @@ const Units = () => {
                             <div className="unit-dropdown-label">STATUS</div>
                             <div className="unit-dropdown-value">
                               <span
-                                className={`px-[10px] py-[5px] h-[24px] rounded-[4px] unit-status ${
-                                  unit.unit_status === "inactive"
-                                    ? "bg-[#E6F5EC] text-[#1C7D4D] !w-[60px]"
-                                    : unit.unit_status === "pending"
-                                    ? "bg-[#FFF3E0] text-[#F57C00] !w-[75px]"
-                                    : "bg-[#E8EFF6] text-[#1458A2] !w-[75px]"
-                                }`}
+                                className={`px-[10px] py-[5px] h-[24px] rounded-[4px] unit-status ${unit.unit_status === "occupied"
+                                  ? "bg-[#D1E8FF] text-[#1A73E8] !w-[75px]"
+                                  : unit.unit_status === "renovation"
+                                    ? "bg-[#FFF0F0] text-[#D32F2F] !w-[90px]"
+                                    : unit.unit_status === "vacant"
+                                       ? "bg-[#ebffea] text-[#18ac18] !w-[60px]"
+                                      : unit.unit_status === "disputed"
+                                        ? "bg-[#FDEDED] text-[#C62828] !w-[75px]"
+                                        : ""
+                                  }`}
                               >
                                 {unit.unit_status}
                               </span>
+
                             </div>
                           </div>
                           <div className="unit-grid-item unit-action-column">
@@ -410,11 +414,10 @@ const Units = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
-                currentPage === startPage + i
-                  ? "bg-[#1458A2] text-white"
-                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-              }`}
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${currentPage === startPage + i
+                ? "bg-[#1458A2] text-white"
+                : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+                }`}
               onClick={() => setCurrentPage(startPage + i)}
             >
               {startPage + i}
