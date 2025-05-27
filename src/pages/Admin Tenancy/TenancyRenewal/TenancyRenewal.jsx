@@ -42,22 +42,38 @@ const TenancyRenewal = () => {
   };
 
   // Fetch tenancy data using Axios
+
+  const fetchTenancies = async () => {
+    try {
+      const companyId = getUserCompanyId();
+      setLoading(true);
+      const response = await axios.get(`${BASE_URL}/company/tenancies/company/${companyId}/`);
+      setTenancies(response.data);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching tenancy data:", err);
+      setError("Failed to fetch tenancy data");
+      setLoading(false);
+    }
+  };
+  
   useEffect(() => {
-    const fetchTenancies = async () => {
-      try {
-        const companyId = getUserCompanyId();
-        setLoading(true);
-        const response = await axios.get(`${BASE_URL}/company/tenancies/company/${companyId}/`);
-        setTenancies(response.data);
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching tenancy data:", err);
-        setError("Failed to fetch tenancy data");
-        setLoading(false);
-      }
-    };
     fetchTenancies();
   }, []);
+
+  const handleDelete = async (tenancyId) => {
+    if (window.confirm("Are you sure you want to delete this tenancy?")) {
+      try {
+        await axios.delete(`${BASE_URL}/company/tenancies/${tenancyId}/`);
+        // Refetch tenancies after deletion
+        await fetchTenancies();
+        console.log(`Deleted tenancy with ID: ${tenancyId}`);
+      } catch (error) {
+        console.error("Error deleting tenancy:", error);
+        alert("Failed to delete tenancy. Please try again.");
+      }
+    }
+  };
 
   // Filter tenancies based on search term
   const filteredData = tenancies.filter(
@@ -174,7 +190,7 @@ const TenancyRenewal = () => {
                   </button>
                 </td>
                 <td className="pl-14 text-center pr-5 pt-2">
-                  <button onClick={() => openModal("tenancy-view")}>
+                  <button onClick={() => openModal("tenancy-view", tenancy)}>
                     <img
                       src={viewicon}
                       alt="View"
@@ -190,7 +206,7 @@ const TenancyRenewal = () => {
                       className="w-[18px] h-[18px] trenew-action-btn duration-200"
                     />
                   </button>
-                  <button>
+                  <button onClick={() => handleDelete(tenancy.id)}>
                     <img
                       src={deletesicon}
                       alt="Delete"
@@ -217,8 +233,8 @@ const TenancyRenewal = () => {
               <React.Fragment key={tenancy.tenancy_code}>
                 <tr
                   className={`${expandedRows[tenancy.tenancy_code]
-                      ? "trenew-mobile-no-border"
-                      : "trenew-mobile-with-border"
+                    ? "trenew-mobile-no-border"
+                    : "trenew-mobile-with-border"
                     } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left tenancy-data trenew-id-column">{tenancy.tenancy_code}</td>
@@ -313,7 +329,7 @@ const TenancyRenewal = () => {
                           <div className="trenew-grid-item w-[26%]">
                             <div className="trenew-dropdown-label">VIEW</div>
                             <div className="trenew-dropdown-value">
-                              <button onClick={() => openModal("tenancy-view")}>
+                              <button onClick={() => openModal("tenancy-view", tenancy)}>
                                 <img
                                   src={viewicon}
                                   alt="View"
@@ -376,11 +392,10 @@ const TenancyRenewal = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
-                currentPage === startPage + i
-                  ? "bg-[#1458A2] text-white"
-                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-              }`}
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${currentPage === startPage + i
+                ? "bg-[#1458A2] text-white"
+                : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+                }`}
               onClick={() => setCurrentPage(startPage + i)}
             >
               {startPage + i}
