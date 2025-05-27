@@ -250,7 +250,7 @@ const Collection = () => {
                 ID
               </th>
               <th className="px-5 text-left collection-thead collection-date-column">
-                DATE
+                TENANT NAME
               </th>
               <th className="px-5 text-right collection-thead"></th>
             </tr>
@@ -269,7 +269,7 @@ const Collection = () => {
                     {collection.id}
                   </td>
                   <td className="px-5 text-left collection-data collection-date-column">
-                    {collection.date}
+                    {collection.tenantName}
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
@@ -305,10 +305,10 @@ const Collection = () => {
                           </div>
                           <div className="collection-dropdown-item w-[50%]">
                             <div className="collection-dropdown-label">
-                              TENANT NAME
+                              DATE
                             </div>
                             <div className="collection-dropdown-value">
-                              {collection.tenantName}
+                              {collection.date}
                             </div>
                           </div>
                         </div>

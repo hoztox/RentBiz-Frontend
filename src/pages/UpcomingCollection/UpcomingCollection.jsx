@@ -52,7 +52,7 @@ const UpcomingCollection = () => {
     {
       id: "B24090001",
       invoice_no: "457893",
-      invoice_date: "2024-09-09",
+      invoice_date: "09 sept 2024",
       tenant: "Coffee",
       building: "Emaar Square Area",
       unit: "SHOP10",
@@ -88,7 +88,7 @@ const UpcomingCollection = () => {
     {
       id: "B24090004",
       invoice_no: "457893",
-      invoice_date: "2024-09-09",
+      invoice_date: "09 sept 2024 ",
       tenant: "Coffee",
       building: "Down Town",
       unit: "SHOP10",
@@ -416,7 +416,7 @@ const UpcomingCollection = () => {
                 ID
               </th>
               <th className="px-3 text-left upcoming-collection-thead upcoming-collection-tenant-column">
-                INVOICE NO
+                BUILDING
               </th>
               <th className="px-5 text-right upcoming-collection-thead"></th>
             </tr>
@@ -435,7 +435,7 @@ const UpcomingCollection = () => {
                     {report.id}
                   </td>
                   <td className="px-3 w-[41%] text-left upcoming-collection-data upcoming-collection-tenant-column">
-                    {report.invoice_no}
+                    {report.building}
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
@@ -469,20 +469,20 @@ const UpcomingCollection = () => {
                           </div>
                           <div className="upcoming-collection-grid-item">
                             <div className="upcoming-collection-dropdown-label">
-                              TENANT
+                              INVOICE NO
                             </div>
                             <div className="upcoming-collection-dropdown-value">
-                              {report.tenant}
+                              {report.invoice_no}
                             </div>
                           </div>
                         </div>
                         <div className="upcoming-collection-grid">
                           <div className="upcoming-collection-grid-item">
                             <div className="upcoming-collection-dropdown-label">
-                              BUILDING
+                              TENANT
                             </div>
                             <div className="upcoming-collection-dropdown-value">
-                              {report.building}
+                              {report.tenant}
                             </div>
                           </div>
                           <div className="upcoming-collection-grid-item">

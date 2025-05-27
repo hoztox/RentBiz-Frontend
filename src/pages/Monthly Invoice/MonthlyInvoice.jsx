@@ -187,7 +187,7 @@ const MonthlyInvoice = () => {
           <thead>
             <tr className="mi-table-row-head">
               <th className="px-5 text-left mi-thead mi-id-column">ID</th>
-              <th className="px-5 text-left mi-thead mi-date-column">DATE</th>
+              <th className="px-5 text-left mi-thead mi-date-column">TENANT NAME</th>
               <th className="px-5 text-right mi-thead"></th>
             </tr>
           </thead>
@@ -200,7 +200,7 @@ const MonthlyInvoice = () => {
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left mi-data mi-id-column">{invoice.id}</td>
-                  <td className="px-5 text-left mi-data mi-date-column">{invoice.date}</td>
+                  <td className="px-5 text-left mi-data mi-date-column">{invoice.tenantName}</td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`mi-dropdown-field ${
@@ -228,8 +228,8 @@ const MonthlyInvoice = () => {
                             <div className="mi-dropdown-value">{invoice.tenancyId}</div>
                           </div>
                           <div className="mi-dropdown-content-item w-[50%]">
-                            <div className="mi-dropdown-label">TENANT NAME</div>
-                            <div className="mi-dropdown-value">{invoice.tenantName}</div>
+                            <div className="mi-dropdown-label">DATE</div>
+                            <div className="mi-dropdown-value">{invoice.date}</div>
                           </div>
                         </div>
                         <div className="mi-dropdown-content-grid">

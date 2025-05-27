@@ -54,7 +54,7 @@ const ReportCollection = () => {
     {
       id: "B24090001",
       tenancy: "TC0013-1",
-      date: "2024-09-09",
+      date: "09 sept 2024  ",
       tenant: "Coffee",
       building: "Emaar Square Area",
       unit: "SHOP10",
@@ -65,7 +65,7 @@ const ReportCollection = () => {
     {
       id: "B24090002",
       tenancy: "TC0013-1",
-      date: "2024-09-10",
+      date: "09 sept 2024  ",
       tenant: "Shoes shop",
       building: "Al Reem",
       unit: "SHOP11",
@@ -76,7 +76,7 @@ const ReportCollection = () => {
     {
       id: "B24090003",
       tenancy: "TC0013-1",
-      date: "2024-09-09",
+      date: "09 sept 2024  ",
       tenant: "Coffee",
       building: "Down Town",
       unit: "SHOP10",
@@ -87,7 +87,7 @@ const ReportCollection = () => {
     {
       id: "B24090004",
       tenancy: "TC0013-1",
-      date: "2024-09-10",
+      date: "09 sept 2024  ",
       tenant: "Shoes shop",
       building: "Al Reem",
       unit: "SHOP11",
@@ -374,7 +374,7 @@ const ReportCollection = () => {
                 ID
               </th>
               <th className="px-3 w-[50%] text-left report-collection-thead report-collection-tenant-column">
-                DATE
+                BUILDING
               </th>
               <th className="px-5 text-right report-collection-thead"></th>
             </tr>
@@ -393,7 +393,7 @@ const ReportCollection = () => {
                     {report.id}
                   </td>
                   <td className="px-3 text-left w-[50%] report-collection-data report-collection-tenant-column">
-                    {report.date}
+                    {report.building}
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
@@ -419,28 +419,28 @@ const ReportCollection = () => {
                         <div className="report-collection-grid">
                           <div className="report-collection-grid-item">
                             <div className="report-collection-dropdown-label">
+                              DATE
+                            </div>
+                            <div className="report-collection-dropdown-value">
+                              {report.date}
+                            </div>
+                          </div>
+                          <div className="report-collection-grid-item">
+                            <div className="report-collection-dropdown-label">
                               TENANCY
                             </div>
                             <div className="report-collection-dropdown-value">
                               {report.tenancy}
                             </div>
                           </div>
-                          <div className="report-collection-grid-item">
-                            <div className="report-collection-dropdown-label">
-                              TENANT
-                            </div>
-                            <div className="report-collection-dropdown-value">
-                              {report.tenant}
-                            </div>
-                          </div>
                         </div>
                         <div className="report-collection-grid">
                           <div className="report-collection-grid-item">
                             <div className="report-collection-dropdown-label">
-                              BUILDING
+                              TENANT 
                             </div>
                             <div className="report-collection-dropdown-value">
-                              {report.building}
+                              {report.tenant}
                             </div>
                           </div>
                           <div className="report-collection-grid-item">

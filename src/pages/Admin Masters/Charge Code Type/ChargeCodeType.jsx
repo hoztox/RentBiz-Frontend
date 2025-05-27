@@ -476,23 +476,15 @@ const ChargeCodeType = () => {
               </span>
               <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
                 <button
-                  className={`px-[10px] py-[6px] rounded-md duration-200 cursor-pointer pagination-btn ${
-                    loading || currentPage === 1
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-[#F4F4F4] hover:bg-[#e6e6e6]"
-                  }`}
-                  disabled={loading || currentPage === 1}
+                  className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+                  disabled={currentPage === 1 || loading}
                   onClick={() => setCurrentPage(currentPage - 1)}
                 >
                   Previous
                 </button>
                 {startPage > 1 && (
                   <button
-                    className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
-                      loading
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
-                    }`}
+                    className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
                     onClick={() => setCurrentPage(1)}
                     disabled={loading}
                   >
@@ -508,8 +500,6 @@ const ChargeCodeType = () => {
                     className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
                       currentPage === startPage + i
                         ? "bg-[#1458A2] text-white"
-                        : loading
-                        ? "bg-gray-400 cursor-not-allowed"
                         : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
                     }`}
                     onClick={() => setCurrentPage(startPage + i)}
@@ -523,11 +513,7 @@ const ChargeCodeType = () => {
                 )}
                 {endPage < totalPages && (
                   <button
-                    className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
-                      loading
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
-                    }`}
+                    className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
                     onClick={() => setCurrentPage(totalPages)}
                     disabled={loading}
                   >
@@ -535,12 +521,8 @@ const ChargeCodeType = () => {
                   </button>
                 )}
                 <button
-                  className={`px-[10px] py-[6px] rounded-md duration-200 cursor-pointer pagination-btn ${
-                    loading || currentPage === totalPages
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-[#F4F4F4] hover:bg-[#e6e6e6]"
-                  }`}
-                  disabled={loading || currentPage === totalPages}
+                  className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+                  disabled={currentPage === totalPages || loading}
                   onClick={() => setCurrentPage(currentPage + 1)}
                 >
                   Next

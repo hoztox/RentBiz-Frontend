@@ -187,7 +187,7 @@ const Invoice = () => {
           <thead>
             <tr className="inv-table-row-head">
               <th className="px-5 text-left inv-thead inv-id-column">ID</th>
-              <th className="px-5 text-left inv-thead inv-date-column">DATE</th>
+              <th className="px-5 text-left inv-thead inv-date-column">TENANT NAME</th>
               <th className="px-5 text-right inv-thead"></th>
             </tr>
           </thead>
@@ -200,7 +200,7 @@ const Invoice = () => {
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left inv-data inv-id-column">{invoice.id}</td>
-                  <td className="px-5 text-left inv-data inv-date-column">{invoice.date}</td>
+                  <td className="px-5 text-left inv-data inv-date-column">{invoice.tenantName}</td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`inv-dropdown-field ${
@@ -228,8 +228,8 @@ const Invoice = () => {
                             <div className="inv-dropdown-value">{invoice.tenancyId}</div>
                           </div>
                           <div className="inv-dropdown-content-item w-[50%]">
-                            <div className="inv-dropdown-label">TENANT NAME</div>
-                            <div className="inv-dropdown-value">{invoice.tenantName}</div>
+                            <div className="inv-dropdown-label">DATE</div>
+                            <div className="inv-dropdown-value">{invoice.date}</div>
                           </div>
                         </div>
                         <div className="inv-dropdown-content-grid">

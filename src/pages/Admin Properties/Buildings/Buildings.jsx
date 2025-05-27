@@ -90,19 +90,17 @@ const Buildings = () => {
         const response = await axios.get(
           `${BASE_URL}/company/buildings/company/${companyId}/`
         );
-        // Ensure response.data is an array
         const data = Array.isArray(response.data)
           ? response.data
           : response.data.results || [];
+        console.log("Buildings: Fetched buildings:", data); // Debug log
         setBuildings(data);
         setLoading(false);
-        console.log("building", response.data);
       } catch (err) {
         setError("Failed to fetch buildings data", err);
         setLoading(false);
       }
     };
-
     fetchBuildings();
   }, [companyId]);
 
@@ -144,9 +142,13 @@ const Buildings = () => {
     }
   };
 
-  const handleEditClick = (buildingId) => {
+ const handleEditClick = (buildingId) => {
+    console.log("Buildings: Selected buildingId:", buildingId);
     setSelectedBuildingId(buildingId);
-    openEditBuildingModal(true);
+    setTimeout(() => {
+      console.log("Buildings: Opening modal with buildingId:", buildingId);
+      setEditBuildingModalOpen(true);
+    }, 0);
   };
 
   const maxPageButtons = 5;
@@ -232,7 +234,7 @@ const Buildings = () => {
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
                 <td className="px-5 text-left bldg-data">
-                  {(currentPage - 1) * itemsPerPage + index + 1}
+                  {building.code || "N/A"}
                 </td>
                 <td className="px-5 text-left bldg-data">
                   {new Date(building.created_at).toLocaleDateString("en-GB", {
@@ -242,7 +244,7 @@ const Buildings = () => {
                   })}
                 </td>
                 <td className="pl-5 text-left bldg-data">
-                  {building.building_name || "Unnamed Building"}
+                  {building.building_name || "N/A"}
                 </td>
                 <td className="px-5 text-left bldg-data">
                   {building.building_address || "N/A"}
@@ -305,7 +307,7 @@ const Buildings = () => {
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left bldg-data bldg-id-column">
-                    {(currentPage - 1) * itemsPerPage + index + 1}
+                    {building.code || "N/A"}
                   </td>
                   <td className="px-5 text-left bldg-data bldg-date-column">
                    {building.building_name || "N/A"}

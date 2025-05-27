@@ -196,7 +196,7 @@
 
 @media (max-width: 428px) {
   .report-collection-thead.report-collection-tenant-column {
-    padding-left: 16px;
+    padding-left: 24px;
     padding-right: 0;
   }
   .report-collection-data.report-collection-tenant-column {
@@ -299,7 +299,7 @@
   }
   .report-collection-data.report-collection-tenant-column {
     white-space: nowrap;
-    padding-left: 16px;
+    padding-left: 24px;
     padding-right: 0;
   }
   .report-collection-dropdown-label {

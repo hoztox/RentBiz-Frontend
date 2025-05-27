@@ -9,7 +9,14 @@ import axios from "axios";
 
 const DocumentsForm = ({ onNext, onBack, initialData, buildingId }) => {
   const safeInitialDocuments = Array.isArray(initialData?.documents)
-    ? initialData.documents
+    ? initialData.documents.map((doc, index) => ({
+        id: doc.id || index + 1, // Ensure id
+        doc_type: doc.doc_type || "",
+        number: doc.number || "",
+        issued_date: doc.issued_date || "",
+        expiry_date: doc.expiry_date || "",
+        upload_file: Array.isArray(doc.upload_file) ? doc.upload_file : [],
+      }))
     : [];
 
   const [documents, setDocuments] = useState(
@@ -30,6 +37,9 @@ const DocumentsForm = ({ onNext, onBack, initialData, buildingId }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  console.log("DocumentsForm initialData:", initialData);
+  console.log("DocumentsForm documents state:", documents);
+
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
     const storedCompanyId = localStorage.getItem("company_id");
@@ -44,6 +54,9 @@ const DocumentsForm = ({ onNext, onBack, initialData, buildingId }) => {
       setLoading(true);
       try {
         const companyId = getUserCompanyId();
+        if (!companyId) {
+          throw new Error("Company ID not found.");
+        }
         const response = await axios.get(
           `${BASE_URL}/company/doc_type/company/${companyId}`,
           {

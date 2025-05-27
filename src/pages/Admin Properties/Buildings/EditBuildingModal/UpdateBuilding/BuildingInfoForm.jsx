@@ -2,81 +2,45 @@ import React, { useState, useEffect } from "react";
 import "./buildinginfoform.css";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import PropTypes from "prop-types";
-import axios from "axios";
-import { BASE_URL } from "../../../../../utils/config";
 
-const BuildingInfoForm = ({ onNext, buildingId }) => {
-  const [formState, setFormState] = useState(
-    buildingId || {
-      building_no: "",
-      plot_no: "",
-      building_name: "",
-      building_address: "",
-      description: "",
-      remarks: "",
-      status: "active",
-      latitude: "",
-      longitude: "",
-      land_mark: "",
-      company: localStorage.getItem("company_id") || "",
-      user: localStorage.getItem("user_id") || null,
-    }
-  );
+const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
+  const [formState, setFormState] = useState({
+    building_no: "",
+    plot_no: "",
+    building_name: "",
+    building_address: "",
+    description: "",
+    remarks: "",
+    status: "active",
+    latitude: "",
+    longitude: "",
+    land_mark: "",
+    company: localStorage.getItem("company_id") || "",
+    user: localStorage.getItem("user_id") || null,
+  });
   const [isSelectFocused, setIsSelectFocused] = useState(false);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
 
-  // Fetch data if buildingId is not provided and buildingId is available
+  // Initialize formState with initialData when provided
   useEffect(() => {
-    if (!buildingId) {
-      const fetchBuildingData = async () => {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          setError("Authentication token missing. Please log in again.");
-          return;
-        }
-        setLoading(true);
-        try {
-          const response = await axios.get(
-            `${BASE_URL}/company/buildings/${buildingId}/`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          const buildingData = response.data;
-          setFormState({
-            building_no: buildingData.building_no || "",
-            plot_no: buildingData.plot_no || "",
-            building_name: buildingData.building_name || "",
-            building_address: buildingData.building_address || "",
-            description: buildingData.description || "",
-            remarks: buildingData.remarks || "",
-            status: buildingData.status || "active",
-            latitude: buildingData.latitude || "",
-            longitude: buildingData.longitude || "",
-            land_mark: buildingData.land_mark || "",
-            company: buildingData.company || localStorage.getItem("company_id"),
-            user: buildingData.user || localStorage.getItem("user_id") || null,
-          });
-          setError(null);
-        } catch (err) {
-          const errorMessage =
-            err.response?.status === 404
-              ? "Building not found."
-              : "Failed to load building data. Please try again.";
-          setError(errorMessage);
-          console.error("Error fetching building data:", err);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchBuildingData();
-    } else if (buildingId) {
-      setFormState(buildingId);
+    if (initialData) {
+      console.log("BuildingInfoForm received initialData:", initialData);
+      setFormState({
+        building_no: initialData.building_no || "",
+        plot_no: initialData.plot_no || "",
+        building_name: initialData.building_name || "",
+        building_address: initialData.building_address || "",
+        description: initialData.description || "",
+        remarks: initialData.remarks || "",
+        status: initialData.status || "active",
+        latitude: initialData.latitude || "",
+        longitude: initialData.longitude || "",
+        land_mark: initialData.land_mark || "",
+        company: initialData.company || localStorage.getItem("company_id") || "",
+        user: initialData.user || localStorage.getItem("user_id") || null,
+      });
     }
-  }, [ buildingId]);
+  }, [initialData]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -97,7 +61,13 @@ const BuildingInfoForm = ({ onNext, buildingId }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const errors = {};
-    const requiredFields = ["building_no", "plot_no", "building_name", "building_address", "status"];
+    const requiredFields = [
+      "building_no",
+      "plot_no",
+      "building_name",
+      "building_address",
+      "status",
+    ];
     requiredFields.forEach((field) => {
       if (!formState[field]) {
         errors[field] = `${field.replace("_", " ")} is required`;
@@ -306,6 +276,7 @@ const BuildingInfoForm = ({ onNext, buildingId }) => {
 
 BuildingInfoForm.propTypes = {
   onNext: PropTypes.func.isRequired,
+  initialData: PropTypes.object,
   buildingId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 

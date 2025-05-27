@@ -12,7 +12,7 @@ const BuildingFormFlow = ({ onClose, buildingId }) => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [formData, setFormData] = useState({
     building: null,
-    documents: null,
+    documents: { documents: [] },
   });
   const [formProgress, setFormProgress] = useState({
     updateBuilding: 0,
@@ -25,7 +25,6 @@ const BuildingFormFlow = ({ onClose, buildingId }) => {
   const [error, setError] = useState(null);
 
   const pageTitles = ["Update Building", "Upload Documents", "Review", ""];
-
   const currentTitle = pageTitles[currentPageIndex];
 
   useEffect(() => {
@@ -35,25 +34,15 @@ const BuildingFormFlow = ({ onClose, buildingId }) => {
         setLoading(false);
         return;
       }
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("Authentication token missing. Please log in again.");
-        setLoading(false);
-        return;
-      }
+      
       setLoading(true);
       try {
         const response = await axios.get(
           `${BASE_URL}/company/buildings/${buildingId}/`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+         
         );
         const buildingData = response.data;
-        console.log("Fetched building data:", buildingData);
-
+        console.log("BuildingFormFlow: Fetched building data:", buildingData);
         setFormData({
           building: {
             building_no: buildingData.building_no || "",
@@ -88,12 +77,11 @@ const BuildingFormFlow = ({ onClose, buildingId }) => {
             : err.response?.data?.message ||
               "Failed to load building data. Please try again.";
         setError(errorMessage);
-        console.error("Error fetching building data:", err);
+        console.error("BuildingFormFlow: Error fetching building data:", err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchBuildingData();
   }, [buildingId]);
 
@@ -112,7 +100,7 @@ const BuildingFormFlow = ({ onClose, buildingId }) => {
     if (currentPageIndex === 0 && formData.building) {
       const requiredFields = [
         "building_no",
-        "plot_no",
+        "plot_no", // Corrected typo
         "building_name",
         "building_address",
         "company",
@@ -130,11 +118,16 @@ const BuildingFormFlow = ({ onClose, buildingId }) => {
   }, [currentPageIndex, formData]);
 
   const handleNextPage = (pageData) => {
+    console.log("BuildingFormFlow: Received pageData:", pageData);
     setAnimating(true);
-    setFormData((prevData) => ({
-      ...prevData,
-      [currentPageIndex === 0 ? "building" : "documents"]: pageData,
-    }));
+    setFormData((prevData) => {
+      const newData = {
+        ...prevData,
+        [currentPageIndex === 0 ? "building" : "documents"]: pageData,
+      };
+      console.log("BuildingFormFlow: Updated formData:", newData);
+      return newData;
+    });
 
     setTimeout(() => {
       setCurrentPageIndex((prev) => prev + 1);
@@ -142,24 +135,27 @@ const BuildingFormFlow = ({ onClose, buildingId }) => {
     }, 500);
   };
 
-  const handlePreviousPage = (pageData) => {
-    setAnimating(true);
-    if (pageData) {
-      setFormData((prevData) => ({
+const handlePreviousPage = (pageData) => {
+  setAnimating(true);
+  if (pageData) {
+    setFormData((prevData) => {
+      const newData = {
         ...prevData,
-        documents: pageData,
-      }));
-    }
-
-    setTimeout(() => {
-      setCurrentPageIndex((prev) => Math.max(prev - 1, 0));
-      setAnimating(false);
-    }, 500);
-  };
+        documents: { documents: pageData.documents || [] }, // Ensure object structure
+      };
+      console.log("BuildingFormFlow: Updated formData on back:", newData);
+      return newData;
+    });
+  }
+  setTimeout(() => {
+    setCurrentPageIndex((prev) => Math.max(prev - 1, 0));
+    setAnimating(false);
+  }, 500);
+};
 
   const handleClose = () => {
     setCurrentPageIndex(0);
-    setFormData({ building: null, documents: null });
+    setFormData({ building: null, documents: { documents: [] } });
     setFormProgress({
       updateBuilding: 0,
       uploadDocuments: 0,
@@ -185,6 +181,7 @@ const BuildingFormFlow = ({ onClose, buildingId }) => {
     return <div className="text-red-500 p-4">{error}</div>;
   }
 
+  console.log("BuildingFormFlow: Passing initialData to BuildingInfoForm/ReviewPage:", formData);
   return (
     <div className="flex">
       <div className="w-[350px] pr-[53px]">

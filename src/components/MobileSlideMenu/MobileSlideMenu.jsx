@@ -21,7 +21,7 @@ import tenancyReport from "../../assets/Images/Admin Sidebar/tenancy report.svg"
 import upcomingCollection from "../../assets/Images/Admin Sidebar/upcoming collection.svg";
 import reportCollection from "../../assets/Images/Admin Sidebar/report collection.svg";
 import incomeExpense from "../../assets/Images/Admin Sidebar/income-expense.svg";
-import logout from "../../assets/Images/Admin Sidebar/logout-icon.svg"
+import logout from "../../assets/Images/Admin Sidebar/logout-icon.svg";
 import closeicon from "../../assets/Images/Admin Navbar/close-icon.svg";
 
 const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
@@ -70,6 +70,17 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
     setActiveItem("Dashboard");
     navigate("/admin/dashboard");
     toggleMobileMenu();
+  };
+
+  const handleLogout = () => {
+    // Clear all localStorage data
+    localStorage.clear();
+
+    // Navigate to login page
+    navigate("/");
+
+    // Update active item to reflect logout
+    setActiveItem("Logout");
   };
 
   return (
@@ -775,11 +786,10 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
                     ? "menu-active"
                     : "text-gray-700 hover:bg-gray-200"
                 }`}
-                onClick={() =>
-                  handleNonDropdownClick(
-                    "Logout",
-                  )
-                }
+                onClick={() => {
+                  handleLogout();
+                  toggleMobileMenu();
+                }}
               >
                 <img
                   src={logout}

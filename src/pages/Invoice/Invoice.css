@@ -214,7 +214,7 @@
   
   @media (max-width: 428px) {
     .inv-thead.inv-date-column {
-      padding-left: 20px;
+      padding-left: 17px;
       padding-right: 0;
     }
     .inv-data.inv-date-column {
@@ -330,7 +330,7 @@
     }
     .inv-data.inv-date-column {
       white-space: nowrap;
-      padding-left: 20px;
+      padding-left: 17px;
       padding-right: 0;
     }
     .inv-dropdown-label {

@@ -1,8 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, Component } from "react";
 import axios from "axios";
 import { BASE_URL } from "../../../../../utils/config";
 import DocumentsView from "./DocumentsView";
 import "./reviewpage.css";
+
+class ErrorBoundary extends Component {
+  state = { hasError: false, error: null };
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="text-red-500 p-4">
+          Error in DocumentsView: {this.state.error.message}
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
   const [loading, setLoading] = useState(false);
@@ -14,7 +33,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
     : [];
 
   console.log("ReviewPage formData:", formData);
-  console.log("Documents:", documents);
+  console.log("ReviewPage documents:", documents);
 
   const handleNext = async () => {
     setLoading(true);
@@ -111,7 +130,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
   const handleBack = () => {
     const backData = {
       ...formData,
-      documents: { documents },
+      documents: documents, // Pass documents array directly
     };
     console.log("ReviewPage passing back:", backData);
     onBack(backData);
@@ -177,7 +196,9 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
       </div>
       <div className="border rounded-md border-[#E9E9E9] p-5">
         <h2 className="review-page-head">Documents</h2>
-        <DocumentsView documents={documents} />
+        <ErrorBoundary>
+          <DocumentsView documents={documents} />
+        </ErrorBoundary>
       </div>
       <div className="flex justify-end gap-4 pt-5 mt-auto">
         <button
