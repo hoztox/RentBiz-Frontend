@@ -6,7 +6,7 @@ import DocumentsForm from "../Upload Documents/DocumentsForm";
 import ReviewPage from "../ReviewPage/ReviewPage";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 
-const BuildingFormFlow = ({ onClose }) => {
+const BuildingFormFlow = ({ onClose, onBuildingCreated }) => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [formData, setFormData] = useState({
     building: null,
@@ -110,6 +110,7 @@ const BuildingFormFlow = ({ onClose }) => {
       formData={formData}
       onNext={handleNextPage}
       onBack={handlePreviousPage}
+      onBuildingCreated={onBuildingCreated} // Pass the callback to ReviewPage
     />,
     <SubmissionConfirmation key="confirm" formData={formData} onClose={handleClose} />,
   ];
