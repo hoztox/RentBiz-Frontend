@@ -7,7 +7,7 @@ import DocumentsForm from "../Upload Documents/DocumentsForm";
 import UnitReview from "../Review/UnitReview";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 
-const UnitFormFlow = ({ onClose }) => {
+const UnitFormFlow = ({ onClose, onUnitCreated }) => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [formData, setFormData] = useState({
     building: null,
@@ -45,10 +45,13 @@ const UnitFormFlow = ({ onClose }) => {
     if (currentPageIndex >= 1) newProgress.selectBuilding = 100;
     if (currentPageIndex >= 2) newProgress.createUnit = 100;
     if (currentPageIndex >= 3) newProgress.uploadDocuments = 100;
-    if (currentPageIndex >= 4) newProgress.review = 100;
+    if (currentPageIndex >= 4) {
+      newProgress.review = 100;
+      newProgress.submitted = 100;
+    }
 
     if (currentPageIndex === 0 && formData.building) {
-      const requiredFields = ["building"];
+      const requiredFields = ["buildingId"];
       const filledFields = requiredFields.filter(
         (field) => formData.building[field]
       ).length;
@@ -82,7 +85,11 @@ const UnitFormFlow = ({ onClose }) => {
     setAnimating(true);
     setFormData((prevData) => ({
       ...prevData,
-      [currentPageIndex === 0 ? "building" : currentPageIndex === 1 ? "unit" : "documents"]: pageData,
+      [currentPageIndex === 0
+        ? "building"
+        : currentPageIndex === 1
+        ? "unit"
+        : "documents"]: pageData,
     }));
 
     setTimeout(() => {
@@ -107,6 +114,10 @@ const UnitFormFlow = ({ onClose }) => {
   };
 
   const handleClose = () => {
+    if (currentPageIndex === 4) {
+      // Trigger refresh only when closing from SubmissionConfirmation
+      onUnitCreated();
+    }
     setCurrentPageIndex(0);
     setFormData({ building: null, unit: null, documents: null });
     setFormProgress({
@@ -116,6 +127,7 @@ const UnitFormFlow = ({ onClose }) => {
       review: 0,
       submitted: 0,
     });
+    setAnimating(false);
     onClose();
   };
 
@@ -143,7 +155,7 @@ const UnitFormFlow = ({ onClose }) => {
       onNext={handleNextPage}
       onBack={handlePreviousPage}
     />,
-    <SubmissionConfirmation key="confirm" formData={formData} onClose={handleClose} />,
+    <SubmissionConfirmation key="confirm" />,
   ];
 
   return (
@@ -167,7 +179,9 @@ const UnitFormFlow = ({ onClose }) => {
         </div>
         <div
           className={`transition-all duration-500 ease-in-out ${
-            animating ? "opacity-0 transform translate-x-10" : "opacity-100 transform translate-x-0"
+            animating
+              ? "opacity-0 transform translate-x-10"
+              : "opacity-100 transform translate-x-0"
           }`}
         >
           {pageComponents[currentPageIndex]}
