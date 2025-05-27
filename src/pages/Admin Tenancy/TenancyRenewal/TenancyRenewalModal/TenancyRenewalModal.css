@@ -1,0 +1,324 @@
+.tenancy-renewal-modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.tenancy-renewal-modal-container {
+  width: 1011px;
+  height: 786px;
+  border-radius: 6px;
+  background-color: #ffffff;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.tenancy-renewal-modal-head {
+  font-family: "Inter Tight";
+  font-weight: 500;
+  font-size: 21px;
+  line-height: 24px;
+  letter-spacing: 0px;
+}
+
+.tenancy-renewal-close-btn {
+  display: flex;
+  width: 42px;
+  height: 42px;
+  padding: 11px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 60px;
+  border: 1px solid #e9e9e9;
+}
+
+.tenancy-renewal-modal-label {
+  font-family: "Inter Tight";
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 100%;
+  letter-spacing: 0px;
+  margin-bottom: 10px;
+  color: #201d1e;
+}
+
+.tenancy-renewal-input-box {
+  border-radius: 6px;
+  border: 1px solid #e9e9e9;
+  font-family: "Inter Tight";
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 24px;
+  letter-spacing: 0px;
+}
+
+.tenancy-renewal-input-box::placeholder {
+  color: #b7b5be;
+}
+
+.tenancy-renewal-modal-thead {
+  color: #677487;
+  font-family: "Inter Tight";
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.tenancy-renewal-modal-table-input {
+  border-color: #e9e9e9;
+  border-radius: 6px;
+  color: #201d1e;
+  padding: 7px 14px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: 0px;
+}
+
+.tenancy-renewal-modal-table-select {
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-family: "Inter Tight";
+  border-color: #e9e9e9;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 24px;
+  letter-spacing: 0px;
+}
+
+.tenancy-renewal-addrow-btn {
+  width: 136px;
+  height: 38px;
+  border-radius: 6px;
+  font-family: "Inter Tight";
+  font-weight: 400;
+  font-size: 15px;
+  letter-spacing: 0.43px;
+}
+
+.tenancy-renewal-hidepayement-btn {
+  border-radius: 6px;
+  font-family: "Public Sans";
+  font-weight: 400;
+}
+
+.tenancy-renewal-save-btn {
+  width: 136px;
+  height: 38px;
+  border-radius: 6px;
+  font-family: "Inter Tight";
+  font-weight: 400;
+  font-size: 15px;
+  letter-spacing: 0.43px;
+}
+
+.tenancy-renewal-desktop-table {
+  width: 100%;
+}
+
+.tenancy-renewal-desktop-table table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.tenancy-renewal-desktop-table thead {
+  background-color: transparent;
+}
+
+.tenancy-renewal-desktop-table th {
+  padding: 10px;
+  font-size: 13px;
+  color: #677487;
+}
+
+.tenancy-renewal-desktop-table td {
+  padding: 5px 10px;
+  height: 57px;
+}
+
+.tenancy-renewal-desktop-table thead tr {
+  border-bottom: 1px solid #e9e9e9;
+}
+
+.tenancy-renewal-desktop-table tbody tr {
+  border-top: 1px solid #e9e9e9;
+  background-color: transparent;
+}
+
+.tenancy-renewal-modal-table-input,
+.tenancy-renewal-modal-table-select {
+  max-width: none;
+  background-color: #ffffff;
+  font-size: 14px;
+  padding: 7px 14px;
+  border: 1px solid #e9e9e9;
+  border-radius: 6px;
+  box-shadow: none;
+}
+
+.tenancy-renewal-modal-table-input:focus,
+.tenancy-renewal-modal-table-select:focus {
+  border-color: #4b5563;
+  box-shadow: none;
+}
+
+.tenancy-renewal-modal-table-input::placeholder {
+  color: #b7b5be;
+  font-size: 14px;
+}
+
+.tenancy-renewal-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 481px) {
+  .tenancy-renewal-mobile-table {
+    display: none;
+  }
+
+  .tenancy-renewal-desktop-table {
+    display: block;
+  }
+
+  .tenancy-renewal-overflow-x-auto {
+    border: 1px solid #e9e9e9;
+    border-radius: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tenancy-renewal-modal-container {
+    position: absolute;
+    top: 90px;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    margin: 0;
+    height: 100vh;
+    border-radius: 0;
+    background-color: #f8f9fa;
+    padding: 20px;
+    max-height: calc(100vh - 90px);
+    overflow-y: auto;
+  }
+
+  .tenancy-renewal-modal-overlay {
+    position: static;
+    inset: auto;
+    display: block;
+    background-color: transparent;
+    opacity: 1;
+  }
+
+  .tenancy-renewal-modal-head {
+    display: none;
+  }
+
+  .tenancy-renewal-close-btn {
+    display: none !important;
+  }
+
+  .tenancy-renewal-input-box,
+  .tenancy-renewal-modal-table-input,
+  .tenancy-renewal-modal-table-select {
+    max-width: calc(100vw - 40px);
+    background-color: #f8f9fa;
+  }
+
+  .tenancy-renewal-addrow-btn,
+  .tenancy-renewal-save-btn {
+    max-width: calc(100vw - 40px);
+    margin-bottom: 50px;
+  }
+
+  .tenancy-renewal-hidepayement-btn {
+    max-width: calc(100vw - 40px);
+  }
+
+  .tenancy-renewal-modal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tenancy-renewal-desktop-table {
+    display: none;
+  }
+
+  .tenancy-renewal-mobile-table {
+    display: block;
+  }
+
+  .tenancy-renewal-overflow-x-auto {
+    width: 100%;
+    overflow-x: hidden;
+    border: none;
+    border-radius: 0;
+  }
+
+  .tenancy-renewal-additional-charges-container {
+    border: 1px solid #e9e9e9;
+    border-radius: 6px;
+  }
+
+  .tenancy-renewal-mobile-payment-section {
+    border: 1px solid #e9e9e9;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    background-color: #fff;
+  }
+
+  .tenancy-renewal-mobile-payment-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .tenancy-renewal-mobile-payment-section .cursor-pointer {
+    cursor: pointer;
+  }
+
+  .tenancy-renewal-mobile-section {
+    width: 100%;
+  }
+
+  .tenancy-renewal-mobile-section-container {
+    border: 1px solid #e9e9e9;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    background-color: #fff;
+  }
+
+  .tenancy-renewal-mobile-section-container:last-child {
+    margin-bottom: 0;
+  }
+
+  .tenancy-renewal-mobile-table .tenancy-renewal-modal-table-input,
+  .tenancy-renewal-mobile-table .tenancy-renewal-modal-table-select {
+    width: 100%;
+    max-width: none;
+    background-color: #fff;
+  }
+
+  .tenancy-renewal-modal-thead {
+    font-size: 12px !important;
+  }
+
+  .tenancy-renewal-modal-table-input::placeholder {
+    color: #b7b5be;
+    font-size: 13px;
+  }
+
+  .tenancy-renewal-modal-column {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tenancy-renewal-modal-column > div {
+    width: 100%;
+  }
+}

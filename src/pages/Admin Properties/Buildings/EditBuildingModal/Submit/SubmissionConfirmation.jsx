@@ -3,7 +3,7 @@ import "./submissionconfirmation.css";
 import success from "../../../../../assets/Images/Admin Buildings/success.png";
 import successtick from "../../../../../assets/Images/Admin Buildings/success_tick.png";
 
-const SubmissionConfirmation = ({ onClose }) => {
+const SubmissionConfirmation = () => {
   return (
     <div className="submit-confirm-container">
       <div className="submit-confirm-box">
