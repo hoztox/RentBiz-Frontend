@@ -126,6 +126,7 @@ const modalTitles = {
   "update-expense": "Update Expense",
   "create-refund": "Create Refund",
   "update-refund": "Update Refund",
+  "tenancy-renewal": "Tenancy Renewal",
 };
 
 const AdminNavbar = () => {

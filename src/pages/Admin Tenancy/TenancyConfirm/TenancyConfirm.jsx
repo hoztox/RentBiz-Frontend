@@ -70,22 +70,45 @@ const TenancyConfirm = () => {
 
   const handleConfirmAction = async () => {
     try {
-      
+      // Extract only the IDs for the nested objects
       const tenancyData = {
-        ...selectedTenancy,
+        // Include basic fields
+        tenancy_code: selectedTenancy.tenancy_code,
+        rental_months: selectedTenancy.rental_months,
+        start_date: selectedTenancy.start_date,
+        end_date: selectedTenancy.end_date,
+
+        // Extract IDs from nested objects
+        tenant: selectedTenancy.tenant?.id,
+        building: selectedTenancy.building?.id,
+        unit: selectedTenancy.unit?.id,
+
+        // Update status
         status: "active",
+
+        // Include any other fields your API expects
+        // Add other fields as needed based on your API requirements
       };
-      await axios.put(`${BASE_URL}/company/tenancies/${selectedTenancy.id}/`, tenancyData); 
+
+      await axios.put(
+        `${BASE_URL}/company/tenancies/${selectedTenancy.id}/`,
+        tenancyData
+      );
+
       setTenancies((prev) =>
         prev.map((t) =>
           t.id === selectedTenancy.id ? { ...t, status: "active" } : t
         )
       );
+
       console.log('Confirmed Tenancy:', tenancyData);
-      
       setConfirmModalOpen(false);
     } catch (error) {
       console.error("Error confirming tenancy:", error);
+      // Optional: Add user-friendly error handling
+      if (error.response?.data?.errors) {
+        console.error("Validation errors:", error.response.data.errors);
+      }
     }
   };
 
