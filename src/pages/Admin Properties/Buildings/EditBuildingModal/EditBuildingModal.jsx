@@ -2,7 +2,7 @@ import React from 'react';
 import "./editbuilding.css";
 import BuildingFormFlow from './Building Form Flow/BuildingFormFlow';
 
-const EditBuildingModal = ({ open, onClose, buildingId }) => {
+const EditBuildingModal = ({ open, onClose, buildingId, onBuildingCreated }) => {
   console.log("EditBuildingModal: Received buildingId:", buildingId); // Debug log
   return (
     <div
@@ -15,7 +15,11 @@ const EditBuildingModal = ({ open, onClose, buildingId }) => {
         className={`building-modal-styles transition-all 
           ${open ? "scale-100 opacity-100" : "scale-125 opacity-0"}`}
       >
-        <BuildingFormFlow onClose={onClose} buildingId={buildingId} />
+        <BuildingFormFlow
+          onClose={onClose}
+          buildingId={buildingId}
+          onBuildingCreated={onBuildingCreated}
+        />
       </div>
     </div>
   );

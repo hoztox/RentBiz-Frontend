@@ -20,7 +20,7 @@ const Units = () => {
   const [updateUnitModalOpen, setUpdateUnitModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
   const [units, setUnits] = useState([]);
-  const [selectedUnitId, setSelectedUnitId] = useState(null); // Changed to store unitId
+  const [selectedUnitId, setSelectedUnitId] = useState(null);
   const itemsPerPage = 10;
 
   const navigate = useNavigate();
@@ -44,19 +44,25 @@ const Units = () => {
     return null;
   };
 
+  const fetchUnits = async () => {
+    try {
+      const companyId = getUserCompanyId();
+      const response = await axios.get(
+        `${BASE_URL}/company/units/company/${companyId}/`
+      );
+      setUnits(response.data);
+      console.log("Units fetched:", response.data);
+    } catch (error) {
+      console.error("Error fetching units:", error);
+    }
+  };
+
+  const refreshUnits = () => {
+    console.log("Units: Refreshing unit list");
+    fetchUnits();
+  };
+
   useEffect(() => {
-    const fetchUnits = async () => {
-      try {
-        const companyId = getUserCompanyId();
-        const response = await axios.get(
-          `${BASE_URL}/company/units/company/${companyId}/`
-        );
-        setUnits(response.data);
-        console.log("Units fetched:", response.data);
-      } catch (error) {
-        console.error("Error fetching units:", error);
-      }
-    };
     fetchUnits();
   }, []);
 
@@ -86,18 +92,17 @@ const Units = () => {
     setSelectedUnitId(null);
   };
 
-const handleDeleteUnit = async (unitId) => {
-  const confirmDelete = window.confirm("Are you sure you want to delete this unit?");
-  
-  if (!confirmDelete) return;
+  const handleDeleteUnit = async (unitId) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this unit?");
+    if (!confirmDelete) return;
 
-  try {
-    await axios.delete(`${BASE_URL}/company/units/${unitId}/`);
-    setUnits(units.filter((unit) => unit.id !== unitId)); // Use id for filtering
-  } catch (error) {
-    console.error("Error deleting unit:", error);
-  }
-};
+    try {
+      await axios.delete(`${BASE_URL}/company/units/${unitId}/`);
+      setUnits(units.filter((unit) => unit.id !== unitId));
+    } catch (error) {
+      console.error("Error deleting unit:", error);
+    }
+  };
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -345,7 +350,7 @@ const handleDeleteUnit = async (unitId) => {
                                     : unit.unit_status === "vacant"
                                     ? "bg-[#ebffea] text-[#18ac18] !w-[60px]"
                                     : unit.unit_status === "disputed"
-                                    ? "bg-[#FDEDED] text-[#C72828] !w-[75px]"
+                                    ? "bg-[#FDEDED] text-[#C62828] !w-[75px]"
                                     : ""
                                 }`}
                               >
@@ -439,7 +444,11 @@ const handleDeleteUnit = async (unitId) => {
           </button>
         </div>
       </div>
-      <AddUnitModal open={unitModalOpen} onClose={closeUnitModal} />
+      <AddUnitModal
+        open={unitModalOpen}
+        onClose={closeUnitModal}
+        onUnitCreated={refreshUnits}
+      />
       <EditUnitModal
         open={updateUnitModalOpen}
         onClose={closeUpdateUnitModal}

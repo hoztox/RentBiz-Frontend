@@ -92,7 +92,10 @@ const Buildings = () => {
       setBuildings(data);
       setLoading(false);
     } catch (err) {
-      setError("Failed to fetch buildings data: " + (err.response?.data?.message || err.message));
+      setError(
+        "Failed to fetch buildings data: " +
+          (err.response?.data?.message || err.message)
+      );
       setLoading(false);
     }
   };
@@ -110,9 +113,15 @@ const Buildings = () => {
   // Filter buildings based on search term
   const filteredData = buildings.filter(
     (building) =>
-      (building.building_no?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (building.building_name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (building.building_address?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (building.building_no?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase()
+      ) ||
+      (building.building_name?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase()
+      ) ||
+      (building.building_address?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase()
+      ) ||
       (building.status?.toLowerCase() || "").includes(searchTerm.toLowerCase())
   );
 
@@ -129,12 +138,17 @@ const Buildings = () => {
           `${BASE_URL}/company/buildings/${buildingId}/`
         );
         if (response.status === 204) {
-          setBuildings(buildings.filter((building) => building.id !== buildingId));
+          setBuildings(
+            buildings.filter((building) => building.id !== buildingId)
+          );
           console.log("Buildings: Successfully deleted building", buildingId);
         }
       } catch (err) {
         console.error("Failed to delete building", err);
-        setError("Failed to delete building: " + (err.response?.data?.message || err.message));
+        setError(
+          "Failed to delete building: " +
+            (err.response?.data?.message || err.message)
+        );
       }
     }
   };
@@ -216,7 +230,9 @@ const Buildings = () => {
               <th className="px-5 text-left bldg-thead w-[12%]">DATE</th>
               <th className="pl-5 text-left bldg-thead w-[15%]">NAME</th>
               <th className="px-5 text-left bldg-thead">ADDRESS</th>
-              <th className="pl-12 pr-5 text-left bldg-thead w-[18%]">NO. OF UNITS</th>
+              <th className="pl-12 pr-5 text-left bldg-thead w-[18%]">
+                NO. OF UNITS
+              </th>
               <th className="px-5 text-left bldg-thead w-[12%]">STATUS</th>
               <th className="px-5 pr-6 text-right bldg-thead">ACTION</th>
             </tr>
@@ -227,7 +243,9 @@ const Buildings = () => {
                 key={building.id || index}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-5 text-left bldg-data">{building.code || "N/A"}</td>
+                <td className="px-5 text-left bldg-data">
+                  {building.code || "N/A"}
+                </td>
                 <td className="px-5 text-left bldg-data">
                   {new Date(building.created_at).toLocaleDateString("en-GB", {
                     day: "2-digit",
@@ -235,8 +253,12 @@ const Buildings = () => {
                     year: "numeric",
                   })}
                 </td>
-                <td className="pl-5 text-left bldg-data">{building.building_name || "N/A"}</td>
-                <td className="px-5 text-left bldg-data">{building.building_address || "N/A"}</td>
+                <td className="pl-5 text-left bldg-data">
+                  {building.building_name || "N/A"}
+                </td>
+                <td className="px-5 text-left bldg-data">
+                  {building.building_address || "N/A"}
+                </td>
                 <td className="pl-12 pr-5 text-left bldg-data">N/A</td>
                 <td className="px-5 text-left bldg-data">
                   <span
@@ -249,7 +271,8 @@ const Buildings = () => {
                     }`}
                   >
                     {building.status
-                      ? building.status.charAt(0).toUpperCase() + building.status.slice(1)
+                      ? building.status.charAt(0).toUpperCase() +
+                        building.status.slice(1)
                       : "N/A"}
                   </span>
                 </td>
@@ -279,7 +302,9 @@ const Buildings = () => {
           <thead>
             <tr className="bldg-table-row-head">
               <th className="px-5 text-left bldg-thead bldg-id-column">ID</th>
-              <th className="px-5 text-left bldg-thead bldg-date-column">NAME</th>
+              <th className="px-5 text-left bldg-thead bldg-date-column">
+                NAME
+              </th>
               <th className="px-5 text-right bldg-thead"></th>
             </tr>
           </thead>
@@ -324,11 +349,14 @@ const Buildings = () => {
                           <div className="bldg-grid-item w-[45%]">
                             <div className="bldg-dropdown-label">DATE</div>
                             <div className="bldg-dropdown-value">
-                              {new Date(building.created_at).toLocaleDateString("en-GB", {
-                                day: "2-digit",
-                                month: "short",
-                                year: "numeric",
-                              })}
+                              {new Date(building.created_at).toLocaleDateString(
+                                "en-GB",
+                                {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                }
+                              )}
                             </div>
                           </div>
                           <div className="bldg-grid-item w-[60%]">
@@ -340,7 +368,9 @@ const Buildings = () => {
                         </div>
                         <div className="bldg-grid">
                           <div className="bldg-grid-item w-[33%]">
-                            <div className="bldg-dropdown-label">NO. OF UNITS</div>
+                            <div className="bldg-dropdown-label">
+                              NO. OF UNITS
+                            </div>
                             <div className="bldg-dropdown-value">N/A</div>
                           </div>
                           <div className="bldg-grid-item w-[27%]">
@@ -356,7 +386,8 @@ const Buildings = () => {
                                 }`}
                               >
                                 {building.status
-                                  ? building.status.charAt(0).toUpperCase() + building.status.slice(1)
+                                  ? building.status.charAt(0).toUpperCase() +
+                                    building.status.slice(1)
                                   : "N/A"}
                               </span>
                             </div>
@@ -364,14 +395,18 @@ const Buildings = () => {
                           <div className="bldg-grid-item bldg-action-column w-[20%]">
                             <div className="bldg-dropdown-label">ACTION</div>
                             <div className="bldg-dropdown-value bldg-flex bldg-items-center bldg-gap-2">
-                              <button onClick={() => handleEditClick(building.id)}>
+                              <button
+                                onClick={() => handleEditClick(building.id)}
+                              >
                                 <img
                                   src={editicon}
                                   alt="Edit"
                                   className="w-[18px] h-[18px] bldg-action-btn duration-200"
                                 />
                               </button>
-                              <button onClick={() => deleteBuilding(building.id)}>
+                              <button
+                                onClick={() => deleteBuilding(building.id)}
+                              >
                                 <img
                                   src={deletesicon}
                                   alt="Delete"
@@ -392,9 +427,10 @@ const Buildings = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 bldg-pagination-container">
         <span className="bldg-pagination bldg-collection-list-pagination">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length}{" "}
-          entries
+          Showing{" "}
+          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+          {filteredData.length} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto bldg-pagination-buttons">
           <button
@@ -426,7 +462,9 @@ const Buildings = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
+          {endPage < totalPages - 1 && (
+            <span className="px-2 flex items-center">...</span>
+          )}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
@@ -453,6 +491,7 @@ const Buildings = () => {
         open={editbuildingModalOpen}
         onClose={closeEditBuildingModal}
         buildingId={selectedBuildingId}
+        onBuildingCreated={refreshBuildings}
       />
     </div>
   );
