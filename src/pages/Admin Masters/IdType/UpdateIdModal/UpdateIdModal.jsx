@@ -7,7 +7,7 @@ import { toast, Toaster } from "react-hot-toast";
 import { BASE_URL } from "../../../../utils/config";
 
 const UpdateIdModal = () => {
-  const { modalState, closeModal } = useModal();
+  const { modalState, closeModal, triggerRefresh } = useModal();
   const [title, setTitle] = useState("");
   const [companyId, setCompanyId] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -108,7 +108,7 @@ const UpdateIdModal = () => {
       if (modalState.onSuccess) {
         modalState.onSuccess(response.data);
       }
-
+      triggerRefresh();
       closeModal();
     } catch (err) {
       console.error("Error updating ID type:", err.response?.data || err.message);

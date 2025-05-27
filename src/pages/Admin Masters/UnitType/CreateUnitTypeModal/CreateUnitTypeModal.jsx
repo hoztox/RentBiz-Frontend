@@ -6,7 +6,7 @@ import { BASE_URL } from "../../../../utils/config";
 import axios from "axios";
 
 const CreateUnitTypeModal = () => {
-  const { modalState, closeModal } = useModal();
+  const { modalState, closeModal, triggerRefresh } = useModal();
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -94,6 +94,7 @@ const CreateUnitTypeModal = () => {
       }
 
       console.log("New Unit Type Created: ", { title, companyId, userId });
+      triggerRefresh();
       closeModal();
     } catch (err) {
       console.error("Error:", err.response?.data || err.message);

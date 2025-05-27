@@ -6,7 +6,7 @@ import { useModal } from "../../../../context/ModalContext";
 import { BASE_URL } from "../../../../utils/config";
 
 const CreateIdModal = () => {
-  const { modalState, closeModal } = useModal();
+  const { modalState, closeModal, triggerRefresh } = useModal();
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -95,6 +95,7 @@ const CreateIdModal = () => {
       }
 
       console.log("New ID Type Created: ", response.data);
+      triggerRefresh();
       closeModal();
     } catch (err) {
       console.error("Error:", err.response?.data || err.message);

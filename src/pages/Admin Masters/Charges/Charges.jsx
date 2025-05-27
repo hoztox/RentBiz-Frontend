@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import "./Charges.css";
 import { ChevronDown } from "lucide-react";
@@ -110,6 +111,9 @@ const Charges = () => {
       }
       setData((prev) => prev.filter((item) => item.id !== chargeIdToDelete));
       toast.success("Charge deleted successfully");
+      if (paginatedData.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
     } catch (err) {
       console.error(
         "Error deleting charge:",
@@ -272,49 +276,60 @@ const Charges = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {paginatedData.map((charge, index) => {
-                      const isLastItemOnPage = index === paginatedData.length - 1;
-                      const shouldRemoveBorder =
-                        isLastItemOnPage && paginatedData.length === itemsPerPage;
-
-                      return (
-                        <tr
-                          key={charge.id}
-                          className={`h-[57px] hover:bg-gray-50 cursor-pointer ${
-                            shouldRemoveBorder ? "" : "border-b border-[#E9E9E9]"
-                          }`}
+                    {paginatedData.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan={5}
+                          className="px-5 py-8 text-center text-gray-500"
                         >
-                          <td className="px-5 text-left charges-data">
-                            {(currentPage - 1) * itemsPerPage + index + 1}
-                          </td>
-                          <td className="px-5 text-left charges-data">
-                            {formatDate(charge.created_at)}
-                          </td>
-                          <td className="pl-5 text-left charges-data">
-                            {charge.name}
-                          </td>
-                          <td className="pl-5 text-left charges-data w-[15%]">
-                            {charge.charge_code?.title || "N/A"}
-                          </td>
-                          <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                            <button onClick={() => openUpdateModal(charge)}>
-                              <img
-                                src={editicon}
-                                alt="Edit"
-                                className="w-[18px] h-[18px] action-btn duration-200"
-                              />
-                            </button>
-                            <button onClick={() => handleDelete(charge.id)}>
-                              <img
-                                src={deleteicon}
-                                alt="Delete"
-                                className="w-[18px] h-[18px] action-btn duration-200"
-                              />
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                          No Charges found
+                        </td>
+                      </tr>
+                    ) : (
+                      paginatedData.map((charge, index) => {
+                        const isLastItemOnPage = index === paginatedData.length - 1;
+                        const shouldRemoveBorder =
+                          isLastItemOnPage && paginatedData.length === itemsPerPage;
+
+                        return (
+                          <tr
+                            key={charge.id}
+                            className={`h-[57px] hover:bg-gray-50 cursor-pointer ${
+                              shouldRemoveBorder ? "" : "border-b border-[#E9E9E9]"
+                            }`}
+                          >
+                            <td className="px-5 text-left charges-data">
+                              {(currentPage - 1) * itemsPerPage + index + 1}
+                            </td>
+                            <td className="px-5 text-left charges-data">
+                              {formatDate(charge.created_at)}
+                            </td>
+                            <td className="pl-5 text-left charges-data">
+                              {charge.name}
+                            </td>
+                            <td className="pl-5 text-left charges-data w-[15%]">
+                              {charge.charge_code?.title || "N/A"}
+                            </td>
+                            <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
+                              <button onClick={() => openUpdateModal(charge)}>
+                                <img
+                                  src={editicon}
+                                  alt="Edit"
+                                  className="w-[18px] h-[18px] action-btn duration-200"
+                                />
+                              </button>
+                              <button onClick={() => handleDelete(charge.id)}>
+                                <img
+                                  src={deleteicon}
+                                  alt="Delete"
+                                  className="w-[18px] h-[18px] action-btn duration-200"
+                                />
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -330,10 +345,10 @@ const Charges = () => {
                       <thead>
                         <tr className="border-b border-[#E9E9E9] h-[57px]">
                           <th className="px-4 py-3 text-left tax-section-thead">
-                            TAX 
+                            TAX
                           </th>
                           <th className="px-4 py-3 text-left tax-section-thead">
-                             NAME
+                            NAME
                           </th>
                           <th className="px-4 py-3 text-left tax-section-thead">
                             CHARGE TYPE
@@ -516,155 +531,170 @@ const Charges = () => {
                 </tr>
               </thead>
               <tbody>
-                {paginatedData.map((charge, index) => (
-                  <React.Fragment key={charge.id}>
-                    <tr
-                      className={`${
-                        expandedRows[charge.id]
-                          ? "mobile-no-border"
-                          : "mobile-with-border"
-                      } border-b border-[#E9E9E9] h-[57px]`}
+                {paginatedData.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={3}
+                      className="px-5 py-4 text-center charges-data text-gray-500"
                     >
-                      <td className="px-5 text-left charges-data">
-                        {(currentPage - 1) * itemsPerPage + index + 1}
-                      </td>
-                      <td className="px-5 text-left charges-data charges-date-column">
-                        {charge.name}
-                        
-                      </td>
-                      <td className="py-4 flex items-center justify-end h-[57px]">
-                        <div
-                          className={`charges-dropdown-field ${
-                            expandedRows[charge.id] ? "active" : ""
-                          }`}
-                          onClick={() => toggleRowExpand(charge.id)}
-                        >
-                          <img
-                            src={downarrow}
-                            alt="drop-down-arrow"
-                            className={`charges-dropdown-img ${
-                              expandedRows[charge.id] ? "text-white" : ""
+                      No Charges found
+                    </td>
+                  </tr>
+                ) : (
+                  paginatedData.map((charge, index) => (
+                    <React.Fragment key={charge.id}>
+                      <tr
+                        className={`${
+                          expandedRows[charge.id]
+                            ? "mobile-no-border"
+                            : "mobile-with-border"
+                        } border-b border-[#E9E9E9] h-[57px]`}
+                      >
+                        <td className="px-5 text-left charges-data">
+                          {(currentPage - 1) * itemsPerPage + index + 1}
+                        </td>
+                        <td className="px-5 text-left charges-data charges-date-column">
+                          {charge.name}
+                        </td>
+                        <td className="py-4 flex items-center justify-end h-[57px]">
+                          <div
+                            className={`charges-dropdown-field ${
+                              expandedRows[charge.id] ? "active" : ""
                             }`}
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                    {expandedRows[charge.id] && (
-                      <tr className="mobile-with-border border-b border-[#E9E9E9]">
-                        <td colSpan={3} className="px-5">
-                          <div className="charges-dropdown-content">
-                            <div className="charges-grid">
-                              <div className="charges-grid-items">
-                                <div className="dropdown-label">DATE</div>
-                                <div className="dropdown-value">{formatDate(charge.created_at)}</div>
-                              </div>
-                              <div className="charges-grid-items">
-                                <div className="dropdown-label">CHARGE TYPE</div>
-                                <div className="dropdown-value">
-                                  {charge.charge_code?.title || "N/A"}
-                                </div>
-                              </div>
-                              <div className="charges-grid-items">
-                                <div className="dropdown-label">VAT PERCENTAGE</div>
-                                <div className="dropdown-value">
-                                  {charge.vat_percentage ? `${charge.vat_percentage}%` : "N/A"}
-                                </div>
-                              </div>
-                            </div>
-                            <div className="charges-grid">
-                              <div className="charges-grid-items">
-                                <div className="dropdown-label">ACTION</div>
-                                <div className="dropdown-value flex items-center gap-4 p-1">
-                                  <button onClick={() => openUpdateModal(charge)}>
-                                    <img
-                                      src={editicon}
-                                      alt="Edit"
-                                      className="w-[18px] h-[18px] action-btn duration-200"
-                                    />
-                                  </button>
-                                  <button onClick={() => handleDelete(charge.id)}>
-                                    <img
-                                      src={deleteicon}
-                                      alt="Delete"
-                                      className="w-[18px] h-[18px] action-btn duration-200"
-                                    />
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
+                            onClick={() => toggleRowExpand(charge.id)}
+                          >
+                            <img
+                              src={downarrow}
+                              alt="drop-down-arrow"
+                              className={`charges-dropdown-img ${
+                                expandedRows[charge.id] ? "text-white" : ""
+                              }`}
+                            />
                           </div>
                         </td>
                       </tr>
-                    )}
-                  </React.Fragment>
-                ))}
+                      {expandedRows[charge.id] && (
+                        <tr className="mobile-with-border border-b border-[#E9E9E9]">
+                          <td colSpan={3} className="px-5">
+                            <div className="charges-dropdown-content">
+                              <div className="charges-grid">
+                                <div className="charges-grid-items">
+                                  <div className="dropdown-label">DATE</div>
+                                  <div className="dropdown-value">{formatDate(charge.created_at)}</div>
+                                </div>
+                                <div className="charges-grid-items">
+                                  <div className="dropdown-label">CHARGE TYPE</div>
+                                  <div className="dropdown-value">
+                                    {charge.charge_code?.title || "N/A"}
+                                  </div>
+                                </div>
+                                <div className="charges-grid-items">
+                                  <div className="dropdown-label">VAT PERCENTAGE</div>
+                                  <div className="dropdown-value">
+                                    {charge.vat_percentage ? `${charge.vat_percentage}%` : "N/A"}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="charges-grid">
+                                <div className="charges-grid-items">
+                                  <div className="dropdown-label">ACTION</div>
+                                  <div className="dropdown-value flex items-center gap-4 p-1">
+                                    <button onClick={() => openUpdateModal(charge)}>
+                                      <img
+                                        src={editicon}
+                                        alt="Edit"
+                                        className="w-[18px] h-[18px] action-btn duration-200"
+                                      />
+                                    </button>
+                                    <button onClick={() => handleDelete(charge.id)}>
+                                      <img
+                                        src={deleteicon}
+                                        alt="Delete"
+                                        className="w-[18px] h-[18px] action-btn duration-200"
+                                      />
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
 
           {/* Pagination */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
-            <span className="collection-list-pagination">
-              Showing{" "}
-              {Math.min(
-                (currentPage - 1) * itemsPerPage + 1,
-                filteredData.length
-              )}{" "}
-              to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-              {filteredData.length} entries
-            </span>
-            <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
-              <button
-                className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(currentPage - 1)}
-              >
-                Previous
-              </button>
-              {startPage > 1 && (
+          {filteredData.length > 0 && (
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
+              <span className="collection-list-pagination">
+                Showing{" "}
+                {Math.min(
+                  (currentPage - 1) * itemsPerPage + 1,
+                  filteredData.length
+                )}{" "}
+                to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+                {filteredData.length} entries
+              </span>
+              <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
                 <button
-                  className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
-                  onClick={() => setCurrentPage(1)}
+                  className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+                  disabled={currentPage === 1 || loading}
+                  onClick={() => setCurrentPage(currentPage - 1)}
                 >
-                  1
+                  Previous
                 </button>
-              )}
-              {startPage > 2 && (
-                <span className="px-2 flex items-center">...</span>
-              )}
-              {[...Array(endPage - startPage + 1)].map((_, i) => (
+                {startPage > 1 && (
+                  <button
+                    className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+                    onClick={() => setCurrentPage(1)}
+                    disabled={loading}
+                  >
+                    1
+                  </button>
+                )}
+                {startPage > 2 && (
+                  <span className="px-2 flex items-center">...</span>
+                )}
+                {[...Array(endPage - startPage + 1)].map((_, i) => (
+                  <button
+                    key={startPage + i}
+                    className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+                      currentPage === startPage + i
+                        ? "bg-[#1458A2] text-white"
+                        : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+                    }`}
+                    onClick={() => setCurrentPage(startPage + i)}
+                    disabled={loading}
+                  >
+                    {startPage + i}
+                  </button>
+                ))}
+                {endPage < totalPages - 1 && (
+                  <span className="px-2 flex items-center">...</span>
+                )}
+                {endPage < totalPages && (
+                  <button
+                    className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+                    onClick={() => setCurrentPage(totalPages)}
+                    disabled={loading}
+                  >
+                    {totalPages}
+                  </button>
+                )}
                 <button
-                  key={startPage + i}
-                  className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
-                    currentPage === startPage + i
-                      ? "bg-[#1458A2] text-white"
-                      : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-                  }`}
-                  onClick={() => setCurrentPage(startPage + i)}
+                  className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+                  disabled={currentPage === totalPages || loading}
+                  onClick={() => setCurrentPage(currentPage + 1)}
                 >
-                  {startPage + i}
+                  Next
                 </button>
-              ))}
-              {endPage < totalPages - 1 && (
-                <span className="px-2 flex items-center">...</span>
-              )}
-              {endPage < totalPages && (
-                <button
-                  className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
-                  onClick={() => setCurrentPage(totalPages)}
-                >
-                  {totalPages}
-                </button>
-              )}
-              <button
-                className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage(currentPage + 1)}
-              >
-                Next
-              </button>
+              </div>
             </div>
-          </div>
+          )}
         </>
       )}
       <DeleteChargesModal

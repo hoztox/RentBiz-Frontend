@@ -291,8 +291,8 @@ const AdminUsers = () => {
           <tbody>
             {paginatedData.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-5 py-4 text-center">
-                  No users found.
+                <td colSpan={8} className="px-5 py-8 text-center text-gray-500">
+                  No users found
                 </td>
               </tr>
             ) : (

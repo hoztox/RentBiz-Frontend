@@ -14,7 +14,7 @@ import { BASE_URL } from "../../../utils/config";
 import IdTypeDeleteModal from "./IdTypeDeleteModal/IdTypeDeleteModal";
 
 const IdType = () => {
-  const { openModal } = useModal();
+  const { openModal, refreshCounter } = useModal();
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -175,7 +175,7 @@ const IdType = () => {
     if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(totalPages);
     }
-  }, [companyId, currentPage, searchTerm]);
+  }, [companyId, currentPage, searchTerm, refreshCounter]);
 
   const openUpdateModal = (idType) => {
     openModal("update-id-type-master", idType);

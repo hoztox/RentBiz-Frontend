@@ -22,7 +22,7 @@ const UnitType = () => {
   const [unitTypes, setUnitTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { openModal } = useModal();
+  const { openModal, refreshCounter } = useModal();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [unitTypeIdToDelete, setUnitTypeIdToDelete] = useState(null);
   const itemsPerPage = 10;
@@ -165,7 +165,7 @@ const UnitType = () => {
 
   useEffect(() => {
     fetchUnitTypes();
-  }, [companyId]);
+  }, [companyId, refreshCounter]);
 
   const openUpdateModal = (unit) => {
     openModal("update-unit-type-master", unit);
