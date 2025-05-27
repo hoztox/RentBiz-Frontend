@@ -35,7 +35,7 @@ const CreateTenancyModal = () => {
     rent_per_frequency: "",
     total_rent_receivable: "",
     deposit: "",
-    commission: "",
+    commision: "",
     remarks: "",
   });
 
@@ -141,12 +141,12 @@ const CreateTenancyModal = () => {
       formData.first_rent_due_on &&
       formData.rent_per_frequency &&
       formData.deposit &&
-      formData.commission
+      formData.commision
     ) {
       const schedule = [];
       const firstDueDate = new Date(formData.first_rent_due_on);
       const depositChargeType = chargeTypes.find(ct => ct.name === "Deposit")?.id || "";
-      const commissionChargeType = chargeTypes.find(ct => ct.name === "Commission")?.id || "";
+      const commisionChargeType = chargeTypes.find(ct => ct.name === "Commission")?.id || "";
       const rentChargeType = chargeTypes.find(ct => ct.name === "Rent")?.id || "";
 
       // Add Deposit
@@ -164,13 +164,13 @@ const CreateTenancyModal = () => {
       // Add Commission
       schedule.push({
         id: "02",
-        charge_type: commissionChargeType,
+        charge_type: commisionChargeType,
         reason: "Commission",
         due_date: firstDueDate.toISOString().split("T")[0],
         status: "pending",
-        amount: parseFloat(formData.commission || 0).toFixed(2),
+        amount: parseFloat(formData.commision || 0).toFixed(2),
         vat: "0.00",
-        total: parseFloat(formData.commission || 0).toFixed(2),
+        total: parseFloat(formData.commision || 0).toFixed(2),
       });
 
       // Add Rent payments
@@ -198,7 +198,7 @@ const CreateTenancyModal = () => {
     formData.first_rent_due_on,
     formData.rent_per_frequency,
     formData.deposit,
-    formData.commission,
+    formData.commision,
     chargeTypes,
   ]);
 
@@ -334,7 +334,7 @@ const CreateTenancyModal = () => {
       first_rent_due_on: formData.first_rent_due_on,
       rent_per_frequency: parseFloat(formData.rent_per_frequency || 0).toFixed(2),
       deposit: parseFloat(formData.deposit || 0).toFixed(2),
-      commission: parseFloat(formData.commission || 0).toFixed(2),
+      commision: parseFloat(formData.commision || 0).toFixed(2),
       remarks: formData.remarks,
       additional_charges: additionalCharges.map((charge) => ({
         charge_type: parseInt(charge.charge_type),
@@ -611,8 +611,8 @@ const CreateTenancyModal = () => {
               </label>
               <input
                 type="number"
-                name="commission"
-                value={formData.commission}
+                name="commision"
+                value={formData.commision}
                 onChange={handleInputChange}
                 placeholder="Enter Commission"
                 className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 tenancy-input-box"
@@ -985,7 +985,8 @@ const CreateTenancyModal = () => {
                                   e.target.value
                                 )
                               }
-                              className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-700 focus:border-gray-700 bg-white tenancy-modal-table-select"
+                              className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-700 focus:border-gray-700 bg-white tenancy-modal-table-select cursor-not-allowed"
+                              disabled
                               onFocus={() =>
                                 toggleSelectOpen(`payment-charge-${item.id}`)
                               }
@@ -1000,12 +1001,12 @@ const CreateTenancyModal = () => {
                                 </option>
                               ))}
                             </select>
-                            <ChevronDown
+                            {/* <ChevronDown
                               className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${selectOpenStates[`payment-charge-${item.id}`]
                                 ? "rotate-180"
                                 : ""
                                 }`}
-                            />
+                            /> */}
                           </td>
                           <td className="px-[10px] py-[5px] w-[162px]">
                             <input
@@ -1019,7 +1020,8 @@ const CreateTenancyModal = () => {
                                 )
                               }
                               placeholder="Enter Reason"
-                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
+                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input cursor-not-allowed"
+                              readOnly
                             />
                           </td>
                           <td className="px-[10px] py-[5px] w-[173px] relative">

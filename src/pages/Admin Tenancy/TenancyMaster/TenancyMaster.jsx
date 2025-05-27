@@ -25,10 +25,8 @@ const TenancyMaster = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
 
     if (role === "company") {
-      // When a company logs in, their own ID is stored as company_id
       return localStorage.getItem("company_id");
     } else if (role === "user" || role === "admin") {
-      // When a user logs in, company_id is directly stored
       try {
         const userCompanyId = localStorage.getItem("company_id");
         return userCompanyId ? JSON.parse(userCompanyId) : null;
@@ -41,24 +39,40 @@ const TenancyMaster = () => {
     return null;
   };
 
-  // Fetch tenancies from backend
-  useEffect(() => {
-    const fetchTenancies = async () => {
-      try {
-        const companyId = getUserCompanyId();
-        setLoading(true);
-        const response = await axios.get(`${BASE_URL}/company/tenancies/company/${companyId}/`);
-        setTenancies(response.data);
-        console.log('Fetched tenancies:', response.data);
+  // Reusable function to fetch tenancies
+  const fetchTenancies = async () => {
+    try {
+      const companyId = getUserCompanyId();
+      setLoading(true);
+      const response = await axios.get(`${BASE_URL}/company/tenancies/company/${companyId}/`);
+      setTenancies(response.data);
+      console.log('Fetched tenancies:', response.data);
+    } catch (error) {
+      console.error("Error fetching tenancies:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      } catch (error) {
-        console.error("Error fetching tenancies:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Fetch tenancies on component mount
+  useEffect(() => {
     fetchTenancies();
   }, []);
+
+  // Handle delete action
+  const handleDelete = async (tenancyId) => {
+    if (window.confirm("Are you sure you want to delete this tenancy?")) {
+      try {
+        await axios.delete(`${BASE_URL}/company/tenancies/${tenancyId}/`);
+        // Refetch tenancies after deletion
+        await fetchTenancies();
+        console.log(`Deleted tenancy with ID: ${tenancyId}`);
+      } catch (error) {
+        console.error("Error deleting tenancy:", error);
+        alert("Failed to delete tenancy. Please try again.");
+      }
+    }
+  };
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -182,7 +196,7 @@ const TenancyMaster = () => {
                   </span>
                 </td>
                 <td className="pl-12 pr-5 pt-2 text-center">
-                  <button onClick={() => openModal("tenancy-view", tenancy.tenancy_code)}>
+                  <button onClick={() => openModal("tenancy-view", tenancy)}>
                     <img
                       src={viewicon}
                       alt="View"
@@ -198,7 +212,7 @@ const TenancyMaster = () => {
                       className="w-[18px] h-[18px] tenancy-action-btn duration-200"
                     />
                   </button>
-                  <button onClick={() => openModal("tenancy-delete", tenancy)}>
+                  <button onClick={() => handleDelete(tenancy.id)}>
                     <img
                       src={deletesicon}
                       alt="Delete"
@@ -306,7 +320,7 @@ const TenancyMaster = () => {
                                   className="w-[18px] h-[18px] tenancy-action-btn duration-200"
                                 />
                               </button>
-                              <button onClick={() => openModal("tenancy-delete", tenancy)}>
+                              <button onClick={() => handleDelete(tenancy.id)}>
                                 <img
                                   src={deletesicon}
                                   alt="Delete"
