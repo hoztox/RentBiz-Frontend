@@ -4,13 +4,12 @@ import { BASE_URL } from "../../../../../utils/config";
 import DocumentsView from "./DocumentsView";
 import "./reviewpage.css";
 
-const ReviewPage = ({ formData, onBack, onNext }) => {
+const ReviewPage = ({ formData, onBack, onNext, onBuildingCreated }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   // Extract building and documents data from formData
   const building = formData?.building || {};
-  // Ensure documents is an array
   const documents = Array.isArray(formData?.documents?.documents)
     ? formData.documents.documents
     : [];
@@ -67,7 +66,6 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
       formDataWithFiles.append('plot_no', building.plot_no);
       formDataWithFiles.append('description', getValueOrEmpty(building.description));
       formDataWithFiles.append('remarks', getValueOrEmpty(building.remarks));
-      // Handle latitude and longitude - allow empty strings for null values
       formDataWithFiles.append('latitude', getValueOrEmpty(building.latitude));
       formDataWithFiles.append('longitude', getValueOrEmpty(building.longitude));
       formDataWithFiles.append('status', building.status);
@@ -75,12 +73,10 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
       formDataWithFiles.append('building_address', building.building_address);
       // Add documents data
       documents.forEach((doc, index) => {
-        // Add document metadata
         formDataWithFiles.append(`build_comp[${index}][doc_type]`, doc.doc_type);
         formDataWithFiles.append(`build_comp[${index}][number]`, doc.number);
         formDataWithFiles.append(`build_comp[${index}][issued_date]`, doc.issued_date);
         formDataWithFiles.append(`build_comp[${index}][expiry_date]`, doc.expiry_date);
-        // Add file if exists
         if (doc.upload_file && doc.upload_file[0]) {
           formDataWithFiles.append(`build_comp[${index}][upload_file]`, doc.upload_file[0]);
         }
@@ -101,19 +97,19 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
         }
       );
       console.log("Successfully created building:", response.data);
-      onNext({ formData, response: response.data });
+      onBuildingCreated(); // Trigger the refresh callback
+      onNext({ formData, response: response.data }); // Proceed to SubmissionConfirmation
     } catch (err) {
       console.error("Error creating building:", err);
       setError(
-        `Failed to save building: ${err.response?.data?.message || err.message
-        }`
+        `Failed to save building: ${err.response?.data?.message || err.message}`
       );
     } finally {
       setLoading(false);
     }
   };
+
   const handleBack = () => {
-    // Ensure formData.documents is correctly structured
     const backData = {
       ...formData,
       documents: { documents },
@@ -129,7 +125,6 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
       )}
       <div className="border rounded-md border-[#E9E9E9] p-5 mb-5">
         <h2 className="review-page-head">Building</h2>
-
         <div className="grid grid-cols-1 md:grid-cols-2">
           {/* Left Column */}
           <div className="space-y-8 border-r border-[#E9E9E9]">
@@ -137,59 +132,45 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
               <p className="review-page-label">Building No*</p>
               <p className="review-page-data">{building.building_no || "N/A"}</p>
             </div>
-
             <div>
               <p className="review-page-label">Building Name*</p>
-              <p className="review-page-data">
-                {building.building_name || "N/A"}
-              </p>
+              <p className="review-page-data">{building.building_name || "N/A"}</p>
             </div>
-
             <div>
               <p className="review-page-label">Description</p>
               <p className="review-page-data">{building.description || "N/A"}</p>
             </div>
-
             <div>
               <p className="review-page-label">Latitude</p>
               <p className="review-page-data">{building.latitude || "N/A"}</p>
             </div>
-
             <div>
               <p className="review-page-label">Status*</p>
               <p className="review-page-data">
                 {building.status
-                  ? building.status.charAt(0).toUpperCase() +
-                  building.status.slice(1)
+                  ? building.status.charAt(0).toUpperCase() + building.status.slice(1)
                   : "N/A"}
               </p>
             </div>
           </div>
-
           {/* Right Column */}
           <div className="space-y-8 ml-5">
             <div>
               <p className="review-page-label">Plot No*</p>
               <p className="review-page-data">{building.plot_no || "N/A"}</p>
             </div>
-
             <div>
               <p className="review-page-label">Address*</p>
-              <p className="review-page-data">
-                {building.building_address || "N/A"}
-              </p>
+              <p className="review-page-data">{building.building_address || "N/A"}</p>
             </div>
-
             <div>
               <p className="review-page-label">Remarks</p>
               <p className="review-page-data">{building.remarks || "N/A"}</p>
             </div>
-
             <div>
               <p className="review-page-label">Longitude</p>
               <p className="review-page-data">{building.longitude || "N/A"}</p>
             </div>
-
             <div>
               <p className="review-page-label">Near By Landmark</p>
               <p className="review-page-data">{building.land_mark || "N/A"}</p>
@@ -197,13 +178,11 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
           </div>
         </div>
       </div>
-
       {/* Documents Section */}
       <div className="border rounded-md border-[#E9E9E9] p-5">
         <h2 className="review-page-head">Documents</h2>
         <DocumentsView documents={documents} />
       </div>
-
       <div className="flex justify-end gap-4 pt-5 mt-auto">
         <button
           type="button"

@@ -19,7 +19,7 @@ const Buildings = () => {
   const [buildingModalOpen, setBuildingModalOpen] = useState(false);
   const [editbuildingModalOpen, setEditBuildingModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
-  const [buildings, setBuildings] = useState([]); // Initialize as empty array
+  const [buildings, setBuildings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedBuildingId, setSelectedBuildingId] = useState(null);
   const [error, setError] = useState(null);
@@ -28,12 +28,9 @@ const Buildings = () => {
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
-
     if (role === "company") {
-      // When a company logs in, their own ID is stored as company_id
       return localStorage.getItem("company_id");
     } else if (role === "user" || role === "admin") {
-      // When a user logs in, company_id is directly stored
       try {
         const userCompanyId = localStorage.getItem("company_id");
         return userCompanyId ? JSON.parse(userCompanyId) : null;
@@ -42,7 +39,6 @@ const Buildings = () => {
         return null;
       }
     }
-
     return null;
   };
 
@@ -81,41 +77,42 @@ const Buildings = () => {
     }));
   };
 
-  // Fetch buildings data from API
+  // Function to fetch buildings
+  const fetchBuildings = async () => {
+    try {
+      const companyId = getUserCompanyId();
+      setLoading(true);
+      const response = await axios.get(
+        `${BASE_URL}/company/buildings/company/${companyId}/`
+      );
+      const data = Array.isArray(response.data)
+        ? response.data
+        : response.data.results || [];
+      console.log("Buildings: Fetched buildings:", data);
+      setBuildings(data);
+      setLoading(false);
+    } catch (err) {
+      setError("Failed to fetch buildings data: " + (err.response?.data?.message || err.message));
+      setLoading(false);
+    }
+  };
+
+  // Refresh function to be called after building creation
+  const refreshBuildings = () => {
+    console.log("Buildings: Refreshing building list");
+    fetchBuildings();
+  };
+
   useEffect(() => {
-    const fetchBuildings = async () => {
-      try {
-        const companyId = getUserCompanyId();
-        setLoading(true);
-        const response = await axios.get(
-          `${BASE_URL}/company/buildings/company/${companyId}/`
-        );
-        const data = Array.isArray(response.data)
-          ? response.data
-          : response.data.results || [];
-        console.log("Buildings: Fetched buildings:", data); // Debug log
-        setBuildings(data);
-        setLoading(false);
-      } catch (err) {
-        setError("Failed to fetch buildings data", err);
-        setLoading(false);
-      }
-    };
     fetchBuildings();
   }, [companyId]);
 
   // Filter buildings based on search term
   const filteredData = buildings.filter(
     (building) =>
-      (building.building_no?.toLowerCase() || "").includes(
-        searchTerm.toLowerCase()
-      ) ||
-      (building.building_name?.toLowerCase() || "").includes(
-        searchTerm.toLowerCase()
-      ) ||
-      (building.building_address?.toLowerCase() || "").includes(
-        searchTerm.toLowerCase()
-      ) ||
+      (building.building_no?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (building.building_name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (building.building_address?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
       (building.status?.toLowerCase() || "").includes(searchTerm.toLowerCase())
   );
 
@@ -132,22 +129,22 @@ const Buildings = () => {
           `${BASE_URL}/company/buildings/${buildingId}/`
         );
         if (response.status === 204) {
-          setBuildings(
-            buildings.filter((building) => building.id !== buildingId)
-          );
+          setBuildings(buildings.filter((building) => building.id !== buildingId));
+          console.log("Buildings: Successfully deleted building", buildingId);
         }
       } catch (err) {
         console.error("Failed to delete building", err);
+        setError("Failed to delete building: " + (err.response?.data?.message || err.message));
       }
     }
   };
 
- const handleEditClick = (buildingId) => {
+  const handleEditClick = (buildingId) => {
     console.log("Buildings: Selected buildingId:", buildingId);
     setSelectedBuildingId(buildingId);
     setTimeout(() => {
-      console.log("Buildings: Opening modal with buildingId:", buildingId);
-      setEditBuildingModalOpen(true);
+      console.log("Buildings: Opening edit modal with buildingId:", buildingId);
+      openEditBuildingModal();
     }, 0);
   };
 
@@ -156,7 +153,7 @@ const Buildings = () => {
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
+  if (error) return <div className="text-red-500 p-5">{error}</div>;
 
   return (
     <div className="border border-[#E9E9E9] rounded-md bldg-table">
@@ -174,7 +171,6 @@ const Buildings = () => {
             <div className="relative w-[40%] md:w-auto">
               <select
                 name="select"
-                id=""
                 className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 bldg-selection"
                 onFocus={() => setIsSelectOpen(true)}
                 onBlur={() => setIsSelectOpen(false)}
@@ -220,9 +216,7 @@ const Buildings = () => {
               <th className="px-5 text-left bldg-thead w-[12%]">DATE</th>
               <th className="pl-5 text-left bldg-thead w-[15%]">NAME</th>
               <th className="px-5 text-left bldg-thead">ADDRESS</th>
-              <th className="pl-12 pr-5 text-left bldg-thead w-[18%]">
-                NO. OF UNITS
-              </th>
+              <th className="pl-12 pr-5 text-left bldg-thead w-[18%]">NO. OF UNITS</th>
               <th className="px-5 text-left bldg-thead w-[12%]">STATUS</th>
               <th className="px-5 pr-6 text-right bldg-thead">ACTION</th>
             </tr>
@@ -230,12 +224,10 @@ const Buildings = () => {
           <tbody>
             {paginatedData.map((building, index) => (
               <tr
-                key={index}
+                key={building.id || index}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-5 text-left bldg-data">
-                  {building.code || "N/A"}
-                </td>
+                <td className="px-5 text-left bldg-data">{building.code || "N/A"}</td>
                 <td className="px-5 text-left bldg-data">
                   {new Date(building.created_at).toLocaleDateString("en-GB", {
                     day: "2-digit",
@@ -243,12 +235,8 @@ const Buildings = () => {
                     year: "numeric",
                   })}
                 </td>
-                <td className="pl-5 text-left bldg-data">
-                  {building.building_name || "N/A"}
-                </td>
-                <td className="px-5 text-left bldg-data">
-                  {building.building_address || "N/A"}
-                </td>
+                <td className="pl-5 text-left bldg-data">{building.building_name || "N/A"}</td>
+                <td className="px-5 text-left bldg-data">{building.building_address || "N/A"}</td>
                 <td className="pl-12 pr-5 text-left bldg-data">N/A</td>
                 <td className="px-5 text-left bldg-data">
                   <span
@@ -260,8 +248,9 @@ const Buildings = () => {
                         : "bg-[#FFF4E1] text-[#FFA500]"
                     }`}
                   >
-                    {building.status.charAt(0).toUpperCase() +
-                      building.status.slice(1)}
+                    {building.status
+                      ? building.status.charAt(0).toUpperCase() + building.status.slice(1)
+                      : "N/A"}
                   </span>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
@@ -275,7 +264,7 @@ const Buildings = () => {
                   <button onClick={() => deleteBuilding(building.id)}>
                     <img
                       src={deletesicon}
-                      alt="Deletes"
+                      alt="Delete"
                       className="w-[18px] h-[18px] bldg-action-btn duration-200"
                     />
                   </button>
@@ -290,15 +279,13 @@ const Buildings = () => {
           <thead>
             <tr className="bldg-table-row-head">
               <th className="px-5 text-left bldg-thead bldg-id-column">ID</th>
-              <th className="px-5 text-left bldg-thead bldg-date-column">
-                NAME
-              </th>
+              <th className="px-5 text-left bldg-thead bldg-date-column">NAME</th>
               <th className="px-5 text-right bldg-thead"></th>
             </tr>
           </thead>
           <tbody>
             {paginatedData.map((building, index) => (
-              <React.Fragment key={index}>
+              <React.Fragment key={building.id || index}>
                 <tr
                   className={`${
                     expandedRows[building.building_no]
@@ -310,7 +297,7 @@ const Buildings = () => {
                     {building.code || "N/A"}
                   </td>
                   <td className="px-5 text-left bldg-data bldg-date-column">
-                   {building.building_name || "N/A"}
+                    {building.building_name || "N/A"}
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
@@ -337,14 +324,11 @@ const Buildings = () => {
                           <div className="bldg-grid-item w-[45%]">
                             <div className="bldg-dropdown-label">DATE</div>
                             <div className="bldg-dropdown-value">
-                              {new Date(building.created_at).toLocaleDateString(
-                                "en-GB",
-                                {
-                                  day: "2-digit",
-                                  month: "short",
-                                  year: "numeric",
-                                }
-                              )}
+                              {new Date(building.created_at).toLocaleDateString("en-GB", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                              })}
                             </div>
                           </div>
                           <div className="bldg-grid-item w-[60%]">
@@ -356,9 +340,7 @@ const Buildings = () => {
                         </div>
                         <div className="bldg-grid">
                           <div className="bldg-grid-item w-[33%]">
-                            <div className="bldg-dropdown-label">
-                              NO. OF UNITS
-                            </div>
+                            <div className="bldg-dropdown-label">NO. OF UNITS</div>
                             <div className="bldg-dropdown-value">N/A</div>
                           </div>
                           <div className="bldg-grid-item w-[27%]">
@@ -373,25 +355,26 @@ const Buildings = () => {
                                     : "bg-[#FFF4E1] text-[#FFA500]"
                                 }`}
                               >
-                                {building.status.charAt(0).toUpperCase() +
-                                  building.status.slice(1)}
+                                {building.status
+                                  ? building.status.charAt(0).toUpperCase() + building.status.slice(1)
+                                  : "N/A"}
                               </span>
                             </div>
                           </div>
                           <div className="bldg-grid-item bldg-action-column w-[20%]">
                             <div className="bldg-dropdown-label">ACTION</div>
                             <div className="bldg-dropdown-value bldg-flex bldg-items-center bldg-gap-2">
-                              <button onClick={openEditBuildingModal}>
+                              <button onClick={() => handleEditClick(building.id)}>
                                 <img
                                   src={editicon}
                                   alt="Edit"
                                   className="w-[18px] h-[18px] bldg-action-btn duration-200"
                                 />
                               </button>
-                              <button>
+                              <button onClick={() => deleteBuilding(building.id)}>
                                 <img
                                   src={deletesicon}
-                                  alt="Deletes"
+                                  alt="Delete"
                                   className="w-[18px] h-[18px] bldg-action-btn duration-200"
                                 />
                               </button>
@@ -409,10 +392,9 @@ const Buildings = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 bldg-pagination-container">
         <span className="bldg-pagination bldg-collection-list-pagination">
-          Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-          {filteredData.length} entries
+          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
+          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length}{" "}
+          entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto bldg-pagination-buttons">
           <button
@@ -444,9 +426,7 @@ const Buildings = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && (
-            <span className="px-2 flex items-center">...</span>
-          )}
+          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
@@ -464,7 +444,11 @@ const Buildings = () => {
           </button>
         </div>
       </div>
-      <AddBuildingModal open={buildingModalOpen} onClose={closeBuildingModal} />
+      <AddBuildingModal
+        open={buildingModalOpen}
+        onClose={closeBuildingModal}
+        onBuildingCreated={refreshBuildings}
+      />
       <EditBuildingModal
         open={editbuildingModalOpen}
         onClose={closeEditBuildingModal}
