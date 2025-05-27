@@ -300,13 +300,6 @@ const TenantInfoForm = ({ onNext, initialData }) => {
                   {type.title}
                 </option>
               ))}
-              {idTypes.length === 0 && !loading && (
-                <>
-                  <option value="1">Passport</option>
-                  <option value="2">National ID</option>
-                  <option value="3">Driver's License</option>
-                </>
-              )}
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
@@ -428,7 +421,6 @@ const TenantInfoForm = ({ onNext, initialData }) => {
             >
               <option value="Active">Active</option>
               <option value="Inactive">Inactive</option>
-              <option value="Pending">Pending</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown

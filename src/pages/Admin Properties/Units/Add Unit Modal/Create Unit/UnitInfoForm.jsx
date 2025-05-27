@@ -242,9 +242,10 @@ const UnitInfoForm = ({ onNext, onBack, initialData }) => {
               className="w-full appearance-none unit-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer"
               required
             >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="pending">Pending</option>
+              <option value="occupied">Occupied</option>
+              <option value="renovation">Renovation</option>
+              <option value="vacant">Vacant</option>
+              <option value="disputed">Disputed</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
