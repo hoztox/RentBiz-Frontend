@@ -42,6 +42,10 @@ const TenancyConfirm = () => {
     return null;
   };
 
+  const openUpdateModal = (tenancy) => {
+    openModal("tenancy-update", tenancy);
+  };
+
   // Fetch tenancies from backend
   useEffect(() => {
     const fetchTenancies = async () => {
@@ -262,7 +266,8 @@ const TenancyConfirm = () => {
                       </button>
                     </td>
                     <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                      <button onClick={() => openModal("tenancy-update", { tenancy })}>
+                      <button
+                        onClick={() => openUpdateModal(tenancy)}>
                         <img
                           src={editicon}
                           alt="Edit"
