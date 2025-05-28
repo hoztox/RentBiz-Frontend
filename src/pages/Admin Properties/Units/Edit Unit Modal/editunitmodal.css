@@ -2,6 +2,7 @@
   width: 1365px;
   border-radius: 6px;
   background-color: #fff;
+  height: 700px;
 }
 
 .unit-modal-header {
@@ -19,4 +20,16 @@
   font-weight: 500;
   line-height: 24px;
   color: #201d1e;
+}
+
+@media screen and (min-width: 1536px) and (max-width: 1799px) {
+  .unit-modal-styles {
+    height: 700px;
+  }
+}
+
+@media screen and (min-width: 1800px) {
+  .unit-modal-styles {
+    height: 780px;
+  }
 }
