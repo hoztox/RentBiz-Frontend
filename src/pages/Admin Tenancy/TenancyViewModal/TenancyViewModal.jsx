@@ -183,8 +183,8 @@ const TenancyViewModal = () => {
                         key={charge.id || index}
                         className="h-[57px] border-b border-[#E9E9E9] last:border-b-0 hover:bg-gray-100"
                       >
-                        <td className="px-[10px] py-[5px] w-[20px] view-tenancy-charges-tdata">{charge.id || index + 1}</td>
-                        <td className="px-[10px] py-[5px] w-[110px] view-tenancy-charges-tdata">{charge.charge_type_name || "N/A"}</td>
+                        <td className="px-[10px] py-[5px] w-[20px] view-tenancy-charges-tdata">{ index + 1}</td>
+                        <td className="px-[10px] py-[5px] w-[110px] view-tenancy-charges-tdata">{charge.charge_type?.name || "N/A"}</td>
                         <td className="px-[10px] py-[5px] w-[110px] view-tenancy-charges-tdata">{charge.reason || "N/A"}</td>
                         <td className="px-[10px] py-[5px] w-[120px] view-tenancy-charges-tdata">{charge.due_date || "N/A"}</td>
                         <td className="px-[10px] py-[5px] w-[52px] text-left text-[14px] view-tenancy-charges-tdata">{charge.status || "N/A"}</td>

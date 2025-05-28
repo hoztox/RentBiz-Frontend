@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./CreateTenancyModal.css";
 import closeicon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/close-icon.svg";
-// import calendaricon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/calendar-icon.svg";
 import deleteicon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/delete-icon.svg";
 import plusicon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/plus-icon.svg";
 import { ChevronDown } from "lucide-react";
@@ -46,21 +45,19 @@ const CreateTenancyModal = () => {
       reason: "",
       due_date: "",
       amount: "",
+      vat: "",
+      total: "",
     },
   ]);
 
   const [paymentSchedule, setPaymentSchedule] = useState([]);
-
   const [expandedStates, setExpandedStates] = useState({});
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
-
     if (role === "company") {
-      // When a company logs in, their own ID is stored as company_id
       return localStorage.getItem("company_id");
     } else if (role === "user" || role === "admin") {
-      // When a user logs in, company_id is directly stored
       try {
         const userCompanyId = localStorage.getItem("company_id");
         return userCompanyId ? JSON.parse(userCompanyId) : null;
@@ -69,37 +66,32 @@ const CreateTenancyModal = () => {
         return null;
       }
     }
-
     return null;
   };
 
   const getRelevantUserId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
-
     if (role === "user" || role === "admin") {
       const userId = localStorage.getItem("user_id");
       if (userId) return userId;
     }
-
     return null;
   };
 
-
-  // Fetch data from APIs
+  // Fetch tenants, buildings, and charge types
   useEffect(() => {
     const fetchData = async () => {
       try {
         const companyId = getUserCompanyId();
-        const [tenantsRes, buildingsRes, unitsRes, chargeTypesRes] = await Promise.all([
+        const [tenantsRes, buildingsRes, chargeTypesRes] = await Promise.all([
           axios.get(`${BASE_URL}/company/tenant/company/${companyId}/`),
-          axios.get(`${BASE_URL}/company/buildings/company/${companyId}/`),
-          axios.get(`${BASE_URL}/company/units/company/${companyId}/`),
+          axios.get(`${BASE_URL}/company/buildings/vacant/${companyId}/`),
           axios.get(`${BASE_URL}/company/charges/company/${companyId}/`),
         ]);
         setTenants(tenantsRes.data);
         setBuildings(buildingsRes.data);
-        setUnits(unitsRes.data);
         setChargeTypes(chargeTypesRes.data);
+        console.log("Charges:", chargeTypesRes.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -107,19 +99,43 @@ const CreateTenancyModal = () => {
     fetchData();
   }, []);
 
-  // Auto-calculate end_date and total_rent_receivable
+  // Fetch units when building changes
+  useEffect(() => {
+    const fetchUnits = async () => {
+      if (formData.building) {
+        try {
+          const response = await axios.get( 
+            `${BASE_URL}/company/units/${formData.building}/vacant-units/`
+          );
+          setUnits(response.data);
+        } catch (error) {
+          console.error("Error fetching units:", error);
+          setUnits([]);
+        }
+      } else {
+        setUnits([]);
+      }
+    };
+    fetchUnits();
+  }, [formData.building]);
+
   useEffect(() => {
     if (formData.start_date && formData.rental_months) {
       const startDate = new Date(formData.start_date);
       const endDate = new Date(startDate);
       endDate.setMonth(startDate.getMonth() + parseInt(formData.rental_months));
-
-      // Subtract 1 day to get the correct end date
       endDate.setDate(endDate.getDate() - 1);
-
       setFormData((prev) => ({
         ...prev,
         end_date: endDate.toISOString().split("T")[0],
+        first_rent_due_on: prev.first_rent_due_on || formData.start_date,
+      }));
+    }
+
+    if (formData.start_date && !formData.first_rent_due_on) {
+      setFormData((prev) => ({
+        ...prev,
+        first_rent_due_on: formData.start_date,
       }));
     }
 
@@ -132,12 +148,19 @@ const CreateTenancyModal = () => {
         total_rent_receivable: total,
       }));
     }
-  }, [formData.start_date, formData.rental_months, formData.rent_per_frequency, formData.no_payments]);
+  }, [
+    formData.start_date,
+    formData.rental_months,
+    formData.rent_per_frequency,
+    formData.no_payments,
+    formData.first_rent_due_on,
+  ]);
 
-  // Generate payment schedule
+  // Generate payment schedule with VAT as amount
   useEffect(() => {
     if (
       formData.no_payments &&
+      formData.rental_months &&
       formData.first_rent_due_on &&
       formData.rent_per_frequency &&
       formData.deposit &&
@@ -145,56 +168,91 @@ const CreateTenancyModal = () => {
     ) {
       const schedule = [];
       const firstDueDate = new Date(formData.first_rent_due_on);
-      const depositChargeType = chargeTypes.find(ct => ct.name === "Deposit")?.id || "";
-      const commisionChargeType = chargeTypes.find(ct => ct.name === "Commission")?.id || "";
-      const rentChargeType = chargeTypes.find(ct => ct.name === "Rent")?.id || "";
+      const depositChargeType =
+        chargeTypes.find((ct) => ct.name === "Deposit")?.id || "";
+      const commisionChargeType =
+        chargeTypes.find((ct) => ct.name === "Commission")?.id || "";
+      const rentChargeType =
+        chargeTypes.find((ct) => ct.name === "Rent")?.id || "";
+
+      const rentalMonths = parseInt(formData.rental_months);
+      const noPayments = parseInt(formData.no_payments);
+      const paymentFrequencyMonths = Math.round(rentalMonths / noPayments);
 
       // Add Deposit
+      const depositAmount = parseFloat(formData.deposit || 0);
+      const depositVatPercentage = parseFloat(
+        chargeTypes.find((ct) => ct.name === "Deposit")?.vat_percentage || 0
+      );
+      const depositVat = (depositAmount * (depositVatPercentage / 100)).toFixed(2);
       schedule.push({
         id: "01",
         charge_type: depositChargeType,
         reason: "Deposit",
         due_date: firstDueDate.toISOString().split("T")[0],
         status: "pending",
-        amount: parseFloat(formData.deposit || 0).toFixed(2),
-        vat: "0.00",
-        total: parseFloat(formData.deposit || 0).toFixed(2),
+        amount: depositAmount.toFixed(2),
+        vat: depositVat,
+        total: (depositAmount + parseFloat(depositVat)).toFixed(2),
       });
 
       // Add Commission
+      const commissionAmount = parseFloat(formData.commision || 0);
+      const commissionVatPercentage = parseFloat(
+        chargeTypes.find((ct) => ct.name === "Commission")?.vat_percentage || 0
+      );
+      const commissionVat = (commissionAmount * (commissionVatPercentage / 100)).toFixed(2);
       schedule.push({
         id: "02",
         charge_type: commisionChargeType,
         reason: "Commission",
         due_date: firstDueDate.toISOString().split("T")[0],
         status: "pending",
-        amount: parseFloat(formData.commision || 0).toFixed(2),
-        vat: "0.00",
-        total: parseFloat(formData.commision || 0).toFixed(2),
+        amount: commissionAmount.toFixed(2),
+        vat: commissionVat,
+        total: (commissionAmount + parseFloat(commissionVat)).toFixed(2),
       });
 
       // Add Rent payments
-      const noPayments = parseInt(formData.no_payments);
+      const rentAmount = parseFloat(formData.rent_per_frequency);
+      const rentVatPercentage = parseFloat(
+        chargeTypes.find((ct) => ct.name === "Rent")?.vat_percentage || 0
+      );
+      const rentVat = (rentAmount * (rentVatPercentage / 100)).toFixed(2);
       for (let i = 0; i < noPayments; i++) {
         const dueDate = new Date(firstDueDate);
-        dueDate.setMonth(firstDueDate.getMonth() + i);
+        dueDate.setMonth(firstDueDate.getMonth() + i * paymentFrequencyMonths);
         schedule.push({
           id: (i + 3).toString().padStart(2, "0"),
           charge_type: rentChargeType,
-          reason: "Monthly Rent",
+          reason:
+            paymentFrequencyMonths === 1
+              ? "Monthly Rent"
+              : paymentFrequencyMonths === 2
+                ? "Bi-Monthly Rent"
+                : paymentFrequencyMonths === 3
+                  ? "Quarterly Rent"
+                  : paymentFrequencyMonths === 6
+                    ? "Semi-Annual Rent"
+                    : paymentFrequencyMonths === 12
+                      ? "Annual Rent"
+                      : `${paymentFrequencyMonths}-Monthly Rent`,
           due_date: dueDate.toISOString().split("T")[0],
           status: "pending",
-          amount: parseFloat(formData.rent_per_frequency).toFixed(2),
-          vat: "0.00",
-          total: parseFloat(formData.rent_per_frequency).toFixed(2),
+          amount: rentAmount.toFixed(2),
+          vat: rentVat,
+          total: (rentAmount + parseFloat(rentVat)).toFixed(2),
         });
       }
 
       setPaymentSchedule(schedule);
-      setExpandedStates(schedule.reduce((acc, item) => ({ ...acc, [item.id]: false }), {}));
+      setExpandedStates(
+        schedule.reduce((acc, item) => ({ ...acc, [item.id]: false }), {})
+      );
     }
   }, [
     formData.no_payments,
+    formData.rental_months,
     formData.first_rent_due_on,
     formData.rent_per_frequency,
     formData.deposit,
@@ -213,14 +271,31 @@ const CreateTenancyModal = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+      ...(name === "building" ? { unit: "" } : {}), // Reset unit when building changes
+    }));
   };
 
   const handleAdditionalChargeChange = (id, field, value) => {
     setAdditionalCharges((prev) =>
-      prev.map((charge) =>
-        charge.id === id ? { ...charge, [field]: value } : charge
-      )
+      prev.map((charge) => {
+        if (charge.id === id) {
+          const updatedCharge = { ...charge, [field]: value };
+          if (field === "charge_type" || field === "amount") {
+            const selectedChargeType = chargeTypes.find(
+              (type) => type.id === parseInt(updatedCharge.charge_type)
+            );
+            const vatPercentage = parseFloat(selectedChargeType?.vat_percentage || 0);
+            const amount = parseFloat(updatedCharge.amount || 0);
+            updatedCharge.vat = (amount * (vatPercentage / 100)).toFixed(2);
+            updatedCharge.total = (amount + parseFloat(updatedCharge.vat || 0)).toFixed(2);
+          }
+          return updatedCharge;
+        }
+        return charge;
+      })
     );
   };
 
@@ -251,6 +326,8 @@ const CreateTenancyModal = () => {
         reason: "",
         due_date: "",
         amount: "",
+        vat: "",
+        total: "",
       },
     ]);
   };
@@ -273,7 +350,6 @@ const CreateTenancyModal = () => {
   };
 
   const handleSubmit = async () => {
-    // Basic validation
     const requiredFields = [
       "tenant",
       "building",
@@ -291,19 +367,18 @@ const CreateTenancyModal = () => {
         return;
       }
     }
-    // Validate additional charges
     for (const charge of additionalCharges) {
       if (
         !charge.charge_type ||
         !charge.reason ||
         !charge.due_date ||
-        !charge.amount
+        !charge.amount ||
+        charge.vat === ""
       ) {
         alert("Please fill all fields in Additional Charges");
         return;
       }
     }
-    // Validate payment schedule
     for (const item of paymentSchedule) {
       if (
         !item.charge_type ||
@@ -320,7 +395,10 @@ const CreateTenancyModal = () => {
     const companyId = getUserCompanyId();
     const userId = getRelevantUserId();
 
-    // Prepare data for backend
+    // Console log formData and additionalCharges
+    console.log("Form Data:", formData);
+    console.log("Additional Charges:", additionalCharges);
+
     const payload = {
       company: companyId,
       user: userId,
@@ -339,8 +417,10 @@ const CreateTenancyModal = () => {
       additional_charges: additionalCharges.map((charge) => ({
         charge_type: parseInt(charge.charge_type),
         reason: charge.reason,
-        amount: parseFloat(charge.amount).toFixed(2),
         due_date: charge.due_date,
+        amount: parseFloat(charge.amount).toFixed(2),
+        vat: parseFloat(charge.vat).toFixed(2),
+        total: parseFloat(charge.total).toFixed(2),
       })),
       payment_schedule: paymentSchedule.map((item) => ({
         charge_type: parseInt(item.charge_type),
@@ -354,16 +434,20 @@ const CreateTenancyModal = () => {
     };
 
     try {
-      const response = await axios.post(`${BASE_URL}/company/tenancies/create/`, payload);
-      console.log('Tenancy created successfully:', response.data);
-
+      const response = await axios.post(
+        `${BASE_URL}/company/tenancies/create/`,
+        payload
+      );
+      console.log("Tenancy created successfully:", response.data);
       closeModal();
       navigate("/admin/tenancy-master");
     } catch (error) {
-      console.error("Error submitting tenancy:", error.response?.data || error.message);
+      console.error(
+        "Error submitting tenancy:",
+        error.response?.data || error.message
+      );
       alert("Failed to create tenancy. Please try again.");
     }
-
   };
 
   return (
@@ -404,8 +488,9 @@ const CreateTenancyModal = () => {
                   ))}
                 </select>
                 <ChevronDown
-                  className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${selectOpenStates["tenant"] ? "rotate-180" : "rotate-0"
-                    }`}
+                  className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
+                    selectOpenStates["tenant"] ? "rotate-180" : "rotate-0"
+                  }`}
                   width={22}
                   height={22}
                   color="#201D1E"
@@ -431,8 +516,9 @@ const CreateTenancyModal = () => {
                   ))}
                 </select>
                 <ChevronDown
-                  className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${selectOpenStates["building"] ? "rotate-180" : "rotate-0"
-                    }`}
+                  className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
+                    selectOpenStates["building"] ? "rotate-180" : "rotate-0"
+                  }`}
                   width={22}
                   height={22}
                   color="#201D1E"
@@ -460,8 +546,9 @@ const CreateTenancyModal = () => {
                     ))}
                   </select>
                   <ChevronDown
-                    className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${selectOpenStates["unit"] ? "rotate-180" : "rotate-0"
-                      }`}
+                    className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
+                      selectOpenStates["unit"] ? "rotate-180" : "rotate-0"
+                    }`}
                     width={22}
                     height={22}
                     color="#201D1E"
@@ -492,15 +579,8 @@ const CreateTenancyModal = () => {
                     name="start_date"
                     value={formData.start_date}
                     onChange={handleInputChange}
-                    className="w-full p-2 pr-10 focus:outline-none focus:border-gray-700 focus:ring-gray-700 tenancy-input-box"
+                    className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 tenancy-input-box"
                   />
-                  {/* <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                    <img
-                      src={calendaricon}
-                      alt="Calendar"
-                      className="w-5 h-5"
-                    />
-                  </div> */}
                 </div>
               </div>
               <div className="w-1/2">
@@ -513,13 +593,6 @@ const CreateTenancyModal = () => {
                     readOnly
                     className="w-full p-2 pr-10 bg-gray-100 tenancy-input-box"
                   />
-                  {/* <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                    <img
-                      src={calendaricon}
-                      alt="Calendar"
-                      className="w-5 h-5"
-                    />
-                  </div> */}
                 </div>
               </div>
             </div>
@@ -549,15 +622,8 @@ const CreateTenancyModal = () => {
                     name="first_rent_due_on"
                     value={formData.first_rent_due_on}
                     onChange={handleInputChange}
-                    className="w-full p-2 pr-10 focus:outline-none focus:border-gray-700 focus:ring-gray-700 tenancy-input-box"
+                    className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 tenancy-input-box"
                   />
-                  {/* <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                    <img
-                      src={calendaricon}
-                      alt="Calendar"
-                      className="w-5 h-5"
-                    />
-                  </div> */}
                 </div>
               </div>
             </div>
@@ -664,6 +730,12 @@ const CreateTenancyModal = () => {
                       <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[148px]">
                         AMOUNT
                       </th>
+                      <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[70px]">
+                        VAT
+                      </th>
+                      <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[43px]">
+                        TOTAL
+                      </th>
                       <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[61px]">
                         REMOVE
                       </th>
@@ -701,10 +773,11 @@ const CreateTenancyModal = () => {
                             ))}
                           </select>
                           <ChevronDown
-                            className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${selectOpenStates[`charge-${charge.id}`]
-                              ? "rotate-180"
-                              : ""
-                              }`}
+                            className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
+                              selectOpenStates[`charge-${charge.id}`]
+                                ? "rotate-180"
+                                : ""
+                            }`}
                           />
                         </td>
                         <td className="px-[10px] py-[5px] w-[162px]">
@@ -735,11 +808,6 @@ const CreateTenancyModal = () => {
                             }
                             className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
                           />
-                          {/* <img
-                            src={calendaricon}
-                            alt="Calendar"
-                            className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                          /> */}
                         </td>
                         <td className="px-[10px] py-[5px] w-[148px]">
                           <input
@@ -758,6 +826,26 @@ const CreateTenancyModal = () => {
                             min="0"
                           />
                         </td>
+                        <td className="px-[10px] py-[5px] w-[70px]">
+                          <input
+                            type="number"
+                            value={charge.vat}
+                            onChange={(e) =>
+                              handleAdditionalChargeChange(
+                                charge.id,
+                                "vat",
+                                e.target.value
+                              )
+                            }
+                            placeholder="Enter VAT"
+                            className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
+                            step="0.01"
+                            min="0"
+                          />
+                        </td>
+                        <td className="px-[10px] py-[5px] w-[43px] text-[14px] text-[#201D1E]">
+                          {charge.total}
+                        </td>
                         <td className="px-[10px] py-[5px] w-[30px]">
                           <button onClick={() => removeRow(charge.id)}>
                             <img
@@ -772,14 +860,12 @@ const CreateTenancyModal = () => {
                   </tbody>
                 </table>
               </div>
-              {/* Mobile Table */}
               <div className="tenancy-mobile-table">
                 {additionalCharges.map((charge) => (
                   <div
                     key={charge.id}
                     className="border-b border-[#E9E9E9] last:border-b-0"
                   >
-                    {/* First Row - 3 columns */}
                     <div className="flex justify-start border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
                       <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
                         NO
@@ -819,10 +905,11 @@ const CreateTenancyModal = () => {
                           ))}
                         </select>
                         <ChevronDown
-                          className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${selectOpenStates[`charge-${charge.id}`]
-                            ? "rotate-180"
-                            : ""
-                            }`}
+                          className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
+                            selectOpenStates[`charge-${charge.id}`]
+                              ? "rotate-180"
+                              : ""
+                          }`}
                         />
                       </div>
                       <div className="px-[10px] py-[13px] w-full">
@@ -842,12 +929,11 @@ const CreateTenancyModal = () => {
                       </div>
                     </div>
 
-                    {/* Second Row - 2 columns */}
                     <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
                       <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
                         DUE DATE
                       </div>
-                      <div className="px-[10px] flex items-center tenancy-modal-thead w-[41.5%] uppercase">
+                      <div className="px-[10px] flex items-center tenancy-modal-thead uppercase w-[41.5%]">
                         AMOUNT
                       </div>
                     </div>
@@ -865,11 +951,6 @@ const CreateTenancyModal = () => {
                           }
                           className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
                         />
-                        {/* <img
-                          src={calendaricon}
-                          alt="Calendar"
-                          className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                        /> */}
                       </div>
                       <div className="px-[10px] py-[13px] w-full">
                         <input
@@ -890,7 +971,37 @@ const CreateTenancyModal = () => {
                       </div>
                     </div>
 
-                    {/* Third Row - 1 column */}
+                    <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
+                      <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
+                        VAT
+                      </div>
+                      <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
+                        TOTAL
+                      </div>
+                    </div>
+                    <div className="flex justify-start border-b border-[#E9E9E9] h-[67px]">
+                      <div className="px-[9px] py-[13px] w-full">
+                        <input
+                          type="number"
+                          value={charge.vat}
+                          onChange={(e) =>
+                            handleAdditionalChargeChange(
+                              charge.id,
+                              "vat",
+                              e.target.value
+                            )
+                          }
+                          placeholder="Enter VAT"
+                          className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
+                          step="0.01"
+                          min="0"
+                        />
+                      </div>
+                      <div className="px-[10px] py-[13px] w-full text-[14px] text-[#201D1E]">
+                        {charge.total}
+                      </div>
+                    </div>
+
                     <div className="flex justify-between bg-[#F2F2F2] h-[57px] border-b border-[#E9E9E9]">
                       <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
                         REMOVE
@@ -958,7 +1069,7 @@ const CreateTenancyModal = () => {
                         <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[148px]">
                           AMOUNT
                         </th>
-                        <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[25px]">
+                        <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[70px]">
                           VAT
                         </th>
                         <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[43px]">
@@ -987,12 +1098,6 @@ const CreateTenancyModal = () => {
                               }
                               className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-700 focus:border-gray-700 bg-white tenancy-modal-table-select cursor-not-allowed"
                               disabled
-                              onFocus={() =>
-                                toggleSelectOpen(`payment-charge-${item.id}`)
-                              }
-                              onBlur={() =>
-                                toggleSelectOpen(`payment-charge-${item.id}`)
-                              }
                             >
                               <option value="">Choose</option>
                               {chargeTypes.map((type) => (
@@ -1001,12 +1106,6 @@ const CreateTenancyModal = () => {
                                 </option>
                               ))}
                             </select>
-                            {/* <ChevronDown
-                              className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${selectOpenStates[`payment-charge-${item.id}`]
-                                ? "rotate-180"
-                                : ""
-                                }`}
-                            /> */}
                           </td>
                           <td className="px-[10px] py-[5px] w-[162px]">
                             <input
@@ -1037,11 +1136,6 @@ const CreateTenancyModal = () => {
                               }
                               className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
                             />
-                            {/* <img
-                              src={calendaricon}
-                              alt="Calendar"
-                              className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                            /> */}
                           </td>
                           <td className="px-[10px] py-[5px] w-[55px] text-[14px] text-[#201D1E]">
                             {item.status}
@@ -1063,7 +1157,7 @@ const CreateTenancyModal = () => {
                               min="0"
                             />
                           </td>
-                          <td className="px-[10px] py-[5px] w-[25px]">
+                          <td className="px-[10px] py-[5px] w-[70px]">
                             <input
                               type="number"
                               value={item.vat}
@@ -1094,10 +1188,10 @@ const CreateTenancyModal = () => {
                       key={item.id}
                       className="tenancy-mobile-payment-section"
                     >
-                      {/* First Row - Header */}
                       <div
-                        className={`flex justify-between border-b border-[#E9E9E9] h-[57px] rounded-t ${expandedStates[item.id] ? "bg-[#F2F2F2]" : "bg-white"
-                          }`}
+                        className={`flex justify-between border-b border-[#E9E9E9] h-[57px] rounded-t ${
+                          expandedStates[item.id] ? "bg-[#F2F2F2]" : "bg-white"
+                        }`}
                       >
                         <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
                           NO
@@ -1109,12 +1203,10 @@ const CreateTenancyModal = () => {
                           REASON
                         </div>
                       </div>
-                      {/* First Row - Content (Clickable) */}
                       <div
-                        className={`flex justify-between h-[67px] cursor-pointer ${expandedStates[item.id]
-                          ? "border-b border-[#E9E9E9]"
-                          : ""
-                          }`}
+                        className={`flex justify-between h-[67px] cursor-pointer ${
+                          expandedStates[item.id] ? "border-b border-[#E9E9E9]" : ""
+                        }`}
                         onClick={() => toggleExpand(item.id)}
                       >
                         <div className="px-[13px] py-[13px] text-[14px] text-[#201D1E]">
@@ -1146,10 +1238,11 @@ const CreateTenancyModal = () => {
                             ))}
                           </select>
                           <ChevronDown
-                            className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${selectOpenStates[`payment-charge-${item.id}`]
-                              ? "rotate-180"
-                              : ""
-                              }`}
+                            className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
+                              selectOpenStates[`payment-charge-${item.id}`]
+                                ? "rotate-180"
+                                : ""
+                            }`}
                           />
                         </div>
                         <div className="px-[10px] py-[13px] w-[30%]">
@@ -1171,12 +1264,10 @@ const CreateTenancyModal = () => {
 
                       {expandedStates[item.id] && (
                         <>
-                          {/* Second Row - Header */}
                           <div
-                            className={`flex justify-between border-b border-[#E9E9E9] h-[57px] rounded-t ${expandedStates[item.id]
-                              ? "bg-[#F2F2F2]"
-                              : "bg-white"
-                              }`}
+                            className={`flex justify-between border-b border-[#E9E9E9] h-[57px] rounded-t ${
+                              expandedStates[item.id] ? "bg-[#F2F2F2]" : "bg-white"
+                            }`}
                           >
                             <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
                               DUE DATE
@@ -1188,7 +1279,6 @@ const CreateTenancyModal = () => {
                               AMOUNT
                             </div>
                           </div>
-                          {/* Second Row - Content */}
                           <div className="flex justify-between border-b border-[#E9E9E9] h-[67px]">
                             <div className="px-[9px] py-[13px] relative w-full">
                               <input
@@ -1203,11 +1293,6 @@ const CreateTenancyModal = () => {
                                 }
                                 className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-700 focus:border-gray-700 tenancy-modal-table-input"
                               />
-                              {/* <img
-                                src={calendaricon}
-                                alt="Calendar"
-                                className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                              /> */}
                             </div>
                             <div className="py-[10px] text-[14px] text-[#201D1E]">
                               {item.status}
@@ -1231,12 +1316,10 @@ const CreateTenancyModal = () => {
                             </div>
                           </div>
 
-                          {/* Third Row - Header */}
                           <div
-                            className={`flex justify-between border-b border-[#E9E9E9] h-[57px] rounded-t ${expandedStates[item.id]
-                              ? "bg-[#F2F2F2]"
-                              : "bg-white"
-                              }`}
+                            className={`flex justify-between border-b border-[#E9E9E9] h-[57px] rounded-t ${
+                              expandedStates[item.id] ? "bg-[#F2F2F2]" : "bg-white"
+                            }`}
                           >
                             <div className="px-[10px] flex items-center tenancy-modal-thead uppercase w-[50%]">
                               VAT
@@ -1245,7 +1328,6 @@ const CreateTenancyModal = () => {
                               TOTAL
                             </div>
                           </div>
-                          {/* Third Row - Content */}
                           <div className="flex justify-between h-[57px]">
                             <div className="px-[13px] py-[13px] w-full">
                               <input
@@ -1292,4 +1374,4 @@ const CreateTenancyModal = () => {
   );
 };
 
-export default CreateTenancyModal;
+export default CreateTenancyModal; 
