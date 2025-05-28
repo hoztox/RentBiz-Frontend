@@ -2,7 +2,7 @@ import React from "react";
 import "./editunitmodal.css";
 import UnitFormFlow from "./Unit Form Flow/UnitFormFlow";
 
-const EditUnitModal = ({ open, onClose, title }) => {
+const EditUnitModal = ({ open, onClose, title ,unitId}) => {
   return (
     <div
       onClick={onClose}
@@ -15,7 +15,7 @@ const EditUnitModal = ({ open, onClose, title }) => {
                     ${open ? "scale-100 opacity-100" : "scale-125 opacity-0"}`}
       >
         {/* Content Here */}
-        <UnitFormFlow title={title} onClose={onClose} />
+        <UnitFormFlow title={title} onClose={onClose}  unitId={unitId}/>
       </div>
     </div>
   );
