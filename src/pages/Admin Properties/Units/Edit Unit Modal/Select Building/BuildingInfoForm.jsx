@@ -2,22 +2,24 @@ import React, { useState, useEffect } from "react";
 import "./buildinginfoform.css";
 import { ChevronDown } from "lucide-react";
 import axios from "axios";
-import PropTypes from "prop-types"; // Added PropTypes import
+import PropTypes from "prop-types";
 import { BASE_URL } from "../../../../../utils/config";
 
 const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
   const [formState, setFormState] = useState(
-    initialData || {
-      buildingId: "",
-      building_name: "",
-      description: "",
-      building_address: "",
-      building_no: "",
-      plot_no: "",
-    }
+    initialData && initialData.buildingId
+      ? { ...initialData }
+      : {
+          buildingId: "",
+          building_name: "",
+          description: "",
+          building_address: "",
+          building_no: "",
+          plot_no: "",
+        }
   );
   const [buildings, setBuildings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Changed to false to avoid initial loading state
   const [error, setError] = useState(null);
   const [isSelectFocused, setIsSelectFocused] = useState(false);
 
@@ -48,19 +50,21 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
   }, []);
 
   useEffect(() => {
-    const fetchBuildingDetails = async () => {
-      if (!formState.buildingId) {
-        setFormState((prev) => ({
-          ...prev,
-          building_name: "",
-          description: "",
-          building_address: "",
-          building_no: "",
-          plot_no: "",
-        }));
-        return;
-      }
+    // Only fetch building details if buildingId is a non-empty string
+    if (!formState.buildingId || typeof formState.buildingId !== "string" || formState.buildingId.trim() === "") {
+      setFormState((prev) => ({
+        ...prev,
+        building_name: "",
+        description: "",
+        building_address: "",
+        building_no: "",
+        plot_no: "",
+      }));
+      setLoading(false);
+      return;
+    }
 
+    const fetchBuildingDetails = async () => {
       setLoading(true);
       try {
         const response = await axios.get(`${BASE_URL}/company/buildings/${formState.buildingId}`);
@@ -89,6 +93,7 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
         setLoading(false);
       }
     };
+
     fetchBuildingDetails();
   }, [formState.buildingId]);
 
@@ -106,7 +111,7 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const requiredFields = ["buildingId", "building_name", "description", "building_address", "building_no", "plot_no"];
-    const missingFields = requiredFields.filter((field) => !formState[field]);
+    const missingFields = requiredFields.filter((field) => !formState[field] || formState[field].trim() === "");
     if (missingFields.length > 0) {
       setError(`Please fill required fields: ${missingFields.join(", ")}`);
       return;
@@ -117,7 +122,7 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
     }
 
     const tempData = {
-      unitId, // Include unitId in tempData
+      unitId,
       buildingId: formState.buildingId,
       building_name: formState.building_name,
       description: formState.description,
@@ -232,11 +237,10 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
   );
 };
 
-// Added PropTypes for consistency with the second form
 BuildingInfoForm.propTypes = {
   onNext: PropTypes.func.isRequired,
   initialData: PropTypes.object,
-  unitId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), 
+  unitId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default BuildingInfoForm;

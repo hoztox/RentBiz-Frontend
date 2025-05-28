@@ -82,7 +82,6 @@ const Units = () => {
     console.log("Units: Selected unitId:", unitId);
     setSelectedUnitId(unitId);
     setTimeout(() => {
-      console.log("Units: Opening update modal with unitId:", unitId);
       setUpdateUnitModalOpen(true);
     });
   };
