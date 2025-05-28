@@ -231,7 +231,7 @@ const Units = () => {
                         : ""
                     }`}
                   >
-                    {unit.unit_status}
+                    {unit.unit_status.charAt(0).toUpperCase() + unit.unit_status.slice(1)}
                   </span>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
