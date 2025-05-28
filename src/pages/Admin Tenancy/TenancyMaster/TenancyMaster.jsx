@@ -18,7 +18,6 @@ const TenancyMaster = () => {
   const [expandedRows, setExpandedRows] = useState({});
   const [tenancies, setTenancies] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sortOrder, setSortOrder] = useState("asc"); // New state for sort order
   const itemsPerPage = 10;
   const { openModal } = useModal();
 
@@ -65,6 +64,7 @@ const TenancyMaster = () => {
     if (window.confirm("Are you sure you want to delete this tenancy?")) {
       try {
         await axios.delete(`${BASE_URL}/company/tenancies/${tenancyId}/`);
+        // Refetch tenancies after deletion
         await fetchTenancies();
         console.log(`Deleted tenancy with ID: ${tenancyId}`);
       } catch (error) {
@@ -85,28 +85,15 @@ const TenancyMaster = () => {
     openModal("tenancy-update", tenancy);
   };
 
-  // Toggle sort order when clicking ID header
-  const handleSort = () => {
-    setSortOrder(prev => prev === "asc" ? "desc" : "asc");
-  };
-
-  // Filter and sort tenancies
-  const filteredData = tenancies
-    .filter(
-      (tenancy) =>
-        tenancy.tenancy_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        tenancy.tenant?.tenant_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        tenancy.building?.building_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        tenancy.unit?.unit_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        tenancy.status?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (sortOrder === "asc") {
-        return a.id - b.id;
-      } else {
-        return b.id - a.id;
-      }
-    });
+  // Filter tenancies based on search term
+  const filteredData = tenancies.filter(
+    (tenancy) =>
+      tenancy.tenancy_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tenancy.tenant?.tenant_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tenancy.building?.building_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tenancy.unit?.unit_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tenancy.status?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const paginatedData = filteredData.slice(
@@ -175,9 +162,7 @@ const TenancyMaster = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-[#E9E9E9] h-[57px]">
-              <th className="px-5 text-left tenancy-thead cursor-pointer" onClick={handleSort}>
-                ID {sortOrder === "asc" ? "↑" : "↓"}
-              </th>
+              <th className="px-5 text-left tenancy-thead">ID</th>
               <th className="px-5 text-left tenancy-thead w-[15%]">TENANT NAME</th>
               <th className="pl-5 text-left tenancy-thead w-[15%]">BUILDING NAME</th>
               <th className="pl-5 text-left tenancy-thead w-[12%]">UNIT NAME</th>
@@ -208,11 +193,14 @@ const TenancyMaster = () => {
                         ? "bg-[#FFF3E0] text-[#F57C00]"
                         : tenancy.status === "terminated"
                           ? "bg-[#FFE6E6] text-[#D32F2F]"
-                          : "bg-[#E0F7E0] text-[#388E3C]"
+                          : tenancy.status === "closed"
+                            ? "bg-[#E0E0E0] text-[#616161]"
+                            : "bg-[#E0F7E0] text-[#388E3C]"
                       }`}
                   >
                     {tenancy.status.charAt(0).toUpperCase() + tenancy.status.slice(1)}
                   </span>
+
                 </td>
                 <td className="pl-12 pr-5 pt-2 text-center">
                   <button onClick={() => openModal("tenancy-view", tenancy)}>
@@ -225,6 +213,7 @@ const TenancyMaster = () => {
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
                   <button
+                    // onClick={() => openModal("tenancy-update", tenancy)}>
                     onClick={() => openUpdateModal(tenancy)}>
                     <img
                       src={editicon}
@@ -249,9 +238,7 @@ const TenancyMaster = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="tenancy-table-row-head">
-              <th className="px-5 w-[50%] text-left tenancy-thead tenancy-id-column cursor-pointer" onClick={handleSort}>
-                ID {sortOrder === "asc" ? "↑" : "↓"}
-              </th>
+              <th className="px-5 w-[50%] text-left tenancy-thead tenancy-id-column">ID</th>
               <th className="px-3 w-[50%] text-left tenancy-thead tenancy-tenant-column">TENANT NAME</th>
               <th className="px-5 text-right tenancy-thead"></th>
             </tr>
@@ -305,17 +292,20 @@ const TenancyMaster = () => {
                             <div className="tenancy-dropdown-label">STATUS</div>
                             <div className="tenancy-dropdown-value">
                               <span
-                                className={`px-[10px] py-[5px] h-[24px] rounded-[4px] tenancy-status ${tenancy.status === "active"
-                                  ? "bg-[#E8EFF6] text-[#1458A2]"
-                                  : tenancy.status === "pending"
-                                    ? "bg-[#FFF3E0] text-[#F57C00]"
-                                    : tenancy.status === "terminated"
-                                      ? "bg-[#FFE6E6] text-[#D32F2F]"
-                                      : "bg-[#E0F7E0] text-[#388E3C]"
+                                className={`px-[10px] py-[5px] rounded-[4px] w-[69px] tenancy-status ${tenancy.status === "active"
+                                    ? "bg-[#E8EFF6] text-[#1458A2]"
+                                    : tenancy.status === "pending"
+                                      ? "bg-[#FFF3E0] text-[#F57C00]"
+                                      : tenancy.status === "terminated"
+                                        ? "bg-[#FFE6E6] text-[#D32F2F]"
+                                        : tenancy.status === "closed"
+                                          ? "bg-[#E0E0E0] text-[#616161]"
+                                          : "bg-[#E0F7E0] text-[#388E3C]"
                                   }`}
                               >
                                 {tenancy.status.charAt(0).toUpperCase() + tenancy.status.slice(1)}
                               </span>
+
                             </div>
                           </div>
                         </div>
@@ -335,7 +325,7 @@ const TenancyMaster = () => {
                           <div className="tenancy-grid-item tenancy-action-column">
                             <div className="tenancy-dropdown-label">ACTION</div>
                             <div className="tenancy-dropdown-value tenancy-flex tenancy-items-center tenancy-gap-2">
-                              <button onClick={() => openUpdateModal(tenancy)}>
+                              <button onClick={() => openModal("tenancy-update", tenancy)}>
                                 <img
                                   src={editicon}
                                   alt="Edit"
@@ -413,7 +403,7 @@ const TenancyMaster = () => {
           </button>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

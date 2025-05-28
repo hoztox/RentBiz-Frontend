@@ -124,7 +124,7 @@ const UpdateTenancyModal = () => {
     }
   }, [modalState.isOpen, modalState.type, modalState.data]);
 
-  // Fetch tenants, buildings, and charge types
+  // Fetch data from APIs
   useEffect(() => {
     const fetchData = async () => {
       const companyId = getUserCompanyId();
@@ -138,14 +138,16 @@ const UpdateTenancyModal = () => {
         setLoading(true);
         setError(null);
 
-        const [tenantsRes, buildingsRes, chargeTypesRes] = await Promise.all([
+        const [tenantsRes, buildingsRes, unitsRes, chargeTypesRes] = await Promise.all([
           axios.get(`${BASE_URL}/company/tenant/company/${companyId}/`),
-          axios.get(`${BASE_URL}/company/buildings/vacant/${companyId}/`),
+          axios.get(`${BASE_URL}/company/buildings/company/${companyId}/`),
+          axios.get(`${BASE_URL}/company/units/company/${companyId}/`),
           axios.get(`${BASE_URL}/company/charges/company/${companyId}/`),
         ]);
 
         setTenants(tenantsRes.data);
         setBuildings(buildingsRes.data);
+        setUnits(unitsRes.data);
         setChargeTypes(chargeTypesRes.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -161,26 +163,6 @@ const UpdateTenancyModal = () => {
       fetchData();
     }
   }, [modalState.isOpen, modalState.type]);
-
-  // Fetch units when building changes
-  useEffect(() => {
-    const fetchUnits = async () => {
-      if (formData.building) {
-        try {
-          const response = await axios.get(
-            `${BASE_URL}/company/units/${formData.building}/vacant-units/`
-          );
-          setUnits(response.data);
-        } catch (error) {
-          console.error("Error fetching units:", error);
-          setUnits([]);
-        }
-      } else {
-        setUnits([]);
-      }
-    };
-    fetchUnits();
-  }, [formData.building]);
 
   // Update end_date and total_rent_receivable
   useEffect(() => {
@@ -329,11 +311,7 @@ const UpdateTenancyModal = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-      ...(name === "building" ? { unit: "" } : {}), // Reset unit when building changes
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleAdditionalChargeChange = (id, field, value) => {
@@ -542,6 +520,7 @@ const UpdateTenancyModal = () => {
       <div className="text-lg"></div>
     );
   }
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 update-tenancy-modal-overlay">
@@ -783,31 +762,6 @@ const UpdateTenancyModal = () => {
               className="w-full p-2 focus:outline-none focus:ring-gray-700 focus:border-gray-700 update-tenancy-input-box"
               disabled={loading}
             />
-          </div>
-          <div>
-            <label className="block update-tenancy-modal-label">Status*</label>
-            <div className="relative">
-              <select
-                name="status"
-                value={formData.status}
-                onChange={handleInputChange}
-                className="w-full p-2 appearance-none update-tenancy-input-box"
-                onFocus={() => toggleSelectOpen("status")}
-                onBlur={() => toggleSelectOpen("status")}
-                disabled={loading}
-              >
-                <option value="pending">Pending</option>
-                <option value="active">Active</option>
-                <option value="terminated">Terminated</option>
-                <option value="closed">Closed</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${selectOpenStates["status"] ? "rotate-180" : "rotate-0"}`}
-                width={22}
-                height={22}
-                color="#201D1E"
-              />
-            </div>
           </div>
         </div>
 
