@@ -218,7 +218,7 @@ const UnitFormFlow = ({ onClose, unitId }) => {
           progress={formProgress}
         />
       </div>
-      <div className="w-full h-[780px] px-[33px] pt-[50px] pb-[40px] overflow-y-scroll">
+      <div className="w-full h-[700px] desktop:h-[780px] px-[33px] pt-[50px] pb-[40px] overflow-y-scroll">
         <div className="building-modal-header flex justify-between items-center mb-[41px]">
           <h3 className="building-modal-title">{currentTitle}</h3>
           <button
