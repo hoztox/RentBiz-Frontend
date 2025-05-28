@@ -89,13 +89,10 @@ const TenancyConfirm = () => {
 
         // Update status
         status: "active",
-
-        // Include any other fields your API expects
-        // Add other fields as needed based on your API requirements
       };
 
-      await axios.put(
-        `${BASE_URL}/company/tenancies/${selectedTenancy.id}/`,
+      await axios.post(
+        `${BASE_URL}/company/tenancy/${selectedTenancy.id}/confirm/`,
         tenancyData
       );
 
