@@ -155,11 +155,19 @@ const CreateTenancyModal = () => {
     formData.no_payments,
     formData.first_rent_due_on,
   ]);
+  }, [
+    formData.start_date,
+    formData.rental_months,
+    formData.rent_per_frequency,
+    formData.no_payments,
+    formData.first_rent_due_on,
+  ]);
 
   // Generate payment schedule with VAT as amount
   useEffect(() => {
     if (
       formData.no_payments &&
+      formData.rental_months &&
       formData.rental_months &&
       formData.first_rent_due_on &&
       formData.rent_per_frequency &&
@@ -249,9 +257,13 @@ const CreateTenancyModal = () => {
       setExpandedStates(
         schedule.reduce((acc, item) => ({ ...acc, [item.id]: false }), {})
       );
+      setExpandedStates(
+        schedule.reduce((acc, item) => ({ ...acc, [item.id]: false }), {})
+      );
     }
   }, [
     formData.no_payments,
+    formData.rental_months,
     formData.rental_months,
     formData.first_rent_due_on,
     formData.rent_per_frequency,
@@ -410,7 +422,9 @@ const CreateTenancyModal = () => {
       end_date: formData.end_date,
       no_payments: parseInt(formData.no_payments),
       first_rent_due_on: formData.first_rent_due_on,
-      rent_per_frequency: parseFloat(formData.rent_per_frequency || 0).toFixed(2),
+      rent_per_frequency: parseFloat(formData.rent_per_frequency || 0).toFixed(
+        2
+      ),
       deposit: parseFloat(formData.deposit || 0).toFixed(2),
       commision: parseFloat(formData.commision || 0).toFixed(2),
       remarks: formData.remarks,
@@ -442,6 +456,10 @@ const CreateTenancyModal = () => {
       closeModal();
       navigate("/admin/tenancy-master");
     } catch (error) {
+      console.error(
+        "Error submitting tenancy:",
+        error.response?.data || error.message
+      );
       console.error(
         "Error submitting tenancy:",
         error.response?.data || error.message
@@ -491,6 +509,9 @@ const CreateTenancyModal = () => {
                   className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
                     selectOpenStates["tenant"] ? "rotate-180" : "rotate-0"
                   }`}
+                  className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
+                    selectOpenStates["tenant"] ? "rotate-180" : "rotate-0"
+                  }`}
                   width={22}
                   height={22}
                   color="#201D1E"
@@ -516,6 +537,9 @@ const CreateTenancyModal = () => {
                   ))}
                 </select>
                 <ChevronDown
+                  className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
+                    selectOpenStates["building"] ? "rotate-180" : "rotate-0"
+                  }`}
                   className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
                     selectOpenStates["building"] ? "rotate-180" : "rotate-0"
                   }`}
@@ -549,6 +573,9 @@ const CreateTenancyModal = () => {
                     className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
                       selectOpenStates["unit"] ? "rotate-180" : "rotate-0"
                     }`}
+                    className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
+                      selectOpenStates["unit"] ? "rotate-180" : "rotate-0"
+                    }`}
                     width={22}
                     height={22}
                     color="#201D1E"
@@ -579,6 +606,7 @@ const CreateTenancyModal = () => {
                     name="start_date"
                     value={formData.start_date}
                     onChange={handleInputChange}
+                    className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 tenancy-input-box"
                     className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 tenancy-input-box"
                   />
                 </div>
@@ -778,6 +806,11 @@ const CreateTenancyModal = () => {
                                 ? "rotate-180"
                                 : ""
                             }`}
+                            className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
+                              selectOpenStates[`charge-${charge.id}`]
+                                ? "rotate-180"
+                                : ""
+                            }`}
                           />
                         </td>
                         <td className="px-[10px] py-[5px] w-[162px]">
@@ -905,6 +938,11 @@ const CreateTenancyModal = () => {
                           ))}
                         </select>
                         <ChevronDown
+                          className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
+                            selectOpenStates[`charge-${charge.id}`]
+                              ? "rotate-180"
+                              : ""
+                          }`}
                           className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
                             selectOpenStates[`charge-${charge.id}`]
                               ? "rotate-180"
@@ -1070,6 +1108,7 @@ const CreateTenancyModal = () => {
                           AMOUNT
                         </th>
                         <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[70px]">
+                        <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[70px]">
                           VAT
                         </th>
                         <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[43px]">
@@ -1192,6 +1231,9 @@ const CreateTenancyModal = () => {
                         className={`flex justify-between border-b border-[#E9E9E9] h-[57px] rounded-t ${
                           expandedStates[item.id] ? "bg-[#F2F2F2]" : "bg-white"
                         }`}
+                        className={`flex justify-between border-b border-[#E9E9E9] h-[57px] rounded-t ${
+                          expandedStates[item.id] ? "bg-[#F2F2F2]" : "bg-white"
+                        }`}
                       >
                         <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
                           NO
@@ -1238,6 +1280,11 @@ const CreateTenancyModal = () => {
                             ))}
                           </select>
                           <ChevronDown
+                            className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
+                              selectOpenStates[`payment-charge-${item.id}`]
+                                ? "rotate-180"
+                                : ""
+                            }`}
                             className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
                               selectOpenStates[`payment-charge-${item.id}`]
                                 ? "rotate-180"
