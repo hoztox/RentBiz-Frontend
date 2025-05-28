@@ -81,6 +81,10 @@ const TenancyMaster = () => {
     }));
   };
 
+  const openUpdateModal = (tenancy) => {
+    openModal("tenancy-update", tenancy);
+  };
+
   // Filter tenancies based on search term
   const filteredData = tenancies.filter(
     (tenancy) =>
@@ -205,7 +209,9 @@ const TenancyMaster = () => {
                   </button>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={() => openModal("tenancy-update", tenancy)}>
+                  <button
+                    // onClick={() => openModal("tenancy-update", tenancy)}>
+                    onClick={() => openUpdateModal(tenancy)}>
                     <img
                       src={editicon}
                       alt="Edit"
@@ -391,7 +397,7 @@ const TenancyMaster = () => {
           </button>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 
