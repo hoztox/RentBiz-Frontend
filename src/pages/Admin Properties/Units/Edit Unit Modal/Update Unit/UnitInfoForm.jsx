@@ -2,25 +2,26 @@ import React, { useState, useEffect } from "react";
 import "./unitinfoform.css";
 import { ChevronDown } from "lucide-react";
 import axios from "axios";
-import PropTypes from "prop-types"; // Added PropTypes import
+import PropTypes from "prop-types";
 import { BASE_URL } from "../../../../../utils/config";
 
 const UnitInfoForm = ({ onNext, onBack, initialData, unitId }) => {
-  const [formState, setFormState] = useState(
-    initialData || {
-      unit_name: "",
-      unit_type: "",
-      address: "",
-      description: "",
-      remarks: "",
-      no_of_bedrooms: "",
-      no_of_bathrooms: "",
-      premise_no: "",
-      unit_status: "active",
-      company: null,
-      user: null,
-    }
-  );
+  console.log("UnitInfoForm rendered with unitId:", unitId);
+  console.log("Initial data received:", initialData);
+
+  const [formState, setFormState] = useState({
+    unit_name: initialData?.unit_name || "",
+    unit_type: initialData?.unit_type?.id || initialData?.unit_type || "", // Extract id if unit_type is an object
+    address: initialData?.address || "",
+    description: initialData?.description || "",
+    remarks: initialData?.remarks || "",
+    no_of_bedrooms: initialData?.no_of_bedrooms || "",
+    no_of_bathrooms: initialData?.no_of_bathrooms || "",
+    premise_no: initialData?.premise_no || "",
+    unit_status: initialData?.unit_status || "active",
+    company: null,
+    user: null,
+  });
   const [unitTypes, setUnitTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -57,13 +58,33 @@ const UnitInfoForm = ({ onNext, onBack, initialData, unitId }) => {
       }
     };
 
+    // Update formState with company and user IDs
     setFormState((prev) => ({
       ...prev,
       company: getUserCompanyId(),
       user: getRelevantUserId(),
     }));
+
     fetchUnitTypes();
   }, []);
+
+  // Handle initialData changes (e.g., when editing an existing unit)
+  useEffect(() => {
+    if (initialData) {
+      setFormState((prev) => ({
+        ...prev,
+        unit_name: initialData.unit_name || "",
+        unit_type: initialData.unit_type?.id || initialData.unit_type || "", // Ensure unit_type is set to id
+        address: initialData.address || "",
+        description: initialData.description || "",
+        remarks: initialData.remarks || "",
+        no_of_bedrooms: initialData.no_of_bedrooms || "",
+        no_of_bathrooms: initialData.no_of_bathrooms || "",
+        premise_no: initialData.premise_no || "",
+        unit_status: initialData.unit_status || "active",
+      }));
+    }
+  }, [initialData]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -90,7 +111,7 @@ const UnitInfoForm = ({ onNext, onBack, initialData, unitId }) => {
     }
 
     const tempData = {
-      unitId, // Include unitId in tempData
+      unitId,
       company: formState.company,
       user: formState.user,
       unit_name: formState.unit_name || null,
@@ -109,7 +130,7 @@ const UnitInfoForm = ({ onNext, onBack, initialData, unitId }) => {
 
   const handleBack = () => {
     const tempData = {
-      unitId, // Include unitId in tempData
+      unitId,
       company: formState.company,
       user: formState.user,
       unit_name: formState.unit_name || null,
@@ -279,12 +300,11 @@ const UnitInfoForm = ({ onNext, onBack, initialData, unitId }) => {
   );
 };
 
-// Added PropTypes for consistency with BuildingInfoForm
 UnitInfoForm.propTypes = {
   onNext: PropTypes.func.isRequired,
   onBack: PropTypes.func.isRequired,
   initialData: PropTypes.object,
-  unitId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), // Match the type from BuildingInfoForm
+  unitId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 };
 
 export default UnitInfoForm;

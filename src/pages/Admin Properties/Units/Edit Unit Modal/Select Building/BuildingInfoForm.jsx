@@ -6,20 +6,16 @@ import PropTypes from "prop-types";
 import { BASE_URL } from "../../../../../utils/config";
 
 const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
-  const [formState, setFormState] = useState(
-    initialData && initialData.buildingId
-      ? { ...initialData }
-      : {
-          buildingId: "",
-          building_name: "",
-          description: "",
-          building_address: "",
-          building_no: "",
-          plot_no: "",
-        }
-  );
+  const [formState, setFormState] = useState({
+    buildingId: "",
+    building_name: "",
+    description: "",
+    building_address: "",
+    building_no: "",
+    plot_no: "",
+  });
   const [buildings, setBuildings] = useState([]);
-  const [loading, setLoading] = useState(false); // Changed to false to avoid initial loading state
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isSelectFocused, setIsSelectFocused] = useState(false);
 
@@ -36,7 +32,8 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
         const companyId = getUserCompanyId();
         if (!companyId) throw new Error("Company ID not found.");
         const response = await axios.get(`${BASE_URL}/company/buildings/company/${companyId}`);
-        setBuildings(Array.isArray(response.data) ? response.data : []);
+        const fetchedBuildings = Array.isArray(response.data) ? response.data : [];
+        setBuildings(fetchedBuildings);
         setError(null);
       } catch (error) {
         console.error("Error fetching buildings:", error);
@@ -50,52 +47,34 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
   }, []);
 
   useEffect(() => {
-    // Only fetch building details if buildingId is a non-empty string
-    if (!formState.buildingId || typeof formState.buildingId !== "string" || formState.buildingId.trim() === "") {
-      setFormState((prev) => ({
-        ...prev,
-        building_name: "",
-        description: "",
-        building_address: "",
-        building_no: "",
-        plot_no: "",
-      }));
-      setLoading(false);
-      return;
+    if (initialData) {
+      const buildingId = initialData.buildingId?.id || initialData.buildingId || "";
+      setFormState({
+        buildingId,
+        building_name: initialData.building_name || "",
+        description: initialData.description || "",
+        building_address: initialData.building_address || "",
+        building_no: initialData.building_no || "",
+        plot_no: initialData.plot_no || "",
+      });
     }
+  }, [initialData]);
 
-    const fetchBuildingDetails = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get(`${BASE_URL}/company/buildings/${formState.buildingId}`);
-        const building = response.data;
+  useEffect(() => {
+    if (formState.buildingId && buildings.length > 0) {
+      const selectedBuilding = buildings.find((b) => b.id === formState.buildingId);
+      if (selectedBuilding) {
         setFormState((prev) => ({
           ...prev,
-          building_name: building.building_name || "",
-          description: building.description || "",
-          building_address: building.building_address || "",
-          building_no: building.building_no || "",
-          plot_no: building.plot_no || "",
+          building_name: selectedBuilding.building_name || "",
+          description: selectedBuilding.description || "",
+          building_address: selectedBuilding.building_address || "",
+          building_no: selectedBuilding.building_no || "",
+          plot_no: selectedBuilding.plot_no || "",
         }));
-        setError(null);
-      } catch (error) {
-        console.error("Error fetching building details:", error);
-        setError("Failed to load building details.");
-        setFormState((prev) => ({
-          ...prev,
-          building_name: "",
-          description: "",
-          building_address: "",
-          building_no: "",
-          plot_no: "",
-        }));
-      } finally {
-        setLoading(false);
       }
-    };
-
-    fetchBuildingDetails();
-  }, [formState.buildingId]);
+    }
+  }, [formState.buildingId, buildings]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -111,11 +90,15 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const requiredFields = ["buildingId", "building_name", "description", "building_address", "building_no", "plot_no"];
-    const missingFields = requiredFields.filter((field) => !formState[field] || formState[field].trim() === "");
+    const missingFields = requiredFields.filter(
+      (field) => !formState[field] || formState[field].toString().trim() === ""
+    );
+
     if (missingFields.length > 0) {
       setError(`Please fill required fields: ${missingFields.join(", ")}`);
       return;
     }
+
     if (!unitId) {
       setError("Unit ID is required.");
       return;
@@ -130,7 +113,7 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
       building_no: formState.building_no,
       plot_no: formState.plot_no,
     };
-    console.log("Temporarily saved building data:", tempData);
+
     onNext(tempData);
   };
 
@@ -154,12 +137,14 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
               <option value="">Select Building</option>
               {loading ? (
                 <option value="">Loading...</option>
-              ) : (
+              ) : buildings.length > 0 ? (
                 buildings.map((building) => (
                   <option key={building.id} value={building.id}>
                     {building.building_name}
                   </option>
                 ))
+              ) : (
+                <option value="">No buildings available</option>
               )}
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -176,10 +161,9 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
             value={formState.description}
             onChange={handleInputChange}
             placeholder="Enter building description"
-            className="w-full building-info-form-inputs focus:border-gray-300 resize-none duration-200 cursor-not-allowed"
+            className="w-full building-info-form-inputs focus:border-gray-300 resize-none duration-200"
             required
             disabled={loading}
-            readOnly
           />
         </div>
         <div className="col-span-1">
@@ -189,10 +173,9 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
             value={formState.building_address}
             onChange={handleInputChange}
             placeholder="Enter building address"
-            className="w-full building-info-form-inputs focus:border-gray-300 resize-none duration-200 cursor-not-allowed"
+            className="w-full building-info-form-inputs focus:border-gray-300 resize-none duration-200"
             required
             disabled={loading}
-            readOnly
           />
         </div>
         <div className="col-span-1">
@@ -203,10 +186,9 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
             value={formState.building_no}
             onChange={handleInputChange}
             placeholder="Enter building number"
-            className="w-full building-info-form-inputs focus:border-gray-300 duration-200 cursor-not-allowed"
+            className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
             required
             disabled={loading}
-            readOnly
           />
         </div>
         <div className="col-span-1">
@@ -217,10 +199,9 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
             value={formState.plot_no}
             onChange={handleInputChange}
             placeholder="Enter plot number"
-            className="w-full building-info-form-inputs focus:border-gray-300 duration-200 cursor-not-allowed"
+            className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
             required
             disabled={loading}
-            readOnly
           />
         </div>
         <div className="next-btn-container mt-[29px] col-span-1 text-right">
