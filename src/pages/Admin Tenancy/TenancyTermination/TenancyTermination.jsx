@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "./TenancyTermination.css";
 import { ChevronDown } from "lucide-react";
 import downloadicon from "../../../assets/Images/Admin Tenancy/download-icon.svg";
@@ -7,6 +8,7 @@ import terminateicon from "../../../assets/Images/Admin Tenancy/terminate-icon.s
 import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
 import TenancyTerminateModal from "./TenancyTerminateModal/TenancyTerminateModal";
 import { useModal } from "../../../context/ModalContext";
+import { BASE_URL } from "../../../utils/config";
 
 const TenancyTermination = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -15,72 +17,98 @@ const TenancyTermination = () => {
   const [terminateModalOpen, setTerminateModalOpen] = useState(false);
   const [selectedTenancy, setSelectedTenancy] = useState(null);
   const [expandedRows, setExpandedRows] = useState({});
+  const [tenancies, setTenancies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { openModal } = useModal();
   const itemsPerPage = 10;
+
+  const getUserCompanyId = () => {
+    const role = localStorage.getItem("role")?.toLowerCase();
+
+    if (role === "company") {
+      return localStorage.getItem("company_id");
+    } else if (role === "user" || role === "admin") {
+      try {
+        const userCompanyId = localStorage.getItem("company_id");
+        return userCompanyId ? JSON.parse(userCompanyId) : null;
+      } catch (e) {
+        console.error("Error parsing user company ID:", e);
+        return null;
+      }
+    }
+
+    return null;
+  };
+
+  // Fetch tenancies from the backend
+  useEffect(() => {
+    const fetchTenancies = async () => {
+      try {
+        const companyId = getUserCompanyId();
+        setLoading(true);
+        const response = await axios.get(`${BASE_URL}/company/tenancies/company/${companyId}/`);
+        setTenancies(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.log("Error fetching tenancies:", err);
+
+        setError("Failed to fetch tenancies. Please try again later.");
+        setLoading(false);
+      }
+    };
+    fetchTenancies();
+  }, []);
 
   const openTerminateModal = (tenancy) => {
     setSelectedTenancy(tenancy);
     setTerminateModalOpen(true);
   };
 
-  const handleTerminateAction = () => {
-    console.log("Confirmed action for tenancy:", selectedTenancy);
+  const handleTerminateAction = async () => {
+    if (selectedTenancy) {
+      try {
+        const response = await axios.put(`${BASE_URL}/company/tenancies/${selectedTenancy.id}/`, {
+          is_termination: true,
+          status: "terminated",
+        });
+        if (response.status === 200) {
+          // Update local state to reflect termination
+          setTenancies((prev) =>
+            prev.map((t) =>
+              t.id === selectedTenancy.id
+                ? { ...t, is_termination: true, status: "terminated" }
+                : t
+            )
+          );
+          console.log(`Tenancy ${selectedTenancy.id} terminated successfully`); 
+        } else {
+          console.error("Failed to terminate tenancy");
+        }
+      } catch (error) {
+        console.error("Error terminating tenancy:", error);
+      }
+    }
     setTerminateModalOpen(false);
   };
 
-  const toggleRowExpand = (id) => {
+  const toggleRowExpand = (tenancy_code) => {
     setExpandedRows((prev) => ({
       ...prev,
-      [id]: !prev[id],
+      [tenancy_code]: !prev[tenancy_code],
     }));
   };
 
-  const demoData = [
-    {
-      id: "#TC0018-1",
-      tenant: "Furniture shop",
-      building: "DANAT ALZAHIA",
-      unit: "SHOP10",
-      endDate: "09 Sept 2024",
-    },
-    {
-      id: "#TC0018-2",
-      tenant: "Furniture shop",
-      building: "DANAT ALZAHIA",
-      unit: "SHOP10",
-      endDate: "09 Sept 2024",
-    },
-    {
-      id: "#TC0018-3",
-      tenant: "Furniture shop",
-      building: "DANAT ALZAHIA",
-      unit: "SHOP10",
-      endDate: "09 Sept 2024",
-    },
-    {
-      id: "#TC0018-4",
-      tenant: "Furniture shop",
-      building: "DANAT ALZAHIA",
-      unit: "SHOP10",
-      endDate: "09 Sept 2024",
-    },
-    {
-      id: "#TC0018-5",
-      tenant: "Furniture shop",
-      building: "DANAT ALZAHIA",
-      unit: "SHOP10",
-      endDate: "09 Sept 2024",
-    },
-  ];
-
-  const filteredData = demoData.filter(
+  const filteredData = tenancies.filter(
     (tenancy) =>
-      tenancy.tenant.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenancy.building.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenancy.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenancy.unit.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (tenancy.endDate &&
-        tenancy.endDate.toLowerCase().includes(searchTerm.toLowerCase()))
+      tenancy.status !== "terminated" &&
+      tenancy.status !== "closed" &&
+      (tenancy.tenant?.tenant_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tenancy.building?.building_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tenancy.tenancy_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tenancy.unit?.unit_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (tenancy.end_date &&
+          tenancy.end_date.toLowerCase().includes(searchTerm.toLowerCase())))
   );
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -92,6 +120,14 @@ const TenancyTermination = () => {
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+  if (loading) {
+    return <div className="p-5">Loading tenancies...</div>;
+  }
+
+  if (error) {
+    return <div className="p-5 text-red-500">{error}</div>;
+  }
 
   return (
     <div className="border border-[#E9E9E9] rounded-md tenancy-table">
@@ -118,9 +154,8 @@ const TenancyTermination = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
+                  }`}
               />
             </div>
             <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 tterm-download-btn">
@@ -139,22 +174,22 @@ const TenancyTermination = () => {
           <thead>
             <tr className="border-b border-[#E9E9E9] h-[57px]">
               <th className="px-4 text-left tenancy-thead whitespace-nowrap">
-                ID
+                Tenancy Code
               </th>
               <th className="px-4 text-left tenancy-thead whitespace-nowrap">
-                NAME
+                Tenant Name
               </th>
               <th className="px-4 text-left tenancy-thead whitespace-nowrap">
-                BUILDING NAME
+                Building Name
               </th>
               <th className="px-4 text-left tenancy-thead whitespace-nowrap w-[20%]">
-                UNIT NAME
+                Unit Name
               </th>
               <th className="px-4 text-left tenancy-thead whitespace-nowrap w-[12%]">
-                END DATE
+                End Date
               </th>
               <th className="px-4 pr-6 text-right tenancy-thead whitespace-nowrap">
-                ACTION
+                Action
               </th>
             </tr>
           </thead>
@@ -164,17 +199,11 @@ const TenancyTermination = () => {
                 key={index}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-4 text-left tenancy-data">{tenancy.id}</td>
-                <td className="px-4 text-left tenancy-data">
-                  {tenancy.tenant}
-                </td>
-                <td className="px-4 text-left tenancy-data">
-                  {tenancy.building}
-                </td>
-                <td className="px-4 text-left tenancy-data">{tenancy.unit}</td>
-                <td className="px-4 text-left tenancy-data">
-                  {tenancy.endDate}
-                </td>
+                <td className="px-4 text-left tenancy-data">{tenancy.tenancy_code}</td>
+                <td className="px-4 text-left tenancy-data">{tenancy.tenant?.tenant_name || "N/A"}</td>
+                <td className="px-4 text-left tenancy-data">{tenancy.building?.building_name || "N/A"}</td>
+                <td className="px-4 text-left tenancy-data">{tenancy.unit?.unit_name || "N/A"}</td>
+                <td className="px-4 text-left tenancy-data">{tenancy.end_date}</td>
                 <td className="px-4 text-right">
                   <div className="flex gap-3 justify-end items-center">
                     <button onClick={() => openModal("tenancy-update")}>
@@ -203,91 +232,128 @@ const TenancyTermination = () => {
           <thead>
             <tr className="tenancy-table-row-head">
               <th className="px-5 w-[53%] text-left tenancy-thead tterm-id-column">
-                ID
+                Tenancy Code
               </th>
               <th className="px-5 w-[47%] text-left tenancy-thead tterm-end-date-column">
-                NAME
+                Tenant Name
               </th>
               <th className="px-5 text-right tenancy-thead"></th>
             </tr>
           </thead>
           <tbody>
             {paginatedData.map((tenancy) => (
-              <React.Fragment key={tenancy.id}>
+              <React.Fragment key={tenancy.tenancy_code}>
                 <tr
-                  className={`${
-                    expandedRows[tenancy.id]
-                      ? "tterm-mobile-no-border"
-                      : "tterm-mobile-with-border"
-                  } border-b border-[#E9E9E9] h-[57px]`}
+                  className={`${expandedRows[tenancy.tenancy_code]
+                    ? "tterm-mobile-no-border"
+                    : "tterm-mobile-with-border"
+                    } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left tenancy-data tterm-id-column">
-                    {tenancy.id}
+                    {tenancy.tenancy_code}
                   </td>
                   <td className="px-5 text-left tenancy-data tterm-end-date-column">
-                    {tenancy.tenant}
+                    {tenancy.tenant?.tenant_name || "N/A"} 
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
-                      className={`tenancy-dropdown-field ${
-                        expandedRows[tenancy.id] ? "active" : ""
-                      }`}
-                      onClick={() => toggleRowExpand(tenancy.id)}
+                      className={`tenancy-dropdown-field ${expandedRows[tenancy.tenancy_code] ? "active" : ""
+                        }`}
+                      onClick={() => toggleRowExpand(tenancy.tenancy_code)}
                     >
                       <img
                         src={downarrow}
                         alt="drop-down-arrow"
-                        className={`tenancy-dropdown-img ${
-                          expandedRows[tenancy.id] ? "text-white" : ""
-                        }`}
+                        className={`tenancy-dropdown-img ${expandedRows[tenancy.tenancy_code] ? "text-white" : ""
+                          }`}
                       />
                     </div>
                   </td>
                 </tr>
-                {expandedRows[tenancy.id] && (
+                {expandedRows[tenancy.tenancy_code] && (
                   <tr className="tterm-mobile-with-border border-b border-[#E9E9E9]">
                     <td colSpan={3} className="px-5">
                       <div className="tenancy-dropdown-content">
                         <div className="tterm-grid">
                           <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">
-                              BUILDING NAME
-                            </div>
-                            <div className="tterm-dropdown-value">
-                              {tenancy.building}
-                            </div>
+                            <div className="tterm-dropdown-label">BUILDING NAME</div>
+                            <div className="tterm-dropdown-value">{tenancy.building?.building_name || "N/A"}</div>
                           </div>
                           <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">
-                              UNIT NAME
-                            </div>
-                            <div className="tterm-dropdown-value">
-                              {tenancy.unit}
-                            </div>
+                            <div className="tterm-dropdown-label">UNIT NAME</div>
+                            <div className="tterm-dropdown-value">{tenancy.unit?.unit_name || "N/A"}</div>
                           </div>
                         </div>
                         <div className="tterm-grid">
                           <div className="tterm-grid-item">
+                            <div className="tterm-dropdown-label">START DATE</div>
+                            <div className="tterm-dropdown-value">{tenancy.start_date || "N/A"}</div>
+                          </div>
+                          <div className="tterm-grid-item">
                             <div className="tterm-dropdown-label">END DATE</div>
-                            <div className="tterm-dropdown-value">
-                              {tenancy.endDate}
+                            <div className="tterm-dropdown-value">{tenancy.end_date || "N/A"}</div>
+                          </div>
+                        </div>
+                        <div className="tterm-grid">
+                          <div className="tterm-grid-item">
+                            <div className="tterm-dropdown-label">RENTAL MONTHS</div>
+                            <div className="tterm-dropdown-value">{tenancy.rental_months || "N/A"}</div>
+                          </div>
+                          <div className="tterm-grid-item">
+                            <div className="tterm-dropdown-label">RENT PER FREQUENCY</div>
+                            <div className="tterm-dropdown-value">${tenancy.rent_per_frequency || "N/A"}</div>
+                          </div>
+                        </div>
+                        <div className="tterm-grid">
+                          <div className="tterm-grid-item">
+                            <div className="tterm-dropdown-label">TOTAL RENT</div>
+                            <div className="tterm-dropdown-value">${tenancy.total_rent_receivable || "N/A"}</div>
+                          </div>
+                          <div className="tterm-grid-item">
+                            <div className="tterm-dropdown-label">DEPOSIT</div>
+                            <div className="tterm-dropdown-value">${tenancy.deposit || "N/A"}</div>
+                          </div>
+                        </div>
+                        <div className="tterm-grid">
+                          <div className="tterm-grid-item">
+                            <div className="tterm-dropdown-label">COMMISSION</div>
+                            <div className="tterm-dropdown-value">${tenancy.commision || "N/A"}</div>
+                          </div>
+                          <div className="tterm-grid-item">
+                            <div className="tterm-dropdown-label">STATUS</div>
+                            <div className="tterm-dropdown-value">{tenancy.status || "N/A"}</div>
+                          </div>
+                        </div>
+                        {tenancy.additional_charges?.length > 0 && (
+                          <div className="tterm-grid">
+                            <div className="tterm-grid-item">
+                              <div className="tterm-dropdown-label">ADDITIONAL CHARGES</div>
+                              <div className="tterm-dropdown-value">
+                                {tenancy.additional_charges.map((charge, index) => (
+                                  <div key={index} className="mb-2">
+                                    {charge.reason}: ${charge.amount} (Due: {charge.due_date})
+                                  </div>
+                                ))}
+                              </div>
                             </div>
+                          </div>
+                        )}
+                        <div className="tterm-grid">
+                          <div className="tterm-grid-item">
+                            <div className="tterm-dropdown-label">REMARKS</div>
+                            <div className="tterm-dropdown-value">{tenancy.remarks || "N/A"}</div>
                           </div>
                           <div className="tterm-grid-item">
                             <div className="tterm-dropdown-label">ACTION</div>
                             <div className="tterm-dropdown-value tterm-flex tterm-items-center mt-[10px] ml-[5px]">
-                              <button
-                                onClick={() => openModal("tenancy-update")}
-                              >
+                              <button onClick={() => openModal("tenancy-update")}>
                                 <img
                                   src={editicon}
                                   alt="Edit"
                                   className="w-[18px] h-[18px] tterm-action-btn duration-200"
                                 />
                               </button>
-                              <button
-                                onClick={() => openTerminateModal(tenancy)}
-                              >
+                              <button onClick={() => openTerminateModal(tenancy)}>
                                 <img
                                   src={terminateicon}
                                   alt="Terminate"
@@ -333,11 +399,10 @@ const TenancyTermination = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
-                currentPage === startPage + i
-                  ? "bg-[#1458A2] text-white"
-                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-              }`}
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${currentPage === startPage + i
+                ? "bg-[#1458A2] text-white"
+                : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+                }`}
               onClick={() => setCurrentPage(startPage + i)}
             >
               {startPage + i}
