@@ -175,9 +175,8 @@ const CloseTenancy = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
+                  }`}
               />
             </div>
             <button className="flex items-center justify-center gap-2 md:w-[122px] h-[38px] rounded-md duration-200 tclose-download-btn">
@@ -202,7 +201,7 @@ const CloseTenancy = () => {
               <th className="px-5 text-left tenancy-thead">RENTAL MONTHS</th>
               <th className="px-5 text-left tenancy-thead w-[12%]">END DATE</th>
               <th className="pl-12 pr-5 text-center tenancy-thead w-[10%]">VIEW</th>
-              <th className="px-5 text-center tenancy-thead w-[10%]">CLOSE</th>
+              <th className="px-5 text-center tenancy-thead w-[11%]">CLOSE</th>
               <th className="px-5 pr-6 text-right tenancy-thead">ACTION</th>
             </tr>
           </thead>
@@ -240,13 +239,12 @@ const CloseTenancy = () => {
                     <button
                       onClick={() => handleCloseTenancy(tenancy.tenancyId)}
                       disabled={tenancy.isClose}
-                      className={`px-1 py-1 rounded-md ${
-                        tenancy.isClose
-                          ? "bg-gray-300 cursor-not-allowed"
-                          : "bg-[#1458A2] text-white hover:bg-[#104682]"
-                      } duration-200`}
+                      className={`px-4 py-2 rounded-md tenancy-data ${tenancy.isClose
+                          ? "!text-gray-400 cursor-not-allowed"
+                          : "!text-blue-600 hover:text-blue-800"
+                        } duration-200`}
                     >
-                      Click to Close
+                      {tenancy.isClose ? "Closed" : "Click to Close"}
                     </button>
                   </td>
                   <td className="px-5 tclose-flex-gap-23 h-[57px]">
@@ -291,11 +289,10 @@ const CloseTenancy = () => {
               paginatedData.map((tenancy) => (
                 <React.Fragment key={tenancy.id}>
                   <tr
-                    className={`${
-                      expandedRows[tenancy.id]
-                        ? "tclose-mobile-no-border"
-                        : "tclose-mobile-with-border"
-                    } border-b border-[#E9E9E9] h-[57px]`}
+                    className={`${expandedRows[tenancy.id]
+                      ? "tclose-mobile-no-border"
+                      : "tclose-mobile-with-border"
+                      } border-b border-[#E9E9E9] h-[57px]`}
                   >
                     <td className="px-5 text-left tenancy-data">{tenancy.id}</td>
                     <td className="px-5 text-left tenancy-data tclose-end-date-column">
@@ -303,17 +300,15 @@ const CloseTenancy = () => {
                     </td>
                     <td className="py-4 flex items-center justify-end h-[57px]">
                       <div
-                        className={`tenancy-dropdown-field ${
-                          expandedRows[tenancy.id] ? "active" : ""
-                        }`}
+                        className={`tenancy-dropdown-field ${expandedRows[tenancy.id] ? "active" : ""
+                          }`}
                         onClick={() => toggleRowExpand(tenancy.id)}
                       >
                         <img
                           src={downarrow}
                           alt="drop-down-arrow"
-                          className={`tenancy-dropdown-img ${
-                            expandedRows[tenancy.id] ? "text-white" : ""
-                          }`}
+                          className={`tenancy-dropdown-img ${expandedRows[tenancy.id] ? "text-white" : ""
+                            }`}
                         />
                       </div>
                     </td>
@@ -361,13 +356,12 @@ const CloseTenancy = () => {
                                 <button
                                   onClick={() => handleCloseTenancy(tenancy.tenancyId)}
                                   disabled={tenancy.isClose}
-                                  className={`px-4 py-2 rounded-md ${
-                                    tenancy.isClose
-                                      ? "bg-gray-300 cursor-not-allowed"
-                                      : "bg-[#1458A2] text-white hover:bg-[#104682]"
-                                  } duration-200`}
+                                  className={` py-2 rounded-md font-medium ${tenancy.isClose
+                                    ? "text-gray-400 cursor-not-allowed"
+                                    : "text-blue-600 hover:text-blue-800"
+                                    } duration-200`}
                                 >
-                                  Click to Close
+                                  {tenancy.isClose ? "Closed" : "Click to Close"}
                                 </button>
                               </div>
                             </div>
@@ -429,11 +423,10 @@ const CloseTenancy = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
-                currentPage === startPage + i
-                  ? "bg-[#1458A2] text-white"
-                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-              }`}
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${currentPage === startPage + i
+                ? "bg-[#1458A2] text-white"
+                : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+                }`}
               onClick={() => setCurrentPage(startPage + i)}
             >
               {startPage + i}
