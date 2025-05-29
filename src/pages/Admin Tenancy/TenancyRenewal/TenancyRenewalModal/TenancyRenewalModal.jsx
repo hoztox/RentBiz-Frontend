@@ -17,7 +17,9 @@ const TenancyRenewalModal = () => {
   const [showPaymentSchedule, setShowPaymentSchedule] = useState(true);
   const [tenants, setTenants] = useState([]);
   const [buildings, setBuildings] = useState([]);
+  const [displayBuildings, setDisplayBuildings] = useState([]); // New state for combined buildings
   const [units, setUnits] = useState([]);
+  const [displayUnits, setDisplayUnits] = useState([]); // New state for combined units
   const [chargeTypes, setChargeTypes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -75,9 +77,9 @@ const TenancyRenewalModal = () => {
     if (modalState.isOpen && modalState.type === "tenancy-renew" && modalState.data) {
       const tenancy = modalState.data;
       setFormData({
-        tenant: tenancy.tenantId?.toString() || "",
-        building: tenancy.buildingId?.toString() || "",
-        unit: tenancy.unitId?.toString() || "",
+        tenant: tenancy.tenant?.id?.toString() || tenancy.tenantId?.toString() || "",
+        building: tenancy.building?.id?.toString() || tenancy.buildingId?.toString() || "",
+        unit: tenancy.unit?.id?.toString() || tenancy.unitId?.toString() || "",
         rental_months: "",
         start_date: "",
         end_date: "",
@@ -98,7 +100,7 @@ const TenancyRenewalModal = () => {
     }
   }, [modalState.isOpen, modalState.type, modalState.data]);
 
-  // Fetch tenants, buildings, and charge types
+  // Fetch tenants, buildings, units, and charge types
   useEffect(() => {
     const fetchData = async () => {
       const companyId = getUserCompanyId();
@@ -112,17 +114,35 @@ const TenancyRenewalModal = () => {
         setLoading(true);
         setError(null);
 
-        const [tenantsRes, buildingsRes, unitsRes, chargeTypesRes] = await Promise.all([
+        const [tenantsRes, buildingsRes, vacantBuildingsRes, chargeTypesRes] = await Promise.all([
           axios.get(`${BASE_URL}/company/tenant/company/${companyId}/`),
           axios.get(`${BASE_URL}/company/buildings/company/${companyId}/`),
-          axios.get(`${BASE_URL}/company/units/company/${companyId}/`),
+          axios.get(`${BASE_URL}/company/buildings/vacant/${companyId}/`),
           axios.get(`${BASE_URL}/company/charges/company/${companyId}/`),
         ]);
 
         setTenants(tenantsRes.data);
         setBuildings(buildingsRes.data);
-        setUnits(unitsRes.data);
         setChargeTypes(chargeTypesRes.data);
+
+        // Combine vacant buildings with the current tenancy's building
+        const tenancyBuilding = modalState.data?.building || (modalState.data?.buildingId ? { id: modalState.data.buildingId, building_name: `Building ${modalState.data.buildingId}` } : null);
+        if (tenancyBuilding) {
+          const combinedBuildings = [...vacantBuildingsRes.data];
+          const isTenancyBuildingInVacant = vacantBuildingsRes.data.some(
+            (building) => building.id === tenancyBuilding.id
+          );
+          if (!isTenancyBuildingInVacant) {
+            combinedBuildings.push(tenancyBuilding);
+          }
+          const uniqueBuildings = Array.from(
+            new Map(combinedBuildings.map((building) => [building.id, building])).values()
+          );
+          setDisplayBuildings(uniqueBuildings);
+        } else {
+          setDisplayBuildings(vacantBuildingsRes.data);
+        }
+
       } catch (error) {
         console.error("Error fetching data:", error);
         const errorMessage = error.response?.data?.message || "Failed to load data. Please try again.";
@@ -136,7 +156,51 @@ const TenancyRenewalModal = () => {
     if (modalState.isOpen && modalState.type === "tenancy-renew") {
       fetchData();
     }
-  }, [modalState.isOpen, modalState.type]);
+  }, [modalState.isOpen, modalState.type, modalState.data]);
+
+  // Fetch units and combine with current tenancy's unit
+  useEffect(() => {
+    const fetchUnits = async () => {
+      if (formData.building) {
+        try {
+          const response = await axios.get(
+            `${BASE_URL}/company/units/${formData.building}/vacant-units/`
+          );
+          const vacantUnits = response.data;
+          setUnits(vacantUnits);
+
+          // Combine vacant units with the current tenancy's unit
+          const tenancyUnit = modalState.data?.unit || (modalState.data?.unitId ? { id: modalState.data.unitId, unit_name: `Unit ${modalState.data.unitId}` } : null);
+          const tenancyBuildingId = modalState.data?.building?.id || modalState.data?.buildingId;
+          if (tenancyUnit && parseInt(formData.building) === tenancyBuildingId) {
+            const combinedUnits = [...vacantUnits];
+            const isTenancyUnitInVacant = vacantUnits.some(
+              (unit) => unit.id === tenancyUnit.id
+            );
+            if (!isTenancyUnitInVacant) {
+              combinedUnits.push(tenancyUnit);
+            }
+            const uniqueUnits = Array.from(
+              new Map(combinedUnits.map((unit) => [unit.id, unit])).values()
+            );
+            setDisplayUnits(uniqueUnits);
+          } else {
+            setDisplayUnits(vacantUnits);
+          }
+
+        } catch (error) {
+          console.error("Error fetching units:", error);
+          setUnits([]);
+          setDisplayUnits([]);
+          toast.error("Failed to load units.");
+        }
+      } else {
+        setUnits([]);
+        setDisplayUnits([]);
+      }
+    };
+    fetchUnits();
+  }, [formData.building, modalState.data]);
 
   // Update end_date and total_rent_receivable
   useEffect(() => {
@@ -324,7 +388,7 @@ const TenancyRenewalModal = () => {
           }
           return updatedItem;
         }
-        return item;
+        return charge;
       })
     );
   };
@@ -556,7 +620,7 @@ const TenancyRenewalModal = () => {
                 disabled={loading}
               >
                 <option value="">Choose</option>
-                {buildings.map((building) => (
+                {displayBuildings.map((building) => (
                   <option key={building.id} value={building.id}>
                     {building.building_name}
                   </option>
@@ -579,22 +643,22 @@ const TenancyRenewalModal = () => {
                   value={formData.unit}
                   onChange={handleInputChange}
                   className="w-full p-2 appearance-none update-tenancy-input-box"
-                  onFocus={() => toggleSelectOpen("unit")}
-                  onBlur={() => toggleSelectOpen("unit")}
+                  onFocus={() => toggleSelectOpen("unit-selection")}
+                  onBlur={() => toggleSelectOpen("unit-selection")}
                   disabled={loading}
                 >
                   <option value="">Choose</option>
-                  {units.map((unit) => (
+                  {displayUnits.map((unit) => (
                     <option key={unit.id} value={unit.id}>
                       {unit.unit_name}
                     </option>
                   ))}
                 </select>
                 <ChevronDown
-                  className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${selectOpenStates["unit"] ? "rotate-180" : "rotate-0"}`}
+                  className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${selectOpenStates["unit-selection"] ? "rotate-180" : "rotate-0"}`}
                   width={22}
                   height={22}
-                  color="#201D1E"
+                  color="#1D1E9E"
                 />
               </div>
             </div>
@@ -733,31 +797,6 @@ const TenancyRenewalModal = () => {
               disabled={loading}
             />
           </div>
-          {/* <div>
-            <label className="block update-tenancy-modal-label">Status*</label>
-            <div className="relative">
-              <select
-                name="status"
-                value={formData.status}
-                onChange={handleInputChange}
-                className="w-full p-2 appearance-none update-tenancy-input-box"
-                onFocus={() => toggleSelectOpen("status")}
-                onBlur={() => toggleSelectOpen("status")}
-                disabled={loading}
-              >
-                <option value="pending">Pending</option>
-                <option value="active">Active</option>
-                <option value="terminated">Terminated</option>
-                <option value="closed">Closed</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${selectOpenStates["status"] ? "rotate-180" : "rotate-0"}`}
-                width={22}
-                height={22}
-                color="#201D1E"
-              />
-            </div>
-          </div> */}
         </div>
 
         <div className="mt-6">

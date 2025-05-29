@@ -259,7 +259,7 @@ const Buildings = () => {
                 <td className="px-5 text-left bldg-data">
                   {building.building_address || "N/A"}
                 </td>
-                <td className="pl-12 pr-5 text-left bldg-data">N/A</td>
+                <td className="pl-12 pr-5 text-left bldg-data">{building.unit_count}</td>
                 <td className="px-5 text-left bldg-data">
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
