@@ -151,7 +151,6 @@ const UpdateTenancyModal = () => {
           axios.get(`${BASE_URL}/company/tenant/company/${companyId}/`),
           axios.get(`${BASE_URL}/company/buildings/company/${companyId}/`),
           axios.get(`${BASE_URL}/company/buildings/vacant/${companyId}/`),
-
           axios.get(`${BASE_URL}/company/charges/company/${companyId}/`),
         ]);
 
@@ -165,14 +164,12 @@ const UpdateTenancyModal = () => {
         const tenancyBuilding = modalState.data?.building;
         if (tenancyBuilding) {
           const combinedBuildings = [...buildingsVacant.data];
-          // Check if the tenancy's building is already in the vacant buildings list
           const isTenancyBuildingInVacant = buildingsVacant.data.some(
             (building) => building.id === tenancyBuilding.id
           );
           if (!isTenancyBuildingInVacant) {
             combinedBuildings.push(tenancyBuilding);
           }
-          // Remove duplicates based on building ID
           const uniqueBuildings = Array.from(
             new Map(combinedBuildings.map((building) => [building.id, building])).values()
           );
@@ -239,6 +236,11 @@ const UpdateTenancyModal = () => {
     };
     fetchUnits();
   }, [formData.building, modalState.data]);
+
+
+  // console.log("Current unit ID:", modalState.data?.unit?.id);
+  // console.log("formData.unit:", formData.unit);
+  // console.log("displayUnits:", displayUnits);
 
 
 
@@ -376,7 +378,6 @@ const UpdateTenancyModal = () => {
     chargeTypes,
   ]);
 
-  // Only render for "tenancy-update" type and valid data
   if (!modalState.isOpen || modalState.type !== "tenancy-update" || !modalState.data) {
     return null;
   }
@@ -511,6 +512,7 @@ const UpdateTenancyModal = () => {
     const companyId = getUserCompanyId();
     const userId = getRelevantUserId();
     const tenancyId = modalState.data?.id;
+    console.log('tenancy id', tenancyId);
 
     if (!companyId) {
       toast.error("Company ID is missing or invalid");
@@ -577,9 +579,9 @@ const UpdateTenancyModal = () => {
 
       console.log("Tenancy updated successfully:", response.data);
       toast.success("Tenancy updated successfully");
+
       triggerRefresh();
       closeModal();
-      navigate("/admin/tenancy-master");
     } catch (error) {
       console.error("Error updating tenancy:", error.response?.data || error.message);
       const errorMessage =
@@ -651,7 +653,7 @@ const UpdateTenancyModal = () => {
           <div>
             <label className="block update-tenancy-modal-label">Building*</label>
             <div className="relative">
-               <select
+              <select
                 name="building"
                 value={formData.building}
                 onChange={handleInputChange}
@@ -700,7 +702,7 @@ const UpdateTenancyModal = () => {
                   className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${selectOpenStates["unit-selection"] ? "rotate-180" : "rotate-0"}`}
                   width={22}
                   height={22}
-                  color="#201D1E" 
+                  color="#201D1E"
                 />
               </div>
             </div>

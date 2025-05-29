@@ -19,7 +19,7 @@ const TenancyRenewal = () => {
   const [tenancies, setTenancies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { openModal } = useModal();
+  const { openModal, refreshCounter } = useModal();
   const itemsPerPage = 10;
 
   const getUserCompanyId = () => {
@@ -44,6 +44,15 @@ const TenancyRenewal = () => {
     openModal("tenancy-update", tenancy);
   };
 
+  const handleRenewClick = (tenancy) => {
+    openModal("tenancy-renew", {
+      tenancyId: tenancy.id,
+      tenant: tenancy.tenant || { id: tenancy.tenant?.id, tenant_name: tenancy.tenant?.tenant_name },
+      building: tenancy.building || { id: tenancy.building?.id, building_name: tenancy.building?.building_name },
+      unit: tenancy.unit || { id: tenancy.unit?.id, unit_name: tenancy.unit?.unit_name },
+    });
+  };
+
   // Fetch tenancy data using Axios
   const fetchTenancies = async () => {
     try {
@@ -62,7 +71,7 @@ const TenancyRenewal = () => {
 
   useEffect(() => {
     fetchTenancies();
-  }, []);
+  }, [refreshCounter]);
 
   const handleDelete = async (tenancyId) => {
     if (window.confirm("Are you sure you want to delete this tenancy?")) {
@@ -113,17 +122,8 @@ const TenancyRenewal = () => {
       [id]: !prev[id],
     }));
   };
-  // Function to handle opening the renewal modal with tenant, building, and unit
-  const handleRenewClick = (tenancy) => {
-    openModal("tenancy-renew", {
-      tenancyId: tenancy.id,
-      tenantId: tenancy.tenant?.id?.toString() || "",
-      buildingId: tenancy.building?.id?.toString() || "",
-      unitId: tenancy.unit?.id?.toString() || "",
-    });
-  };
 
-  if (loading) return <div className="p-5">Loading...</div>;
+  if (loading) return <div className="p-5"></div>;
   if (error) return <div className="p-5">{error}</div>;
 
   return (
@@ -198,14 +198,14 @@ const TenancyRenewal = () => {
                 <td className="px-5 text-left tenancy-data">
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] tenancy-status ${tenancy.status === "active"
-                        ? "bg-[#E8EFF6] text-[#1458A2]"
-                        : tenancy.status === "pending"
-                          ? "bg-[#FFF3E0] text-[#F57C00]"
-                          : tenancy.status === "terminated"
-                            ? "bg-[#FFE6E6] text-[#D32F2F]"
-                            : tenancy.status === "closed"
-                              ? "bg-[#E0E0E0] text-[#616161]"
-                              : "bg-[#E0F7E0] text-[#388E3C]"
+                      ? "bg-[#E8EFF6] text-[#1458A2]"
+                      : tenancy.status === "pending"
+                        ? "bg-[#FFF3E0] text-[#F57C00]"
+                        : tenancy.status === "terminated"
+                          ? "bg-[#FFE6E6] text-[#D32F2F]"
+                          : tenancy.status === "closed"
+                            ? "bg-[#E0E0E0] text-[#616161]"
+                            : "bg-[#E0F7E0] text-[#388E3C]"
                       }`}
                   >
                     {tenancy.status.charAt(0).toUpperCase() + tenancy.status.slice(1)}
@@ -373,7 +373,7 @@ const TenancyRenewal = () => {
                           <div className="trenew-grid-item w-[20%]">
                             <div className="trenew-dropdown-label">ACTION</div>
                             <div className="trenew-dropdown-value trenew-flex trenew-items-center mt-[10px] ml-[7px]">
-                              <button onClick={() => openModal("tenancy-update")}>
+                              <button onClick={() => openUpdateModal(tenancy)}>
                                 <img
                                   src={editicon}
                                   alt="Edit"

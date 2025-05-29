@@ -50,8 +50,9 @@ const CloseTenancy = () => {
         const response = await axios.get(`${BASE_URL}/company/tenancies/termination/${companyId}/`, {
           params: { status: "closed" },
         });
-        setTenancies(response.data);
-        console.log("Fetched Tenancies:", response.data);
+        const sortedTenancies = response.data.sort((a, b) => a.id - b.id);
+        setTenancies(sortedTenancies);
+        console.log("Fetched and sorted Tenancies:", sortedTenancies);
       } catch (error) {
         console.error("Error fetching tenancies:", error);
       }
@@ -62,7 +63,7 @@ const CloseTenancy = () => {
   // Map backend data to frontend format
   const formattedData = tenancies.map((tenancy) => {
     const formatted = {
-      id: tenancy.tenancy_code || "N/A",
+      id: tenancy.id || "N/A",
       tenant: tenancy.tenant?.tenant_name || "N/A",
       building: tenancy.building?.building_name || "N/A",
       unit: tenancy.unit?.unit_name || "N/A",
@@ -71,9 +72,9 @@ const CloseTenancy = () => {
       endDate: tenancy.end_date || "N/A",
       view: viewicon,
       isClose: tenancy.is_close || false,
-      tenancyId: tenancy.id,
+      tenancy_code: tenancy.tenancy_code,
     };
-    console.log("Formatted Tenancy:", formatted); // Debug log
+    console.log("Formatted Tenancy:", formatted);
     return formatted;
   });
 
@@ -117,31 +118,31 @@ const CloseTenancy = () => {
   };
 
   // Handle delete action
-  const handleDelete = async (tenancyId) => {
+  const handleDelete = async (id) => {
     try {
-      await axios.delete(`${BASE_URL}/company/tenancies/${tenancyId}/`);
-      setTenancies(tenancies.filter((tenancy) => tenancy.tenancy_code !== tenancyId));
-      console.log("Deleted Tenancy ID:", tenancyId); // Debug log
+      await axios.delete(`${BASE_URL}/company/tenancies/${id}/`);
+      setTenancies(tenancies.filter((tenancy) => tenancy.tenancy_code !== id));
+      console.log("Deleted Tenancy ID:", id); // Debug log
     } catch (error) {
       console.error("Error deleting tenancy:", error);
     }
   };
 
   // Handle close tenancy action
-  const handleCloseTenancy = async (tenancyId) => {
+  const handleCloseTenancy = async (id) => {
     try {
-      await axios.put(`${BASE_URL}/company/tenancies/${tenancyId}/`, {
+      await axios.put(`${BASE_URL}/company/tenancies/${id}/`, {
         is_close: true,
         status: "closed",
       });
       setTenancies((prev) =>
         prev.map((tenancy) =>
-          tenancy.id === tenancyId
+          tenancy.id === id
             ? { ...tenancy, is_close: true, status: "closed" }
             : tenancy
         )
       );
-      console.log("Closed Tenancy ID:", tenancyId); // Debug log
+      console.log("Closed Tenancy ID:", id); // Debug log
     } catch (error) {
       console.error("Error closing tenancy:", error);
     }
@@ -237,11 +238,11 @@ const CloseTenancy = () => {
                   </td>
                   <td className="px-5 text-center">
                     <button
-                      onClick={() => handleCloseTenancy(tenancy.tenancyId)}
+                      onClick={() => handleCloseTenancy(tenancy.id)}
                       disabled={tenancy.isClose}
                       className={`px-4 py-2 rounded-md tenancy-data ${tenancy.isClose
-                          ? "!text-gray-400 cursor-not-allowed"
-                          : "!text-blue-600 hover:text-blue-800"
+                        ? "!text-gray-400 cursor-not-allowed"
+                        : "!text-blue-600 hover:text-blue-800"
                         } duration-200`}
                     >
                       {tenancy.isClose ? "Closed" : "Click to Close"}
@@ -354,7 +355,7 @@ const CloseTenancy = () => {
                               <div className="tclose-dropdown-label">CLOSE</div>
                               <div className="tclose-dropdown-value">
                                 <button
-                                  onClick={() => handleCloseTenancy(tenancy.tenancyId)}
+                                  onClick={() => handleCloseTenancy(tenancy.id)}
                                   disabled={tenancy.isClose}
                                   className={` py-2 rounded-md font-medium ${tenancy.isClose
                                     ? "text-gray-400 cursor-not-allowed"

@@ -17,7 +17,7 @@ const TenancyConfirm = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
-  const { openModal } = useModal();
+  const { openModal, refreshCounter, triggerRefresh } = useModal();
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [selectedTenancy, setSelectedTenancy] = useState(null);
   const [tenancies, setTenancies] = useState([]);
@@ -55,9 +55,10 @@ const TenancyConfirm = () => {
         const response = await axios.get(`${BASE_URL}/company/tenancies/pending/${companyId}/`, {
           params: { status: "pending" }
         });
-        console.log('Fetched Pending Tenancies:', response.data);
-
-        setTenancies(response.data);
+        // Sort tenancies by id in ascending order
+        const sortedTenancies = response.data.sort((a, b) => a.id - b.id);
+        setTenancies(sortedTenancies);
+        console.log('Fetched and sorted Pending Tenancies:', sortedTenancies);
       } catch (error) {
         console.error("Error fetching tenancies:", error);
       } finally {
@@ -65,7 +66,7 @@ const TenancyConfirm = () => {
       }
     };
     fetchTenancies();
-  }, []);
+  }, [refreshCounter]);
 
   const openConfirmModal = (tenancy) => {
     setSelectedTenancy(tenancy);
@@ -76,18 +77,13 @@ const TenancyConfirm = () => {
     try {
       // Extract only the IDs for the nested objects
       const tenancyData = {
-        // Include basic fields
         tenancy_code: selectedTenancy.tenancy_code,
         rental_months: selectedTenancy.rental_months,
         start_date: selectedTenancy.start_date,
         end_date: selectedTenancy.end_date,
-
-        // Extract IDs from nested objects
         tenant: selectedTenancy.tenant?.id,
         building: selectedTenancy.building?.id,
         unit: selectedTenancy.unit?.id,
-
-        // Update status
         status: "active",
       };
 
@@ -96,17 +92,13 @@ const TenancyConfirm = () => {
         tenancyData
       );
 
-      setTenancies((prev) =>
-        prev.map((t) =>
-          t.id === selectedTenancy.id ? { ...t, status: "active" } : t
-        )
-      );
+      // Trigger refresh to update the tenancies list
+      triggerRefresh();
 
       console.log('Confirmed Tenancy:', tenancyData);
       setConfirmModalOpen(false);
     } catch (error) {
       console.error("Error confirming tenancy:", error);
-      // Optional: Add user-friendly error handling
       if (error.response?.data?.errors) {
         console.error("Validation errors:", error.response.data.errors);
       }

@@ -24,7 +24,7 @@ const TenancyRenewalModal = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const { tenancyId } = modalState.data || {};
+
 
   const [formData, setFormData] = useState({
     tenant: "",
@@ -46,6 +46,7 @@ const TenancyRenewalModal = () => {
   const [additionalCharges, setAdditionalCharges] = useState([]);
   const [paymentSchedule, setPaymentSchedule] = useState([]);
   const [expandedStates, setExpandedStates] = useState({});
+  const [vacantBuildings, setVacantBuildings] = useState({});
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -74,31 +75,32 @@ const TenancyRenewalModal = () => {
 
   // Initialize form data when modal opens
   useEffect(() => {
-    if (modalState.isOpen && modalState.type === "tenancy-renew" && modalState.data) {
-      const tenancy = modalState.data;
-      setFormData({
-        tenant: tenancy.tenant?.id?.toString() || tenancy.tenantId?.toString() || "",
-        building: tenancy.building?.id?.toString() || tenancy.buildingId?.toString() || "",
-        unit: tenancy.unit?.id?.toString() || tenancy.unitId?.toString() || "",
-        rental_months: "",
-        start_date: "",
-        end_date: "",
-        no_payments: "",
-        first_rent_due_on: "",
-        rent_per_frequency: "",
-        total_rent_receivable: "",
-        deposit: "",
-        commision: "",
-        remarks: "",
-        status: "pending",
-      });
+  if (modalState.isOpen && modalState.type === "tenancy-renew" && modalState.data) {
+    console.log("modalState.data:", JSON.stringify(modalState.data, null, 2)); // Debug
+    const tenancy = modalState.data;
+    setFormData({
+      tenant: tenancy.tenant?.id?.toString() || tenancy.tenantId?.toString() || "",
+      building: tenancy.building?.id?.toString() || tenancy.buildingId?.toString() || "",
+      unit: tenancy.unit?.id?.toString() || tenancy.unitId?.toString() || "",
+      rental_months: "",
+      start_date: "",
+      end_date: "",
+      no_payments: "",
+      first_rent_due_on: "",
+      rent_per_frequency: "",
+      total_rent_receivable: "",
+      deposit: "",
+      commision: "",
+      remarks: "",
+      status: "pending",
+    });
 
-      setAdditionalCharges([]);
-      setPaymentSchedule([]);
-      setExpandedStates({});
-      setError(null);
-    }
-  }, [modalState.isOpen, modalState.type, modalState.data]);
+    setAdditionalCharges([]);
+    setPaymentSchedule([]);
+    setExpandedStates({});
+    setError(null);
+  }
+}, [modalState.isOpen, modalState.type, modalState.data]);
 
   // Fetch tenants, buildings, units, and charge types
   useEffect(() => {
@@ -114,7 +116,7 @@ const TenancyRenewalModal = () => {
         setLoading(true);
         setError(null);
 
-        const [tenantsRes, buildingsRes, vacantBuildingsRes, chargeTypesRes] = await Promise.all([
+        const [tenantsRes, buildingsRes, buildingsVacant, chargeTypesRes] = await Promise.all([
           axios.get(`${BASE_URL}/company/tenant/company/${companyId}/`),
           axios.get(`${BASE_URL}/company/buildings/company/${companyId}/`),
           axios.get(`${BASE_URL}/company/buildings/vacant/${companyId}/`),
@@ -123,13 +125,15 @@ const TenancyRenewalModal = () => {
 
         setTenants(tenantsRes.data);
         setBuildings(buildingsRes.data);
+        setVacantBuildings(buildingsVacant.data);
+
         setChargeTypes(chargeTypesRes.data);
 
         // Combine vacant buildings with the current tenancy's building
-        const tenancyBuilding = modalState.data?.building || (modalState.data?.buildingId ? { id: modalState.data.buildingId, building_name: `Building ${modalState.data.buildingId}` } : null);
+        const tenancyBuilding = modalState.data?.building;
         if (tenancyBuilding) {
-          const combinedBuildings = [...vacantBuildingsRes.data];
-          const isTenancyBuildingInVacant = vacantBuildingsRes.data.some(
+          const combinedBuildings = [...buildingsVacant.data];
+          const isTenancyBuildingInVacant = buildingsVacant.data.some(
             (building) => building.id === tenancyBuilding.id
           );
           if (!isTenancyBuildingInVacant) {
@@ -140,7 +144,7 @@ const TenancyRenewalModal = () => {
           );
           setDisplayBuildings(uniqueBuildings);
         } else {
-          setDisplayBuildings(vacantBuildingsRes.data);
+          setDisplayBuildings(buildingsVacant.data);
         }
 
       } catch (error) {
@@ -158,49 +162,54 @@ const TenancyRenewalModal = () => {
     }
   }, [modalState.isOpen, modalState.type, modalState.data]);
 
-  // Fetch units and combine with current tenancy's unit
+
   useEffect(() => {
-    const fetchUnits = async () => {
-      if (formData.building) {
-        try {
-          const response = await axios.get(
-            `${BASE_URL}/company/units/${formData.building}/vacant-units/`
+  const fetchUnits = async () => {
+    if (formData.building) {
+      try {
+        const response = await axios.get(
+          `${BASE_URL}/company/units/${formData.building}/vacant-units/`
+        );
+        const vacantUnits = response.data;
+        setUnits(vacantUnits);
+
+        const tenancyUnit = modalState.data?.unit || { id: modalState.data?.unitId }; // Fallback
+        const tenancyBuildingId = modalState.data?.building?.id || modalState.data?.buildingId;
+        if (tenancyUnit?.id && parseInt(formData.building) === tenancyBuildingId) {
+          const combinedUnits = [...vacantUnits];
+          const isTenancyUnitInVacant = vacantUnits.some(
+            (unit) => unit.id === tenancyUnit.id
           );
-          const vacantUnits = response.data;
-          setUnits(vacantUnits);
-
-          // Combine vacant units with the current tenancy's unit
-          const tenancyUnit = modalState.data?.unit || (modalState.data?.unitId ? { id: modalState.data.unitId, unit_name: `Unit ${modalState.data.unitId}` } : null);
-          const tenancyBuildingId = modalState.data?.building?.id || modalState.data?.buildingId;
-          if (tenancyUnit && parseInt(formData.building) === tenancyBuildingId) {
-            const combinedUnits = [...vacantUnits];
-            const isTenancyUnitInVacant = vacantUnits.some(
-              (unit) => unit.id === tenancyUnit.id
-            );
-            if (!isTenancyUnitInVacant) {
-              combinedUnits.push(tenancyUnit);
-            }
-            const uniqueUnits = Array.from(
-              new Map(combinedUnits.map((unit) => [unit.id, unit])).values()
-            );
-            setDisplayUnits(uniqueUnits);
-          } else {
-            setDisplayUnits(vacantUnits);
+          if (!isTenancyUnitInVacant) {
+            combinedUnits.push({
+              id: tenancyUnit.id,
+              unit_name: tenancyUnit.unit_name || `Unit ${tenancyUnit.id}`,
+            });
           }
-
-        } catch (error) {
-          console.error("Error fetching units:", error);
-          setUnits([]);
-          setDisplayUnits([]);
-          toast.error("Failed to load units.");
+          const uniqueUnits = Array.from(
+            new Map(combinedUnits.map((unit) => [unit.id, unit])).values()
+          );
+          setDisplayUnits(uniqueUnits);
+        } else {
+          setDisplayUnits(vacantUnits);
         }
-      } else {
+      } catch (error) {
+        console.error("Error fetching units:", error);
         setUnits([]);
         setDisplayUnits([]);
+        toast.error("Failed to load units.");
       }
-    };
-    fetchUnits();
-  }, [formData.building, modalState.data]);
+    } else {
+      setUnits([]);
+      setDisplayUnits([]);
+    }
+  };
+  fetchUnits();
+}, [formData.building, modalState.data]);
+
+  // console.log("Current unit ID:", modalState.data?.unit?.id);
+  // console.log("formData.unit:", formData.unit);
+  // console.log("displayUnits:", displayUnits);
 
   // Update end_date and total_rent_receivable
   useEffect(() => {
@@ -348,11 +357,7 @@ const TenancyRenewalModal = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-      ...(name === "building" ? { unit: "" } : {}),
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleAdditionalChargeChange = (id, field, value) => {
@@ -388,7 +393,7 @@ const TenancyRenewalModal = () => {
           }
           return updatedItem;
         }
-        return charge;
+        return item;
       })
     );
   };
@@ -472,6 +477,9 @@ const TenancyRenewalModal = () => {
 
     const companyId = getUserCompanyId();
     const userId = getRelevantUserId();
+    const tenancyId = modalState.data?.tenancyId;
+    console.log('tenancy id', tenancyId);
+    
 
     if (!companyId) {
       toast.error("Company ID is missing or invalid");
@@ -544,13 +552,13 @@ const TenancyRenewalModal = () => {
       closeModal();
       navigate("/admin/tenancy-master");
     } catch (error) {
-      console.error("Error renewing tenancy:", error.response?.data || error.message);
       const errorMessage =
-        error.response?.data?.detail ||
-        error.response?.data?.message ||
-        "Failed to renew tenancy. Please try again.";
+      error.response?.data?.detail ||
+      error.response?.data?.message ||
+      "Failed to renew tenancy. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
+      console.error("Error renewing tenancy:", error.response?.data || error.message);
     } finally {
       setLoading(false);
     }
@@ -658,7 +666,7 @@ const TenancyRenewalModal = () => {
                   className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${selectOpenStates["unit-selection"] ? "rotate-180" : "rotate-0"}`}
                   width={22}
                   height={22}
-                  color="#1D1E9E"
+                  color="#201D1E"
                 />
               </div>
             </div>
