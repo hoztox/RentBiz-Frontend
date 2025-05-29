@@ -20,7 +20,7 @@ const TenancyTermination = () => {
   const [tenancies, setTenancies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { openModal } = useModal();
+  const { openModal, refreshCounter } = useModal();
   const itemsPerPage = 10;
 
   const getUserCompanyId = () => {
@@ -48,17 +48,19 @@ const TenancyTermination = () => {
         const companyId = getUserCompanyId();
         setLoading(true);
         const response = await axios.get(`${BASE_URL}/company/tenancies/company/${companyId}/`);
-        setTenancies(response.data);
+        // Sort tenancies by id in ascending order
+        const sortedTenancies = response.data.sort((a, b) => a.id - b.id);
+        setTenancies(sortedTenancies);
         setLoading(false);
+        console.log('Fetched and sorted tenancies:', sortedTenancies);
       } catch (err) {
-        console.log("Error fetching tenancies:", err);
-
+        console.error("Error fetching tenancies:", err);
         setError("Failed to fetch tenancies. Please try again later.");
         setLoading(false);
       }
     };
     fetchTenancies();
-  }, []);
+  }, [refreshCounter]);
 
   const openTerminateModal = (tenancy) => {
     setSelectedTenancy(tenancy);
@@ -81,7 +83,7 @@ const TenancyTermination = () => {
                 : t
             )
           );
-          console.log(`Tenancy ${selectedTenancy.id} terminated successfully`); 
+          console.log(`Tenancy ${selectedTenancy.id} terminated successfully`);
         } else {
           console.error("Failed to terminate tenancy");
         }
@@ -253,7 +255,7 @@ const TenancyTermination = () => {
                     {tenancy.tenancy_code}
                   </td>
                   <td className="px-5 text-left tenancy-data tterm-end-date-column">
-                    {tenancy.tenant?.tenant_name || "N/A"} 
+                    {tenancy.tenant?.tenant_name || "N/A"}
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div

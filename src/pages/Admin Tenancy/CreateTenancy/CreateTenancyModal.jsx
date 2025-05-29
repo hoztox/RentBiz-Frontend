@@ -10,7 +10,7 @@ import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 
 const CreateTenancyModal = () => {
-  const { modalState, closeModal } = useModal();
+  const { modalState, closeModal, triggerRefresh } = useModal();
   const navigate = useNavigate();
   const [selectOpenStates, setSelectOpenStates] = useState({});
   const [showPaymentSchedule, setShowPaymentSchedule] = useState(true);
@@ -439,6 +439,7 @@ const CreateTenancyModal = () => {
         payload
       );
       console.log("Tenancy created successfully:", response.data);
+      triggerRefresh();
       closeModal();
       navigate("/admin/tenancy-master");
     } catch (error) {
