@@ -119,7 +119,7 @@ const DocumentView = ({ documents = [], docTypes = [] }) => {
                         <img
                           src={fileSrc}
                           alt={name}
-                          className="object-cover h-[220px]"
+                          className="object-cover h-[220px] w-full"
                           onLoad={(e) => {
                             if (file instanceof File) {
                               URL.revokeObjectURL(e.target.src);
