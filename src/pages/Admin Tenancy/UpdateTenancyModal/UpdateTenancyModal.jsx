@@ -17,7 +17,9 @@ const UpdateTenancyModal = () => {
   const [showPaymentSchedule, setShowPaymentSchedule] = useState(true);
   const [tenants, setTenants] = useState([]);
   const [buildings, setBuildings] = useState([]);
+  const [displayBuildings, setDisplayBuildings] = useState([]);
   const [units, setUnits] = useState([]);
+  const [displayUnits, setDisplayUnits] = useState([]);
   const [chargeTypes, setChargeTypes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -40,6 +42,7 @@ const UpdateTenancyModal = () => {
   const [additionalCharges, setAdditionalCharges] = useState([]);
   const [paymentSchedule, setPaymentSchedule] = useState([]);
   const [expandedStates, setExpandedStates] = useState({});
+  const [vacantBuildings, setVacantBuildings] = useState({});
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -69,8 +72,11 @@ const UpdateTenancyModal = () => {
   // Initialize form data when modal opens
   useEffect(() => {
     if (modalState.isOpen && modalState.type === "tenancy-update" && modalState.data) {
+      console.log("modalState:", modalState); // Log the entire modalState object
       const tenancy = modalState.data;
-      setFormData({
+      console.log("tenancy:", tenancy); // Log the tenancy data
+
+      const newFormData = {
         tenant: tenancy.tenant?.id?.toString() || "",
         building: tenancy.building?.id?.toString() || "",
         unit: tenancy.unit?.id?.toString() || "",
@@ -85,42 +91,45 @@ const UpdateTenancyModal = () => {
         commision: tenancy.commision ? parseFloat(tenancy.commision).toFixed(2) : "",
         remarks: tenancy.remarks || "",
         status: tenancy.status || "pending",
-      });
+      };
+      setFormData(newFormData);
+      console.log("formData:", newFormData); // Log the new formData
 
-      setAdditionalCharges(
-        tenancy.additional_charges?.map((charge, index) => ({
-          id: (index + 1).toString().padStart(2, "0"),
-          charge_type: charge.charge_type?.id?.toString() || "",
-          reason: charge.reason || "",
-          due_date: charge.due_date || "",
-          status: charge.status || "pending",
-          amount: charge.amount ? parseFloat(charge.amount).toFixed(2) : "",
-          vat: charge.vat ? parseFloat(charge.vat).toFixed(2) : "0.00",
-          total: charge.total ? parseFloat(charge.total).toFixed(2) : "0.00",
-        })) || []
-      );
+      const newAdditionalCharges = tenancy.additional_charges?.map((charge, index) => ({
+        id: (index + 1).toString().padStart(2, "0"),
+        charge_type: charge.charge_type?.id?.toString() || "",
+        reason: charge.reason || "",
+        due_date: charge.due_date || "",
+        status: charge.status || "pending",
+        amount: charge.amount ? parseFloat(charge.amount).toFixed(2) : "",
+        vat: charge.vat ? parseFloat(charge.vat).toFixed(2) : "0.00",
+        total: charge.total ? parseFloat(charge.total).toFixed(2) : "0.00",
+      })) || [];
+      setAdditionalCharges(newAdditionalCharges);
+      console.log("additionalCharges:", newAdditionalCharges); // Log additional charges
 
-      setPaymentSchedule(
-        tenancy.payment_schedules?.map((item, index) => ({
-          id: (index + 1).toString().padStart(2, "0"),
-          charge_type: item.charge_type?.id?.toString() || "",
-          reason: item.reason || "",
-          due_date: item.due_date || "",
-          status: item.status || "pending",
-          amount: item.amount ? parseFloat(item.amount).toFixed(2) : "",
-          vat: item.vat ? parseFloat(item.vat).toFixed(2) : "0.00",
-          total: item.total ? parseFloat(item.total).toFixed(2) : "0.00",
-        })) || []
-      );
+      const newPaymentSchedule = tenancy.payment_schedules?.map((item, index) => ({
+        id: (index + 1).toString().padStart(2, "0"),
+        charge_type: item.charge_type?.id?.toString() || "",
+        reason: item.reason || "",
+        due_date: item.due_date || "",
+        status: item.status || "pending",
+        amount: item.amount ? parseFloat(item.amount).toFixed(2) : "",
+        vat: item.vat ? parseFloat(item.vat).toFixed(2) : "0.00",
+        total: item.total ? parseFloat(item.total).toFixed(2) : "0.00",
+      })) || [];
+      setPaymentSchedule(newPaymentSchedule);
+      console.log("paymentSchedule:", newPaymentSchedule); // Log payment schedule
 
-      setExpandedStates(
-        tenancy.payment_schedules?.reduce((acc, item, index) => ({
-          ...acc,
-          [(index + 1).toString().padStart(2, "0")]: false,
-        }), {}) || {}
-      );
+      const newExpandedStates = tenancy.payment_schedules?.reduce((acc, item, index) => ({
+        ...acc,
+        [(index + 1).toString().padStart(2, "0")]: false,
+      }), {}) || {};
+      setExpandedStates(newExpandedStates);
+      console.log("expandedStates:", newExpandedStates); // Log expanded states
 
       setError(null);
+      console.log("error set to null");
     }
   }, [modalState.isOpen, modalState.type, modalState.data]);
 
@@ -138,17 +147,40 @@ const UpdateTenancyModal = () => {
         setLoading(true);
         setError(null);
 
-        const [tenantsRes, buildingsRes, unitsRes, chargeTypesRes] = await Promise.all([
+        const [tenantsRes, buildingsRes, buildingsVacant, chargeTypesRes] = await Promise.all([
           axios.get(`${BASE_URL}/company/tenant/company/${companyId}/`),
           axios.get(`${BASE_URL}/company/buildings/company/${companyId}/`),
-          axios.get(`${BASE_URL}/company/units/company/${companyId}/`),
+          axios.get(`${BASE_URL}/company/buildings/vacant/${companyId}/`),
+
           axios.get(`${BASE_URL}/company/charges/company/${companyId}/`),
         ]);
 
         setTenants(tenantsRes.data);
         setBuildings(buildingsRes.data);
-        setUnits(unitsRes.data);
+        setVacantBuildings(buildingsVacant.data);
+
         setChargeTypes(chargeTypesRes.data);
+
+        // Combine vacant buildings with the current tenancy's building
+        const tenancyBuilding = modalState.data?.building;
+        if (tenancyBuilding) {
+          const combinedBuildings = [...buildingsVacant.data];
+          // Check if the tenancy's building is already in the vacant buildings list
+          const isTenancyBuildingInVacant = buildingsVacant.data.some(
+            (building) => building.id === tenancyBuilding.id
+          );
+          if (!isTenancyBuildingInVacant) {
+            combinedBuildings.push(tenancyBuilding);
+          }
+          // Remove duplicates based on building ID
+          const uniqueBuildings = Array.from(
+            new Map(combinedBuildings.map((building) => [building.id, building])).values()
+          );
+          setDisplayBuildings(uniqueBuildings);
+        } else {
+          setDisplayBuildings(buildingsVacant.data);
+        }
+
       } catch (error) {
         console.error("Error fetching data:", error);
         const errorMessage = error.response?.data?.message || "Failed to load tenancy data. Please try again.";
@@ -162,7 +194,54 @@ const UpdateTenancyModal = () => {
     if (modalState.isOpen && modalState.type === "tenancy-update") {
       fetchData();
     }
-  }, [modalState.isOpen, modalState.type]);
+  }, [modalState.isOpen, modalState.type, modalState.data]);
+
+
+  useEffect(() => {
+    const fetchUnits = async () => {
+      if (formData.building) {
+        try {
+          const response = await axios.get(
+            `${BASE_URL}/company/units/${formData.building}/vacant-units/`
+          );
+          const vacantUnits = response.data;
+          setUnits(vacantUnits);
+
+          // Combine vacant units with the current tenancy's unit
+          const tenancyUnit = modalState.data?.unit;
+          const tenancyBuildingId = modalState.data?.building?.id;
+          if (tenancyUnit && parseInt(formData.building) === tenancyBuildingId) {
+            const combinedUnits = [...vacantUnits];
+            const isTenancyUnitInVacant = vacantUnits.some(
+              (unit) => unit.id === tenancyUnit.id
+            );
+            if (!isTenancyUnitInVacant) {
+              combinedUnits.push(tenancyUnit);
+            }
+            const uniqueUnits = Array.from(
+              new Map(combinedUnits.map((unit) => [unit.id, unit])).values()
+            );
+            setDisplayUnits(uniqueUnits);
+          } else {
+            setDisplayUnits(vacantUnits);
+          }
+
+        } catch (error) {
+          console.error("Error fetching units:", error);
+          setUnits([]);
+          setDisplayUnits([]);
+          toast.error("Failed to load units.");
+        }
+      } else {
+        setUnits([]);
+        setDisplayUnits([]);
+      }
+    };
+    fetchUnits();
+  }, [formData.building, modalState.data]);
+
+
+
 
   // Update end_date and total_rent_receivable
   useEffect(() => {
@@ -572,7 +651,7 @@ const UpdateTenancyModal = () => {
           <div>
             <label className="block update-tenancy-modal-label">Building*</label>
             <div className="relative">
-              <select
+               <select
                 name="building"
                 value={formData.building}
                 onChange={handleInputChange}
@@ -582,7 +661,7 @@ const UpdateTenancyModal = () => {
                 disabled={loading}
               >
                 <option value="">Choose</option>
-                {buildings.map((building) => (
+                {displayBuildings.map((building) => (
                   <option key={building.id} value={building.id}>
                     {building.building_name}
                   </option>
@@ -606,22 +685,22 @@ const UpdateTenancyModal = () => {
                   value={formData.unit}
                   onChange={handleInputChange}
                   className="w-full p-2 appearance-none update-tenancy-input-box"
-                  onFocus={() => toggleSelectOpen("unit")}
-                  onBlur={() => toggleSelectOpen("unit")}
+                  onFocus={() => toggleSelectOpen("unit-selection")}
+                  onBlur={() => toggleSelectOpen("unit-selection")}
                   disabled={loading}
                 >
                   <option value="">Choose</option>
-                  {units.map((unit) => (
+                  {displayUnits.map((unit) => (
                     <option key={unit.id} value={unit.id}>
                       {unit.unit_name}
                     </option>
                   ))}
                 </select>
                 <ChevronDown
-                  className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${selectOpenStates["unit"] ? "rotate-180" : "rotate-0"}`}
+                  className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${selectOpenStates["unit-selection"] ? "rotate-180" : "rotate-0"}`}
                   width={22}
                   height={22}
-                  color="#201D1E"
+                  color="#201D1E" 
                 />
               </div>
             </div>
