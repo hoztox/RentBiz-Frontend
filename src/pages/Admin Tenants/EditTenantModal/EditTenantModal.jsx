@@ -2,7 +2,7 @@ import React from "react";
 import "./edittenantmodal.css";
 import TenantFormFlow from "./TenantFormFlow/TenantFormFlow";
 
-const EditTenantModal = ({ open, onClose }) => {
+const EditTenantModal = ({ open, onClose, tenantId, onTenantUpdated }) => {
   return (
     <div
       onClick={onClose}
@@ -14,8 +14,11 @@ const EditTenantModal = ({ open, onClose }) => {
         className={`tenant-modal-styles transition-all 
                     ${open ? "scale-100 opacity-100" : "scale-125 opacity-0"}`}
       >
-        {/* Content Here */}
-        <TenantFormFlow onClose={onClose} />
+        <TenantFormFlow
+          onClose={onClose}
+          tenantId={tenantId}
+          onTenantUpdated={onTenantUpdated}
+        />
       </div>
     </div>
   );

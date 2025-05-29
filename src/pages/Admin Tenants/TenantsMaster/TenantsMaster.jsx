@@ -20,21 +20,19 @@ const TenantsMaster = () => {
   const [updateTenantModalOpen, setUpdateTenantModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
   const [tenants, setTenants] = useState([]);
-  const [selectedTenant, setSelectedTenant] = useState(null);
+  const [selectedTenantId, setSelectedTenantId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const itemsPerPage = 10;
-
   const navigate = useNavigate();
 
   const isMobileView = () => window.innerWidth < 480;
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
-
     if (role === "company") {
-      // When a company logs in, their own ID is stored as company_id
       return localStorage.getItem("company_id");
     } else if (role === "user" || role === "admin") {
-      // When a user logs in, company_id is directly stored
       try {
         const userCompanyId = localStorage.getItem("company_id");
         return userCompanyId ? JSON.parse(userCompanyId) : null;
@@ -43,26 +41,51 @@ const TenantsMaster = () => {
         return null;
       }
     }
-
     return null;
   };
 
-  // Fetch tenants from the backend
-  useEffect(() => {
-    const fetchTenants = async () => {
-      try {
-        const companyId = getUserCompanyId();
-        const response = await axios.get(
-          `${BASE_URL}/company/tenant/company/${companyId}/`
-        );
-        setTenants(response.data);
-        console.log("tenantssss", response.data);
-      } catch (error) {
-        console.error("Error fetching tenants:", error);
-      }
-    };
+  const companyId = getUserCompanyId();
+
+  const fetchTenants = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${BASE_URL}/company/tenant/company/${companyId}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      const data = Array.isArray(response.data)
+        ? response.data
+        : response.data.results || [];
+      console.log("Tenants: Fetched tenants:", data);
+      setTenants(data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching tenants:", error);
+      setError(
+        "Failed to fetch tenants: " +
+          (error.response?.data?.message || error.message)
+      );
+      setLoading(false);
+    }
+  };
+
+  const refreshTenants = () => {
+    console.log("Tenants: Refreshing tenant list");
     fetchTenants();
-  }, []);
+  };
+
+  useEffect(() => {
+    if (companyId) {
+      fetchTenants();
+    } else {
+      setError("Company ID not found.");
+      setLoading(false);
+    }
+  }, [companyId]);
 
   const openCreateTenantModal = () => {
     if (isMobileView()) {
@@ -76,26 +99,46 @@ const TenantsMaster = () => {
     setCreateTenantModalOpen(false);
   };
 
-  const openUpdateTenantModal = (tenant) => {
+  const openUpdateTenantModal = (tenantId) => {
+    console.log("Tenants: Selected tenantId:", tenantId);
+    setSelectedTenantId(tenantId);
     if (isMobileView()) {
-      navigate("/admin/edit-tenant-timeline", { state: { tenant } });
+      navigate("/admin/edit-tenant-timeline");
     } else {
-      setSelectedTenant(tenant);
-      setUpdateTenantModalOpen(true);
+      setTimeout(() => {
+        console.log("Tenants: Opening edit modal with tenantId:", tenantId);
+        setUpdateTenantModalOpen(true);
+      }, 0);
     }
   };
 
   const closeUpdateTenantModal = () => {
     setUpdateTenantModalOpen(false);
-    setSelectedTenant(null);
+    setSelectedTenantId(null);
   };
 
   const handleDeleteTenant = async (tenantId) => {
-    try {
-      await axios.delete(`${BASE_URL}/company/tenant/${tenantId}/`);
-      setTenants(tenants.filter((tenant) => tenant.code !== tenantId));
-    } catch (error) {
-      console.error("Error deleting tenant:", error);
+    if (window.confirm("Are you sure you want to delete this tenant?")) {
+      try {
+        const response = await axios.delete(
+          `${BASE_URL}/company/tenant/${tenantId}/`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        if (response.status === 204) {
+          setTenants(tenants.filter((tenant) => tenant.id !== tenantId));
+          console.log("Tenants: Successfully deleted tenant", tenantId);
+        }
+      } catch (error) {
+        console.error("Error deleting tenant:", error);
+        setError(
+          "Failed to delete tenant: " +
+            (error.response?.data?.message || error.message)
+        );
+      }
     }
   };
 
@@ -106,17 +149,22 @@ const TenantsMaster = () => {
     }));
   };
 
-  // Filter tenants based on search term
   const filteredData = tenants.filter(
     (tenant) =>
-      tenant.tenant_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenant.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenant.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenant.tenant_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenant.status?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenant.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenant.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenant.id_type?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+      (tenant.tenant_name?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase()
+      ) ||
+      (tenant.address?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (tenant.code?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (tenant.tenant_type?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase()
+      ) ||
+      (tenant.status?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (tenant.phone?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (tenant.email?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (tenant.id_type?.title?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase()
+      )
   );
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -128,6 +176,9 @@ const TenantsMaster = () => {
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+  if (loading) return <div className="p-5">Loading...</div>;
+  if (error) return <div className="text-red-500 p-5">{error}</div>;
 
   return (
     <div className="border border-[#E9E9E9] rounded-md tenant-table">
@@ -145,7 +196,6 @@ const TenantsMaster = () => {
             <div className="relative w-[40%] md:w-auto">
               <select
                 name="select"
-                id=""
                 className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 tenant-selection"
                 onFocus={() => setIsSelectOpen(true)}
                 onBlur={() => setIsSelectOpen(false)}
@@ -201,12 +251,10 @@ const TenantsMaster = () => {
           <tbody>
             {paginatedData.map((tenant) => (
               <tr
-                key={tenant.code}
+                key={tenant.id}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-5 text-left tenant-data">
-                  {tenant.code}
-                </td>
+                <td className="px-5 text-left tenant-data">{tenant.code}</td>
                 <td className="px-5 text-left tenant-data">
                   {new Date(tenant.created_at).toLocaleDateString("en-GB", {
                     day: "2-digit",
@@ -215,9 +263,11 @@ const TenantsMaster = () => {
                   })}
                 </td>
                 <td className="pl-5 text-left tenant-data">
-                  {tenant.tenant_name}
+                  {tenant.tenant_name || "N/A"}
                 </td>
-                <td className="pl-5 text-left tenant-data">{tenant.phone}</td>
+                <td className="pl-5 text-left tenant-data">
+                  {tenant.phone || "N/A"}
+                </td>
                 <td className="px-5 text-left tenant-data">
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] tenant-status ${
@@ -228,15 +278,14 @@ const TenantsMaster = () => {
                         : "bg-[#FFF8E1] text-[#A67C00]"
                     }`}
                   >
-                    {tenant.status}
+                    {tenant.status || "N/A"}
                   </span>
                 </td>
-
                 <td className="pl-12 pr-5 text-left tenant-data">
                   {tenant.id_type?.title || "N/A"}
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={() => openUpdateTenantModal(tenant)}>
+                  <button onClick={() => openUpdateTenantModal(tenant.id)}>
                     <img
                       src={editicon}
                       alt="Edit"
@@ -271,7 +320,7 @@ const TenantsMaster = () => {
           </thead>
           <tbody>
             {paginatedData.map((tenant) => (
-              <React.Fragment key={tenant.code}>
+              <React.Fragment key={tenant.id}>
                 <tr
                   className={`${
                     expandedRows[tenant.code]
@@ -281,7 +330,7 @@ const TenantsMaster = () => {
                 >
                   <td className="px-5 text-left tenant-data">{tenant.code}</td>
                   <td className="px-3 text-left tenant-data date-column">
-                    {tenant.tenant_name}
+                    {tenant.tenant_name || "N/A"}
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
@@ -334,25 +383,27 @@ const TenantsMaster = () => {
                               <span
                                 className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] tenant-status ${
                                   tenant.status === "Active"
-                                    ? "bg-[#E8EFF6] text-[#1458A2]"
-                                    : "bg-[#E6F5EC] text-[#1C7D4D]"
+                                    ? "bg-[#E6F5EC] text-[#1C7D4D]"
+                                    : tenant.status === "Inactive"
+                                    ? "bg-[#FDEAEA] text-[#D1293D]"
+                                    : "bg-[#FFF8E1] text-[#A67C00]"
                                 }`}
                               >
-                                {tenant.status}
+                                {tenant.status || "N/A"}
                               </span>
                             </div>
                           </div>
                           <div className="tenant-grid-item w-[38%]">
                             <div className="dropdown-label">ID TYPE</div>
                             <div className="dropdown-value">
-                              {tenant.id_type?.name || "N/A"}
+                              {tenant.id_type?.title || "N/A"}
                             </div>
                           </div>
                           <div className="tenant-grid-item w-[20%]">
                             <div className="dropdown-label">ACTION</div>
                             <div className="dropdown-value flex items-center gap-2 mt-[10px]">
                               <button
-                                onClick={() => openUpdateTenantModal(tenant)}
+                                onClick={() => openUpdateTenantModal(tenant.id)}
                               >
                                 <img
                                   src={editicon}
@@ -381,8 +432,6 @@ const TenantsMaster = () => {
           </tbody>
         </table>
       </div>
-
-      {/* Pagination Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
         <span className="collection-list-pagination">
           Showing{" "}
@@ -440,18 +489,16 @@ const TenantsMaster = () => {
           </button>
         </div>
       </div>
-
-      {/* Create Tenant Modal */}
       <CreateTenantModal
         open={createTenantModalOpen}
         onClose={closeCreateTenantModal}
+        onTenantCreated={refreshTenants}
       />
-
-      {/* Update Tenant Modal */}
       <EditTenantModal
         open={updateTenantModalOpen}
         onClose={closeUpdateTenantModal}
-        tenant={selectedTenant}
+        tenantId={selectedTenantId}
+        onTenantUpdated={refreshTenants}
       />
     </div>
   );
