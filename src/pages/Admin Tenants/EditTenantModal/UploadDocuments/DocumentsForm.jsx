@@ -1,36 +1,113 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./documentsform.css";
 import { ChevronDown } from "lucide-react";
 import documentIcon from "../../../../assets/Images/Admin Tenants/document-icon.svg";
-// import calendarIcon from '../../../../assets/Images/Admin Tenants/calendar-icon.svg'
 import closeIcon from "../../../../assets/Images/Admin Tenants/close-icon-white.svg";
 import plusIcon from "../../../../assets/Images/Admin Tenants/plus-icon-black.svg";
+import axios from "axios";
+import { BASE_URL } from "../../../../utils/config";
 
-const DocumentsForm = ({ onNext, onBack }) => {
-  const [documents, setDocuments] = useState([
-    {
-      id: 1,
-      type: "",
-      number: "",
-      issueDate: "",
-      expiryDate: "",
-      files: [],
-    },
-  ]);
+const DocumentsForm = ({ onNext, onBack, initialData, tenantId }) => {
+  const safeInitialDocuments = Array.isArray(initialData?.documents)
+    ? initialData.documents.map((doc, index) => ({
+        id: doc.id || index + 1,
+        doc_type: doc.doc_type || "",
+        number: doc.number || "",
+        issued_date: doc.issued_date || "",
+        expiry_date: doc.expiry_date || "",
+        upload_file: Array.isArray(doc.upload_file) ? doc.upload_file : [],
+      }))
+    : [{
+        id: 1,
+        doc_type: "",
+        number: "",
+        issued_date: "",
+        expiry_date: "",
+        upload_file: [],
+      }];
+
+  const [documents, setDocuments] = useState(safeInitialDocuments);
+  const [docTypes, setDocTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchDocTypes = async () => {
+      setLoading(true);
+      try {
+        const companyId = localStorage.getItem("company_id");
+        if (!companyId) {
+          throw new Error("Company ID not found.");
+        }
+        const response = await axios.get(
+          `${BASE_URL}/company/doc_type/company/${companyId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setDocTypes(Array.isArray(response.data) ? response.data : []);
+        setError(null);
+      } catch (error) {
+        console.error("Error fetching document types:", error);
+        setError("Failed to load document types.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDocTypes();
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onNext({ documentsUploaded: true });
+    const validDocuments = documents.filter(
+      (doc) =>
+        doc.doc_type &&
+        doc.number &&
+        doc.issued_date &&
+        doc.expiry_date &&
+        doc.upload_file?.length > 0
+    );
+
+    if (documents.length > 0 && validDocuments.length === 0) {
+      setError("Please fill all required document fields or remove incomplete documents.");
+      return;
+    }
+
+    const tempData = {
+      documents: validDocuments.map((doc) => ({
+        doc_type: parseInt(doc.doc_type) || null,
+        number: doc.number || null,
+        issued_date: doc.issued_date || null,
+        expiry_date: doc.expiry_date || null,
+        upload_file: doc.upload_file || [],
+      })),
+    };
+    onNext(tempData);
+  };
+
+  const handleBack = () => {
+    const tempData = {
+      documents: documents.map((doc) => ({
+        doc_type: parseInt(doc.doc_type) || null,
+        number: doc.number || null,
+        issued_date: doc.issued_date || null,
+        expiry_date: doc.expiry_date || null,
+        upload_file: doc.upload_file || [],
+      })),
+    };
+    onBack(tempData);
   };
 
   const handleAddDocument = () => {
     const newDoc = {
       id: documents.length + 1,
-      type: "",
+      doc_type: "",
       number: "",
-      issueDate: "",
-      expiryDate: "",
-      files: [],
+      issued_date: "",
+      expiry_date: "",
+      upload_file: [],
     };
     setDocuments([...documents, newDoc]);
   };
@@ -41,41 +118,42 @@ const DocumentsForm = ({ onNext, onBack }) => {
 
   const handleChange = (id, field, value) => {
     setDocuments((prevDocs) =>
-      prevDocs.map((doc) => (doc.id === id ? { ...doc, [field]: value } : doc))
+      prevDocs.map((doc) =>
+        doc.id === id ? { ...doc, [field]: value } : doc
+      )
     );
   };
 
   return (
     <div className="w-full flex flex-col h-full">
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
+        {error && <p className="text-red-500 mb-4">{error}</p>}
         <div className="flex-1 overflow-y-auto">
-          {/* Document List */}
+          {loading && <p>Loading document types...</p>}
           <div>
             {documents.map((doc) => (
               <div key={doc.id} className="border-b first:pt-0 py-5">
                 <div className="flex gap-[10px] justify-between">
-                  {/* Document Type */}
                   <div>
                     <label className="block documents-label">Doc.Type</label>
                     <div className="relative">
                       <select
                         className="appearance-none documents-inputs w-[226px] cursor-pointer"
-                        value={doc.type}
+                        value={doc.doc_type}
                         onChange={(e) =>
-                          handleChange(doc.id, "type", e.target.value)
+                          handleChange(doc.id, "doc_type", e.target.value)
                         }
+                        disabled={loading}
                       >
                         <option value="">Select Document</option>
-                        <option value="License">License</option>
-                        <option value="Certificate">Certificate</option>
-                        <option value="Permit">Permit</option>
+                        {docTypes.map((type) => (
+                          <option key={type.id} value={type.id}>{type.title}</option>
+                        ))}
                       </select>
                       <ChevronDown className="absolute right-2 top-[12px] h-4 w-4 text-[#000000] pointer-events-none" />
                     </div>
                   </div>
-
-                  {/* Conditional Fields */}
-                  {doc.type && (
+                  {doc.doc_type && (
                     <>
                       <div>
                         <label className="block documents-label">Number</label>
@@ -89,54 +167,41 @@ const DocumentsForm = ({ onNext, onBack }) => {
                           placeholder="Number"
                         />
                       </div>
-
                       <div>
-                        <label className="block documents-label">
-                          Issue Date
-                        </label>
+                        <label className="block documents-label">Issue Date</label>
                         <div className="relative">
                           <input
                             type="date"
                             className="documents-inputs w-[149px] appearance-none outline-none cursor-pointer"
-                            value={doc.issueDate}
+                            value={doc.issued_date}
                             onChange={(e) =>
-                              handleChange(doc.id, "issueDate", e.target.value)
+                              handleChange(doc.id, "issued_date", e.target.value)
                             }
                           />
                         </div>
                       </div>
-
                       <div>
-                        <label className="block documents-label">
-                          Expiry Date
-                        </label>
+                        <label className="block documents-label">Expiry Date</label>
                         <div className="relative">
                           <input
                             type="date"
                             className="documents-inputs w-[150px] appearance-none outline-none cursor-pointer"
-                            value={doc.expiryDate}
+                            value={doc.expiry_date}
                             onChange={(e) =>
-                              handleChange(doc.id, "expiryDate", e.target.value)
+                              handleChange(doc.id, "expiry_date", e.target.value)
                             }
                           />
                         </div>
                       </div>
-
                       <div className="relative">
-                        <label className="block documents-label">
-                          Upload Files
-                        </label>
+                        <label className="block documents-label">Upload Files</label>
                         <input
                           type="file"
                           className="hidden documents-inputs"
                           id={`fileInput-${doc.id}`}
                           multiple
                           onChange={(e) =>
-                            handleChange(
-                              doc.id,
-                              "files",
-                              Array.from(e.target.files)
-                            )
+                            handleChange(doc.id, "upload_file", Array.from(e.target.files))
                           }
                         />
                         <label
@@ -144,8 +209,8 @@ const DocumentsForm = ({ onNext, onBack }) => {
                           className="flex items-center justify-between documents-inputs cursor-pointer w-[161px] !py-2"
                         >
                           <span className="text-[#4B465C60] text-sm truncate">
-                            {doc.files.length > 0
-                              ? `${doc.files.length} file(s)`
+                            {doc.upload_file.length > 0
+                              ? `${doc.upload_file.length} file(s)`
                               : "Attach Files"}
                           </span>
                           <img
@@ -157,7 +222,6 @@ const DocumentsForm = ({ onNext, onBack }) => {
                       </div>
                     </>
                   )}
-
                   <div className="col-span-1 flex items-end justify-end">
                     <button
                       type="button"
@@ -171,8 +235,6 @@ const DocumentsForm = ({ onNext, onBack }) => {
               </div>
             ))}
           </div>
-
-          {/* Add Document Button */}
           <div className="py-4 flex justify-end">
             <button
               type="button"
@@ -184,13 +246,11 @@ const DocumentsForm = ({ onNext, onBack }) => {
             </button>
           </div>
         </div>
-
-        {/* Navigation Buttons */}
         <div className="flex justify-end gap-4 pt-[35px] border-t mt-auto">
           <button
             type="button"
             className="text-[#201D1E] bg-white hover:bg-[#201D1E] hover:text-white back-button duration-200"
-            onClick={onBack}
+            onClick={handleBack}
           >
             Back
           </button>

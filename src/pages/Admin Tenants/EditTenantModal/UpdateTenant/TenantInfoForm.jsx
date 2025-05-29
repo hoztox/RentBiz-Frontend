@@ -1,82 +1,162 @@
-import { useState } from 'react'
-import "./tenantinfoform.css"
+import { useState, useEffect } from 'react';
+import "./tenantinfoform.css";
 import PhoneInput from 'react-phone-input-2';
 import { ChevronDown } from "lucide-react";
+import axios from "axios";
+import { BASE_URL } from "../../../../utils/config";
+import PropTypes from "prop-types";
 
-const TenantInfoForm = ({onNext}) => {
-      // Form state
-      const [formState, setFormState] = useState({
-        name: "",
-        nationality: "",
-        mobno: "",
-        alternative_mobno: "",
-        email: "",
-        description: "",
-        address: "",
-        tenant_type: "",
-        license_no: "",
-        id_type: "",
-        id_no: "",
-        id_validity: "",
-        sponsor_name: "",
-        sponsor_id_type: "",
-        sponsor_id_no: "",
-        sponsor_id_validity: "",
-        status: "Active",
-        remarks: "",
-      });
-    
-      const [mobno, setMobno] = useState("");
-      const [altMobno, setAltMobno] = useState("");
-      
-      // Track focus state for each dropdown separately
-      const [focusedField, setFocusedField] = useState(null);
-    
-      const handleChange = (value) => {
-        setMobno(value);
-        setFormState({
-          ...formState,
-          mobno: value,
-        });
-      };
-    
-      const handleAltChange = (value) => {
-        setAltMobno(value);
-        setFormState({
-          ...formState,
-          alternative_mobno: value,
-        });
-      };
-    
-      // Handle input changes
-      const handleInputChange = (e) => {
-        const { name, value } = e.target;
-    
-        setFormState({
-          ...formState,
-          [name]: value,
-        });
-      };
-    
-      // Function to handle focus on select elements
-      const handleSelectFocus = (fieldName) => {
-        setFocusedField(fieldName);
-      };
-    
-      // Function to handle blur on select elements
-      const handleSelectBlur = () => {
-        setFocusedField(null);
-      };
-    
-      // Function to handle form submission
-      const handleSubmit = (e) => {
-        e.preventDefault();
-        // Form submission logic would go here
-        console.log("Form submitted:", formState);
-    
-        // Call the onNext prop to move to the next page
-        if (onNext) onNext(formState);
-      };
+const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
+  const [formState, setFormState] = useState({
+    tenant_name: "",
+    nationality: "",
+    phone: "",
+    alternative_phone: "",
+    email: "",
+    description: "",
+    address: "",
+    tenant_type: "",
+    license_no: "",
+    id_type: "",
+    id_number: "",
+    id_validity_date: "",
+    sponser_name: "",
+    sponser_id_type: "",
+    sponser_id_number: "",
+    sponser_id_validity_date: "",
+    status: "Active",
+    remarks: "",
+    company: localStorage.getItem("company_id") || "",
+    user: localStorage.getItem("user_id") || null,
+  });
+  const [mobno, setMobno] = useState("");
+  const [altMobno, setAltMobno] = useState("");
+  const [idTypes, setIdTypes] = useState([]);
+  const [focusedField, setFocusedField] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchIdTypes = async () => {
+      try {
+        const companyId = localStorage.getItem("company_id");
+        const response = await axios.get(
+          `${BASE_URL}/company/id_type/company/${companyId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setIdTypes(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error("Error fetching ID types:", error);
+        setError("Failed to load ID types.");
+      }
+    };
+    fetchIdTypes();
+  }, []);
+
+  useEffect(() => {
+  if (initialData) {
+    console.log("Initial Data:", initialData); 
+    setFormState({
+      tenant_name: initialData.tenant_name || "",
+      nationality: initialData.nationality || "",
+      phone: initialData.phone || "",
+      alternative_phone: initialData.alternative_phone || "",
+      email: initialData.email || "",
+      description: initialData.description || "",
+      address: initialData.address || "",
+      tenant_type: initialData.tenant_type || "",
+      license_no: initialData.license_no || "",
+      // CHANGED: Use the ID number, not the title string
+      id_type: initialData.id_type?.id || "",
+      id_number: initialData.id_number || "",
+      id_validity_date: initialData.id_validity_date || "",
+      sponser_name: initialData.sponser_name || "",
+      // CHANGED: Use the ID number, not the title string  
+      sponser_id_type: initialData.sponser_id_type?.id || "",
+      sponser_id_number: initialData.sponser_id_number || "",
+      sponser_id_validity_date: initialData.sponser_id_validity_date || "",
+      status: initialData.status || "Active",
+      remarks: initialData.remarks || "",
+      company: initialData.company || localStorage.getItem("company_id") || "",
+      user: initialData.user || localStorage.getItem("user_id") || null,
+    });
+    setMobno(initialData.phone || "");
+    setAltMobno(initialData.alternative_phone || "");
+  }
+}, [initialData]);
+
+  const handleChange = (value, field) => {
+    if (field === "phone") {
+      setMobno(value);
+      setFormState({ ...formState, phone: value });
+    } else if (field === "alternative_phone") {
+      setAltMobno(value);
+      setFormState({ ...formState, alternative_phone: value });
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormState({ ...formState, [name]: value });
+  };
+
+  const handleSelectFocus = (fieldName) => {
+    setFocusedField(fieldName);
+  };
+
+  const handleSelectBlur = () => {
+    setFocusedField(null);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const errors = {};
+    const requiredFields = [
+      "tenant_name",
+      "nationality",
+      "phone",
+      "alternative_phone",
+      "email",
+      "address",
+      "tenant_type",
+      "license_no",
+      "id_type",
+      "id_number",
+      "id_validity_date",
+      "sponser_name",
+      "sponser_id_type",
+      "sponser_id_number",
+      "sponser_id_validity_date",
+      "status",
+    ];
+    requiredFields.forEach((field) => {
+      if (!formState[field]) {
+        errors[field] = `${field.replace("_", " ")} is required`;
+      }
+    });
+    if (!tenantId) {
+      errors.tenantId = "Tenant ID is required.";
+    }
+    if (Object.keys(errors).length > 0) {
+      setError(Object.values(errors).join(", "));
+      return;
+    }
+    const tempData = {
+      tenant_id: tenantId,
+      ...formState,
+      id_type: parseInt(formState.id_type) || null,
+      sponser_id_type: parseInt(formState.sponser_id_type) || null,
+    };
+    onNext(tempData);
+  };
+
+  if (error) {
+    return <div className="text-red-500 p-4">{error}</div>;
+  }
+
   return (
     <form onSubmit={handleSubmit} className="flex-1">
       <div className="grid grid-cols-2 gap-5">
@@ -84,14 +164,13 @@ const TenantInfoForm = ({onNext}) => {
           <label className="block tenant-info-form-label">Name*</label>
           <input
             type="text"
-            name="name"
-            value={formState.name}
+            name="tenant_name"
+            value={formState.tenant_name}
             onChange={handleInputChange}
             className="w-full tenant-info-form-inputs focus:border-gray-300 duration-200"
             required
           />
         </div>
-
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Nationality*</label>
           <div className="relative">
@@ -105,7 +184,9 @@ const TenantInfoForm = ({onNext}) => {
               required
             >
               <option value="">Choose</option>
-              <option value="dubai">Dubai</option>
+              <option value="UAE">UAE</option>
+              <option value="India">India</option>
+              {/* Add more nationalities as needed */}
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
@@ -116,44 +197,34 @@ const TenantInfoForm = ({onNext}) => {
             </div>
           </div>
         </div>
-
-        {/* mobile Number */}
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Mobile Number*</label>
           <PhoneInput
             country={"ae"}
-            name="mobno"
+            name="phone"
             value={mobno}
-            onChange={handleChange}
-            inputProps={{
-              required: true,
-            }}
+            onChange={(value) => handleChange(value, "phone")}
+            inputProps={{ required: true }}
             containerClass="phone-input-container"
             inputClass="tenant-info-form-inputs phone-input"
             buttonClass="phone-input-button"
             dropdownClass="phone-input-dropdown"
           />
         </div>
-
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">
-            Alternative Mobile Number*
-          </label>
+          <label className="block tenant-info-form-label">Alternative Mobile Number*</label>
           <PhoneInput
             country={"ae"}
-            name="alternative_mobno"
+            name="alternative_phone"
             value={altMobno}
-            onChange={handleAltChange}
-            inputProps={{
-              required: true,
-            }}
+            onChange={(value) => handleChange(value, "alternative_phone")}
+            inputProps={{ required: true }}
             containerClass="phone-input-container"
             inputClass="tenant-info-form-inputs phone-input"
             buttonClass="phone-input-button"
             dropdownClass="phone-input-dropdown"
           />
         </div>
-
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Email*</label>
           <input
@@ -166,34 +237,26 @@ const TenantInfoForm = ({onNext}) => {
           />
         </div>
         <div></div>
-
-        {/* Description */}
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Description</label>
           <textarea
             name="description"
             value={formState.description}
             onChange={handleInputChange}
-            placeholder=""
             rows="2"
             className="w-full tenant-info-form-inputs resize-none focus:border-gray-300 duration-200"
           />
         </div>
-
-        {/* Address */}
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Address*</label>
           <textarea
-            type="text"
             name="address"
             value={formState.address}
             onChange={handleInputChange}
-            placeholder=""
             className="w-full tenant-info-form-inputs resize-none focus:border-gray-300 duration-200"
             required
           />
         </div>
-
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Tenant Type*</label>
           <div className="relative">
@@ -207,7 +270,8 @@ const TenantInfoForm = ({onNext}) => {
               required
             >
               <option value="">Choose</option>
-              <option value="1">Type 1</option>
+              <option value="Individual">Individual</option>
+              <option value="Organization">Organization</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
@@ -218,11 +282,8 @@ const TenantInfoForm = ({onNext}) => {
             </div>
           </div>
         </div>
-
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">
-            Trade License Number*
-          </label>
+          <label className="block tenant-info-form-label">Trade License Number*</label>
           <input
             type="text"
             name="license_no"
@@ -232,7 +293,6 @@ const TenantInfoForm = ({onNext}) => {
             required
           />
         </div>
-
         <div className="col-span-1">
           <label className="block tenant-info-form-label">ID Type*</label>
           <div className="relative">
@@ -246,7 +306,9 @@ const TenantInfoForm = ({onNext}) => {
               required
             >
               <option value="">Choose</option>
-              <option value="1">ID 1</option>
+              {idTypes.map((type) => (
+                <option key={type.id} value={type.id}>{type.title}</option>
+              ))}
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
@@ -257,100 +319,88 @@ const TenantInfoForm = ({onNext}) => {
             </div>
           </div>
         </div>
-
         <div className="col-span-1">
           <label className="block tenant-info-form-label">ID Number*</label>
           <input
             type="text"
-            name="id_no"
-            value={formState.id_no}
+            name="id_number"
+            value={formState.id_number}
             onChange={handleInputChange}
             className="w-full tenant-info-form-inputs focus:border-gray-300 duration-200"
             required
           />
         </div>
-
         <div className="col-span-1">
           <label className="block tenant-info-form-label">ID Validity*</label>
           <input
             type="date"
-            name="id_validity"
-            value={formState.id_validity}
+            name="id_validity_date"
+            value={formState.id_validity_date}
             onChange={handleInputChange}
             className="w-full tenant-info-form-inputs focus:border-gray-300 duration-200"
             required
           />
         </div>
         <div></div>
-
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Sponsor Name*</label>
           <input
             type="text"
-            name="sponsor_name"
-            value={formState.sponsor_name}
+            name="sponser_name"
+            value={formState.sponser_name}
             onChange={handleInputChange}
             className="w-full tenant-info-form-inputs focus:border-gray-300 duration-200"
             required
           />
         </div>
-
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">
-            Sponsor ID Type*
-          </label>
+          <label className="block tenant-info-form-label">Sponsor ID Type*</label>
           <div className="relative">
             <select
-              name="sponsor_id_type"
-              value={formState.sponsor_id_type}
+              name="sponser_id_type"
+              value={formState.sponser_id_type}
               onChange={handleInputChange}
-              onFocus={() => handleSelectFocus("sponsor_id_type")}
+              onFocus={() => handleSelectFocus("sponser_id_type")}
               onBlur={handleSelectBlur}
               className="w-full appearance-none tenant-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer"
               required
             >
               <option value="">Choose</option>
-              <option value="1">ID 1</option>
+              {idTypes.map((type) => (
+                <option key={type.id} value={type.id}>{type.title}</option>
+              ))}
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
                 className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
-                  focusedField === "sponsor_id_type" ? "rotate-180" : ""
+                  focusedField === "sponser_id_type" ? "rotate-180" : ""
                 }`}
               />
             </div>
           </div>
         </div>
-
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">
-            Sponsor ID Number*
-          </label>
+          <label className="block tenant-info-form-label">Sponsor ID Number*</label>
           <input
             type="text"
-            name="sponsor_id_no"
-            value={formState.sponsor_id_no}
+            name="sponser_id_number"
+            value={formState.sponser_id_number}
             onChange={handleInputChange}
             className="w-full tenant-info-form-inputs focus:border-gray-300 duration-200"
             required
           />
         </div>
-
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">
-            Sponsor ID Validity*
-          </label>
+          <label className="block tenant-info-form-label">Sponsor ID Validity*</label>
           <input
             type="date"
-            name="sponsor_id_validity"
-            value={formState.sponsor_id_validity}
+            name="sponser_id_validity_date"
+            value={formState.sponser_id_validity_date}
             onChange={handleInputChange}
             className="w-full tenant-info-form-inputs focus:border-gray-300 duration-200"
             required
           />
         </div>
-
-        {/* Status */}
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Status*</label>
           <div className="relative">
@@ -376,8 +426,6 @@ const TenantInfoForm = ({onNext}) => {
             </div>
           </div>
         </div>
-
-        {/* Remarks */}
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Remarks</label>
           <input
@@ -385,14 +433,11 @@ const TenantInfoForm = ({onNext}) => {
             name="remarks"
             value={formState.remarks}
             onChange={handleInputChange}
-            placeholder=""
             className="w-full tenant-info-form-inputs focus:border-gray-300 duration-200"
           />
         </div>
       </div>
-
-      {/* Submit Button */}
-      <div className="mt-6 text-right">
+      <div className="next-btn-container mt-6 text-right">
         <button
           type="submit"
           className="w-[150px] h-[38px] next-btn duration-300"
@@ -401,7 +446,13 @@ const TenantInfoForm = ({onNext}) => {
         </button>
       </div>
     </form>
-  )
-}
+  );
+};
 
-export default TenantInfoForm
+TenantInfoForm.propTypes = {
+  onNext: PropTypes.func.isRequired,
+  initialData: PropTypes.object,
+  tenantId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};
+
+export default TenantInfoForm;

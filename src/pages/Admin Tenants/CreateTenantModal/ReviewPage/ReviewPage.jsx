@@ -219,8 +219,7 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
         </div>
       </div>
 
-      <div className="border rounded-md border-[#E9E9E9] p-5">
-        <h2 className="review-page-head">Documents</h2>
+      <div className="py-5">
         <DocumentsView documents={documents} docTypes={documents} />
       </div>
 
