@@ -50,7 +50,6 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
 
   const getDocumentIcon = (type) => {
     try {
-      const { File, FileText, Image } = require("lucide-react");
       switch (type) {
         case "pdf":
           return <FileText className="text-blue-500" size={24} />;

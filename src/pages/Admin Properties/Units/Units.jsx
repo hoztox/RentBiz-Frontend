@@ -44,6 +44,8 @@ const Units = () => {
     return null;
   };
 
+  const companyId = getUserCompanyId();
+  
   const fetchUnits = async () => {
     try {
       const companyId = getUserCompanyId();
@@ -64,7 +66,7 @@ const Units = () => {
 
   useEffect(() => {
     fetchUnits();
-  }, []);
+  }, [companyId]);
 
   const openUnitModal = () => {
     if (isMobileView()) {
