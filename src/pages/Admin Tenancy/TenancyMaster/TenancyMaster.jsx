@@ -19,7 +19,7 @@ const TenancyMaster = () => {
   const [tenancies, setTenancies] = useState([]);
   const [loading, setLoading] = useState(true);
   const itemsPerPage = 10;
-  const { openModal } = useModal();
+  const { openModal, refreshCounter } = useModal();
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -40,13 +40,16 @@ const TenancyMaster = () => {
   };
 
   // Reusable function to fetch tenancies
-  const fetchTenancies = async () => {
+  useEffect(() => {
+  const fetchAndSortTenancies = async () => {
     try {
       const companyId = getUserCompanyId();
       setLoading(true);
       const response = await axios.get(`${BASE_URL}/company/tenancies/company/${companyId}/`);
-      setTenancies(response.data);
-      console.log('Fetched tenancies:', response.data);
+      // Sort tenancies by id in ascending order
+      const sortedTenancies = response.data.sort((a, b) => a.id - b.id);
+      setTenancies(sortedTenancies);
+      console.log('Fetched and sorted tenancies:', sortedTenancies);
     } catch (error) {
       console.error("Error fetching tenancies:", error);
     } finally {
@@ -54,18 +57,14 @@ const TenancyMaster = () => {
     }
   };
 
-  // Fetch tenancies on component mount
-  useEffect(() => {
-    fetchTenancies();
-  }, []);
+  fetchAndSortTenancies();
+}, [refreshCounter]);
 
   // Handle delete action
   const handleDelete = async (tenancyId) => {
     if (window.confirm("Are you sure you want to delete this tenancy?")) {
       try {
         await axios.delete(`${BASE_URL}/company/tenancies/${tenancyId}/`);
-        // Refetch tenancies after deletion
-        await fetchTenancies();
         console.log(`Deleted tenancy with ID: ${tenancyId}`);
       } catch (error) {
         console.error("Error deleting tenancy:", error);
@@ -106,7 +105,7 @@ const TenancyMaster = () => {
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div></div>;
   }
 
   return (
