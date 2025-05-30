@@ -99,19 +99,30 @@ const UnitFormFlow = ({ onClose, onUnitCreated }) => {
   };
 
   const handlePreviousPage = (pageData) => {
-    setAnimating(true);
-    if (pageData) {
-      setFormData((prevData) => ({
+  setAnimating(true);
+  if (pageData) {
+    setFormData((prevData) => {
+      // If navigating back from UnitReview (index 3), merge the full pageData
+      if (currentPageIndex === 3) {
+        return {
+          ...prevData,
+          building: pageData.building || prevData.building,
+          unit: pageData.unit || prevData.unit,
+          documents: pageData.documents || prevData.documents,
+        };
+      }
+      // For other pages, update only the relevant section
+      return {
         ...prevData,
         [currentPageIndex === 2 ? "documents" : "unit"]: pageData,
-      }));
-    }
-
-    setTimeout(() => {
-      setCurrentPageIndex((prev) => Math.max(prev - 1, 0));
-      setAnimating(false);
-    }, 500);
-  };
+      };
+    });
+  }
+  setTimeout(() => {
+    setCurrentPageIndex((prev) => Math.max(prev - 1, 0));
+    setAnimating(false);
+  }, 500);
+};
 
   const handleClose = () => {
     if (currentPageIndex === 4) {

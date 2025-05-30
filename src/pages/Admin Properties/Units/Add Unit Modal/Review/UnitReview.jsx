@@ -35,7 +35,9 @@ const UnitReview = ({ formData, onNext, onBack }) => {
     const fetchBuildings = async () => {
       try {
         const companyId = getUserCompanyId();
-        const response = await axios.get(`${BASE_URL}/company/buildings/company/${companyId}`);
+        const response = await axios.get(
+          `${BASE_URL}/company/buildings/company/${companyId}`
+        );
         setBuildings(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error("Error fetching buildings:", error);
@@ -53,7 +55,13 @@ const UnitReview = ({ formData, onNext, onBack }) => {
   const handleNext = async () => {
     setLoading(true);
     setError(null);
-    const requiredFields = ["unit_name", "unit_type", "address", "premise_no", "unit_status"];
+    const requiredFields = [
+      "unit_name",
+      "unit_type",
+      "address",
+      "premise_no",
+      "unit_status",
+    ];
     const missingFields = requiredFields.filter((field) => !unit[field]);
     if (missingFields.length > 0) {
       setError(`Please fill required fields: ${missingFields.join(", ")}`);
@@ -70,35 +78,46 @@ const UnitReview = ({ formData, onNext, onBack }) => {
           !doc.upload_file?.length
       );
       if (invalidDocs.length > 0) {
-        setError("All documents must have doc_type, number, dates, and at least one file.");
+        setError(
+          "All documents must have doc_type, number, dates, and at least one file."
+        );
         setLoading(false);
         return;
       }
     }
     try {
       const formDataWithFiles = new FormData();
-      formDataWithFiles.append('company', parseInt(getUserCompanyId()));
-      formDataWithFiles.append('building', parseInt(building.buildingId) || '');
-      formDataWithFiles.append('address', unit.address || '');
-      formDataWithFiles.append('unit_name', unit.unit_name || '');
-      formDataWithFiles.append('unit_type', parseInt(unit.unit_type) || '');
-      formDataWithFiles.append('description', unit.description || '');
-      formDataWithFiles.append('remarks', unit.remarks || '');
-      formDataWithFiles.append('no_of_bedrooms', parseInt(unit.no_of_bedrooms) || 0);
-      formDataWithFiles.append('no_of_bathrooms', parseInt(unit.no_of_bathrooms) || 0);
-      formDataWithFiles.append('premise_no', unit.premise_no || '');
-      formDataWithFiles.append('unit_status', unit.unit_status || '');
+      formDataWithFiles.append("company", parseInt(getUserCompanyId()));
+      formDataWithFiles.append("building", parseInt(building.buildingId) || "");
+      formDataWithFiles.append("address", unit.address || "");
+      formDataWithFiles.append("unit_name", unit.unit_name || "");
+      formDataWithFiles.append("unit_type", parseInt(unit.unit_type) || "");
+      formDataWithFiles.append("description", unit.description || "");
+      formDataWithFiles.append("remarks", unit.remarks || "");
+      formDataWithFiles.append(
+        "no_of_bedrooms",
+        parseInt(unit.no_of_bedrooms) || 0
+      );
+      formDataWithFiles.append(
+        "no_of_bathrooms",
+        parseInt(unit.no_of_bathrooms) || 0
+      );
+      formDataWithFiles.append("premise_no", unit.premise_no || "");
+      formDataWithFiles.append("unit_status", unit.unit_status || "");
       const unitCompData = documents.map((doc, index) => ({
         doc_type: parseInt(doc.doc_type),
-        number: doc.number || '',
-        issued_date: doc.issued_date || '',
-        expiry_date: doc.expiry_date || '',
-        file_index: index
+        number: doc.number || "",
+        issued_date: doc.issued_date || "",
+        expiry_date: doc.expiry_date || "",
+        file_index: index,
       }));
-      formDataWithFiles.append('unit_comp_json', JSON.stringify(unitCompData));
+      formDataWithFiles.append("unit_comp_json", JSON.stringify(unitCompData));
       documents.forEach((doc, index) => {
         if (doc.upload_file && doc.upload_file[0]) {
-          formDataWithFiles.append(`document_file_${index}`, doc.upload_file[0]);
+          formDataWithFiles.append(
+            `document_file_${index}`,
+            doc.upload_file[0]
+          );
         }
       });
       console.log("FormData contents:");
@@ -110,7 +129,7 @@ const UnitReview = ({ formData, onNext, onBack }) => {
         formDataWithFiles,
         {
           headers: {
-            "Content-Type": "multipart/form-data"
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -148,8 +167,32 @@ const UnitReview = ({ formData, onNext, onBack }) => {
             <div>
               <p className="review-page-label">Building Name*</p>
               <p className="review-page-data">
-                {building.building_name || getBuildingName(building.buildingId) || "N/A"}
+                {building.building_name || "N/A"}
               </p>
+            </div>
+            <div>
+              <p className="review-page-label">Description*</p>
+              <p className="review-page-data">
+                {building.description || "N/A"}
+              </p>
+            </div>
+            <div>
+              <p className="review-page-label">Building No*</p>
+              <p className="review-page-data">
+                {building.building_no || "N/A"}
+              </p>
+            </div>
+          </div>
+          <div className="space-y-8 ml-5">
+            <div>
+              <p className="review-page-label">Address*</p>
+              <p className="review-page-data">
+                {building.building_address || "N/A"}
+              </p>
+            </div>
+            <div>
+              <p className="review-page-label">Plot No*</p>
+              <p className="review-page-data">{building.plot_no || "N/A"}</p>
             </div>
           </div>
         </div>
@@ -186,7 +229,9 @@ const UnitReview = ({ formData, onNext, onBack }) => {
             </div>
             <div>
               <p className="review-page-label">Bathrooms</p>
-              <p className="review-page-data">{unit.no_of_bathrooms || "N/A"}</p>
+              <p className="review-page-data">
+                {unit.no_of_bathrooms || "N/A"}
+              </p>
             </div>
             <div>
               <p className="review-page-label">Remarks</p>
@@ -196,15 +241,15 @@ const UnitReview = ({ formData, onNext, onBack }) => {
               <p className="review-page-label">Status*</p>
               <p className="review-page-data">
                 {unit.unit_status
-                  ? unit.unit_status.charAt(0).toUpperCase() + unit.unit_status.slice(1)
+                  ? unit.unit_status.charAt(0).toUpperCase() +
+                    unit.unit_status.slice(1)
                   : "N/A"}
               </p>
             </div>
           </div>
         </div>
       </div>
-      <div className="border rounded-md border-[#E9E9E9] p-5 mt-[25px]">
-        <h2 className="review-page-head">Documents</h2>
+      <div className="py-5">
         <DocumentsView documents={documents} />
       </div>
       <div className="flex justify-end gap-4 pt-5 mt-auto">
