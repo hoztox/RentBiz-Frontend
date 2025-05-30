@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../../../../utils/config";
 import DocumentsView from "./DocumentView";
@@ -7,11 +7,51 @@ import "./ReviewPage.css";
 const ReviewPage = ({ formData, onBack, onNext }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [idTypes, setIdTypes] = useState([]);
 
   const tenant = formData?.tenant || {};
   const documents = Array.isArray(formData?.documents?.tenant_comp)
     ? formData.documents.tenant_comp
     : [];
+
+  // Fetch ID types to display titles instead of IDs
+  const getUserCompanyId = () => {
+    const role = localStorage.getItem("role")?.toLowerCase();
+    const storedCompanyId = localStorage.getItem("company_id");
+
+    console.log("Role:", role);
+    console.log("Raw company_id from localStorage:", storedCompanyId);
+
+    if (role === "company") {
+      return storedCompanyId;
+    } else if (role === "user" || role === "admin") {
+      return storedCompanyId;
+    }
+
+    return null;
+  };
+
+  useEffect(() => {
+    const fetchIdTypes = async () => {
+      try {
+        const companyId = getUserCompanyId();
+        const response = await axios.get(`${BASE_URL}/company/id_type/company/${companyId}`); 
+        setIdTypes(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error("Error fetching ID types:", error);
+        setIdTypes([]);
+      }
+    };
+
+    fetchIdTypes();
+  }, []);
+
+  // Function to get ID type title by ID
+  const getIdTypeTitle = (idTypeId) => {
+    if (!idTypeId) return "N/A";
+    const idType = idTypes.find(type => type.id === parseInt(idTypeId));
+    return idType ? idType.title : `ID: ${idTypeId}`;
+  };
 
   const handleNext = async () => {
     setLoading(true);
@@ -197,7 +237,7 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
             </div>
             <div>
               <p className="review-page-label">ID Type</p>
-              <p className="review-page-data">{tenant.id_type}</p>
+              <p className="review-page-data">{getIdTypeTitle(tenant.id_type)}</p>
             </div>
             <div>
               <p className="review-page-label">ID Validity</p>
@@ -205,7 +245,7 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
             </div>
             <div>
               <p className="review-page-label">Sponsor ID Type*</p>
-              <p className="review-page-data">{tenant.sponser_id_type}</p>
+              <p className="review-page-data">{getIdTypeTitle(tenant.sponser_id_type)}</p>
             </div>
             <div>
               <p className="review-page-label">Sponsor ID Validity*</p>
