@@ -54,9 +54,9 @@ const Buildings = () => {
     }
   };
 
-  const openEditBuildingModal = () => {
+  const openEditBuildingModal = (buildingId) => {
     if (isMobileView()) {
-      navigate("/admin/update-building-timeline");
+      navigate("/admin/update-building-timeline", { state: { buildingId } });
     } else {
       setEditBuildingModalOpen(true);
     }
@@ -68,6 +68,7 @@ const Buildings = () => {
 
   const closeEditBuildingModal = () => {
     setEditBuildingModalOpen(false);
+    setSelectedBuildingId(null); // Reset selectedBuildingId on close
   };
 
   const toggleRowExpand = (id) => {
@@ -77,7 +78,6 @@ const Buildings = () => {
     }));
   };
 
-  // Function to fetch buildings
   const fetchBuildings = async () => {
     try {
       const companyId = getUserCompanyId();
@@ -100,7 +100,6 @@ const Buildings = () => {
     }
   };
 
-  // Refresh function to be called after building creation
   const refreshBuildings = () => {
     console.log("Buildings: Refreshing building list");
     fetchBuildings();
@@ -110,7 +109,6 @@ const Buildings = () => {
     fetchBuildings();
   }, [companyId]);
 
-  // Filter buildings based on search term
   const filteredData = buildings.filter(
     (building) =>
       (building.building_no?.toLowerCase() || "").includes(
@@ -156,10 +154,7 @@ const Buildings = () => {
   const handleEditClick = (buildingId) => {
     console.log("Buildings: Selected buildingId:", buildingId);
     setSelectedBuildingId(buildingId);
-    setTimeout(() => {
-      console.log("Buildings: Opening edit modal with buildingId:", buildingId);
-      openEditBuildingModal();
-    }, 0);
+    openEditBuildingModal(buildingId); // Pass buildingId directly
   };
 
   const maxPageButtons = 5;

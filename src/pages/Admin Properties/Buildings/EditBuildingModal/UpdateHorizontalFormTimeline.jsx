@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import './UpdateHorizontalFormTimeline.css';
 import bgimg from "../../../../assets/Images/Admin Buildings/modal-img.svg";
 import tickIcon from "../../../../assets/Images/Admin Buildings/tick-icon.svg";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const UpdateHorizontalFormTimeline = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const buildingId = location.state?.buildingId;
 
-  // Initialize state from localStorage with unique keys for building update
   const [completedSteps, setCompletedSteps] = useState(
     JSON.parse(localStorage.getItem("update_building_completedSteps")) || []
   );
@@ -17,7 +18,6 @@ const UpdateHorizontalFormTimeline = () => {
       : parseInt(localStorage.getItem("update_building_activeCard")) || 1
   );
 
-  // Update localStorage when completedSteps or activeCard changes
   useEffect(() => {
     console.log("update_building_completedSteps:", completedSteps);
     console.log("update_building_activeCard:", activeCard);
@@ -28,7 +28,6 @@ const UpdateHorizontalFormTimeline = () => {
     );
   }, [completedSteps, activeCard]);
 
-  // Navigate to /admin/buildings-reset after 3 seconds if all steps are completed
   useEffect(() => {
     if (
       completedSteps.length === 3 &&
@@ -39,8 +38,8 @@ const UpdateHorizontalFormTimeline = () => {
       console.log("All update steps completed, navigating in 3 seconds");
       const timer = setTimeout(() => {
         navigate("/admin/update-building-reset");
-      }, 3000); // 3 seconds
-      return () => clearTimeout(timer); // Cleanup timer on unmount
+      }, 3000);
+      return () => clearTimeout(timer);
     }
   }, [completedSteps, navigate]);
 
@@ -68,16 +67,14 @@ const UpdateHorizontalFormTimeline = () => {
     },
   ];
 
-  // Function to handle button click
   const handleButtonClick = (route, id) => {
     console.log(`Navigating to ${route}, setting update_building_activeCard to ${id}`);
     setActiveCard(id);
-    navigate(route);
+    navigate(route, { state: { buildingId } });
   };
 
   return (
     <div className="w-full bg-white flex flex-col mb-[80px]">
-      {/* Header Section */}
       <div className="flex flex-col items-center">
         <div>
           <img
@@ -89,13 +86,11 @@ const UpdateHorizontalFormTimeline = () => {
       </div>
 
       <div className="relative top-[120px]">
-        {/* Welcome text */}
         <div className="text-center mb-6">
           <p className="welcome-text">Hi Charlotte, let's walk</p>
           <p className="welcome-text">you through your building</p>
         </div>
 
-        {/* Steps cards */}
         <div className="space-y-4 bg-[#EEF6FD] p-5 rounded-[6px] mb-[80px]">
           {steps.map((step) => {
             console.log(

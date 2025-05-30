@@ -3,7 +3,12 @@ import "./editbuilding.css";
 import BuildingFormFlow from './Building Form Flow/BuildingFormFlow';
 
 const EditBuildingModal = ({ open, onClose, buildingId, onBuildingCreated }) => {
-  console.log("EditBuildingModal: Received buildingId:", buildingId); // Debug log
+  console.log("EditBuildingModal: Received buildingId:", buildingId);
+  
+  if (!open || !buildingId) {
+    return null; // Prevent rendering if modal is not open or buildingId is null
+  }
+
   return (
     <div
       onClick={onClose}

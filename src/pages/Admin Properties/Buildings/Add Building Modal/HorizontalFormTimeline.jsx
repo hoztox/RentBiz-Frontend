@@ -35,9 +35,12 @@ const HorizontalFormTimeline = () => {
       completedSteps.includes(3)
     ) {
       const timer = setTimeout(() => {
+        localStorage.setItem("building_completedSteps", JSON.stringify([]));
+        localStorage.setItem("building_activeCard", "1");
+        localStorage.removeItem("building_formData");
         navigate("/admin/buildings-reset");
-      }, 3000); // 3 seconds
-      return () => clearTimeout(timer); // Cleanup timer on unmount
+      }, 3000);
+      return () => clearTimeout(timer);
     }
   }, [completedSteps, navigate]);
 
@@ -61,11 +64,10 @@ const HorizontalFormTimeline = () => {
       name: "Submitted",
       description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi orci ante, scelerisque",
-      route: "/submitted",
+      route: "/admin/submitted",
     },
   ];
 
-  // Function to handle button click
   const handleButtonClick = (route, id) => {
     setActiveCard(id);
     navigate(route);
@@ -73,28 +75,22 @@ const HorizontalFormTimeline = () => {
 
   return (
     <div className="w-full bg-white flex flex-col mb-[80px]">
-      {/* Header Section */}
       <div className="flex flex-col items-center">
-        {/* Building illustration */}
         <div>
-          <div>
-            <img
-              src={bgimg}
-              alt="Building Illustration"
-              className="building-illustration"
-            />
-          </div>
+          <img
+            src={bgimg}
+            alt="Building Illustration"
+            className="building-illustration"
+          />
         </div>
       </div>
 
       <div className="relative top-[120px]">
-        {/* Welcome text */}
         <div className="text-center mb-6">
           <p className="welcome-text">Hi Charlotte, let's walk</p>
           <p className="welcome-text">you through your building</p>
         </div>
 
-        {/* Steps cards */}
         <div className="space-y-4 bg-[#EEF6FD] p-5 rounded-[6px] mb-[80px]">
           {steps.map((step) => (
             <div
@@ -147,13 +143,17 @@ const HorizontalFormTimeline = () => {
                       </button>
                     ) : null}
                   </div>
-                  <p className={`timeline-description ${
-                        completedSteps.includes(step.id)
-                          ? "completed"
-                          : activeCard === step.id
-                          ? "active"
-                          : ""
-                      }`}>{step.description}</p>
+                  <p
+                    className={`timeline-description ${
+                      completedSteps.includes(step.id)
+                        ? "completed"
+                        : activeCard === step.id
+                        ? "active"
+                        : ""
+                    }`}
+                  >
+                    {step.description}
+                  </p>
                 </div>
               </div>
             </div>

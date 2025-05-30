@@ -1,24 +1,112 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./buildinginfoform.css";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
+import { BASE_URL } from "../../../../../utils/config";
 
 const ResponsiveUpdateBuildingInfoForm = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const buildingId = location.state?.buildingId;
+
   const [formState, setFormState] = useState({
-    buildingNo: "",
-    plotNo: "",
-    buildingName: "",
-    address: "",
+    building_no: "",
+    plot_no: "",
+    building_name: "",
+    building_address: "",
     description: "",
     remarks: "",
-    status: "Active",
+    status: "active",
     latitude: "",
     longitude: "",
-    nearByLandmark: "",
+    land_mark: "",
+    company: localStorage.getItem("company_id") || "",
+    user: localStorage.getItem("user_id") || null,
   });
-
   const [isSelectFocused, setIsSelectFocused] = useState(false);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Initialize form with localStorage data if available
+  useEffect(() => {
+    const storedFormData = JSON.parse(localStorage.getItem("update_building_formData"));
+    if (storedFormData?.building) {
+      setFormState((prev) => ({
+        ...prev,
+        ...storedFormData.building,
+      }));
+    }
+  }, []);
+
+  // Fetch building data on mount and autofill form
+  useEffect(() => {
+    const fetchBuildingData = async () => {
+      if (!buildingId) {
+        console.log("No buildingId provided, skipping fetch");
+        setLoading(false);
+        return;
+      }
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          `${BASE_URL}/company/buildings/${buildingId}/`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        const buildingData = response.data;
+        console.log("ResponsiveUpdateBuildingInfoForm: Fetched building data:", buildingData);
+
+        // Update formState with fetched data
+        const updatedFormState = {
+          building_no: buildingData.building_no || "",
+          plot_no: buildingData.plot_no || "",
+          building_name: buildingData.building_name || "",
+          building_address: buildingData.building_address || "",
+          description: buildingData.description || "",
+          remarks: buildingData.remarks || "",
+          status: buildingData.status || "active",
+          latitude: buildingData.latitude !== null ? buildingData.latitude.toString() : "",
+          longitude: buildingData.longitude !== null ? buildingData.longitude.toString() : "",
+          land_mark: buildingData.land_mark || "",
+          company: buildingData.company || localStorage.getItem("company_id") || "",
+          user: buildingData.user || localStorage.getItem("user_id") || null,
+        };
+
+        setFormState(updatedFormState);
+
+        // Store fetched data in localStorage for persistence
+        localStorage.setItem(
+          "update_building_formData",
+          JSON.stringify({
+            building: updatedFormState,
+            documents: {
+              documents: Array.isArray(buildingData.build_comp)
+                ? buildingData.build_comp.map((doc, index) => ({
+                    id: index + 1,
+                    doc_type: doc.doc_type || "",
+                    number: doc.number || "",
+                    issued_date: doc.issued_date || "",
+                    expiry_date: doc.expiry_date || "",
+                    upload_file: doc.upload_file ? [doc.upload_file] : [],
+                  }))
+                : [],
+            },
+          })
+        );
+
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching building data:", err);
+        setError("Failed to load building data.");
+        setLoading(false);
+      }
+    };
+    fetchBuildingData();
+  }, [buildingId]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -41,16 +129,58 @@ const ResponsiveUpdateBuildingInfoForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Update Form submitted:", formState);
-    // Save completion state and active card in localStorage
-    const completedSteps = [1]; // Mark "Update Building" (id: 1) as completed
+    const requiredFields = [
+      "building_no",
+      "plot_no",
+      "building_name",
+      "building_address",
+      "status",
+    ];
+    const errors = requiredFields
+      .filter((field) => !formState[field])
+      .map((field) => `${field.replace("_", " ")} is required`);
+    if (!buildingId) {
+      errors.push("Building ID is required.");
+    }
+    if (errors.length > 0) {
+      setError(errors.join(", "));
+      return;
+    }
+
+    // Update formData in localStorage
+    const existingFormData = JSON.parse(localStorage.getItem("update_building_formData")) || {
+      building: {},
+      documents: { documents: [] },
+    };
+    localStorage.setItem(
+      "update_building_formData",
+      JSON.stringify({
+        ...existingFormData,
+        building: formState,
+      })
+    );
+
+    // Update completedSteps and activeCard
+    const completedSteps = [1];
     console.log("Setting update_building_completedSteps:", completedSteps);
     console.log("Setting update_building_activeCard: 2");
     localStorage.setItem("update_building_completedSteps", JSON.stringify(completedSteps));
-    localStorage.setItem("update_building_activeCard", "2"); // Set "Upload Documents" (id: 2) as active
-    navigate("/admin/update-building-timeline");
+    localStorage.setItem("update_building_activeCard", "2");
+
+    // Navigate to document form with formData
+    navigate("/admin/update-building-upload-documents", {
+      state: { buildingId, formData: { building: formState, documents: existingFormData.documents } },
+    });
   };
-  
+
+  if (loading) {
+    return <div className="p-4">Loading building data...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500 p-4">{error}</div>;
+  }
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -61,8 +191,8 @@ const ResponsiveUpdateBuildingInfoForm = () => {
           <label className="block building-info-form-label">Building No*</label>
           <input
             type="text"
-            name="buildingNo"
-            value={formState.buildingNo}
+            name="building_no"
+            value={formState.building_no}
             onChange={handleInputChange}
             placeholder="1"
             className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
@@ -74,8 +204,8 @@ const ResponsiveUpdateBuildingInfoForm = () => {
           <label className="block building-info-form-label">Plot No*</label>
           <input
             type="text"
-            name="plotNo"
-            value={formState.plotNo}
+            name="plot_no"
+            value={formState.plot_no}
             onChange={handleInputChange}
             placeholder="1"
             className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
@@ -84,13 +214,11 @@ const ResponsiveUpdateBuildingInfoForm = () => {
         </div>
 
         <div className="col-span-1">
-          <label className="block building-info-form-label">
-            Building Name*
-          </label>
+          <label className="block building-info-form-label">Building Name*</label>
           <input
             type="text"
-            name="buildingName"
-            value={formState.buildingName}
+            name="building_name"
+            value={formState.building_name}
             onChange={handleInputChange}
             placeholder="Lorem ipsum dolor"
             className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
@@ -101,8 +229,8 @@ const ResponsiveUpdateBuildingInfoForm = () => {
         <div className="col-span-1">
           <label className="block building-info-form-label">Address*</label>
           <textarea
-            name="address"
-            value={formState.address}
+            name="building_address"
+            value={formState.building_address}
             onChange={handleInputChange}
             placeholder="Boulevard Downtown Dubai, PO Box 111969 Dubai, UAE"
             className="w-full building-info-form-inputs resize-none focus:border-gray-300 duration-200"
@@ -116,7 +244,7 @@ const ResponsiveUpdateBuildingInfoForm = () => {
             name="description"
             value={formState.description}
             onChange={handleInputChange}
-            placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit.  Morbi orci ante, scelerisque"
+            placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi orci ante, scelerisque"
             className="w-full building-info-form-inputs resize-none focus:border-gray-300 duration-200"
           />
         </div>
@@ -144,9 +272,9 @@ const ResponsiveUpdateBuildingInfoForm = () => {
               className="w-full appearance-none building-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer"
               required
             >
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-              <option value="Pending">Pending</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="pending">Pending</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
@@ -166,21 +294,22 @@ const ResponsiveUpdateBuildingInfoForm = () => {
               name="latitude"
               value={formState.latitude}
               onChange={handleInputChange}
-              placeholder="0.00"
+              placeholder="0.0000"
+              step="0.0001"
               className="w-full building-info-form-inputs focus:border-gray-300 duration-200 pr-8"
             />
             <div className="absolute right-0 top-[-8px] inset-y-0 flex flex-col justify-center pr-2">
               <button
                 type="button"
                 className="flex items-center justify-center h-4 text-[#201D1E]"
-                onClick={() => handleNumberStep("latitude", 0.01)}
+                onClick={() => handleNumberStep("latitude", 0.0001)}
               >
                 <ChevronUp size={14} />
               </button>
               <button
                 type="button"
                 className="flex items-center justify-center h-0 text-[#201D1E]"
-                onClick={() => handleNumberStep("latitude", -0.01)}
+                onClick={() => handleNumberStep("latitude", -0.0001)}
               >
                 <ChevronDown size={14} />
               </button>
@@ -196,21 +325,22 @@ const ResponsiveUpdateBuildingInfoForm = () => {
               name="longitude"
               value={formState.longitude}
               onChange={handleInputChange}
-              placeholder="0.00"
+              placeholder="0.0000"
+              step="0.0001"
               className="w-full building-info-form-inputs focus:border-gray-300 duration-200 pr-8"
             />
             <div className="absolute right-0 top-[-8px] inset-y-0 flex flex-col justify-center pr-2">
               <button
                 type="button"
                 className="flex items-center justify-center h-4 text-[#201D1E]"
-                onClick={() => handleNumberStep("longitude", 0.01)}
+                onClick={() => handleNumberStep("longitude", 0.0001)}
               >
                 <ChevronUp size={14} />
               </button>
               <button
                 type="button"
                 className="flex items-center justify-center h-0 text-[#201D1E]"
-                onClick={() => handleNumberStep("longitude", -0.01)}
+                onClick={() => handleNumberStep("longitude", -0.0001)}
               >
                 <ChevronDown size={14} />
               </button>
@@ -219,13 +349,11 @@ const ResponsiveUpdateBuildingInfoForm = () => {
         </div>
 
         <div className="col-span-1">
-          <label className="block building-info-form-label">
-            Near By Landmark
-          </label>
+          <label className="block building-info-form-label">Near By Landmark</label>
           <input
             type="text"
-            name="nearByLandmark"
-            value={formState.nearByLandmark}
+            name="land_mark"
+            value={formState.land_mark}
             onChange={handleInputChange}
             placeholder="Lorem ipsum dolor"
             className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
