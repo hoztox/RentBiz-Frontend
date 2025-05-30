@@ -47,7 +47,7 @@ const TenancyTermination = () => {
       try {
         const companyId = getUserCompanyId();
         setLoading(true);
-        const response = await axios.get(`${BASE_URL}/company/tenancies/company/${companyId}/`);
+        const response = await axios.get(`${BASE_URL}/company/tenancies/occupied/${companyId}/`);
         // Sort tenancies by id in ascending order
         const sortedTenancies = response.data.sort((a, b) => a.id - b.id);
         setTenancies(sortedTenancies);

@@ -37,25 +37,41 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
   const [error, setError] = useState(null);
   const [countriesList, setCountriesList] = useState([]);
 
+  const getUserCompanyId = () => {
+    const role = localStorage.getItem("role")?.toLowerCase();
+    const storedCompanyId = localStorage.getItem("company_id");
+
+    console.log("Role:", role);
+    console.log("Raw company_id from localStorage:", storedCompanyId);
+
+    if (role === "company") {
+      return storedCompanyId;
+    } else if (role === "user" || role === "admin") {
+      return storedCompanyId;
+    }
+
+    return null;
+  };
+
   // Convert countries object to array and sort alphabetically
   useEffect(() => {
     const countriesArray = Object.entries(countries).map(([code, country]) => ({
       code,
       name: country.name,
     }));
-    
+
     // Sort countries alphabetically by name
-    const sortedCountries = countriesArray.sort((a, b) => 
+    const sortedCountries = countriesArray.sort((a, b) =>
       a.name.localeCompare(b.name)
     );
-    
+
     setCountriesList(sortedCountries);
   }, []);
 
   useEffect(() => {
     const fetchIdTypes = async () => {
       try {
-        const companyId = localStorage.getItem("company_id");
+        const companyId = getUserCompanyId();
         const response = await axios.get(
           `${BASE_URL}/company/id_type/company/${companyId}`,
           {
@@ -74,36 +90,36 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
   }, []);
 
   useEffect(() => {
-  if (initialData) {
-    console.log("Initial Data:", initialData); 
-    setFormState({
-      tenant_name: initialData.tenant_name || "",
-      nationality: initialData.nationality || "",
-      phone: initialData.phone || "",
-      alternative_phone: initialData.alternative_phone || "",
-      email: initialData.email || "",
-      description: initialData.description || "",
-      address: initialData.address || "",
-      tenant_type: initialData.tenant_type || "",
-      license_no: initialData.license_no || "",
-      // CHANGED: Use the ID number, not the title string
-      id_type: initialData.id_type?.id || "",
-      id_number: initialData.id_number || "",
-      id_validity_date: initialData.id_validity_date || "",
-      sponser_name: initialData.sponser_name || "",
-      // CHANGED: Use the ID number, not the title string  
-      sponser_id_type: initialData.sponser_id_type?.id || "",
-      sponser_id_number: initialData.sponser_id_number || "",
-      sponser_id_validity_date: initialData.sponser_id_validity_date || "",
-      status: initialData.status || "Active",
-      remarks: initialData.remarks || "",
-      company: initialData.company || localStorage.getItem("company_id") || "",
-      user: initialData.user || localStorage.getItem("user_id") || null,
-    });
-    setMobno(initialData.phone || "");
-    setAltMobno(initialData.alternative_phone || "");
-  }
-}, [initialData]);
+    if (initialData) {
+      console.log("Initial Data:", initialData);
+      setFormState({
+        tenant_name: initialData.tenant_name || "",
+        nationality: initialData.nationality || "",
+        phone: initialData.phone || "",
+        alternative_phone: initialData.alternative_phone || "",
+        email: initialData.email || "",
+        description: initialData.description || "",
+        address: initialData.address || "",
+        tenant_type: initialData.tenant_type || "",
+        license_no: initialData.license_no || "",
+        // CHANGED: Use the ID number, not the title string
+        id_type: initialData.id_type?.id || "",
+        id_number: initialData.id_number || "",
+        id_validity_date: initialData.id_validity_date || "",
+        sponser_name: initialData.sponser_name || "",
+        // CHANGED: Use the ID number, not the title string  
+        sponser_id_type: initialData.sponser_id_type?.id || "",
+        sponser_id_number: initialData.sponser_id_number || "",
+        sponser_id_validity_date: initialData.sponser_id_validity_date || "",
+        status: initialData.status || "Active",
+        remarks: initialData.remarks || "",
+        company: initialData.company || localStorage.getItem("company_id") || "",
+        user: initialData.user || localStorage.getItem("user_id") || null,
+      });
+      setMobno(initialData.phone || "");
+      setAltMobno(initialData.alternative_phone || "");
+    }
+  }, [initialData]);
 
   const handleChange = (value, field) => {
     if (field === "phone") {
@@ -210,9 +226,8 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
-                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
-                  focusedField === "nationality" ? "rotate-180" : ""
-                }`}
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${focusedField === "nationality" ? "rotate-180" : ""
+                  }`}
               />
             </div>
           </div>

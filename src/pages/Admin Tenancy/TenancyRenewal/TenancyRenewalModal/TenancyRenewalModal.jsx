@@ -17,9 +17,9 @@ const TenancyRenewalModal = () => {
   const [showPaymentSchedule, setShowPaymentSchedule] = useState(true);
   const [tenants, setTenants] = useState([]);
   const [buildings, setBuildings] = useState([]);
-  const [displayBuildings, setDisplayBuildings] = useState([]); // New state for combined buildings
+  const [displayBuildings, setDisplayBuildings] = useState([]);  
   const [units, setUnits] = useState([]);
-  const [displayUnits, setDisplayUnits] = useState([]); // New state for combined units
+  const [displayUnits, setDisplayUnits] = useState([]); 
   const [chargeTypes, setChargeTypes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -506,8 +506,6 @@ const TenancyRenewalModal = () => {
       commision: parseFloat(formData.commision || 0).toFixed(2),
       remarks: formData.remarks,
       status: formData.status,
-      is_reniew: true,
-      previous_tenancy: parseInt(tenancyId),
       additional_charges: additionalCharges.map((charge) => ({
         charge_type: parseInt(charge.charge_type),
         reason: charge.reason,
@@ -532,8 +530,8 @@ const TenancyRenewalModal = () => {
     setError(null);
 
     try {
-      const response = await axios.put(
-        `${BASE_URL}/company/tenancies/${tenancyId}/`,
+      const response = await axios.post(
+        `${BASE_URL}/company/tenancy/${tenancyId}/renew/`, 
         payload,
         {
           headers: {
