@@ -5,6 +5,7 @@ import { ChevronDown } from "lucide-react";
 import axios from "axios";
 import { BASE_URL } from "../../../../utils/config";
 import PropTypes from "prop-types";
+import { countries } from "countries-list";
 
 const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
   const [formState, setFormState] = useState({
@@ -34,6 +35,22 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
   const [idTypes, setIdTypes] = useState([]);
   const [focusedField, setFocusedField] = useState(null);
   const [error, setError] = useState(null);
+  const [countriesList, setCountriesList] = useState([]);
+
+  // Convert countries object to array and sort alphabetically
+  useEffect(() => {
+    const countriesArray = Object.entries(countries).map(([code, country]) => ({
+      code,
+      name: country.name,
+    }));
+    
+    // Sort countries alphabetically by name
+    const sortedCountries = countriesArray.sort((a, b) => 
+      a.name.localeCompare(b.name)
+    );
+    
+    setCountriesList(sortedCountries);
+  }, []);
 
   useEffect(() => {
     const fetchIdTypes = async () => {
@@ -171,6 +188,7 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
             required
           />
         </div>
+
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Nationality*</label>
           <div className="relative">
@@ -183,10 +201,12 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
               className="w-full appearance-none tenant-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer"
               required
             >
-              <option value="">Choose</option>
-              <option value="UAE">UAE</option>
-              <option value="India">India</option>
-              {/* Add more nationalities as needed */}
+              <option value="">Choose Nationality</option>
+              {countriesList.map((country) => (
+                <option key={country.code} value={country.name}>
+                  {country.name}
+                </option>
+              ))}
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
@@ -197,6 +217,7 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
             </div>
           </div>
         </div>
+
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Mobile Number*</label>
           <PhoneInput
@@ -211,6 +232,7 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
             dropdownClass="phone-input-dropdown"
           />
         </div>
+
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Alternative Mobile Number*</label>
           <PhoneInput
@@ -225,6 +247,7 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
             dropdownClass="phone-input-dropdown"
           />
         </div>
+
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Email*</label>
           <input
@@ -237,6 +260,7 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
           />
         </div>
         <div></div>
+
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Description</label>
           <textarea
@@ -247,6 +271,7 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
             className="w-full tenant-info-form-inputs resize-none focus:border-gray-300 duration-200"
           />
         </div>
+
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Address*</label>
           <textarea
@@ -257,6 +282,7 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
             required
           />
         </div>
+
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Tenant Type*</label>
           <div className="relative">
@@ -275,13 +301,13 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
-                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
-                  focusedField === "tenant_type" ? "rotate-180" : ""
-                }`}
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${focusedField === "tenant_type" ? "rotate-180" : ""
+                  }`}
               />
             </div>
           </div>
         </div>
+
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Trade License Number*</label>
           <input
@@ -293,6 +319,7 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
             required
           />
         </div>
+
         <div className="col-span-1">
           <label className="block tenant-info-form-label">ID Type*</label>
           <div className="relative">
@@ -312,13 +339,13 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
-                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
-                  focusedField === "id_type" ? "rotate-180" : ""
-                }`}
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${focusedField === "id_type" ? "rotate-180" : ""
+                  }`}
               />
             </div>
           </div>
         </div>
+
         <div className="col-span-1">
           <label className="block tenant-info-form-label">ID Number*</label>
           <input
@@ -330,6 +357,7 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
             required
           />
         </div>
+
         <div className="col-span-1">
           <label className="block tenant-info-form-label">ID Validity*</label>
           <input
@@ -342,6 +370,7 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
           />
         </div>
         <div></div>
+
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Sponsor Name*</label>
           <input
@@ -353,6 +382,7 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
             required
           />
         </div>
+
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Sponsor ID Type*</label>
           <div className="relative">
@@ -372,13 +402,13 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
-                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
-                  focusedField === "sponser_id_type" ? "rotate-180" : ""
-                }`}
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${focusedField === "sponser_id_type" ? "rotate-180" : ""
+                  }`}
               />
             </div>
           </div>
         </div>
+
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Sponsor ID Number*</label>
           <input
@@ -390,6 +420,7 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
             required
           />
         </div>
+
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Sponsor ID Validity*</label>
           <input
@@ -401,6 +432,7 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
             required
           />
         </div>
+
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Status*</label>
           <div className="relative">
@@ -419,13 +451,13 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
-                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
-                  focusedField === "status" ? "rotate-180" : ""
-                }`}
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${focusedField === "status" ? "rotate-180" : ""
+                  }`}
               />
             </div>
           </div>
         </div>
+
         <div className="col-span-1">
           <label className="block tenant-info-form-label">Remarks</label>
           <input
@@ -437,11 +469,9 @@ const TenantInfoForm = ({ onNext, initialData, tenantId }) => {
           />
         </div>
       </div>
+
       <div className="next-btn-container mt-6 text-right">
-        <button
-          type="submit"
-          className="w-[150px] h-[38px] next-btn duration-300"
-        >
+        <button type="submit" className="w-[150px] h-[38px] next-btn duration-300">
           Next
         </button>
       </div>

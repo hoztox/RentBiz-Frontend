@@ -5,6 +5,7 @@ import "react-phone-input-2/lib/style.css";
 import { ChevronDown } from "lucide-react";
 import axios from "axios";
 import { BASE_URL } from "../../../../utils/config";
+import { countries } from "countries-list";
 
 const TenantInfoForm = ({ onNext, initialData }) => {
   const [formState, setFormState] = useState(
@@ -37,6 +38,22 @@ const TenantInfoForm = ({ onNext, initialData }) => {
   const [error, setError] = useState(null);
   const [companyId, setCompanyId] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [countriesList, setCountriesList] = useState([]);
+
+  // Convert countries object to array and sort alphabetically
+  useEffect(() => {
+    const countriesArray = Object.entries(countries).map(([code, country]) => ({
+      code,
+      name: country.name,
+    }));
+    
+    // Sort countries alphabetically by name
+    const sortedCountries = countriesArray.sort((a, b) => 
+      a.name.localeCompare(b.name)
+    );
+    
+    setCountriesList(sortedCountries);
+  }, []);
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -166,10 +183,12 @@ const TenantInfoForm = ({ onNext, initialData }) => {
               className="w-full appearance-none tenant-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer"
               required
             >
-              <option value="">Choose</option>
-              <option value="UAE">UAE</option>
-              <option value="India">India</option>
-              {/* Add more nationalities as needed */}
+              <option value="">Choose Nationality</option>
+              {countriesList.map((country) => (
+                <option key={country.code} value={country.name}>
+                  {country.name}
+                </option>
+              ))}
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
