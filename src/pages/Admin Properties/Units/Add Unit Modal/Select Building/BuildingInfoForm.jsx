@@ -11,7 +11,7 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
       buildingId: "",
       building_name: "",
       description: "",
-      address: "",
+      building_address: "",
       building_no: "",
       plot_no: "",
     }
@@ -141,7 +141,7 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
       buildingId: formState.buildingId,
       building_name: formState.building_name,
       description: formState.description,
-      building_address: formState.address,
+      building_address: formState.building_address,
       building_no: formState.building_no,
       plot_no: formState.plot_no,
     };
