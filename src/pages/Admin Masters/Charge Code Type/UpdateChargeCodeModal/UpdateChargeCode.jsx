@@ -161,8 +161,8 @@ const UpdateChargeCode = () => {
         </div>
 
         <div className="mb-6">
-          <label className="block pt-2 modal-label">
-            Title <span className="text-red-500">*</span>
+          <label className="block pt-2 pb-1 modal-label">
+            Title *
           </label>
           <input
             type="text"

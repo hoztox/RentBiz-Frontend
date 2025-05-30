@@ -200,7 +200,7 @@ const CreateChargesModal = () => {
 
         <div className="mb-6">
           <label className="block pt-2 mb-2 text-[#201D1E] modal-label">
-            Name <span className="text-red-500">*</span>
+            Name *
           </label>
           <input
             type="text"
@@ -222,7 +222,7 @@ const CreateChargesModal = () => {
           </div>
 
           <label className="block pt-2 mb-2 text-[#201D1E] modal-label">
-            Charge Code Type <span className="text-red-500">*</span>
+            Charge Code *
           </label>
           <div className="relative">
             <select
@@ -268,7 +268,7 @@ const CreateChargesModal = () => {
           </div>
 
           <label className="block pt-2 mb-2 text-[#201D1E] modal-label">
-            VAT Percentage <span className="text-red-500">*</span>
+            VAT Percentage *
           </label>
           <input
             type="number"
