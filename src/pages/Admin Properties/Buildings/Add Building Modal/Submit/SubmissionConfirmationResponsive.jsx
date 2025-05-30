@@ -10,9 +10,9 @@ const SubmissionConfirmationResponsive = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       navigate("/admin/building-timeline");
-    }, 3000); // 3000ms = 3 seconds
+    }, 3000);
 
-    return () => clearTimeout(timer); // Cleanup timer on component unmount
+    return () => clearTimeout(timer);
   }, [navigate]);
 
   return (
@@ -27,7 +27,6 @@ const SubmissionConfirmationResponsive = () => {
           />
         </div>
 
-        {/* Text Content */}
         <div className="submit-confirm-text">
           <h2 className="submit-title">Submitted Successfully</h2>
           <p className="submit-message">
