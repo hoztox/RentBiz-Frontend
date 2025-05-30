@@ -38,7 +38,7 @@ const Layout = () => {
   return (
     <div className="flex h-screen overflow-hidden">
       <AdminSidebar />
-      <div className="flex-1 flex flex-col max-w-[calc(100vw-272px)]">
+      <div className="flex-1 flex flex-col sm:max-w-[calc(100vw-272px)]">
         <AdminNavbar />
         <div className="flex-1 overflow-y-auto bg-[white] p-5">
           <Outlet />
