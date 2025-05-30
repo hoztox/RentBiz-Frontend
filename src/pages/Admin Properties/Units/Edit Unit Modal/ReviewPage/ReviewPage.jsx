@@ -135,7 +135,7 @@ const ReviewPage = ({ formData, onNext, onBack, unitId }) => {
   const handleBack = () => {
     const backData = {
       ...formData,
-      documents: documents,
+      documents: { documents }, // Preserve the nested documents structure
     };
     console.log("ReviewPage passing back:", backData);
     onBack(backData);
