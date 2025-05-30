@@ -22,7 +22,7 @@ const routeTitles = {
   "/admin/tenancy-close": "Tenancy Close Overview",
   "/admin/masters-unit-type": "Unit Masters Overview",
   "/admin/masters-id-type": "ID Type Masters Overview",
-  "/admin/masters-charge-code-type": "Charge Code Type Masters Overview",
+  "/admin/masters-charge-code-type": "Charge Code Masters Overview",
   "/admin/masters-charges": "Charges Masters Overview",
   "/admin/masters-document-type": "Document Type Masters Overview",
   "/admin/masters-translate": "Language Overview",

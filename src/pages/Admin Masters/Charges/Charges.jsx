@@ -270,7 +270,7 @@ const Charges = () => {
                       <th className="px-4 py-3 text-left charges-thead">DATE</th>
                       <th className="px-4 py-3 text-left charges-thead">NAME</th>
                       <th className="px-4 py-3 text-left charges-thead">
-                        CHARGE TYPE
+                        CHARGE CODE
                       </th>
                       <th className="px-4 py-3 text-right charges-thead">ACTION</th>
                     </tr>
