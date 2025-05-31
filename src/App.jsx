@@ -31,11 +31,11 @@ import ReportCollection from "./pages/ReportCollection/ReportCollection";
 import IncomeExpenseReport from "./pages/IncomeExpenseReport/IncomeExpenseReport";
 import ChargeCodeType from "./pages/Admin Masters/Charge Code Type/ChargeCodeType";
 import { ModalProvider } from "./context/ModalContext";
-import HorizontalFormTimeline from "./pages/Admin Properties/Buildings/Add Building Modal/HorizontalFormTimeline";
-import ResponsiveBuildingInfoForm from "./pages/Admin Properties/Buildings/Add Building Modal/Create Building/ResponsiveBuildingInfoForm";
-import ResponsiveDocumentForm from "./pages/Admin Properties/Buildings/Add Building Modal/Upload Documents/ResponsiveDocumentForm";
-import SubmissionConfirmationResponsive from "./pages/Admin Properties/Buildings/Add Building Modal/Submit/SubmissionConfirmationResponsive";
-import BuildingsReset from "./pages/Admin Properties/Buildings/Add Building Modal/BuildingsReset";
+// import HorizontalFormTimeline from "./pages/Admin Properties/Buildings/Add Building Modal/HorizontalFormTimeline";
+// import ResponsiveBuildingInfoForm from "./pages/Admin Properties/Buildings/Add Building Modal/Create Building/ResponsiveBuildingInfoForm";
+// import ResponsiveDocumentForm from "./pages/Admin Properties/Buildings/Add Building Modal/Upload Documents/ResponsiveDocumentForm";
+// import SubmissionConfirmationResponsive from "./pages/Admin Properties/Buildings/Add Building Modal/Submit/SubmissionConfirmationResponsive";
+// import BuildingsReset from "./pages/Admin Properties/Buildings/Add Building Modal/BuildingsReset";
 import UpdateHorizontalFormTimeline from "./pages/Admin Properties/Buildings/EditBuildingModal/UpdateHorizontalFormTimeline";
 import ResponsiveUpdateBuildingInfoForm from "./pages/Admin Properties/Buildings/EditBuildingModal/UpdateBuilding/ResponsiveUpdateBuildingInfoForm";
 import ResponsiveUpdateDocumentForm from "./pages/Admin Properties/Buildings/EditBuildingModal/Upload Documents/ResponsiveUpdateDocumentForm";
@@ -104,11 +104,11 @@ const App = () => {
             path="income-expense-report"
             element={<IncomeExpenseReport />}
           />
-          <Route path="building-timeline" element={<HorizontalFormTimeline />} />
+          {/* <Route path="building-timeline" element={<HorizontalFormTimeline />} />
           <Route path="create-building" element={<ResponsiveBuildingInfoForm />} />
           <Route path="upload-documents" element={<ResponsiveDocumentForm />} />
           <Route path="submitted" element={<SubmissionConfirmationResponsive />} />
-          <Route path="buildings-reset" element={<BuildingsReset />} />
+          <Route path="buildings-reset" element={<BuildingsReset />} /> */}
 
           <Route path="update-building-timeline" element={<UpdateHorizontalFormTimeline />} />
           <Route path="update-building" element={<ResponsiveUpdateBuildingInfoForm />} />

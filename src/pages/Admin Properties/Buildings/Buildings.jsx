@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./buildings.css";
 import { ChevronDown } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import plusicon from "../../../assets/Images/Admin Buildings/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Buildings/download-icon.svg";
@@ -27,7 +27,7 @@ const Buildings = () => {
   const [buildingToDelete, setBuildingToDelete] = useState(null);
   const [error, setError] = useState(null);
   const itemsPerPage = 10;
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -47,22 +47,14 @@ const Buildings = () => {
 
   const companyId = getUserCompanyId();
 
-  const isMobileView = () => window.innerWidth < 480;
+  // const isMobileView = () => window.innerWidth < 480;
 
   const openBuildingModal = () => {
-    if (isMobileView()) {
-      navigate("/admin/building-timeline");
-    } else {
       setBuildingModalOpen(true);
-    }
   };
 
-  const openEditBuildingModal = (buildingId) => {
-    if (isMobileView()) {
-      navigate("/admin/update-building-timeline", { state: { buildingId } });
-    } else {
+  const openEditBuildingModal = () => {
       setEditBuildingModalOpen(true);
-    }
   };
 
   const closeBuildingModal = () => {

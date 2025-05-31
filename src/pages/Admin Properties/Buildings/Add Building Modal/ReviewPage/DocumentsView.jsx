@@ -66,7 +66,6 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
 
   return (
     <div className="flex flex-col w-full">
-      <h1 className="documents-head pb-5">Documents</h1>
       {safeDocuments.length === 0 ? (
         <p className="text-gray-500">No documents uploaded.</p>
       ) : (
