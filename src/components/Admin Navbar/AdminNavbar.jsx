@@ -1,13 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
 import logo from "../../assets/Images/Admin Sidebar/Rentbiz Logo.svg";
 import backarrow from "../../assets/Images/Admin Navbar/backarrow.svg";
-import profile from "../../assets/Images/Admin Navbar/profile.svg";
+import profile from "../../assets/Images/Admin Navbar/profile.png";
 import mobilemenu from "../../assets/Images/Admin Navbar/mobile-menu.svg";
 import "./adminnavbar.css";
 import MobileSlideMenu from "../MobileSlideMenu/MobileSlideMenu";
 import { useModal } from "../../context/ModalContext";
+import { BASE_URL } from "../../utils/config";
+
+// Add your BASE_URL here
 
 const routeTitles = {
   "/admin/dashboard": "Dashboard Overview",
@@ -82,7 +86,7 @@ const mobileRouteTitles = {
   "/admin/unit-submitted": "Submitted",
   "/admin/update-unit-timeline": "",
   "/admin/update-select-building-form": "Select Building",
-  "/admin/update-unit" : "Update Unit",
+  "/admin/update-unit": "Update Unit",
   "/admin/update-unit-upload-documents": "Upload Documents",
   "/admin/update-unit-submitted": "Submitted",
   "/admin/tenant-timeline": "",
@@ -134,34 +138,123 @@ const AdminNavbar = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("English");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [currentPath, setCurrentPath] = useState("");
+
+  // Profile state
+  const [profileData, setProfileData] = useState({
+    name: "",
+    email: "",
+    profileImage: profile, // fallback to default
+  });
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
   const { modalState, closeModal } = useModal();
 
+  // Helper functions
+  const getUserCompanyId = () => {
+    const role = localStorage.getItem("role")?.toLowerCase();
+    if (role === "company") {
+      return localStorage.getItem("company_id");
+    } else if (role === "user") {
+      try {
+        const userCompanyId = localStorage.getItem("company_id");
+        return userCompanyId ? JSON.parse(userCompanyId) : null;
+      } catch (e) {
+        console.error("Error parsing user company ID:", e);
+        return null;
+      }
+    }
+    return null;
+  };
+
+  const getRelevantUserId = () => {
+    const role = localStorage.getItem("role")?.toLowerCase();
+    if (role === "user") {
+      const userId = localStorage.getItem("user_id");
+      if (userId) return userId;
+    }
+    return null;
+  };
+
+  // Fetch profile data
+  const fetchProfileData = async () => {
+    try {
+      setIsLoadingProfile(true);
+      const role = localStorage.getItem("role")?.toLowerCase();
+
+      if (role === "company") {
+        const companyId = getUserCompanyId();
+        if (companyId) {
+          const response = await axios.get(`${BASE_URL}/accounts/company/${companyId}/detail/`); 
+          const companyData = response.data;
+
+          setProfileData({
+            name: companyData.company_name || "Admin",
+            email: companyData.email_address || "example@gmail.com",
+            profileImage: companyData.company_logo ?
+              (companyData.company_logo.startsWith('http') ?
+                companyData.company_logo :
+                `${BASE_URL.replace('/api', '')}${companyData.company_logo}`)
+              : profile,
+          });
+          console.log('company details:', response.data);
+          
+        }
+      } else if (role === "user") {
+        const userId = getRelevantUserId();
+        if (userId) {
+          const response = await axios.get(`${BASE_URL}/company/user/${userId}/details/`);
+          const userData = response.data;
+
+          setProfileData({
+            name: userData.name || "User",
+            email: userData.email || "example@gmail.com",
+            profileImage: userData.company_logo ?
+              (userData.company_logo.startsWith('http') ?
+                userData.company_logo :
+                `${BASE_URL.replace('/api', '')}${userData.company_logo}`)
+              : profile,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching profile data:", error);
+      // Keep default values if API call fails
+    } finally {
+      setIsLoadingProfile(false);
+    }
+  };
+
   useEffect(() => {
     setCurrentPath(location.pathname);
   }, [location.pathname]);
 
+  // Fetch profile data on component mount
+  useEffect(() => {
+    fetchProfileData();
+  }, []);
+
   const isDashboard = currentPath === "/admin/dashboard";
 
-const getPageTitle = (isMobile = false) => {
-  // Prioritize modal titles when modal is open
-  if (modalState.isOpen && modalState.type) {
-    return modalTitles[modalState.type] || mobileRouteTitles.default;
-  }
+  const getPageTitle = (isMobile = false) => {
+    // Prioritize modal titles when modal is open
+    if (modalState.isOpen && modalState.type) {
+      return modalTitles[modalState.type] || mobileRouteTitles.default;
+    }
 
-  const path = currentPath;
-  const titles = isMobile ? mobileRouteTitles : routeTitles;
+    const path = currentPath;
+    const titles = isMobile ? mobileRouteTitles : routeTitles;
 
-  // Check for exact route match and allow empty string to be returned
-  if (path in titles) {
-    return titles[path] !== undefined ? titles[path] : "";
-  }
+    // Check for exact route match and allow empty string to be returned
+    if (path in titles) {
+      return titles[path] !== undefined ? titles[path] : "";
+    }
 
-  // Fallback for unknown routes
-  return titles.default || "Admin";
-};
+    // Fallback for unknown routes
+    return titles.default || "Admin";
+  };
 
   // Store current path in localstorage when it changes
   useEffect(() => {
@@ -203,6 +296,11 @@ const getPageTitle = (isMobile = false) => {
     navigate("/admin/dashboard");
   };
 
+  // Handle profile image error
+  const handleImageError = (e) => {
+    e.target.src = profile; // fallback to default image
+  };
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -218,9 +316,8 @@ const getPageTitle = (isMobile = false) => {
   return (
     <>
       <nav
-        className={`flex items-center justify-between mx-5 h-[86px] border-b border-[#E9E9E9] bg-white admin-navbar ${
-          isDashboard ? "dashboard-nav" : "non-dashboard-nav"
-        } ${modalState.isOpen ? "modal-open" : ""}`}
+        className={`flex items-center justify-between mx-5 h-[86px] border-b border-[#E9E9E9] bg-white admin-navbar ${isDashboard ? "dashboard-nav" : "non-dashboard-nav"
+          } ${modalState.isOpen ? "modal-open" : ""}`}
       >
         <div className="flex items-center w-full">
           {/* Left Section: Logo or Back Arrow */}
@@ -270,18 +367,16 @@ const getPageTitle = (isMobile = false) => {
               {selectedLanguage}
               <ChevronDown
                 size={20}
-                className={`ml-2 transform transition-transform duration-300 ease-in-out text-[#201D1E] ${
-                  isOpen ? "rotate-180" : ""
-                }`}
+                className={`ml-2 transform transition-transform duration-300 ease-in-out text-[#201D1E] ${isOpen ? "rotate-180" : ""
+                  }`}
               />
             </button>
 
             <div
-              className={`absolute mt-1 w-[120px] bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden transition-all duration-300 ease-in-out ${
-                isOpen
+              className={`absolute mt-1 w-[120px] bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden transition-all duration-300 ease-in-out ${isOpen
                   ? "opacity-100 max-h-40 transform translate-y-0"
                   : "opacity-0 max-h-0 transform -translate-y-2 pointer-events-none"
-              }`}
+                }`}
             >
               <div className="py-1">
                 <button
@@ -300,17 +395,31 @@ const getPageTitle = (isMobile = false) => {
             </div>
           </div>
 
-          <div className="flex items-center profile-section">
+          <div className="flex items-center profile-section justify-end">
             <div className="w-10 h-10 rounded-full overflow-hidden mr-5">
-              <img
-                src={profile}
-                alt="User Profile"
-                className="w-[46px] h-[46px] object-cover"
-              />
+              {isLoadingProfile ? (
+                <div className="w-[46px] h-[46px] bg-gray-200 animate-pulse rounded-full"></div>
+              ) : (
+                <img
+                  src={profileData.profileImage}
+                  alt="User Profile"
+                  className="w-[46px] h-[46px] object-cover"
+                  onError={handleImageError}
+                />
+              )}
             </div>
             <div className="flex flex-col">
-              <span className="admin-name">Hi, Admin</span>
-              <span className="admin-email">example@gmail.com</span>
+              {isLoadingProfile ? (
+                <>
+                  <div className="h-4 w-16 bg-gray-200 animate-pulse rounded mb-1"></div>
+                  <div className="h-3 w-24 bg-gray-200 animate-pulse rounded"></div>
+                </>
+              ) : (
+                <>
+                  <span className="admin-name whitespace-nowrap">Hi, {profileData.name}</span>
+                  <span className="admin-email whitespace-nowrap">{profileData.email}</span>
+                </>
+              )}
             </div>
           </div>
         </div>
