@@ -6,7 +6,7 @@ import DocumentsForm from "../UploadDocuments/DocumentsForm";
 import ReviewPage from "../ReviewPage/ReviewPage";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 
-const TenantFormFlow = ({ onClose }) => {
+const TenantFormFlow = ({ onClose, onTenantCreated }) => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [formData, setFormData] = useState({
     tenant: null,
@@ -27,7 +27,12 @@ const TenantFormFlow = ({ onClose }) => {
   const currentTitle = pageTitles[currentPageIndex];
 
   useEffect(() => {
-    const newProgress = { tenantDetails: 0, uploadDocuments: 0, review: 0, submitted: 0 };
+    const newProgress = {
+      tenantDetails: 0,
+      uploadDocuments: 0,
+      review: 0,
+      submitted: 0,
+    };
 
     if (currentPageIndex >= 1) newProgress.tenantDetails = 100;
     if (currentPageIndex >= 2) newProgress.uploadDocuments = 100;
@@ -93,9 +98,17 @@ const TenantFormFlow = ({ onClose }) => {
   };
 
   const handleClose = () => {
+    if (currentPageIndex === 3) {
+      onTenantCreated();
+    }
     setCurrentPageIndex(0);
     setFormData({ tenant: null, documents: null });
-    setFormProgress({ tenantDetails: 0, uploadDocuments: 0, review: 0, submitted: 0 });
+    setFormProgress({
+      tenantDetails: 0,
+      uploadDocuments: 0,
+      review: 0,
+      submitted: 0,
+    });
     onClose();
   };
 

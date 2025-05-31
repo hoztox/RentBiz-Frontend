@@ -86,7 +86,7 @@ const App = () => {
           <Route path="tenancy-close" element={<CloseTenancy />} />
           <Route path="masters-unit-type" element={<UnitType />} />
           <Route path="masters-id-type" element={<IdType />} />
-          <Route path="masters-charge-code-type" element={<ChargeCodeType />} />
+          <Route path="masters-charge-code" element={<ChargeCodeType />} />
           <Route path="masters-charges" element={<Charges />} />
           <Route path="masters-document-type" element={<DocumentType />} />
           <Route path="masters-translate" element={<Translate />} />

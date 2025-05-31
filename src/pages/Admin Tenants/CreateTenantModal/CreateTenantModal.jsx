@@ -3,7 +3,7 @@ import './createtenantmodal.css'
 import TenantFormFlow from './TenantFormFlow/TenantFormFlow'
 
 
-const CreateTenantModal = ({open, onClose}) => {
+const CreateTenantModal = ({open, onClose, onTenantCreated}) => {
   return (
     <div
             onClick={onClose}
@@ -16,7 +16,7 @@ const CreateTenantModal = ({open, onClose}) => {
                     ${open ? "scale-100 opacity-100" : "scale-125 opacity-0"}`}
             >
                 {/* Content Here */}
-                <TenantFormFlow onClose={onClose} />
+                <TenantFormFlow onClose={onClose} onTenantCreated={onTenantCreated} />
             </div>
         </div>
   )

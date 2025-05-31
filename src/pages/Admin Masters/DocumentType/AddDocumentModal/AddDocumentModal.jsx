@@ -129,7 +129,7 @@ const AddDocumentModal = () => {
 
         <div className="mb-6">
           <label className="block pt-2 tenancy-modal-label">
-            Title <span className="text-red-500">*</span>
+            Title *
           </label>
           <input
             type="text"

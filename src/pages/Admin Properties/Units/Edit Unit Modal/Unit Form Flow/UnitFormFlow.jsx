@@ -9,23 +9,23 @@ import axios from "axios";
 import { BASE_URL } from "../../../../../utils/config";
 import ReviewPage from "../ReviewPage/ReviewPage";
 
-const UnitFormFlow = ( { onClose, unitId } ) => {
-  const [currentPageIndex, setCurrentPageIndex] = useState( 0 );
-  const [formData, setFormData] = useState( {
+const UnitFormFlow = ({ onClose, unitId, onUnitCreated }) => {
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const [formData, setFormData] = useState({
     building: null,
     unit: null,
     documents: null,
-  } );
-  const [formProgress, setFormProgress] = useState( {
+  });
+  const [formProgress, setFormProgress] = useState({
     selectBuilding: 0,
     createUnit: 0,
     uploadDocuments: 0,
     review: 0,
     submitted: 0,
-  } );
-  const [animating, setAnimating] = useState( false );
-  const [loading, setLoading] = useState( true );
-  const [error, setError] = useState( null );
+  });
+  const [animating, setAnimating] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const pageTitles = [
     "Select Building",
@@ -38,13 +38,15 @@ const UnitFormFlow = ( { onClose, unitId } ) => {
   const currentTitle = pageTitles[currentPageIndex];
 
   // Fetch unit data on component mount
-  useEffect( () => {
+  useEffect(() => {
     const fetchUnitData = async () => {
-      setLoading( true );
+      setLoading(true);
       try {
-        const response = await axios.get( `${BASE_URL}/company/units/${unitId}/` );
+        const response = await axios.get(
+          `${BASE_URL}/company/units/${unitId}/`
+        );
         const unitData = response.data;
-        setFormData( {
+        setFormData({
           building: {
             buildingId: unitData.building || "",
             building_name: unitData.building_name || "",
@@ -67,29 +69,30 @@ const UnitFormFlow = ( { onClose, unitId } ) => {
             user: unitData.user || null,
           },
           documents: {
-            documents: unitData.unit_comp?.map( ( doc, index ) => ( {
-              id: index + 1,
-              doc_type: doc.doc_type || "",
-              number: doc.number || "",
-              issued_date: doc.issued_date || "",
-              expiry_date: doc.expiry_date || "",
-              upload_file: doc.upload_file ? [doc.upload_file] : [],
-            } ) ) || [],
+            documents:
+              unitData.unit_comp?.map((doc, index) => ({
+                id: index + 1,
+                doc_type: doc.doc_type || "",
+                number: doc.number || "",
+                issued_date: doc.issued_date || "",
+                expiry_date: doc.expiry_date || "",
+                upload_file: doc.upload_file ? [doc.upload_file] : [],
+              })) || [],
           },
-        } );
-        setError( null );
-      } catch ( error ) {
-        console.error( "Error fetching unit data:", error );
-        setError( "Failed to load unit data. Please try again." );
+        });
+        setError(null);
+      } catch (error) {
+        console.error("Error fetching unit data:", error);
+        setError("Failed to load unit data. Please try again.");
       } finally {
-        setLoading( false );
+        setLoading(false);
       }
     };
     fetchUnitData();
-  }, [unitId] );
+  }, [unitId]);
 
   // Update form progress
-  useEffect( () => {
+  useEffect(() => {
     const newProgress = {
       selectBuilding: 0,
       createUnit: 0,
@@ -98,23 +101,23 @@ const UnitFormFlow = ( { onClose, unitId } ) => {
       submitted: 0,
     };
 
-    if ( currentPageIndex >= 1 ) newProgress.selectBuilding = 100;
-    if ( currentPageIndex >= 2 ) newProgress.createUnit = 100;
-    if ( currentPageIndex >= 3 ) newProgress.uploadDocuments = 100;
-    if ( currentPageIndex >= 4 ) newProgress.review = 100;
+    if (currentPageIndex >= 1) newProgress.selectBuilding = 100;
+    if (currentPageIndex >= 2) newProgress.createUnit = 100;
+    if (currentPageIndex >= 3) newProgress.uploadDocuments = 100;
+    if (currentPageIndex >= 4) newProgress.review = 100;
 
-    if ( currentPageIndex === 0 && formData.building ) {
+    if (currentPageIndex === 0 && formData.building) {
       const requiredFields = ["buildingId"];
       const filledFields = requiredFields.filter(
-        ( field ) => formData.building[field]
+        (field) => formData.building[field]
       ).length;
       newProgress.selectBuilding = Math.min(
         100,
-        ( filledFields / requiredFields.length ) * 100
+        (filledFields / requiredFields.length) * 100
       );
     }
 
-    if ( currentPageIndex === 1 && formData.unit ) {
+    if (currentPageIndex === 1 && formData.unit) {
       const requiredFields = [
         "unit_name",
         "unit_type",
@@ -123,36 +126,40 @@ const UnitFormFlow = ( { onClose, unitId } ) => {
         "unit_status",
       ];
       const filledFields = requiredFields.filter(
-        ( field ) => formData.unit[field]
+        (field) => formData.unit[field]
       ).length;
       newProgress.createUnit = Math.min(
         100,
-        ( filledFields / requiredFields.length ) * 100
+        (filledFields / requiredFields.length) * 100
       );
     }
 
-    setFormProgress( newProgress );
-  }, [currentPageIndex, formData] );
+    setFormProgress(newProgress);
+  }, [currentPageIndex, formData]);
 
-  const handleNextPage = ( pageData ) => {
-    setAnimating( true );
-    setFormData( ( prevData ) => ( {
+  const handleNextPage = (pageData) => {
+    setAnimating(true);
+    setFormData((prevData) => ({
       ...prevData,
-      [currentPageIndex === 0 ? "building" : currentPageIndex === 1 ? "unit" : "documents"]: pageData,
-    } ) );
+      [currentPageIndex === 0
+        ? "building"
+        : currentPageIndex === 1
+        ? "unit"
+        : "documents"]: pageData,
+    }));
 
-    setTimeout( () => {
-      setCurrentPageIndex( ( prev ) => prev + 1 );
-      setAnimating( false );
-    }, 500 );
+    setTimeout(() => {
+      setCurrentPageIndex((prev) => prev + 1);
+      setAnimating(false);
+    }, 500);
   };
 
-  const handlePreviousPage = ( pageData ) => {
-    setAnimating( true );
-    if ( pageData ) {
-      setFormData( ( prevData ) => {
+  const handlePreviousPage = (pageData) => {
+    setAnimating(true);
+    if (pageData) {
+      setFormData((prevData) => {
         // If navigating back from ReviewPage (index 3), merge the full pageData
-        if ( currentPageIndex === 3 ) {
+        if (currentPageIndex === 3) {
           return {
             ...prevData,
             building: pageData.building || prevData.building,
@@ -165,24 +172,28 @@ const UnitFormFlow = ( { onClose, unitId } ) => {
           ...prevData,
           [currentPageIndex === 2 ? "documents" : "unit"]: pageData,
         };
-      } );
+      });
     }
-    setTimeout( () => {
-      setCurrentPageIndex( ( prev ) => Math.max( prev - 1, 0 ) );
-      setAnimating( false );
-    }, 500 );
+    setTimeout(() => {
+      setCurrentPageIndex((prev) => Math.max(prev - 1, 0));
+      setAnimating(false);
+    }, 500);
   };
 
   const handleClose = () => {
-    setCurrentPageIndex( 0 );
-    setFormData( { building: null, unit: null, documents: null } );
-    setFormProgress( {
+    if (currentPageIndex === 4) {
+      // Only trigger refresh if closing from SubmissionConfirmation
+      onUnitCreated();
+    }
+    setCurrentPageIndex(0);
+    setFormData({ building: null, unit: null, documents: null });
+    setFormProgress({
       selectBuilding: 0,
       createUnit: 0,
       uploadDocuments: 0,
       review: 0,
       submitted: 0,
-    } );
+    });
     onClose();
   };
 
@@ -214,11 +225,15 @@ const UnitFormFlow = ( { onClose, unitId } ) => {
       onBack={handlePreviousPage}
       unitId={unitId}
     />,
-    <SubmissionConfirmation key="confirm" formData={formData} onClose={handleClose} />,
+    <SubmissionConfirmation
+      key="confirm"
+      formData={formData}
+      onClose={handleClose}
+    />,
   ];
 
-  if ( loading ) return <div>Loading unit data...</div>;
-  if ( error ) return <div className="text-red-500">{error}</div>;
+  if (loading) return <div>Loading unit data...</div>;
+  if (error) return <div className="text-red-500">{error}</div>;
 
   return (
     <div className="flex">
@@ -241,7 +256,9 @@ const UnitFormFlow = ( { onClose, unitId } ) => {
         </div>
         <div
           className={`transition-all duration-500 ease-in-out ${
-            animating ? "opacity-0 transform translate-x-10" : "opacity-100 transform translate-x-0"
+            animating
+              ? "opacity-0 transform translate-x-10"
+              : "opacity-100 transform translate-x-0"
           }`}
         >
           {pageComponents[currentPageIndex]}
