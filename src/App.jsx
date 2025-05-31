@@ -31,11 +31,6 @@ import ReportCollection from "./pages/ReportCollection/ReportCollection";
 import IncomeExpenseReport from "./pages/IncomeExpenseReport/IncomeExpenseReport";
 import ChargeCodeType from "./pages/Admin Masters/Charge Code Type/ChargeCodeType";
 import { ModalProvider } from "./context/ModalContext";
-// import HorizontalFormTimeline from "./pages/Admin Properties/Buildings/Add Building Modal/HorizontalFormTimeline";
-// import ResponsiveBuildingInfoForm from "./pages/Admin Properties/Buildings/Add Building Modal/Create Building/ResponsiveBuildingInfoForm";
-// import ResponsiveDocumentForm from "./pages/Admin Properties/Buildings/Add Building Modal/Upload Documents/ResponsiveDocumentForm";
-// import SubmissionConfirmationResponsive from "./pages/Admin Properties/Buildings/Add Building Modal/Submit/SubmissionConfirmationResponsive";
-// import BuildingsReset from "./pages/Admin Properties/Buildings/Add Building Modal/BuildingsReset";
 import UpdateHorizontalFormTimeline from "./pages/Admin Properties/Buildings/EditBuildingModal/UpdateHorizontalFormTimeline";
 import ResponsiveUpdateBuildingInfoForm from "./pages/Admin Properties/Buildings/EditBuildingModal/UpdateBuilding/ResponsiveUpdateBuildingInfoForm";
 import ResponsiveUpdateDocumentForm from "./pages/Admin Properties/Buildings/EditBuildingModal/Upload Documents/ResponsiveUpdateDocumentForm";
@@ -63,6 +58,7 @@ import ResUpdateTenantInfoForm from "./pages/Admin Tenants/EditTenantModal/Updat
 import EditTenantDocFormRes from "./pages/Admin Tenants/EditTenantModal/UploadDocuments/EditTenantDocFormRes";
 import SubmissionConfirmationRes from "./pages/Admin Tenants/EditTenantModal/Submit/SubmissionConfirmationRes";
 import EditTenantsReset from "./pages/Admin Tenants/EditTenantModal/EditTenantsReset";
+import Taxes from "./pages/Admin Masters/Taxes/Taxes";
 
 const App = () => {
   return (
@@ -87,6 +83,7 @@ const App = () => {
           <Route path="masters-unit-type" element={<UnitType />} />
           <Route path="masters-id-type" element={<IdType />} />
           <Route path="masters-charge-code" element={<ChargeCodeType />} />
+          <Route path="masters-taxes" element={<Taxes />} />
           <Route path="masters-charges" element={<Charges />} />
           <Route path="masters-document-type" element={<DocumentType />} />
           <Route path="masters-translate" element={<Translate />} />
@@ -104,11 +101,6 @@ const App = () => {
             path="income-expense-report"
             element={<IncomeExpenseReport />}
           />
-          {/* <Route path="building-timeline" element={<HorizontalFormTimeline />} />
-          <Route path="create-building" element={<ResponsiveBuildingInfoForm />} />
-          <Route path="upload-documents" element={<ResponsiveDocumentForm />} />
-          <Route path="submitted" element={<SubmissionConfirmationResponsive />} />
-          <Route path="buildings-reset" element={<BuildingsReset />} /> */}
 
           <Route path="update-building-timeline" element={<UpdateHorizontalFormTimeline />} />
           <Route path="update-building" element={<ResponsiveUpdateBuildingInfoForm />} />
