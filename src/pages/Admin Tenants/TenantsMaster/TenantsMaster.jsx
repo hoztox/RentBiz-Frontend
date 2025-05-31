@@ -11,6 +11,7 @@ import CreateTenantModal from "../CreateTenantModal/CreateTenantModal";
 import EditTenantModal from "../EditTenantModal/EditTenantModal";
 import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../utils/config";
+import DeleteTenantModal from "../DeleteTenantModal/DeleteTenantModal";
 
 const TenantsMaster = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -23,6 +24,8 @@ const TenantsMaster = () => {
   const [selectedTenantId, setSelectedTenantId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [tenantToDelete, setTenantToDelete] = useState(null);
   const itemsPerPage = 10;
   const navigate = useNavigate();
 
@@ -117,28 +120,32 @@ const TenantsMaster = () => {
     setSelectedTenantId(null);
   };
 
-  const handleDeleteTenant = async (tenantId) => {
-    if (window.confirm("Are you sure you want to delete this tenant?")) {
-      try {
-        const response = await axios.delete(
-          `${BASE_URL}/company/tenant/${tenantId}/`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        if (response.status === 204) {
-          setTenants(tenants.filter((tenant) => tenant.id !== tenantId));
-          console.log("Tenants: Successfully deleted tenant", tenantId);
+  const handleDeleteTenant = async () => {
+    if (!tenantToDelete) return;
+
+    try {
+      const response = await axios.delete(
+        `${BASE_URL}/company/tenant/${tenantToDelete}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
-      } catch (error) {
-        console.error("Error deleting tenant:", error);
-        setError(
-          "Failed to delete tenant: " +
-            (error.response?.data?.message || error.message)
-        );
+      );
+      if (response.status === 204) {
+        setTenants(tenants.filter((tenant) => tenant.id !== tenantToDelete));
+        console.log("Tenants: Successfully deleted tenant", tenantToDelete);
       }
+      setDeleteModalOpen(false);
+      setTenantToDelete(null);
+    } catch (error) {
+      console.error("Error deleting tenant:", error);
+      setError(
+        "Failed to delete tenant: " +
+          (error.response?.data?.message || error.message)
+      );
+      setDeleteModalOpen(false);
+      setTenantToDelete(null);
     }
   };
 
@@ -154,7 +161,9 @@ const TenantsMaster = () => {
       (tenant.tenant_name?.toLowerCase() || "").includes(
         searchTerm.toLowerCase()
       ) ||
-      (tenant.address?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (tenant.address?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase()
+      ) ||
       (tenant.code?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
       (tenant.tenant_type?.toLowerCase() || "").includes(
         searchTerm.toLowerCase()
@@ -292,7 +301,12 @@ const TenantsMaster = () => {
                       className="w-[18px] h-[18px] action-btn duration-200"
                     />
                   </button>
-                  <button onClick={() => handleDeleteTenant(tenant.id)}>
+                  <button
+                    onClick={() => {
+                      setTenantToDelete(tenant.id);
+                      setDeleteModalOpen(true);
+                    }}
+                  >
                     <img
                       src={deletesicon}
                       alt="Delete"
@@ -412,7 +426,10 @@ const TenantsMaster = () => {
                                 />
                               </button>
                               <button
-                                onClick={() => handleDeleteTenant(tenant.id)}
+                                onClick={() => {
+                                  setTenantToDelete(tenant.id);
+                                  setDeleteModalOpen(true);
+                                }}
                               >
                                 <img
                                   src={deletesicon}
@@ -499,6 +516,14 @@ const TenantsMaster = () => {
         onClose={closeUpdateTenantModal}
         tenantId={selectedTenantId}
         onTenantUpdated={refreshTenants}
+      />
+      <DeleteTenantModal
+        isOpen={deleteModalOpen}
+        onCancel={() => {
+          setDeleteModalOpen(false);
+          setTenantToDelete(null);
+        }}
+        onDelete={handleDeleteTenant}
       />
     </div>
   );

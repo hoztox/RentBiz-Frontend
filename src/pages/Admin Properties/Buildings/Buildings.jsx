@@ -11,6 +11,7 @@ import deletesicon from "../../../assets/Images/Admin Buildings/delete-icon.svg"
 import AddBuildingModal from "./Add Building Modal/AddBuildingModal";
 import EditBuildingModal from "./EditBuildingModal/EditBuildingModal";
 import { BASE_URL } from "../../../utils/config";
+import DeleteBuildingModal from "./DeleteBuildingModal/DeleteBuildingModal";
 
 const Buildings = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -22,6 +23,8 @@ const Buildings = () => {
   const [buildings, setBuildings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedBuildingId, setSelectedBuildingId] = useState(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [buildingToDelete, setBuildingToDelete] = useState(null);
   const [error, setError] = useState(null);
   const itemsPerPage = 10;
   const navigate = useNavigate();
@@ -129,25 +132,32 @@ const Buildings = () => {
     currentPage * itemsPerPage
   );
 
-  const deleteBuilding = async (buildingId) => {
-    if (window.confirm("Are you sure you want to delete this building?")) {
-      try {
-        const response = await axios.delete(
-          `${BASE_URL}/company/buildings/${buildingId}/`
+  const deleteBuilding = async () => {
+    if (!buildingToDelete) return;
+
+    try {
+      const response = await axios.delete(
+        `${BASE_URL}/company/buildings/${buildingToDelete}/`
+      );
+      if (response.status === 204) {
+        setBuildings(
+          buildings.filter((building) => building.id !== buildingToDelete)
         );
-        if (response.status === 204) {
-          setBuildings(
-            buildings.filter((building) => building.id !== buildingId)
-          );
-          console.log("Buildings: Successfully deleted building", buildingId);
-        }
-      } catch (err) {
-        console.error("Failed to delete building", err);
-        setError(
-          "Failed to delete building: " +
-            (err.response?.data?.message || err.message)
+        console.log(
+          "Buildings: Successfully deleted building",
+          buildingToDelete
         );
       }
+      setDeleteModalOpen(false);
+      setBuildingToDelete(null);
+    } catch (err) {
+      console.error("Failed to delete building", err);
+      setError(
+        "Failed to delete building: " +
+          (err.response?.data?.message || err.message)
+      );
+      setDeleteModalOpen(false);
+      setBuildingToDelete(null);
     }
   };
 
@@ -254,7 +264,9 @@ const Buildings = () => {
                 <td className="px-5 text-left bldg-data">
                   {building.building_address || "N/A"}
                 </td>
-                <td className="pl-12 pr-5 text-left bldg-data">{building.unit_count}</td>
+                <td className="pl-12 pr-5 text-left bldg-data">
+                  {building.unit_count}
+                </td>
                 <td className="px-5 text-left bldg-data">
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
@@ -279,7 +291,12 @@ const Buildings = () => {
                       className="w-[18px] h-[18px] bldg-action-btn duration-200"
                     />
                   </button>
-                  <button onClick={() => deleteBuilding(building.id)}>
+                  <button
+                    onClick={() => {
+                      setBuildingToDelete(building.id);
+                      setDeleteModalOpen(true);
+                    }}
+                  >
                     <img
                       src={deletesicon}
                       alt="Delete"
@@ -400,7 +417,10 @@ const Buildings = () => {
                                 />
                               </button>
                               <button
-                                onClick={() => deleteBuilding(building.id)}
+                                onClick={() => {
+                                  setBuildingToDelete(building.id);
+                                  setDeleteModalOpen(true);
+                                }}
                               >
                                 <img
                                   src={deletesicon}
@@ -487,6 +507,14 @@ const Buildings = () => {
         onClose={closeEditBuildingModal}
         buildingId={selectedBuildingId}
         onBuildingCreated={refreshBuildings}
+      />
+      <DeleteBuildingModal
+        isOpen={deleteModalOpen}
+        onCancel={() => {
+          setDeleteModalOpen(false);
+          setBuildingToDelete(null);
+        }}
+        onDelete={deleteBuilding}
       />
     </div>
   );
