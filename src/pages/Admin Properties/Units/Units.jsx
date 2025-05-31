@@ -454,6 +454,7 @@ const Units = () => {
         open={updateUnitModalOpen}
         onClose={closeUpdateUnitModal}
         unitId={selectedUnitId}
+        onUnitCreated={refreshUnits}
       />
     </div>
   );
