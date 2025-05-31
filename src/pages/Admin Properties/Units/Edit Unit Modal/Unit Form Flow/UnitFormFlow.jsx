@@ -40,6 +40,7 @@ const UnitFormFlow = ({ onClose, unitId, onUnitCreated }) => {
   // Fetch unit data on component mount
   useEffect(() => {
     const fetchUnitData = async () => {
+      if (!unitId) return;
       setLoading(true);
       try {
         const response = await axios.get(
