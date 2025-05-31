@@ -482,6 +482,17 @@ const AdminSidebar = () => {
                 </div>
 
                 <div
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Taxes" ? "submenu-active" : ""
+                    }`}
+                  onClick={() => {
+                    setActiveItem("Taxes");
+                    navigate("/admin/masters-taxes");
+                  }}
+                >
+                  <p className="pl-10 py-[7px]">Taxes</p>
+                </div>
+
+                <div
                   className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Charges" ? "submenu-active" : ""
                     }`}
                   onClick={() => {

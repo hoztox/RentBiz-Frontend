@@ -11,7 +11,6 @@ import MobileSlideMenu from "../MobileSlideMenu/MobileSlideMenu";
 import { useModal } from "../../context/ModalContext";
 import { BASE_URL } from "../../utils/config";
 
-// Add your BASE_URL here
 
 const routeTitles = {
   "/admin/dashboard": "Dashboard Overview",
@@ -27,6 +26,7 @@ const routeTitles = {
   "/admin/masters-unit-type": "Unit Masters Overview",
   "/admin/masters-id-type": "ID Type Masters Overview",
   "/admin/masters-charge-code": "Charge Code Masters Overview",
+  "/admin/masters-taxes": "Taxes Overview",
   "/admin/masters-charges": "Charges Masters Overview",
   "/admin/masters-document-type": "Document Type Masters Overview",
   "/admin/masters-translate": "Language Overview",
@@ -57,6 +57,7 @@ const mobileRouteTitles = {
   "/admin/masters-unit-type": "Unit Type Masters",
   "/admin/masters-id-type": "ID Type Masters",
   "/admin/masters-charge-code": "Charge Code Masters",
+  "/admin/masters-taxes": "Taxes Overview",
   "/admin/masters-charges": "Charges Master",
   "/admin/masters-document-type": "Document Type Masters",
   "/admin/masters-translate": "Translation",
