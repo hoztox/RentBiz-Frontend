@@ -19,21 +19,16 @@ const AdminCreateUserModal = () => {
   const navigate = useNavigate();
 
   const getUserCompanyId = () => {
-    // First check if company_id is stored directly
-    const storedCompanyId = localStorage.getItem("company_id");
-    if (storedCompanyId) return storedCompanyId;
-    // If user data exists with company_id
-    const userRole = localStorage.getItem("role");
-    if (userRole === "user") {
-      // Try to get company_id from user data that was stored during login
-      const userData = localStorage.getItem("user_company_id");
-      if (userData) {
-        try {
-          return JSON.parse(userData);  // Ensure it's valid JSON
-        } catch (e) {
-          console.error("Error parsing user company ID:", e);
-          return null;
-        }
+    const role = localStorage.getItem("role")?.toLowerCase();
+    if (role === "company") {
+      return localStorage.getItem("company_id");
+    } else if (role === "user" || role === "admin") {
+      try {
+        const userCompanyId = localStorage.getItem("company_id");
+        return userCompanyId ? JSON.parse(userCompanyId) : null;
+      } catch (e) {
+        console.error("Error parsing user company ID:", e);
+        return null;
       }
     }
     return null;
