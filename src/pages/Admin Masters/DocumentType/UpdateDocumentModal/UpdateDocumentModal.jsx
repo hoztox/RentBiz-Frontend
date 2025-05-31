@@ -151,7 +151,7 @@ const UpdateDocumentModal = () => {
         </div>
 
         <div className="mb-6">
-          <label className="block pt-2 update-modal-label">Title*</label>
+          <label className="block pt-2 pb-1 update-modal-label">Title *</label>
           <input
             type="text"
             className={`input-style border transition-colors duration-200 ${

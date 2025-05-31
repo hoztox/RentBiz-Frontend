@@ -471,14 +471,14 @@ const AdminSidebar = () => {
                 </div>
 
                 <div
-                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Charge Code Type" ? "submenu-active" : ""
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Charge Code" ? "submenu-active" : ""
                     }`}
                   onClick={() => {
-                    setActiveItem("Charge Code Type");
-                    navigate("/admin/masters-charge-code-type");
+                    setActiveItem("Charge Code");
+                    navigate("/admin/masters-charge-code");
                   }}
                 >
-                  <p className="pl-10 py-[7px]">Charge Code Type</p>
+                  <p className="pl-10 py-[7px]">Charge Code</p>
                 </div>
 
                 <div
