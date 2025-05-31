@@ -1,0 +1,5 @@
+@media(max-width:480px) {
+    .form-time-line, .building-modal-header {
+        display: none !important;
+    }
+}
