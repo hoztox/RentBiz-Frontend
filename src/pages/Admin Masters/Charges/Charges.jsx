@@ -583,15 +583,9 @@ const Charges = () => {
                                   <div className="dropdown-value">{formatDate(charge.created_at)}</div>
                                 </div>
                                 <div className="charges-grid-items">
-                                  <div className="dropdown-label">CHARGE TYPE</div>
+                                  <div className="dropdown-label">CHARGE CODE</div>
                                   <div className="dropdown-value">
                                     {charge.charge_code?.title || "N/A"}
-                                  </div>
-                                </div>
-                                <div className="charges-grid-items">
-                                  <div className="dropdown-label">VAT PERCENTAGE</div>
-                                  <div className="dropdown-value">
-                                    {charge.vat_percentage ? `${charge.vat_percentage}%` : "N/A"}
                                   </div>
                                 </div>
                               </div>

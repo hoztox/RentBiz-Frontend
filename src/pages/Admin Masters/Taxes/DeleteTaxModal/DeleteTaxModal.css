@@ -1,4 +1,4 @@
-.charges-modal-box {
+.modal-box-tax {
   display: flex;
   width: 380px;
   height: 432px;
@@ -11,7 +11,7 @@
   box-sizing: border-box;
 }
 
-.charges-modal-bg {
+.modal-bg-tax {
   display: flex;
   width: 312px;
   height: 225px;
@@ -22,19 +22,19 @@
   background: #f0f8ff;
 }
 
-.charges-modal-content {
+.modal-content-tax {
   font-family: "Inter Tight";
   margin-top: 20px;
 }
 
-.charges-modal-content h2 {
+.modal-content-tax h2 {
   font-size: 21px;
   font-weight: 400;
   line-height: 24px;
   letter-spacing: 0;
 }
 
-.charges-modal-content p {
+.modal-content-tax p {
   margin-top: 9px;
   font-weight: 400;
   font-size: 15px;
@@ -42,7 +42,7 @@
   letter-spacing: 0px;
 }
 
-.charges-cancel-btn {
+.cancel-btn-tax {
   width: 150px;
   height: 38px;
   border-radius: 6px;
@@ -54,7 +54,7 @@
   letter-spacing: 0.43px;
 }
 
-.charges-modal-delete-btn {
+.modal-delete-btn-tax {
   width: 150px;
   height: 38px;
   border-radius: 6px;
@@ -67,40 +67,40 @@
 
 /* Responsive adjustments for mobile screens */
 @media (max-width: 640px) {
-  .charges-modal-box {
+  .modal-box-tax {
     width: 300px;
     height: 360px;
     padding: 20px;
     gap: 15px;
   }
 
-  .charges-modal-bg {
+  .modal-bg-tax {
     width: 240px;
     height: 160px;
     padding: 20px 30px;
   }
 
-  .charges-modal-bg img {
+  .modal-bg-tax img {
     height: 100px;
   }
 
-  .charges-modal-content {
+  .modal-content-tax {
     margin-top: 15px;
   }
 
-  .charges-modal-content h2 {
+  .modal-content-tax h2 {
     font-size: 18px;
     line-height: 20px;
   }
 
-  .charges-modal-content p {
+  .modal-content-tax p {
     font-size: 13px;
     line-height: 18px;
     margin-top: 6px;
   }
 
-  .charges-cancel-btn,
-  .charges-modal-delete-btn {
+  .cancel-btn-tax,
+  .modal-delete-btn-tax {
     width: 120px;
     height: 32px;
     font-size: 14px;
@@ -113,34 +113,34 @@
 }
 
 @media (max-width: 360px) {
-  .charges-modal-box {
+  .modal-box-tax {
     width: 270px;
-    height: 320px;
+    height: 300px;
     padding: 15px;
   }
 
-  .charges-modal-bg {
+  .modal-bg-tax {
     width: 220px;
     height: 140px;
     padding: 15px 25px;
   }
 
-  .charges-modal-bg img {
+  .modal-bg-tax img {
     height: 80px;
   }
 
-  .charges-modal-content h2 {
+  .modal-content-tax h2 {
     font-size: 16px;
     line-height: 18px;
   }
 
-  .charges-modal-content p {
+  .modal-content-tax p {
     font-size: 12px;
     line-height: 16px;
   }
 
-  .charges-cancel-btn,
-  .charges-modal-delete-btn {
+  .cancel-btn-tax,
+  .modal-delete-btn-tax {
     width: 110px;
     height: 30px;
     font-size: 13px;
