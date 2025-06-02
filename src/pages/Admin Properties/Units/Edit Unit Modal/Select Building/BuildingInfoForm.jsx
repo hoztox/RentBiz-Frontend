@@ -120,7 +120,7 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
   return (
     <form onSubmit={handleSubmit} className="flex-1">
       {error && <p className="text-red-500 mb-4">{error}</p>}
-      <div className="grid grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div className="col-span-1">
           <label className="block building-info-form-label">Building Name*</label>
           <div className="relative">

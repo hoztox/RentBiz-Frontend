@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import closeicon from "../../../../../assets/Images/Admin Units/close-icon.svg";
 import FormTimeline from "../FromTimeline";
 import BuildingInfoForm from "../Select Building/BuildingInfoForm";
@@ -7,8 +7,8 @@ import DocumentsForm from "../Upload Documents/DocumentsForm";
 import UnitReview from "../Review/UnitReview";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 
-const UnitFormFlow = ({ onClose, onUnitCreated }) => {
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+const UnitFormFlow = ({ onClose, onUnitCreated, onPageChange, initialPageIndex = 0 }) => {
+  const [currentPageIndex, setCurrentPageIndex] = useState(initialPageIndex);
   const [formData, setFormData] = useState({
     building: null,
     unit: null,
@@ -22,6 +22,8 @@ const UnitFormFlow = ({ onClose, onUnitCreated }) => {
     submitted: 0,
   });
   const [animating, setAnimating] = useState(false);
+  // Use ref to track external navigation
+  const isExternalNavigation = useRef(false);
 
   const pageTitles = [
     "Select Building",
@@ -32,6 +34,24 @@ const UnitFormFlow = ({ onClose, onUnitCreated }) => {
   ];
 
   const currentTitle = pageTitles[currentPageIndex];
+
+  // Handle external page navigation from dropdown
+  useEffect(() => {
+    if (initialPageIndex !== currentPageIndex && !isExternalNavigation.current) {
+      isExternalNavigation.current = true;
+      setCurrentPageIndex(initialPageIndex);
+      setTimeout(() => {
+        isExternalNavigation.current = false;
+      }, 0);
+    }
+  }, [initialPageIndex]);
+
+  // Notify parent of page changes
+  useEffect(() => {
+    if (onPageChange && !isExternalNavigation.current) {
+      onPageChange(currentPageIndex);
+    }
+  }, [currentPageIndex, onPageChange]);
 
   useEffect(() => {
     const newProgress = {
@@ -99,30 +119,30 @@ const UnitFormFlow = ({ onClose, onUnitCreated }) => {
   };
 
   const handlePreviousPage = (pageData) => {
-  setAnimating(true);
-  if (pageData) {
-    setFormData((prevData) => {
-      // If navigating back from UnitReview (index 3), merge the full pageData
-      if (currentPageIndex === 3) {
+    setAnimating(true);
+    if (pageData) {
+      setFormData((prevData) => {
+        // If navigating back from UnitReview (index 3), merge the full pageData
+        if (currentPageIndex === 3) {
+          return {
+            ...prevData,
+            building: pageData.building || prevData.building,
+            unit: pageData.unit || prevData.unit,
+            documents: pageData.documents || prevData.documents,
+          };
+        }
+        // For other pages, update only the relevant section
         return {
           ...prevData,
-          building: pageData.building || prevData.building,
-          unit: pageData.unit || prevData.unit,
-          documents: pageData.documents || prevData.documents,
+          [currentPageIndex === 2 ? "documents" : "unit"]: pageData,
         };
-      }
-      // For other pages, update only the relevant section
-      return {
-        ...prevData,
-        [currentPageIndex === 2 ? "documents" : "unit"]: pageData,
-      };
-    });
-  }
-  setTimeout(() => {
-    setCurrentPageIndex((prev) => Math.max(prev - 1, 0));
-    setAnimating(false);
-  }, 500);
-};
+      });
+    }
+    setTimeout(() => {
+      setCurrentPageIndex((prev) => Math.max(prev - 1, 0));
+      setAnimating(false);
+    }, 500);
+  };
 
   const handleClose = () => {
     if (currentPageIndex === 4) {

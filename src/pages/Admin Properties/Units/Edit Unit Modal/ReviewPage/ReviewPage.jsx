@@ -171,10 +171,10 @@ const ReviewPage = ({ formData, onNext, onBack, unitId }) => {
       {error && (
         <p className="text-red-500 mb-4 p-2 bg-red-100 rounded">{error}</p>
       )}
-      <div className="border rounded-md border-[#E9E9E9] p-5 mb-5">
+      <div className="border rounded-md border-[#E9E9E9] p-5">
         <h2 className="review-page-head">Building</h2>
         <div className="grid grid-cols-1 md:grid-cols-2">
-          <div className="space-y-8 border-r border-[#E9E9E9]">
+          <div className="space-y-8 border-r border-[#E9E9E9] max-[480px]:border-r-0">
             <div>
               <p className="review-page-label">Building Name*</p>
               <p className="review-page-data">
@@ -194,7 +194,7 @@ const ReviewPage = ({ formData, onNext, onBack, unitId }) => {
               </p>
             </div>
           </div>
-          <div className="space-y-8 ml-5">
+          <div className="space-y-8 sm:ml-5 max-[480px]:mt-8">
             <div>
               <p className="review-page-label">Address*</p>
               <p className="review-page-data">
@@ -208,10 +208,10 @@ const ReviewPage = ({ formData, onNext, onBack, unitId }) => {
           </div>
         </div>
       </div>
-      <div className="border rounded-md border-[#E9E9E9] p-5">
+      <div className="border rounded-md border-[#E9E9E9] p-5 mt-[25px]">
         <h2 className="review-page-head">Unit</h2>
         <div className="grid grid-cols-1 md:grid-cols-2">
-          <div className="space-y-8 border-r border-[#E9E9E9]">
+          <div className="space-y-8 border-r border-[#E9E9E9] max-[480px]:border-r-0">
             <div>
               <p className="review-page-label">Unit Name*</p>
               <p className="review-page-data">{unit.unit_name || "N/A"}</p>
@@ -233,7 +233,7 @@ const ReviewPage = ({ formData, onNext, onBack, unitId }) => {
               <p className="review-page-data">{unit.premise_no || "N/A"}</p>
             </div>
           </div>
-          <div className="space-y-8 ml-5">
+          <div className="space-y-8 sm:ml-5 max-[480px]:mt-8">
             <div>
               <p className="review-page-label">Address*</p>
               <p className="review-page-data">{unit.address || "N/A"}</p>
