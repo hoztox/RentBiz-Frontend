@@ -24,7 +24,7 @@ const Buildings = () => {
   const [buildings, setBuildings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedBuildingId, setSelectedBuildingId] = useState(null);
-  // const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const { openModal} = useModal();
   const [buildingToDelete, setBuildingToDelete] = useState(null);
   const [error, setError] = useState(null);
@@ -51,9 +51,9 @@ const Buildings = () => {
 
   // const isMobileView = () => window.innerWidth < 480;
 
-  const openBuildingModal = () => {
-      setBuildingModalOpen(true);
-  };
+  // const openBuildingModal = () => {
+  //     setBuildingModalOpen(true);
+  // };
 
   const openEditBuildingModal = () => {
       setEditBuildingModalOpen(true);
@@ -201,7 +201,7 @@ const Buildings = () => {
           <div className="flex gap-[10px] bldg-action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md bldg-add-new-building duration-200"
-              onClick={openBuildingModal}
+              onClick={()=>openModal("create-building")}
             >
               Add New Building
               <img
