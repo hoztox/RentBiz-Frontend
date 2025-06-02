@@ -257,7 +257,7 @@ const Buildings = () => {
                   {building.building_address || "N/A"}
                 </td>
                 <td className="pl-12 pr-5 text-left bldg-data">
-                  {building.unit_count}
+                  {building.unit_count || "N/A"}
                 </td>
                 <td className="px-5 text-left bldg-data">
                   <span
@@ -375,7 +375,7 @@ const Buildings = () => {
                             <div className="bldg-dropdown-label">
                               NO. OF UNITS
                             </div>
-                            <div className="bldg-dropdown-value">N/A</div>
+                            <div className="bldg-dropdown-value">{building.unit_count || "N/A"}</div>
                           </div>
                           <div className="bldg-grid-item w-[27%]">
                             <div className="bldg-dropdown-label">STATUS</div>
