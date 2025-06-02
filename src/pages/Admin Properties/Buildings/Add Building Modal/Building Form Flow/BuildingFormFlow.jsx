@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import closeicon from "../../../../../assets/Images/Admin Buildings/close-icon.svg";
 import FormTimeline from "../FormTimeline";
 import BuildingInfoForm from "../Create Building/BuildingInfoForm";
@@ -7,8 +7,8 @@ import ReviewPage from "../ReviewPage/ReviewPage";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 import "./buildingformflow.css"
 
-const BuildingFormFlow = ({ onClose, onBuildingCreated }) => {
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+const BuildingFormFlow = ({ onClose, onBuildingCreated, onPageChange, initialPageIndex = 0 }) => {
+  const [currentPageIndex, setCurrentPageIndex] = useState(initialPageIndex);
   const [formData, setFormData] = useState({
     building: null,
     documents: null,
@@ -20,6 +20,9 @@ const BuildingFormFlow = ({ onClose, onBuildingCreated }) => {
     submitted: 0,
   });
   const [animating, setAnimating] = useState(false);
+  
+  // Use ref to track if we're handling external navigation
+  const isExternalNavigation = useRef(false);
 
   // Dynamic page titles based on current page
   const pageTitles = [
@@ -31,6 +34,25 @@ const BuildingFormFlow = ({ onClose, onBuildingCreated }) => {
 
   // Get current title based on page index
   const currentTitle = pageTitles[currentPageIndex];
+
+  // Handle external page navigation (from dropdown) - only update if different
+  useEffect(() => {
+    if (initialPageIndex !== currentPageIndex && !isExternalNavigation.current) {
+      isExternalNavigation.current = true;
+      setCurrentPageIndex(initialPageIndex);
+      // Reset the flag after state update
+      setTimeout(() => {
+        isExternalNavigation.current = false;
+      }, 0);
+    }
+  }, [initialPageIndex]);
+
+  // Update parent component when page changes - but avoid circular updates
+  useEffect(() => {
+    if (onPageChange && !isExternalNavigation.current) {
+      onPageChange(currentPageIndex);
+    }
+  }, [currentPageIndex, onPageChange]);
 
   useEffect(() => {
     const newProgress = { createBuilding: 0, uploadDocuments: 0, review: 0, submitted: 0 };
@@ -137,7 +159,7 @@ const BuildingFormFlow = ({ onClose, onBuildingCreated }) => {
       </div>
 
       {/* Right Side - Form Steps & Modal Header */}
-      <div className="w-full h-[700px] desktop:h-[780px] px-[20px] sm:px-[26px] pt-[50px] pb-[140px] sm:pb-[40px] overflow-y-scroll">
+      <div className="w-full h-[700px] desktop:h-[780px] px-[20px] sm:px-[26px] pt-[8px] sm:pt-[50px] pb-[285px] sm:pb-[40px] overflow-y-scroll">
         {/* Modal Header with Dynamic Title */}
         <div className="building-modal-header flex justify-between items-center mb-[35px]">
           <h3 className="building-modal-title">{currentTitle}</h3>
