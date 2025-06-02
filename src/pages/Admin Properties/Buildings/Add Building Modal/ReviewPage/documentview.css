@@ -8,4 +8,19 @@
   font-family: "Inter Tight";
   font-weight: 400;
   font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 320px) {
+  .grid {
+    grid-template-columns: 1fr; /* Fallback to single column for very narrow screens */
+  }
+  .document-name {
+    font-size: 0.65rem; /* Smaller font for tiny screens */
+  }
+  .max-w-\[150px\] {
+    max-width: 100%; /* Allow cards to take full width in single-column mode */
+  }
 }
