@@ -71,6 +71,8 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
       formDataWithFiles.append('status', building.status);
       formDataWithFiles.append('land_mark', getValueOrEmpty(building.land_mark));
       formDataWithFiles.append('building_address', building.building_address);
+      formDataWithFiles.append('country', getValueOrEmpty(building.country));
+      formDataWithFiles.append('state', getValueOrEmpty(building.state));
       // Add documents data
       documents.forEach((doc, index) => {
         formDataWithFiles.append(`build_comp[${index}][doc_type]`, doc.doc_type);

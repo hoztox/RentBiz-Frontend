@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./buildinginfoform.css";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { BASE_URL } from "../../../../../utils/config";
+import axios from "axios";
 
 const BuildingInfoForm = ({ onNext, initialData }) => {
   const [formState, setFormState] = useState(
@@ -15,21 +17,70 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
       latitude: "",
       longitude: "",
       land_mark: "",
+      country: "", // Added country field
+      state: "",   // Added state field
     }
   );
   const [companyId, setCompanyId] = useState(null);
   const [userId, setUserId] = useState(null);
-  const [isSelectFocused, setIsSelectFocused] = useState(false);
+  const [isSelectFocused, setIsSelectFocused] = useState({
+    status: false,
+    country: false,
+    state: false,
+  });
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [loading, setLoading] = useState({ countries: false, states: false });
+
+  // Fetch countries from API
+  useEffect(() => {
+    const fetchCountries = async () => {
+      setLoading((prev) => ({ ...prev, countries: true }));
+      try {
+        const response = await axios.get(`${BASE_URL}/accounts/countries/`);
+        setCountries(response.data);
+      } catch (error) {
+        console.error("Error fetching countries:", error);
+      } finally {
+        setLoading((prev) => ({ ...prev, countries: false }));
+      }
+    };
+    fetchCountries();
+  }, []);
+
+  // Fetch states when country changes
+  useEffect(() => {
+    if (formState.country) {
+      const fetchStates = async () => {
+        setLoading((prev) => ({ ...prev, states: true }));
+        try {
+          const response = await axios.get(
+            `${BASE_URL}/accounts/countries/${formState.country}/states/`
+          );
+          setStates(response.data);
+        } catch (error) {
+          console.error("Error fetching states:", error);
+          setStates([]);
+        } finally {
+          setLoading((prev) => ({ ...prev, states: false }));
+        }
+      };
+      fetchStates();
+    } else {
+      setStates([]);
+      setFormState((prev) => ({ ...prev, state: "" }));
+    }
+  }, [formState.country]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormState({
-      ...formState,
+    setFormState((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
 
-    if (name === "status" || name === "company") {
-      setIsSelectFocused(false);
+    if (name === "status" || name === "country" || name === "state") {
+      setIsSelectFocused((prev) => ({ ...prev, [name]: false }));
     }
   };
 
@@ -44,39 +95,23 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
     const storedCompanyId = localStorage.getItem("company_id");
-
-    console.log("Role:", role);
-    console.log("Raw company_id from localStorage:", storedCompanyId);
-
-    if (role === "company") {
-      return storedCompanyId;
-    } else if (role === "user" || role === "admin") {
+    if (role === "company" || role === "user" || role === "admin") {
       return storedCompanyId;
     }
-
     return null;
   };
 
   const getRelevantUserId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
-
     if (role === "user" || role === "admin") {
-      const userId = localStorage.getItem("user_id");
-      if (userId) return userId;
+      return localStorage.getItem("user_id");
     }
-
     return null;
   };
 
   useEffect(() => {
-    const cid = getUserCompanyId();
-    const uid = getRelevantUserId();
-
-    console.log("Company ID (inside useEffect):", cid);
-    console.log("User ID (inside useEffect):", uid);
-
-    setCompanyId(cid);
-    setUserId(uid);
+    setCompanyId(getUserCompanyId());
+    setUserId(getRelevantUserId());
   }, []);
 
   const handleSubmit = (e) => {
@@ -94,6 +129,8 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
       land_mark: formState.land_mark || null,
       building_address: formState.building_address || null,
       status: formState.status,
+      country: formState.country || null, // Include country
+      state: formState.state || null,     // Include state
     };
     console.log("Temporarily saved building data:", tempData);
     onNext(tempData);
@@ -151,6 +188,66 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
             className="w-full building-info-form-inputs resize-none focus:border-gray-300 duration-200"
             required
           />
+        </div>
+
+        {/* Country */}
+        <div className="col-span-1">
+          <label className="block building-info-form-label">Country*</label>
+          <div className="relative">
+            <select
+              name="country"
+              value={formState.country}
+              onChange={handleInputChange}
+              onFocus={() => setIsSelectFocused((prev) => ({ ...prev, country: true }))}
+              onBlur={() => setIsSelectFocused((prev) => ({ ...prev, country: false }))}
+              className="w-full appearance-none building-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer"
+              required
+            >
+              <option value="">Select Country</option>
+              {countries.map((country) => (
+                <option key={country.id} value={country.id}>
+                  {country.name}
+                </option>
+              ))}
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <ChevronDown
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
+                  isSelectFocused.country ? "rotate-180" : ""
+                }`}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* State */}
+        <div className="col-span-1">
+          <label className="block building-info-form-label">State</label>
+          <div className="relative">
+            <select
+              name="state"
+              value={formState.state}
+              onChange={handleInputChange}
+              onFocus={() => setIsSelectFocused((prev) => ({ ...prev, state: true }))}
+              onBlur={() => setIsSelectFocused((prev) => ({ ...prev, state: false }))}
+              className="w-full appearance-none building-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer"
+              disabled={!formState.country || loading.states}
+            >
+              <option value="">Select State</option>
+              {states.map((state) => (
+                <option key={state.id} value={state.id}>
+                  {state.name}
+                </option>
+              ))}
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <ChevronDown
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
+                  isSelectFocused.state ? "rotate-180" : ""
+                }`}
+              />
+            </div>
+          </div>
         </div>
 
         {/* Description */}
@@ -249,8 +346,8 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
               name="status"
               value={formState.status}
               onChange={handleInputChange}
-              onFocus={() => setIsSelectFocused(true)}
-              onBlur={() => setIsSelectFocused(false)}
+              onFocus={() => setIsSelectFocused((prev) => ({ ...prev, status: true }))}
+              onBlur={() => setIsSelectFocused((prev) => ({ ...prev, status: false }))}
               className="w-full appearance-none building-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer"
               required
             >
@@ -260,7 +357,7 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
                 className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
-                  isSelectFocused ? "rotate-180" : ""
+                  isSelectFocused.status ? "rotate-180" : ""
                 }`}
               />
             </div>
