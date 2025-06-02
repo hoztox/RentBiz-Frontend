@@ -63,7 +63,6 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
       "email",
       "address",
       "tenant_type",
-      "license_no",
       "id_type",
       "id_number",
       "id_validity_date",

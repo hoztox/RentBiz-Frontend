@@ -17,23 +17,23 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
   const [documents, setDocuments] = useState(
     safeInitialDocuments.length > 0
       ? safeInitialDocuments.map((doc, index) => ({
-        id: index + 1,
-        doc_type: doc.doc_type || "",
-        number: doc.number || "",
-        issued_date: doc.issued_date || "",
-        expiry_date: doc.expiry_date || "",
-        upload_file: doc.upload_file || [],
-      }))
+          id: index + 1,
+          doc_type: doc.doc_type || "",
+          number: doc.number || "",
+          issued_date: doc.issued_date || "",
+          expiry_date: doc.expiry_date || "",
+          upload_file: doc.upload_file || [],
+        }))
       : [
-        {
-          id: 1,
-          doc_type: "",
-          number: "",
-          issued_date: "",
-          expiry_date: "",
-          upload_file: [],
-        },
-      ]
+          {
+            id: 1,
+            doc_type: "",
+            number: "",
+            issued_date: "",
+            expiry_date: "",
+            upload_file: [],
+          },
+        ]
   );
   const [docTypes, setDocTypes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,16 +42,9 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
     const storedCompanyId = localStorage.getItem("company_id");
-
-    console.log("Role:", role);
-    console.log("Raw company_id from localStorage:", storedCompanyId);
-
-    if (role === "company") {
-      return storedCompanyId;
-    } else if (role === "user" || role === "admin") {
+    if (role === "company" || role === "user" || role === "admin") {
       return storedCompanyId;
     }
-
     return null;
   };
 
@@ -91,8 +84,9 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
     }
 
     const tempData = {
+      ...initialData, // Include all TenantInfoForm data
       tenant_comp: validDocuments.map((doc) => ({
-        doc_type: parseInt(doc.doc_type) || null,
+        doc_type: doc.doc_type || null, // Keep as string
         number: doc.number || null,
         issued_date: doc.issued_date || null,
         expiry_date: doc.expiry_date || null,
@@ -105,8 +99,9 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
 
   const handleBack = () => {
     const tempData = {
+      ...initialData, // Include all TenantInfoForm data
       tenant_comp: documents.map((doc) => ({
-        doc_type: parseInt(doc.doc_type) || null,
+        doc_type: doc.doc_type || null,
         number: doc.number || null,
         issued_date: doc.issued_date || null,
         expiry_date: doc.expiry_date || null,
@@ -146,7 +141,7 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <div className="flex-1 overflow-y-auto">
-          {loading && <p></p>}
+          {loading && <p>Loading document types...</p>}
           <div>
             {documents.map((doc) => (
               <div key={doc.id} className="border-b first:pt-0 py-5">

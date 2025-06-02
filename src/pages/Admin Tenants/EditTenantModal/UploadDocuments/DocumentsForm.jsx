@@ -76,27 +76,31 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
     }
 
     const tempData = {
+      ...initialData, // Include all TenantInfoForm data
       documents: validDocuments.map((doc) => ({
-        doc_type: parseInt(doc.doc_type) || null,
+        doc_type: doc.doc_type || null, // Keep as string
         number: doc.number || null,
         issued_date: doc.issued_date || null,
         expiry_date: doc.expiry_date || null,
         upload_file: doc.upload_file || [],
       })),
     };
+    console.log("Temporarily saved documents data:", tempData);
     onNext(tempData);
   };
 
   const handleBack = () => {
     const tempData = {
+      ...initialData, // Include all TenantInfoForm data
       documents: documents.map((doc) => ({
-        doc_type: parseInt(doc.doc_type) || null,
+        doc_type: doc.doc_type || null, // Keep as string
         number: doc.number || null,
         issued_date: doc.issued_date || null,
         expiry_date: doc.expiry_date || null,
         upload_file: doc.upload_file || [],
       })),
     };
+    console.log("Passing documents data back:", tempData);
     onBack(tempData);
   };
 

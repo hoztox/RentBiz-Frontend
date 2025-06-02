@@ -90,7 +90,6 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
       "address",
       "status",
       "tenant_type",
-      "license_no",
       "id_type",
       "id_number",
       "id_validity_date",
