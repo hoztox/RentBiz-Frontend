@@ -36,12 +36,6 @@ import ResponsiveTenantInfoForm from "./pages/Admin Tenants/CreateTenantModal/Cr
 import TenantDocumentFormResponsive from "./pages/Admin Tenants/CreateTenantModal/UploadDocuments/TenantDocumentFormResponsive";
 import TenantSubmitConfirmResponsive from "./pages/Admin Tenants/CreateTenantModal/Submit/TenantSubmitConfirmResponsive";
 import TenantsReset from "./pages/Admin Tenants/CreateTenantModal/TenantsReset";
-import UpdateUnitBuildingInfoResponsive from "./pages/Admin Properties/Units/Edit Unit Modal/Select Building/UpdateUnitBuildingInfoResponsive";
-import UpdateUnitInfoFormResponsive from "./pages/Admin Properties/Units/Edit Unit Modal/Update Unit/UpdateUnitInfoFormResponsive";
-import UpdateUnitDocumentFormResponsive from "./pages/Admin Properties/Units/Edit Unit Modal/Upload Documents/UpdateUnitDocumentFormResponsive";
-import UpdateUnitSubmitPageResponsive from "./pages/Admin Properties/Units/Edit Unit Modal/Submit/UpdateUnitSubmitPageResponsive";
-import UpdateUnitsReset from "./pages/Admin Properties/Units/Edit Unit Modal/UpdateUnitsReset";
-import UpdateFormTimelineRes from "./pages/Admin Properties/Units/Edit Unit Modal/UpdateFormTimelineRes";
 import EditTenantFormTimelineRes from "./pages/Admin Tenants/EditTenantModal/EditTenantFormTimelineRes";
 import ResUpdateTenantInfoForm from "./pages/Admin Tenants/EditTenantModal/UpdateTenant/ResUpdateTenantInfoForm";
 import EditTenantDocFormRes from "./pages/Admin Tenants/EditTenantModal/UploadDocuments/EditTenantDocFormRes";
@@ -90,16 +84,6 @@ const App = () => {
             path="income-expense-report"
             element={<IncomeExpenseReport />}
           />
-
-
-          
-
-          <Route path="update-unit-timeline" element={<UpdateFormTimelineRes />} />
-          <Route path="update-select-building-form" element={<UpdateUnitBuildingInfoResponsive />} />
-          <Route path="update-unit" element={<UpdateUnitInfoFormResponsive />} />
-          <Route path="update-unit-upload-documents" element={<UpdateUnitDocumentFormResponsive />} />
-          <Route path="update-unit-submitted" element={<UpdateUnitSubmitPageResponsive />} />
-          <Route path="update-unit-reset" element={<UpdateUnitsReset />} />
 
           <Route path="tenant-timeline" element={<ResponsiveTenantFormTimeline />} />
           <Route path="create-tenant" element={<ResponsiveTenantInfoForm />} />
