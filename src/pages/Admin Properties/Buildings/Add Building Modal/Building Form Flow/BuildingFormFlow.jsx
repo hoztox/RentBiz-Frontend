@@ -112,16 +112,15 @@ const BuildingFormFlow = ({ onClose, onBuildingCreated, onPageChange, initialPag
     }, 500);
   };
 
-  const handleClose = () => {
-    if (currentPageIndex === 3) {
-      // Only trigger refresh if closing from SubmissionConfirmation
-      onBuildingCreated();
-    }
-    setCurrentPageIndex(0);
-    setFormData({ building: null, documents: null });
-    setFormProgress({ createBuilding: 0, uploadDocuments: 0, review: 0, submitted: 0 });
-    onClose();
-  };
+const handleClose = () => {
+  if (currentPageIndex === 3 && typeof onBuildingCreated === 'function') {
+    onBuildingCreated();
+  }
+  setCurrentPageIndex(0);
+  setFormData({ building: null, documents: null });
+  setFormProgress({ createBuilding: 0, uploadDocuments: 0, review: 0, submitted: 0 });
+  onClose();
+};
 
   const pageComponents = [
     <BuildingInfoForm
@@ -144,6 +143,7 @@ const BuildingFormFlow = ({ onClose, onBuildingCreated, onPageChange, initialPag
     <SubmissionConfirmation
       key="confirm"
       formData={formData}
+      onClose={handleClose}
     />,
   ];
 

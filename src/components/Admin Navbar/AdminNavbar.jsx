@@ -11,7 +11,6 @@ import MobileSlideMenu from "../MobileSlideMenu/MobileSlideMenu";
 import { useModal } from "../../context/ModalContext";
 import { BASE_URL } from "../../utils/config";
 
-
 const routeTitles = {
   "/admin/dashboard": "Dashboard Overview",
   "/admin/users-manage": "Users Overview",
@@ -91,7 +90,6 @@ const mobileRouteTitles = {
   "/admin/update-unit-upload-documents": "Upload Documents",
   "/admin/update-unit-submitted": "Submitted",
   "/admin/tenant-timeline": "",
-  // "/admin/create-tenant": "Create New Tenant",
   "/admin/tenant-upload-documents": "Upload Documents",
   "/admin/tenant-submitted": "Submitted",
   "/admin/edit-tenant-timeline": "",
@@ -104,6 +102,7 @@ const mobileRouteTitles = {
 const modalTitles = {
   "user-create": "Create User",
   "user-update": "Update User",
+  "create-building": "Create New Building",
   "create-tenant": "Create New Tenant",
   "tenancy-create": "Create New Tenancy",
   "tenancy-update": "Update Tenancy",
@@ -191,34 +190,37 @@ const AdminNavbar = () => {
       if (role === "company") {
         const companyId = getUserCompanyId();
         if (companyId) {
-          const response = await axios.get(`${BASE_URL}/accounts/company/${companyId}/detail/`); 
+          const response = await axios.get(
+            `${BASE_URL}/accounts/company/${companyId}/detail/`
+          );
           const companyData = response.data;
 
           setProfileData({
             name: companyData.company_name || "Admin",
             email: companyData.email_address || "example@gmail.com",
-            profileImage: companyData.company_logo ?
-              (companyData.company_logo.startsWith('http') ?
-                companyData.company_logo :
-                `${BASE_URL.replace('/api', '')}${companyData.company_logo}`)
+            profileImage: companyData.company_logo
+              ? companyData.company_logo.startsWith("http")
+                ? companyData.company_logo
+                : `${BASE_URL.replace("/api", "")}${companyData.company_logo}`
               : profile,
           });
-          console.log('company details:', response.data);
-          
+          console.log("company details:", response.data);
         }
       } else if (role === "user") {
         const userId = getRelevantUserId();
         if (userId) {
-          const response = await axios.get(`${BASE_URL}/company/user/${userId}/details/`);
+          const response = await axios.get(
+            `${BASE_URL}/company/user/${userId}/details/`
+          );
           const userData = response.data;
 
           setProfileData({
             name: userData.name || "User",
             email: userData.email || "example@gmail.com",
-            profileImage: userData.company_logo ?
-              (userData.company_logo.startsWith('http') ?
-                userData.company_logo :
-                `${BASE_URL.replace('/api', '')}${userData.company_logo}`)
+            profileImage: userData.company_logo
+              ? userData.company_logo.startsWith("http")
+                ? userData.company_logo
+                : `${BASE_URL.replace("/api", "")}${userData.company_logo}`
               : profile,
           });
         }
@@ -243,7 +245,12 @@ const AdminNavbar = () => {
   const isDashboard = currentPath === "/admin/dashboard";
 
   const getPageTitle = (isMobile = false) => {
-    // Prioritize modal titles when modal is open
+    // Prioritize modal title when modal is open and title is set
+    if (modalState.isOpen && modalState.title) {
+      return modalState.title;
+    }
+
+    // Fallback to modal type if title is not set
     if (modalState.isOpen && modalState.type) {
       return modalTitles[modalState.type] || mobileRouteTitles.default;
     }
@@ -320,8 +327,9 @@ const AdminNavbar = () => {
   return (
     <>
       <nav
-        className={`flex items-center justify-between mx-5 h-[86px] border-b border-[#E9E9E9] bg-white admin-navbar ${isDashboard ? "dashboard-nav" : "non-dashboard-nav"
-          } ${modalState.isOpen ? "modal-open" : ""}`}
+        className={`flex items-center justify-between mx-5 h-[86px] border-b border-[#E9E9E9] bg-white admin-navbar ${
+          isDashboard ? "dashboard-nav" : "non-dashboard-nav"
+        } ${modalState.isOpen ? "modal-open" : ""}`}
       >
         <div className="flex items-center w-full">
           {/* Left Section: Logo or Back Arrow */}
@@ -371,16 +379,18 @@ const AdminNavbar = () => {
               {selectedLanguage}
               <ChevronDown
                 size={20}
-                className={`ml-2 transform transition-transform duration-300 ease-in-out text-[#201D1E] ${isOpen ? "rotate-180" : ""
-                  }`}
+                className={`ml-2 transform transition-transform duration-300 ease-in-out text-[#201D1E] ${
+                  isOpen ? "rotate-180" : ""
+                }`}
               />
             </button>
 
             <div
-              className={`absolute mt-1 w-[120px] bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden transition-all duration-300 ease-in-out ${isOpen
+              className={`absolute mt-1 w-[120px] bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden transition-all duration-300 ease-in-out ${
+                isOpen
                   ? "opacity-100 max-h-40 transform translate-y-0"
                   : "opacity-0 max-h-0 transform -translate-y-2 pointer-events-none"
-                }`}
+              }`}
             >
               <div className="py-1">
                 <button
@@ -420,8 +430,12 @@ const AdminNavbar = () => {
                 </>
               ) : (
                 <>
-                  <span className="admin-name whitespace-nowrap">Hi, {profileData.name}</span>
-                  <span className="admin-email whitespace-nowrap">{profileData.email}</span>
+                  <span className="admin-name whitespace-nowrap">
+                    Hi, {profileData.name}
+                  </span>
+                  <span className="admin-email whitespace-nowrap">
+                    {profileData.email}
+                  </span>
                 </>
               )}
             </div>
