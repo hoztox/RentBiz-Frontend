@@ -32,6 +32,7 @@ import UpdateExpenseModal from "./Expense/UpdateExpenseModal/UpdateExpenseModal"
 import AddRefundModal from "./Refund/AddRefundModal/AddRefundModal";
 import UpdateRefundModal from "./Refund/UpdateRefundModal/UpdateRefundModal";
 import CreateTaxModal from "./Admin Masters/Taxes/CreateTaxModal/CreateTaxModal";
+import UpdateTaxModal from "./Admin Masters/Taxes/UpdateTaxModal/UpdateTaxModal";
 
 const Layout = () => {
   const { modalState } = useModal();
@@ -58,6 +59,7 @@ const Layout = () => {
       {modalState.isOpen && modalState.type === "create-charge-code-type" && <CreateChargeCodeModal />}
       {modalState.isOpen && modalState.type === "update-charge-code-type" && <UpdateChargeCode />}
       {modalState.isOpen && modalState.type === "create-tax-master" && <CreateTaxModal />}
+      {modalState.isOpen && modalState.type === "update-tax-master" && <UpdateTaxModal />}
       {modalState.isOpen && modalState.type === "create-charges-master" && <CreateChargesModal />}
       {modalState.isOpen && modalState.type === "update-charges-master" && <UpdateChargesModal />}
       {modalState.isOpen && modalState.type === "create-document-type-master" && <AddDocumentModal />}

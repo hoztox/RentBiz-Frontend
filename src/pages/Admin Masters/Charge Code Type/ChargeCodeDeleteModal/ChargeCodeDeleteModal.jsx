@@ -6,15 +6,15 @@ const ChargeCodeDeleteModal = ({ isOpen, onCancel, onDelete }) => {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white shadow-lg modal-box">
-        <div className="p-6">
+      <div className="bg-white shadow-lg ccdm-modal-box">
+        <div className="p-3">
           <div className="flex justify-center">
-            <div className="modal-bg">
+            <div className="ccdm-modal-bg">
               <img src={deleteImage} alt="Delete" className="h-40" />
             </div>
           </div>
 
-          <div className="text-center mb-6 modal-content">
+          <div className="text-center mb-6 ccdm-modal-content">
             <h2 className="text-2xl font-semibold text-[#E44747]">
               Are You Sure?
             </h2>
@@ -25,14 +25,14 @@ const ChargeCodeDeleteModal = ({ isOpen, onCancel, onDelete }) => {
           <div className="flex gap-3">
             <button
               onClick={onCancel}
-              className="flex-1 text-[#201D1E] hover:bg-gray-100 focus:outline-none cancel-btn"
+              className="flex-1 text-[#201D1E] hover:bg-gray-100 focus:outline-none ccdm-cancel-btn"
             >
               Cancel
             </button>
 
             <button
               onClick={onDelete}
-              className="flex-1 bg-[#E44747] text-white hover:bg-[#d12f2f] focus:outline-none modal-delete-btn"
+              className="flex-1 bg-[#E44747] text-white hover:bg-[#d12f2f] focus:outline-none ccdm-modal-delete-btn"
             >
               Delete
             </button>

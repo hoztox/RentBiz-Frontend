@@ -114,6 +114,7 @@ const modalTitles = {
   "create-charge-code-type": "Create New Charge Code Master",
   "update-charge-code-type": "Update Charge Code Master",
   "create-tax-master": "Create New Tax",
+  "update-tax-master": "Update Tax",
   "create-charges-master": "Create New Charges Master",
   "update-charges-master": "Update Charges Master",
   "create-document-type-master": "Create New Document Type Master",

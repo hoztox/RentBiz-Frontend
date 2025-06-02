@@ -8,8 +8,7 @@ import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-
-
+import DeleteTaxModal from "./DeleteTaxModal/DeleteTaxModal";
 
 const Taxes = () => {
   const { openModal, refreshCounter } = useModal();
@@ -187,7 +186,10 @@ const Taxes = () => {
       tax.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       tax.country.toLowerCase().includes(searchTerm.toLowerCase()) ||
       tax.tax_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tax.tax_percentage.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tax.tax_percentage
+        .toString()
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       tax.applicable_from.toLowerCase().includes(searchTerm.toLowerCase()) ||
       tax.applicable_to.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -303,7 +305,10 @@ const Taxes = () => {
               <tbody>
                 {paginatedData.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-5 py-8 text-center text-gray-500">
+                    <td
+                      colSpan={7}
+                      className="px-5 py-8 text-center text-gray-500"
+                    >
                       No taxes found
                     </td>
                   </tr>
@@ -315,10 +320,16 @@ const Taxes = () => {
                     >
                       <td className="px-5 text-left tax-data">{tax.id}</td>
                       <td className="px-5 text-left tax-data">{tax.country}</td>
-                      <td className="px-5 text-left tax-data">{tax.tax_type}</td>
+                      <td className="px-5 text-left tax-data">
+                        {tax.tax_type}
+                      </td>
                       <td className="px-5 text-left tax-data">{`${tax.tax_percentage}%`}</td>
-                      <td className="px-5 text-left tax-data">{tax.applicable_from}</td>
-                      <td className="px-5 text-left tax-data">{tax.applicable_to}</td>
+                      <td className="px-5 text-left tax-data">
+                        {tax.applicable_from}
+                      </td>
+                      <td className="px-5 text-left tax-data">
+                        {tax.applicable_to}
+                      </td>
                       <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
                         <button onClick={() => openUpdateModal(tax)}>
                           <img
@@ -347,15 +358,22 @@ const Taxes = () => {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="tax-table-row-head">
-                  <th className="px-5 w-[50%] text-left tax-thead tax-id-column">COUNTRY</th>
-                  <th className="px-5 w-[50%] text-left tax-thead tax-country-column">TAX TYPE</th>
+                  <th className="px-5 w-[50%] text-left tax-thead tax-id-column">
+                    COUNTRY
+                  </th>
+                  <th className="px-5 w-[50%] text-left tax-thead tax-country-column">
+                    TAX TYPE
+                  </th>
                   <th className="px-5 text-right tax-thead"></th>
                 </tr>
               </thead>
               <tbody>
                 {paginatedData.length === 0 ? (
                   <tr>
-                    <td colSpan={3} className="px-5 py-8 text-center text-gray-500">
+                    <td
+                      colSpan={3}
+                      className="px-5 py-8 text-center text-gray-500"
+                    >
                       No taxes found
                     </td>
                   </tr>
@@ -369,8 +387,12 @@ const Taxes = () => {
                             : "tax-mobile-with-border"
                         } border-b border-[#E9E9E9] h-[57px]`}
                       >
-                        <td className="px-5 text-left tax-data tax-id-column">{tax.country}</td>
-                        <td className="px-5 text-left tax-data tax-country-column">{tax.tax_type}</td>
+                        <td className="px-5 text-left tax-data tax-id-column">
+                          {tax.country}
+                        </td>
+                        <td className="px-5 text-left tax-data tax-country-column">
+                          {tax.tax_type}
+                        </td>
                         <td className="py-4 flex items-center justify-end h-[57px]">
                           <div
                             className={`tax-dropdown-field ${
@@ -394,36 +416,56 @@ const Taxes = () => {
                             <div className="tax-dropdown-content">
                               <div className="tax-dropdown-content-grid">
                                 <div className="tax-dropdown-content-item w-[50%]">
-                                  <div className="tax-dropdown-label">TAX ID</div>
-                                  <div className="tax-dropdown-value">{tax.id}</div>
+                                  <div className="tax-dropdown-label">
+                                    TAX ID
+                                  </div>
+                                  <div className="tax-dropdown-value">
+                                    {tax.id}
+                                  </div>
                                 </div>
                                 <div className="tax-dropdown-content-item w-[50%]">
-                                  <div className="tax-dropdown-label">PERCENTAGE</div>
+                                  <div className="tax-dropdown-label">
+                                    PERCENTAGE
+                                  </div>
                                   <div className="tax-dropdown-value">{`${tax.tax_percentage}%`}</div>
                                 </div>
                               </div>
                               <div className="tax-dropdown-content-grid">
                                 <div className="tax-dropdown-content-item w-[50%]">
-                                  <div className="tax-dropdown-label">APPLICABLE FROM</div>
-                                  <div className="tax-dropdown-value">{tax.applicable_from}</div>
+                                  <div className="tax-dropdown-label">
+                                    APPLICABLE FROM
+                                  </div>
+                                  <div className="tax-dropdown-value">
+                                    {tax.applicable_from}
+                                  </div>
                                 </div>
                                 <div className="tax-dropdown-content-item w-[50%]">
-                                  <div className="tax-dropdown-label">APPLICABLE TO</div>
-                                  <div className="tax-dropdown-value">{tax.applicable_to}</div>
+                                  <div className="tax-dropdown-label">
+                                    APPLICABLE TO
+                                  </div>
+                                  <div className="tax-dropdown-value">
+                                    {tax.applicable_to}
+                                  </div>
                                 </div>
                               </div>
                               <div className="tax-dropdown-content-grid">
                                 <div className="tax-dropdown-content-item w-[50%]">
-                                  <div className="tax-dropdown-label">ACTION</div>
+                                  <div className="tax-dropdown-label">
+                                    ACTION
+                                  </div>
                                   <div className="tax-dropdown-value flex items-center gap-4">
-                                    <button onClick={() => openUpdateModal(tax)}>
+                                    <button
+                                      onClick={() => openUpdateModal(tax)}
+                                    >
                                       <img
                                         src={editicon}
                                         alt="Edit"
                                         className="w-[18px] h-[18px] tax-action-btn duration-200"
                                       />
                                     </button>
-                                    <button onClick={() => handleDelete(tax.id)}>
+                                    <button
+                                      onClick={() => handleDelete(tax.id)}
+                                    >
                                       <img
                                         src={deleteicon}
                                         alt="Delete"
@@ -449,9 +491,12 @@ const Taxes = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
               <span className="collection-list-pagination">
                 Showing{" "}
-                {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-                to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-                {filteredData.length} entries
+                {Math.min(
+                  (currentPage - 1) * itemsPerPage + 1,
+                  filteredData.length
+                )}{" "}
+                to {Math.min(currentPage * itemsPerPage, filteredData.length)}{" "}
+                of {filteredData.length} entries
               </span>
               <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
                 <button
@@ -511,6 +556,11 @@ const Taxes = () => {
           )}
         </>
       )}
+      <DeleteTaxModal
+        isOpen={isDeleteModalOpen}
+        onCancel={handleCancelDelete}
+        onDelete={handleConfirmDelete}
+      />
     </div>
   );
 };
