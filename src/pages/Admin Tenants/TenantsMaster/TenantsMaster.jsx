@@ -11,6 +11,7 @@ import CreateTenantModal from "../CreateTenantModal/CreateTenantModal";
 import EditTenantModal from "../EditTenantModal/EditTenantModal";
 import { BASE_URL } from "../../../utils/config";
 import DeleteTenantModal from "../DeleteTenantModal/DeleteTenantModal";
+import { useModal } from "../../../context/ModalContext";
 
 const TenantsMaster = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -25,6 +26,7 @@ const TenantsMaster = () => {
   const [error, setError] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [tenantToDelete, setTenantToDelete] = useState(null);
+  const { openModal } = useModal();
   const itemsPerPage = 10;
   // const navigate = useNavigate();
 
@@ -89,9 +91,9 @@ const TenantsMaster = () => {
     }
   }, [companyId]);
 
-  const openCreateTenantModal = () => {
-      setCreateTenantModalOpen(true);
-  };
+  // const openCreateTenantModal = () => {
+  //     setCreateTenantModalOpen(true);
+  // };
 
   const closeCreateTenantModal = () => {
     setCreateTenantModalOpen(false);
@@ -212,7 +214,7 @@ const TenantsMaster = () => {
           <div className="flex gap-[10px] action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md add-new-tenant duration-200"
-              onClick={openCreateTenantModal}
+              onClick={()=>openModal("create-tenant")}
             >
               Add New Tenant
               <img

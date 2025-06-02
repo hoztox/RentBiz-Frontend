@@ -29,9 +29,9 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
   const navigate = useNavigate();
   const { openModal } = useModal();
 
-  const openCreateTenant = () => {
-    navigate("/admin/tenant-timeline");
-  };
+  // const openCreateTenant = () => {
+  //   navigate("/admin/tenant-timeline");
+  // };
 
   const [expandedMenus, setExpandedMenus] = useState({
     Users: false,
@@ -309,7 +309,7 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
                   }`}
                   onClick={() => {
                     setActiveItem("Create Tenant");
-                    openCreateTenant();
+                    openModal("create-tenant");
                     toggleMobileMenu();
                   }}
                 >
