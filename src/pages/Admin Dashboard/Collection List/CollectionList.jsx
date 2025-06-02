@@ -315,7 +315,7 @@ const CollectionList = () => {
                                         >
                                             <td colSpan="4" className="pb-5">
                                                 {/* Dropdown content goes here */}
-                                                <div className="grid grid-cols-3 px-5">
+                                                <div className="grid !grid-cols-3 px-5">
                                                     <div className='flex flex-col items-start'>
                                                         <h4 className='drop-down-head'>UNIT NAME</h4>
                                                         <p className='drop-down-data'>
@@ -336,7 +336,7 @@ const CollectionList = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className="grid grid-cols-3 px-5 mt-6">
+                                                <div className="grid !grid-cols-3 px-5 mt-6">
                                                     <div>
                                                         <h4 className='drop-down-head'>DUE DATE</h4>
                                                         <p className='drop-down-data'>

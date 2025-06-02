@@ -299,11 +299,11 @@ const AdminCreateUserModal = () => {
         </div>
 
         {/* Form */}
-        <div className="px-4 md:px-6 pt-4 md:pt-6 grid grid-cols-1 md:grid-cols-2 gap-x-3 gap-y-4 md:gap-y-5 mt-[60px] md:mt-[68px] overflow-y-auto flex-1">
+        <div className="px-4 md:px-6 pt-4 md:pt-6 grid grid-cols-1 md:grid-cols-2 gap-x-3 gap-y-4 md:gap-y-5 mt-[40px] md:mt-[68px] overflow-y-auto flex-1">
           {/* Name */}
           <div>
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
-              Name*
+              Name *
             </label>
             <input
               type="text"
@@ -326,7 +326,7 @@ const AdminCreateUserModal = () => {
           {/* Username */}
           <div>
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
-              Username*
+              Username *
             </label>
             <input
               type="text"
@@ -351,7 +351,7 @@ const AdminCreateUserModal = () => {
           {/* Email */}
           <div>
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
-              Email*
+              Email *
             </label>
             <input
               type="email"
@@ -374,7 +374,7 @@ const AdminCreateUserModal = () => {
           {/* Role */}
           <div className="relative">
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mt-[-5px]">
-              Role*
+              Role *
             </label>
             <select
               name="user_role"
@@ -414,7 +414,7 @@ const AdminCreateUserModal = () => {
           {/* Password */}
           <div>
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
-              Password*
+              Password *
             </label>
             <input
               type="password"
@@ -439,7 +439,7 @@ const AdminCreateUserModal = () => {
           {/* Confirm Password */}
           <div>
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
-              Confirm Password*
+              Confirm Password *
             </label>
             <input
               type="password"
