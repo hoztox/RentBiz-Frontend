@@ -48,66 +48,66 @@ const TenantFormFlow = ({ onClose, tenantId, onTenantUpdated, onPageChange, init
   }, [currentPageIndex, onPageChange]);
 
   useEffect(() => {
-    const fetchTenantData = async () => {
-      if (!tenantId) {
-        setLoading(false);
-        return;
-      }
-      try {
-        const response = await axios.get(
-          `${BASE_URL}/company/tenant/${tenantId}/`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        const tenantData = response.data;
-        setFormData({
-          tenant: {
-            tenant_name: tenantData.tenant_name || "",
-            nationality: tenantData.nationality || "",
-            phone: tenantData.phone || "",
-            alternative_phone: tenantData.alternative_phone || "",
-            email: tenantData.email || "",
-            description: tenantData.description || "",
-            address: tenantData.address || "",
-            tenant_type: tenantData.tenant_type || "",
-            license_no: tenantData.license_no || "",
-            id_type: tenantData.id_type || "",
-            id_number: tenantData.id_number || "",
-            id_validity_date: tenantData.id_validity_date || "",
-            sponser_name: tenantData.sponser_name || "",
-            sponser_id_type: tenantData.sponser_id_type || "",
-            sponser_id_number: tenantData.sponser_id_number || "",
-            sponser_id_validity_date: tenantData.sponser_id_validity_date || "",
-            status: tenantData.status || "Active",
-            remarks: tenantData.remarks || "",
-            company: tenantData.company || localStorage.getItem("company_id") || "",
-            user: tenantData.user || localStorage.getItem("user_id") || null,
+  const fetchTenantData = async () => {
+    if (!tenantId) {
+      setLoading(false);
+      return;
+    }
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/company/tenant/${tenantId}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          documents: {
-            documents: Array.isArray(tenantData.tenant_comp)
-              ? tenantData.tenant_comp.map((doc, index) => ({
-                  id: index + 1,
-                  doc_type: doc.doc_type || "",
-                  number: doc.number || "",
-                  issued_date: doc.issued_date || "",
-                  expiry_date: doc.expiry_date || "",
-                  upload_file: doc.upload_file ? [doc.upload_file] : [],
-                }))
-              : [],
-          },
-        });
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching tenant data:", error);
-        setError("Failed to load tenant data.");
-        setLoading(false);
-      }
-    };
-    fetchTenantData();
-  }, [tenantId]);
+        }
+      );
+      const tenantData = response.data;
+      setFormData({
+        tenant: {
+          tenant_name: tenantData.tenant_name || "",
+          nationality: tenantData.nationality || "",
+          phone: tenantData.phone || "",
+          alternative_phone: tenantData.alternative_phone || "",
+          email: tenantData.email || "",
+          description: tenantData.description || "",
+          address: tenantData.address || "",
+          tenant_type: tenantData.tenant_type || "",
+          license_no: tenantData.license_no || "",
+          id_type: tenantData.id_type?.id || "", // Extract id if object
+          id_number: tenantData.id_number || "",
+          id_validity_date: tenantData.id_validity_date || "",
+          sponser_name: tenantData.sponser_name || "",
+          sponser_id_type: tenantData.sponser_id_type?.id || "", // Extract id if object
+          sponser_id_number: tenantData.sponser_id_number || "",
+          sponser_id_validity_date: tenantData.sponser_id_validity_date || "",
+          status: tenantData.status || "Active",
+          remarks: tenantData.remarks || "",
+          company: tenantData.company || localStorage.getItem("company_id") || "",
+          user: tenantData.user || localStorage.getItem("user_id") || null,
+        },
+        documents: {
+          documents: Array.isArray(tenantData.tenant_comp)
+            ? tenantData.tenant_comp.map((doc, index) => ({
+                id: index + 1,
+                doc_type: doc.doc_type || "",
+                number: doc.number || "",
+                issued_date: doc.issued_date || "",
+                expiry_date: doc.expiry_date || "",
+                upload_file: doc.upload_file ? [doc.upload_file] : [],
+              }))
+            : [],
+        },
+      });
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching tenant data:", error);
+      setError("Failed to load tenant data.");
+      setLoading(false);
+    }
+  };
+  fetchTenantData();
+}, [tenantId]);
 
   useEffect(() => {
     const newProgress = {

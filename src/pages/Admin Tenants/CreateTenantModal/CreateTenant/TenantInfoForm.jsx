@@ -7,7 +7,7 @@ import axios from "axios";
 import { BASE_URL } from "../../../../utils/config";
 import { countries } from "countries-list";
 
-const TenantInfoForm = ({ onNext, initialData }) => {
+const TenantInfoForm = ({ onNext, onBack, initialData }) => {
   const [formState, setFormState] = useState(
     initialData || {
       tenant_name: "",
@@ -46,39 +46,26 @@ const TenantInfoForm = ({ onNext, initialData }) => {
       code,
       name: country.name,
     }));
-    
-    // Sort countries alphabetically by name
-    const sortedCountries = countriesArray.sort((a, b) => 
+    const sortedCountries = countriesArray.sort((a, b) =>
       a.name.localeCompare(b.name)
     );
-    
     setCountriesList(sortedCountries);
   }, []);
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
     const storedCompanyId = localStorage.getItem("company_id");
-
-    console.log("Role:", role);
-    console.log("Raw company_id from localStorage:", storedCompanyId);
-
-    if (role === "company") {
-      return storedCompanyId;
-    } else if (role === "user" || role === "admin") {
+    if (role === "company" || role === "user" || role === "admin") {
       return storedCompanyId;
     }
-
     return null;
   };
 
   const getRelevantUserId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
-
     if (role === "user" || role === "admin") {
-      const userId = localStorage.getItem("user_id");
-      if (userId) return userId;
+      return localStorage.getItem("user_id");
     }
-
     return null;
   };
 
@@ -140,12 +127,12 @@ const TenantInfoForm = ({ onNext, initialData }) => {
       description: formState.description || null,
       address: formState.address || null,
       tenant_type: formState.tenant_type || null,
-      license_no: formState.license_no || null,
-      id_type: parseInt(formState.id_type) || null,
+      license_no: formState.tenant_type === "Individual" ? null : formState.license_no || null,
+      id_type: formState.id_type || null, // Keep as string to match select options
       id_number: formState.id_number || null,
       id_validity_date: formState.id_validity_date || null,
       sponser_name: formState.sponser_name || null,
-      sponser_id_type: parseInt(formState.sponser_id_type) || null,
+      sponser_id_type: formState.sponser_id_type || null, // Keep as string
       sponser_id_number: formState.sponser_id_number || null,
       sponser_id_validity_date: formState.sponser_id_validity_date || null,
       status: formState.status || "Active",
@@ -153,6 +140,12 @@ const TenantInfoForm = ({ onNext, initialData }) => {
     };
     console.log("Temporarily saved tenant data:", tempData);
     onNext(tempData);
+  };
+
+  const handleBack = () => {
+    // Pass back the current form state when navigating back
+    const tempData = { ...formState };
+    onBack?.(tempData);
   };
 
   return (
@@ -192,8 +185,9 @@ const TenantInfoForm = ({ onNext, initialData }) => {
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
-                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${focusedField === "nationality" ? "rotate-180" : ""
-                  }`}
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
+                  focusedField === "nationality" ? "rotate-180" : ""
+                }`}
               />
             </div>
           </div>
@@ -281,22 +275,25 @@ const TenantInfoForm = ({ onNext, initialData }) => {
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
-                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${focusedField === "tenant_type" ? "rotate-180" : ""
-                  }`}
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
+                  focusedField === "tenant_type" ? "rotate-180" : ""
+                }`}
               />
             </div>
           </div>
         </div>
 
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">Trade License Number*</label>
+          <label className="block tenant-info-form-label">
+            Trade License Number{formState.tenant_type === "Organization" ? "*" : ""}
+          </label>
           <input
             type="text"
             name="license_no"
             value={formState.license_no}
             onChange={handleInputChange}
             className="w-full tenant-info-form-inputs focus:border-gray-300 duration-200"
-            required
+            required={formState.tenant_type === "Organization"}
           />
         </div>
 
@@ -322,8 +319,9 @@ const TenantInfoForm = ({ onNext, initialData }) => {
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
-                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${focusedField === "id_type" ? "rotate-180" : ""
-                  }`}
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
+                  focusedField === "id_type" ? "rotate-180" : ""
+                }`}
               />
             </div>
           </div>
@@ -395,8 +393,9 @@ const TenantInfoForm = ({ onNext, initialData }) => {
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
-                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${focusedField === "sponser_id_type" ? "rotate-180" : ""
-                  }`}
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
+                  focusedField === "sponser_id_type" ? "rotate-180" : ""
+                }`}
               />
             </div>
           </div>
@@ -443,8 +442,9 @@ const TenantInfoForm = ({ onNext, initialData }) => {
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
-                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${focusedField === "status" ? "rotate-180" : ""
-                  }`}
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
+                  focusedField === "status" ? "rotate-180" : ""
+                }`}
               />
             </div>
           </div>
@@ -463,6 +463,15 @@ const TenantInfoForm = ({ onNext, initialData }) => {
       </div>
 
       <div className="next-btn-container mt-6 text-right">
+        {onBack && (
+          <button
+            type="button"
+            className="w-[150px] h-[38px] mr-4 text-[#201D1E] bg-white hover:bg-[#201D1E] hover:text-white duration-200"
+            onClick={handleBack}
+          >
+            Back
+          </button>
+        )}
         <button type="submit" className="w-[150px] h-[38px] next-btn duration-300">
           Next
         </button>
