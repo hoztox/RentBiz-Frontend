@@ -140,7 +140,7 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
           <div>
             {documents.map((doc) => (
               <div key={doc.id} className="border-b first:pt-0 py-5">
-                <div className="flex gap-[10px] justify-between">
+                <div className="sm:flex sm:gap-[10px] sm:justify-between max-[480px]:grid max-[480px]:grid-cols-2 max-[480px]:gap-4">
                   <div>
                     <label className="block documents-label">Doc.Type</label>
                     <div className="relative">
@@ -255,7 +255,7 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
             </button>
           </div>
         </div>
-        <div className="flex justify-end gap-4 pt-[35px] border-t mt-auto">
+        <div className="flex justify-end gap-4 pt-[35px] border-t mt-auto max-[480px]:border-t-0">
           <button
             type="button"
             className="text-[#201D1E] bg-white hover:bg-[#201D1E] hover:text-white back-button duration-200"

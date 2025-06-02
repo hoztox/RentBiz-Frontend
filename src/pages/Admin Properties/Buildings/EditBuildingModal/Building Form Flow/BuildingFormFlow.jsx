@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import closeicon from "../../../../../assets/Images/Admin Buildings/close-icon.svg";
 import FormTimeline from "../FormTimeline";
@@ -8,8 +8,8 @@ import ReviewPage from "../ReviewPage/ReviewPage";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 import { BASE_URL } from "../../../../../utils/config";
 
-const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated }) => {
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated, onPageChange, initialPageIndex = 0 }) => {
+  const [currentPageIndex, setCurrentPageIndex] = useState(initialPageIndex);
   const [formData, setFormData] = useState({
     building: null,
     documents: { documents: [] },
@@ -23,9 +23,30 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated }) => {
   const [animating, setAnimating] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Use ref to track if we're handling external navigation
+  const isExternalNavigation = useRef(false);
 
   const pageTitles = ["Update Building", "Upload Documents", "Review", ""];
   const currentTitle = pageTitles[currentPageIndex];
+
+  // Handle external page navigation from dropdown
+  useEffect(() => {
+    if (initialPageIndex !== currentPageIndex && !isExternalNavigation.current) {
+      isExternalNavigation.current = true;
+      setCurrentPageIndex(initialPageIndex);
+      setTimeout(() => {
+        isExternalNavigation.current = false;
+      }, 0);
+    }
+  }, [initialPageIndex]);
+
+  // Notify parent of page changes
+  useEffect(() => {
+    if (onPageChange && !isExternalNavigation.current) {
+      onPageChange(currentPageIndex);
+    }
+  }, [currentPageIndex, onPageChange]);
 
   useEffect(() => {
     const fetchBuildingData = async () => {
@@ -40,7 +61,6 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated }) => {
           }
         );
         const buildingData = response.data;
-        console.log("BuildingFormFlow: Fetched building data:", buildingData);
         setFormData({
           building: {
             building_no: buildingData.building_no || "",
@@ -114,14 +134,12 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated }) => {
   }, [currentPageIndex, formData]);
 
   const handleNextPage = (pageData) => {
-    console.log("BuildingFormFlow: Received pageData:", pageData);
     setAnimating(true);
     setFormData((prevData) => {
       const newData = {
         ...prevData,
         [currentPageIndex === 0 ? "building" : "documents"]: pageData,
       };
-      console.log("BuildingFormFlow: Updated formData:", newData);
       return newData;
     });
 
@@ -139,7 +157,6 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated }) => {
           ...prevData,
           documents: { documents: pageData.documents || [] },
         };
-        console.log("BuildingFormFlow: Updated formData on back:", newData);
         return newData;
       });
     }
@@ -151,7 +168,6 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated }) => {
 
   const handleClose = () => {
     if (currentPageIndex === 3) {
-      // Trigger refresh only when closing from SubmissionConfirmation
       onBuildingCreated();
     }
     setCurrentPageIndex(0);
@@ -174,10 +190,6 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated }) => {
     return <div className="text-red-500 p-4">{error}</div>;
   }
 
-  console.log(
-    "BuildingFormFlow: Passing initialData to BuildingInfoForm/ReviewPage:",
-    formData
-  );
   return (
     <div className="flex">
       <div className="w-[350px] pr-[53px] form-time-line">

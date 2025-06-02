@@ -118,7 +118,7 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
                         <img
                           src={fileSrc}
                           alt={name}
-                          className="object-contain w-full h-auto max-h-[120px] min-[480px]:h-[220px] min-[480px]:max-h-[220px] aspect-[4/3]"
+                          className="object-cover h-[162px] w-full"
                           onLoad={(e) => {
                             if (file instanceof File) {
                               URL.revokeObjectURL(e.target.src);
@@ -140,7 +140,7 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
                         </div>
                       )}
                     </div>
-                    <div className="p-1 min-[480px]:p-2 min-[480px]:px-3 bg-[#1458A2] text-start">
+                    <div className="p-2 min-[480px]:p-2 min-[480px]:px-3 bg-[#1458A2] text-start">
                       <p className="document-name text-white text-xs min-[480px]:text-base truncate">
                         {getDocTypeName} {name}
                       </p>
