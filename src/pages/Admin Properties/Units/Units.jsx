@@ -9,7 +9,6 @@ import deletesicon from "../../../assets/Images/Admin Units/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Units/downarrow.svg";
 import AddUnitModal from "./Add Unit Modal/AddUnitModal";
 import EditUnitModal from "./Edit Unit Modal/EditUnitModal";
-import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../utils/config";
 import DeleteUnitModal from "./DeleteUnitModal/DeleteUnitModal";
 
@@ -26,7 +25,7 @@ const Units = () => {
   const [unitToDelete, setUnitToDelete] = useState(null);
   const itemsPerPage = 10;
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // const isMobileView = () => window.innerWidth < 480;
 

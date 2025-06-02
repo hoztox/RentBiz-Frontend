@@ -31,11 +31,6 @@ import ReportCollection from "./pages/ReportCollection/ReportCollection";
 import IncomeExpenseReport from "./pages/IncomeExpenseReport/IncomeExpenseReport";
 import ChargeCodeType from "./pages/Admin Masters/Charge Code Type/ChargeCodeType";
 import { ModalProvider } from "./context/ModalContext";
-import ResponsiveTenantFormTimeline from "./pages/Admin Tenants/CreateTenantModal/ResponsiveTenantFormTimeline";
-import ResponsiveTenantInfoForm from "./pages/Admin Tenants/CreateTenantModal/CreateTenant/ResponsiveTenantInfoForm";
-import TenantDocumentFormResponsive from "./pages/Admin Tenants/CreateTenantModal/UploadDocuments/TenantDocumentFormResponsive";
-import TenantSubmitConfirmResponsive from "./pages/Admin Tenants/CreateTenantModal/Submit/TenantSubmitConfirmResponsive";
-import TenantsReset from "./pages/Admin Tenants/CreateTenantModal/TenantsReset";
 import EditTenantFormTimelineRes from "./pages/Admin Tenants/EditTenantModal/EditTenantFormTimelineRes";
 import ResUpdateTenantInfoForm from "./pages/Admin Tenants/EditTenantModal/UpdateTenant/ResUpdateTenantInfoForm";
 import EditTenantDocFormRes from "./pages/Admin Tenants/EditTenantModal/UploadDocuments/EditTenantDocFormRes";
@@ -84,12 +79,6 @@ const App = () => {
             path="income-expense-report"
             element={<IncomeExpenseReport />}
           />
-
-          <Route path="tenant-timeline" element={<ResponsiveTenantFormTimeline />} />
-          <Route path="create-tenant" element={<ResponsiveTenantInfoForm />} />
-          <Route path="tenant-upload-documents" element={<TenantDocumentFormResponsive />} />
-          <Route path="tenant-submitted" element={<TenantSubmitConfirmResponsive />} />
-          <Route path="tenant-reset" element={<TenantsReset />} />
 
           <Route path="edit-tenant-timeline" element={<EditTenantFormTimelineRes />} />
           <Route path="edit-create-tenant" element={<ResUpdateTenantInfoForm />} />

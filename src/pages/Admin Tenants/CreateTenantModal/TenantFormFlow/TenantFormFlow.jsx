@@ -5,6 +5,7 @@ import TenantInfoForm from "../CreateTenant/TenantInfoForm";
 import DocumentsForm from "../UploadDocuments/DocumentsForm";
 import ReviewPage from "../ReviewPage/ReviewPage";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
+import "./tenantformflow.css"
 
 const TenantFormFlow = ({ onClose, onTenantCreated }) => {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
@@ -140,7 +141,7 @@ const TenantFormFlow = ({ onClose, onTenantCreated }) => {
   return (
     <div className="flex">
       {/* Left Side - Timeline */}
-      <div className="w-[350px] pr-[53px]">
+      <div className="w-[350px] pr-[53px] form-time-line">
         <FormTimeline
           key={currentPageIndex}
           currentStep={currentPageIndex + 1}
@@ -149,9 +150,9 @@ const TenantFormFlow = ({ onClose, onTenantCreated }) => {
       </div>
 
       {/* Right Side - Form Steps & Modal Header */}
-      <div className="w-full h-[700px] desktop:h-[780px] px-[33px] pt-[50px] pb-[40px] overflow-y-scroll">
+      <div className="w-full h-[700px] desktop:h-[780px] px-[20px] sm:px-[26px] pt-[8px] sm:pt-[50px] pb-[285px] sm:pb-[40px] overflow-y-scroll">
         {/* Modal Header with Dynamic Title */}
-        <div className="tenant-modal-header flex justify-between items-center mb-[35px]">
+        <div className="tenant-modal-header flex justify-between items-center mb-[41px]">
           <h3 className="tenant-modal-title">{currentTitle}</h3>
           <button
             onClick={handleClose}

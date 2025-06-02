@@ -9,7 +9,6 @@ import deletesicon from "../../../assets/Images/Admin Tenants/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenants/downarrow.svg";
 import CreateTenantModal from "../CreateTenantModal/CreateTenantModal";
 import EditTenantModal from "../EditTenantModal/EditTenantModal";
-import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../utils/config";
 import DeleteTenantModal from "../DeleteTenantModal/DeleteTenantModal";
 
@@ -27,9 +26,9 @@ const TenantsMaster = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [tenantToDelete, setTenantToDelete] = useState(null);
   const itemsPerPage = 10;
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
-  const isMobileView = () => window.innerWidth < 480;
+  // const isMobileView = () => window.innerWidth < 480;
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -91,11 +90,7 @@ const TenantsMaster = () => {
   }, [companyId]);
 
   const openCreateTenantModal = () => {
-    if (isMobileView()) {
-      navigate("/admin/tenant-timeline");
-    } else {
       setCreateTenantModalOpen(true);
-    }
   };
 
   const closeCreateTenantModal = () => {
@@ -105,14 +100,9 @@ const TenantsMaster = () => {
   const openUpdateTenantModal = (tenantId) => {
     console.log("Tenants: Selected tenantId:", tenantId);
     setSelectedTenantId(tenantId);
-    if (isMobileView()) {
-      navigate("/admin/edit-tenant-timeline");
-    } else {
       setTimeout(() => {
-        console.log("Tenants: Opening edit modal with tenantId:", tenantId);
         setUpdateTenantModalOpen(true);
-      }, 0);
-    }
+      });
   };
 
   const closeUpdateTenantModal = () => {

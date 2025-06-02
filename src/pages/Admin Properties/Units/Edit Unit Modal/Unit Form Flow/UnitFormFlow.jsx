@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import closeicon from "../../../../../assets/Images/Admin Units/close-icon.svg";
 import FormTimeline from "../FormTimeline";
 import BuildingInfoForm from "../Select Building/BuildingInfoForm";
@@ -9,8 +9,8 @@ import axios from "axios";
 import { BASE_URL } from "../../../../../utils/config";
 import ReviewPage from "../ReviewPage/ReviewPage";
 
-const UnitFormFlow = ({ onClose, unitId, onUnitCreated }) => {
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+const UnitFormFlow = ({ onClose, unitId, onUnitCreated, onPageChange, initialPageIndex = 0 }) => {
+  const [currentPageIndex, setCurrentPageIndex] = useState(initialPageIndex);
   const [formData, setFormData] = useState({
     building: null,
     unit: null,
@@ -26,6 +26,8 @@ const UnitFormFlow = ({ onClose, unitId, onUnitCreated }) => {
   const [animating, setAnimating] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // Use ref to track external navigation
+  const isExternalNavigation = useRef(false);
 
   const pageTitles = [
     "Select Building",
@@ -36,6 +38,24 @@ const UnitFormFlow = ({ onClose, unitId, onUnitCreated }) => {
   ];
 
   const currentTitle = pageTitles[currentPageIndex];
+
+  // Handle external page navigation from dropdown
+  useEffect(() => {
+    if (initialPageIndex !== currentPageIndex && !isExternalNavigation.current) {
+      isExternalNavigation.current = true;
+      setCurrentPageIndex(initialPageIndex);
+      setTimeout(() => {
+        isExternalNavigation.current = false;
+      }, 0);
+    }
+  }, [initialPageIndex]);
+
+  // Notify parent of page changes
+  useEffect(() => {
+    if (onPageChange && !isExternalNavigation.current) {
+      onPageChange(currentPageIndex);
+    }
+  }, [currentPageIndex, onPageChange]);
 
   // Fetch unit data on component mount
   useEffect(() => {
@@ -145,8 +165,8 @@ const UnitFormFlow = ({ onClose, unitId, onUnitCreated }) => {
       [currentPageIndex === 0
         ? "building"
         : currentPageIndex === 1
-        ? "unit"
-        : "documents"]: pageData,
+          ? "unit"
+          : "documents"]: pageData,
     }));
 
     setTimeout(() => {
@@ -233,7 +253,7 @@ const UnitFormFlow = ({ onClose, unitId, onUnitCreated }) => {
     />,
   ];
 
-  if (loading) return <div></div>;
+  if (loading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (
@@ -256,11 +276,10 @@ const UnitFormFlow = ({ onClose, unitId, onUnitCreated }) => {
           </button>
         </div>
         <div
-          className={`transition-all duration-500 ease-in-out ${
-            animating
+          className={`transition-all duration-500 ease-in-out ${animating
               ? "opacity-0 transform translate-x-10"
               : "opacity-100 transform translate-x-0"
-          }`}
+            }`}
         >
           {pageComponents[currentPageIndex]}
         </div>
