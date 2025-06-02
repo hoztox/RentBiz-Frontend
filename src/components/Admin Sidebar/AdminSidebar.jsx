@@ -78,10 +78,10 @@ const AdminSidebar = () => {
   // Create Tenant Modal
   const [isCreateTenantModalOpen, setIsCreateTenantModalOpen] = useState(false);
 
-  const openCreateTenantModal = () => {
-    setIsCreateTenantModalOpen(true);
-    setActiveItem("Tenants Master");
-  };
+  // const openCreateTenantModal = () => {
+  //   setIsCreateTenantModalOpen(true);
+  //   setActiveItem("Tenants Master");
+  // };
 
   const closeCreateTenantModal = () => {
     setIsCreateTenantModalOpen(false);
@@ -295,8 +295,9 @@ const AdminSidebar = () => {
                     }`}
                   onClick={() => {
                     setActiveItem("Create Tenant");
-                    openCreateTenantModal();
+                    // openCreateTenantModal();
                     navigate("/admin/tenants");
+                    openModal("create-tenant");
                   }}
                 >
                   <p className="pl-10 py-[7px]">Create Tenant</p>
@@ -725,8 +726,8 @@ const AdminSidebar = () => {
         <div className="mx-5">
           <div
             className={`flex items-center py-[7px] px-3 mb-5 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Logout"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
+              ? "menu-active"
+              : "text-gray-700 hover:bg-gray-200"
               }`}
             onClick={handleLogout}
             role="button"
