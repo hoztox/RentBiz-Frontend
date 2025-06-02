@@ -28,7 +28,7 @@ const Units = () => {
 
   const navigate = useNavigate();
 
-  const isMobileView = () => window.innerWidth < 480;
+  // const isMobileView = () => window.innerWidth < 480;
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -72,11 +72,7 @@ const Units = () => {
   }, [companyId]);
 
   const openUnitModal = () => {
-    if (isMobileView()) {
-      navigate("/unit-timeline");
-    } else {
       setUnitModalOpen(true);
-    }
   };
 
   const closeUnitModal = () => {

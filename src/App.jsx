@@ -31,12 +31,6 @@ import ReportCollection from "./pages/ReportCollection/ReportCollection";
 import IncomeExpenseReport from "./pages/IncomeExpenseReport/IncomeExpenseReport";
 import ChargeCodeType from "./pages/Admin Masters/Charge Code Type/ChargeCodeType";
 import { ModalProvider } from "./context/ModalContext";
-import HorizontalUnitFormTimeline from "./pages/Admin Properties/Units/Add Unit Modal/HorizontalUnitFormTimeline";
-import UnitBuildingInfoForm from "./pages/Admin Properties/Units/Add Unit Modal/Select Building/UnitBuildingInfoForm";
-import UnitInfoFormResponsive from "./pages/Admin Properties/Units/Add Unit Modal/Create Unit/UnitInfoFormResponsive";
-import UnitDocumentsFormResponsive from "./pages/Admin Properties/Units/Add Unit Modal/Upload Documents/UnitDocumentsFormResponsive";
-import UnitSubmitPageResponsive from "./pages/Admin Properties/Units/Add Unit Modal/Submit/UnitSubmitPageResponsive";
-import UnitsResets from "./pages/Admin Properties/Units/Add Unit Modal/UnitsResets";
 import ResponsiveTenantFormTimeline from "./pages/Admin Tenants/CreateTenantModal/ResponsiveTenantFormTimeline";
 import ResponsiveTenantInfoForm from "./pages/Admin Tenants/CreateTenantModal/CreateTenant/ResponsiveTenantInfoForm";
 import TenantDocumentFormResponsive from "./pages/Admin Tenants/CreateTenantModal/UploadDocuments/TenantDocumentFormResponsive";
@@ -98,12 +92,7 @@ const App = () => {
           />
 
 
-          <Route path="unit-timeline" element={<HorizontalUnitFormTimeline />} />
-          <Route path="unit-select-building-form" element={<UnitBuildingInfoForm />} />
-          <Route path="unit-create-unit-form" element={<UnitInfoFormResponsive />} />
-          <Route path="unit-upload-documents" element={<UnitDocumentsFormResponsive />} />
-          <Route path="unit-submitted" element={<UnitSubmitPageResponsive />} />
-          <Route path="unit-reset" element={<UnitsResets />} />
+          
 
           <Route path="update-unit-timeline" element={<UpdateFormTimelineRes />} />
           <Route path="update-select-building-form" element={<UpdateUnitBuildingInfoResponsive />} />
