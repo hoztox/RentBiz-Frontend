@@ -1,19 +1,19 @@
 .modal-container {
   width: 100%;
-  max-width: 100vw; 
+  max-width: 100vw;
   height: 100vh;
   border-radius: 0;
-  background-color: #F8F9FA; 
-  box-sizing: border-box; 
+  background-color: #F8F9FA;
+  box-sizing: border-box;
 }
 
 @media (min-width: 768px) {
   .modal-container {
     width: 830px;
-    max-width: 830px; 
+    max-width: 830px;
     height: 548px;
     border-radius: 6px;
-    background-color: #ffffff; 
+    background-color: #ffffff;
   }
 }
 
@@ -26,6 +26,8 @@
     width: 100vw;
     margin: 0;
     height: 100vh;
+    max-height: calc(100vh - 90px);
+    overflow-y: auto;
     background-color: #f8f9fa;
     padding: 10px;
     z-index: 100;
@@ -33,22 +35,22 @@
 }
 
 .modal-overlay {
- position: fixed;
+  position: fixed;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1;
-  background-color: rgba(0, 0, 0, 0.3) !important; 
+  background-color: rgba(0, 0, 0, 0.3) !important;
 }
 
 @media (max-width: 480px) {
   .modal-overlay {
-    position: static; /* Neutralizes fixed positioning */
-    inset: auto; /* Removes inset: 0 */
-    display: block; /* Removes flexbox centering */
-    background-color: transparent; /* Removes the black background */
-    opacity: 1; /* Resets opacity */
+    position: static;
+    inset: auto;
+    display: block;
+    background-color: transparent;
+    opacity: 1;
   }
 }
 
@@ -88,7 +90,7 @@
 
 @media (min-width: 768px) {
   .input-style {
-    width: 375px;   
+    width: 375px;
   }
 }
 
@@ -127,13 +129,13 @@
   font-family: "Inter Tight";
   font-size: 15px;
   font-weight: 400;
-  color: #201d1e; 
+  color: #201d1e;
 }
 
-@media(max-width: 480px){
+@media(max-width: 480px) {
   .drop-down-icon {
-     top: 38px;
-     right: 15px; 
+    top: 38px;
+    right: 15px;
   }
 }
 
