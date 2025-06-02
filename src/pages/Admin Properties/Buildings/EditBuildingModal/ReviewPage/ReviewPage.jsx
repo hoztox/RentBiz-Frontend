@@ -185,7 +185,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
       <div className="border rounded-md border-[#E9E9E9] p-5 mb-5">
         <h2 className="review-page-head">Building</h2>
         <div className="grid grid-cols-1 md:grid-cols-2">
-          <div className="space-y-8 border-r border-[#E9E9E9]">
+          <div className="space-y-8 border-r border-[#E9E9E9] max-[480px]:border-r-0">
             <div>
               <p className="review-page-label">Building No*</p>
               <p className="review-page-data">{building.building_no || "N/A"}</p>
@@ -211,7 +211,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
               </p>
             </div>
           </div>
-          <div className="space-y-8 ml-5">
+          <div className="space-y-8 sm:ml-5 max-[480px]:mt-8">
             <div>
               <p className="review-page-label">Plot No*</p>
               <p className="review-page-data">{building.plot_no || "N/A"}</p>
@@ -235,7 +235,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
           </div>
         </div>
       </div>
-      <div className="border rounded-md border-[#E9E9E9] p-5">
+      <div className="py-5">
         <h2 className="review-page-head">Documents</h2>
         <ErrorBoundary>
           <DocumentsView documents={documents} />

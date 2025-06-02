@@ -31,15 +31,10 @@ import ReportCollection from "./pages/ReportCollection/ReportCollection";
 import IncomeExpenseReport from "./pages/IncomeExpenseReport/IncomeExpenseReport";
 import ChargeCodeType from "./pages/Admin Masters/Charge Code Type/ChargeCodeType";
 import { ModalProvider } from "./context/ModalContext";
-import UpdateHorizontalFormTimeline from "./pages/Admin Properties/Buildings/EditBuildingModal/UpdateHorizontalFormTimeline";
-import ResponsiveUpdateBuildingInfoForm from "./pages/Admin Properties/Buildings/EditBuildingModal/UpdateBuilding/ResponsiveUpdateBuildingInfoForm";
-import ResponsiveUpdateDocumentForm from "./pages/Admin Properties/Buildings/EditBuildingModal/Upload Documents/ResponsiveUpdateDocumentForm";
-import UpdateSubmissionConfirmResponsive from "./pages/Admin Properties/Buildings/EditBuildingModal/Submit/UpdateSubmissionConfirmResponsive";
 import HorizontalUnitFormTimeline from "./pages/Admin Properties/Units/Add Unit Modal/HorizontalUnitFormTimeline";
 import UnitBuildingInfoForm from "./pages/Admin Properties/Units/Add Unit Modal/Select Building/UnitBuildingInfoForm";
 import UnitInfoFormResponsive from "./pages/Admin Properties/Units/Add Unit Modal/Create Unit/UnitInfoFormResponsive";
 import UnitDocumentsFormResponsive from "./pages/Admin Properties/Units/Add Unit Modal/Upload Documents/UnitDocumentsFormResponsive";
-import UpdateBuildingsReset from "./pages/Admin Properties/Buildings/EditBuildingModal/UpdateBuildingsReset";
 import UnitSubmitPageResponsive from "./pages/Admin Properties/Units/Add Unit Modal/Submit/UnitSubmitPageResponsive";
 import UnitsResets from "./pages/Admin Properties/Units/Add Unit Modal/UnitsResets";
 import ResponsiveTenantFormTimeline from "./pages/Admin Tenants/CreateTenantModal/ResponsiveTenantFormTimeline";
@@ -102,11 +97,6 @@ const App = () => {
             element={<IncomeExpenseReport />}
           />
 
-          <Route path="update-building-timeline" element={<UpdateHorizontalFormTimeline />} />
-          <Route path="update-building" element={<ResponsiveUpdateBuildingInfoForm />} />
-          <Route path="update-building-upload-documents" element={<ResponsiveUpdateDocumentForm />} />
-          <Route path="update-building-submitted" element={<UpdateSubmissionConfirmResponsive />} />
-          <Route path="update-building-reset" element={<UpdateBuildingsReset />} />
 
           <Route path="unit-timeline" element={<HorizontalUnitFormTimeline />} />
           <Route path="unit-select-building-form" element={<UnitBuildingInfoForm />} />

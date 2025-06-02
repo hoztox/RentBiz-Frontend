@@ -70,7 +70,7 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
         <p className="text-gray-500">No documents uploaded.</p>
       ) : (
         <>
-          <div className="grid grid-cols-2 min-[480px]:!grid-cols-5 gap-0.5 min-[480px]:gap-4 mb-4">
+          <div className="grid grid-cols-2 min-[480px]:!grid-cols-5 gap-0.5 min-[480px]:gap-4">
             {visibleDocuments.map((doc, index) => {
               // Use the first file in upload_file for display
               const file = Array.isArray(doc.upload_file)
