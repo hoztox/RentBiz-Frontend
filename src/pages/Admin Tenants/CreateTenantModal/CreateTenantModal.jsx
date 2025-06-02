@@ -3,11 +3,16 @@ import './createtenantmodal.css'
 import buildingimg from "../../../assets/Images/Admin Buildings/building-top.svg"
 import TenantFormFlow from './TenantFormFlow/TenantFormFlow'
 import { ChevronDown } from 'lucide-react'
+import { useModal } from '../../../context/ModalContext'
 
 
 const CreateTenantModal = ({ open, onClose, onTenantCreated }) => {
+    const {modalState} = useModal();
     const [isExpanded, setIsExpanded] = useState(false);
     const handleToggle = () => setIsExpanded(prev => !prev);
+
+    if (!modalState.isOpen || modalState.type !== "create-tenant") return null;
+
     return (
         <div
             onClick={onClose}

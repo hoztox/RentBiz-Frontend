@@ -142,7 +142,7 @@ const AddCurrencyModal = () => {
         <form onSubmit={handleSave}>
           <div className="mb-6">
             <label className="block pt-2 mb-2 text-[#201D1E] currency-modal-label">
-              Country <span className="text-red-500">*</span>
+              Country *
             </label>
             <div className="relative">
               <select
@@ -183,7 +183,7 @@ const AddCurrencyModal = () => {
             </div>
 
             <label className="block pt-2 mb-2 text-[#201D1E] currency-modal-label">
-              Currency <span className="text-red-500">*</span>
+              Currency *
             </label>
             <input
               type="text"
@@ -200,7 +200,7 @@ const AddCurrencyModal = () => {
             />
 
             <label className="block pt-2 mb-2 text-[#201D1E] currency-modal-label">
-              Code <span className="text-red-500">*</span>
+              Code *
             </label>
             <input
               type="text"
@@ -217,7 +217,7 @@ const AddCurrencyModal = () => {
             />
 
             <label className="block pt-2 mt-2 mb-2 text-[#201D1E] currency-modal-label">
-              Minor Unit <span className="text-red-500">*</span>
+              Minor Unit *
             </label>
             <input
               type="text"
