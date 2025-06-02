@@ -17,7 +17,7 @@ const SubmissionConfirmation = () => {
         </div>
       </div>
     </div>
-  );
+  );  
 };
 
 export default SubmissionConfirmation;
