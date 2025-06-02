@@ -146,7 +146,7 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <div className="flex-1 overflow-y-auto">
-          {loading && <p>Loading document types...</p>}
+          {loading && <p></p>}
           <div>
             {documents.map((doc) => (
               <div key={doc.id} className="border-b first:pt-0 py-5">

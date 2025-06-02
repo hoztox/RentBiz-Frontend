@@ -91,7 +91,7 @@ const mobileRouteTitles = {
   "/admin/update-unit-upload-documents": "Upload Documents",
   "/admin/update-unit-submitted": "Submitted",
   "/admin/tenant-timeline": "",
-  "/admin/create-tenant": "Create New Tenant",
+  // "/admin/create-tenant": "Create New Tenant",
   "/admin/tenant-upload-documents": "Upload Documents",
   "/admin/tenant-submitted": "Submitted",
   "/admin/edit-tenant-timeline": "",
@@ -104,6 +104,7 @@ const mobileRouteTitles = {
 const modalTitles = {
   "user-create": "Create User",
   "user-update": "Update User",
+  "create-tenant": "Create New Tenant",
   "tenancy-create": "Create New Tenancy",
   "tenancy-update": "Update Tenancy",
   "tenancy-view": "Tenancy View",

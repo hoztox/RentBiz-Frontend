@@ -248,7 +248,7 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
       <div className="border rounded-md border-[#E9E9E9] p-5">
         <h2 className="review-page-head">Tenant</h2>
         <div className="grid grid-cols-1 md:grid-cols-2">
-          <div className="space-y-8 border-r border-[#E9E9E9]">
+          <div className="space-y-8 border-r border-[#E9E9E9] max-[480px]:border-r-0">
             <div>
               <p className="review-page-label">Tenant Name*</p>
               <p className="review-page-data">{tenant.tenant_name || "N/A"}</p>
@@ -282,7 +282,7 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
               <p className="review-page-data">{tenant.status || "N/A"}</p>
             </div>
           </div>
-          <div className="space-y-8 ml-5">
+          <div className="space-y-8 sm:ml-5 max-[480px]:mt-8">
             <div>
               <p className="review-page-label">Nationality*</p>
               <p className="review-page-data">{tenant.nationality || "N/A"}</p>
