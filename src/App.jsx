@@ -31,11 +31,6 @@ import ReportCollection from "./pages/ReportCollection/ReportCollection";
 import IncomeExpenseReport from "./pages/IncomeExpenseReport/IncomeExpenseReport";
 import ChargeCodeType from "./pages/Admin Masters/Charge Code Type/ChargeCodeType";
 import { ModalProvider } from "./context/ModalContext";
-import EditTenantFormTimelineRes from "./pages/Admin Tenants/EditTenantModal/EditTenantFormTimelineRes";
-import ResUpdateTenantInfoForm from "./pages/Admin Tenants/EditTenantModal/UpdateTenant/ResUpdateTenantInfoForm";
-import EditTenantDocFormRes from "./pages/Admin Tenants/EditTenantModal/UploadDocuments/EditTenantDocFormRes";
-import SubmissionConfirmationRes from "./pages/Admin Tenants/EditTenantModal/Submit/SubmissionConfirmationRes";
-import EditTenantsReset from "./pages/Admin Tenants/EditTenantModal/EditTenantsReset";
 import Taxes from "./pages/Admin Masters/Taxes/Taxes";
 
 const App = () => {
@@ -79,12 +74,6 @@ const App = () => {
             path="income-expense-report"
             element={<IncomeExpenseReport />}
           />
-
-          <Route path="edit-tenant-timeline" element={<EditTenantFormTimelineRes />} />
-          <Route path="edit-create-tenant" element={<ResUpdateTenantInfoForm />} />
-          <Route path="edit-tenant-upload-docs" element={<EditTenantDocFormRes />} />
-          <Route path="edit-tenant-submitted" element={<SubmissionConfirmationRes />} />
-          <Route path="edit-tenant-reset" element={<EditTenantsReset />} />
         </Route>
       </Routes>
     </BrowserRouter>

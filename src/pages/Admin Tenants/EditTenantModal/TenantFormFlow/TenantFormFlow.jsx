@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import closeicon from "../../../../assets/Images/Admin Tenants/close-icon.svg";
 import FormTimeline from "../FormTimeline";
@@ -8,8 +8,8 @@ import ReviewPage from "../ReviewPage/ReviewPage";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 import { BASE_URL } from "../../../../utils/config";
 
-const TenantFormFlow = ({ onClose, tenantId, onTenantUpdated }) => {
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+const TenantFormFlow = ({ onClose, tenantId, onTenantUpdated, onPageChange, initialPageIndex = 0 }) => {
+  const [currentPageIndex, setCurrentPageIndex] = useState(initialPageIndex);
   const [formData, setFormData] = useState({
     tenant: null,
     documents: { documents: [] },
@@ -23,9 +23,29 @@ const TenantFormFlow = ({ onClose, tenantId, onTenantUpdated }) => {
   const [animating, setAnimating] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // Use ref to track external navigation
+  const isExternalNavigation = useRef(false);
 
   const pageTitles = ["Update Tenant", "Upload Documents", "Review", ""];
   const currentTitle = pageTitles[currentPageIndex];
+
+  // Handle external page navigation from dropdown
+  useEffect(() => {
+    if (initialPageIndex !== currentPageIndex && !isExternalNavigation.current) {
+      isExternalNavigation.current = true;
+      setCurrentPageIndex(initialPageIndex);
+      setTimeout(() => {
+        isExternalNavigation.current = false;
+      }, 0);
+    }
+  }, [initialPageIndex]);
+
+  // Notify parent of page changes
+  useEffect(() => {
+    if (onPageChange && !isExternalNavigation.current) {
+      onPageChange(currentPageIndex);
+    }
+  }, [currentPageIndex, onPageChange]);
 
   useEffect(() => {
     const fetchTenantData = async () => {
@@ -43,7 +63,6 @@ const TenantFormFlow = ({ onClose, tenantId, onTenantUpdated }) => {
           }
         );
         const tenantData = response.data;
-        console.log("data", response.data)
         setFormData({
           tenant: {
             tenant_name: tenantData.tenant_name || "",
@@ -192,15 +211,15 @@ const TenantFormFlow = ({ onClose, tenantId, onTenantUpdated }) => {
 
   return (
     <div className="flex">
-      <div className="w-[350px] pr-[53px]">
+      <div className="w-[350px] pr-[53px] form-time-line">
         <FormTimeline
           key={currentPageIndex}
           currentStep={currentPageIndex + 1}
           progress={formProgress}
         />
       </div>
-      <div className="w-full h-[700px] desktop:h-[780px] px-[33px] pt-[50px] pb-[40px] overflow-y-scroll">
-        <div className="tenant-modal-header flex justify-between items-center mb-[35px]">
+      <div className="w-full h-[700px] desktop:h-[780px] px-[20px] sm:px-[26px] pt-[8px] sm:pt-[50px] pb-[285px] sm:pb-[40px] overflow-y-scroll">
+        <div className="tenant-modal-header flex justify-between items-center mb-[41px]">
           <h3 className="tenant-modal-title">{currentTitle}</h3>
           <button
             onClick={handleClose}
@@ -237,7 +256,7 @@ const TenantFormFlow = ({ onClose, tenantId, onTenantUpdated }) => {
               onBack={handlePreviousPage}
               tenantId={tenantId}
             />,
-            <SubmissionConfirmation key="confirm" formData={formData} />,
+            <SubmissionConfirmation key="confirm" formData={formData} onClose={handleClose} />,
           ][currentPageIndex]}
         </div>
       </div>

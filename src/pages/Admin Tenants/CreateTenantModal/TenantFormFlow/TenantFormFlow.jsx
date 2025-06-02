@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import closeicon from "../../../../assets/Images/Admin Tenants/close-icon.svg";
 import FormTimeline from "../FormTimeline";
 import TenantInfoForm from "../CreateTenant/TenantInfoForm";
 import DocumentsForm from "../UploadDocuments/DocumentsForm";
 import ReviewPage from "../ReviewPage/ReviewPage";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
-import "./tenantformflow.css"
+import "./tenantformflow.css";
 
-const TenantFormFlow = ({ onClose, onTenantCreated }) => {
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+const TenantFormFlow = ({ onClose, onTenantCreated, onPageChange, initialPageIndex = 0 }) => {
+  const [currentPageIndex, setCurrentPageIndex] = useState(initialPageIndex);
   const [formData, setFormData] = useState({
     tenant: null,
     documents: null,
@@ -20,12 +20,30 @@ const TenantFormFlow = ({ onClose, onTenantCreated }) => {
     submitted: 0,
   });
   const [animating, setAnimating] = useState(false);
+  // Use ref to track external navigation
+  const isExternalNavigation = useRef(false);
 
   // Dynamic page titles based on current page
   const pageTitles = ["Create New Tenant", "Upload Documents", "Review", ""];
-
-  // Get current title based on page index
   const currentTitle = pageTitles[currentPageIndex];
+
+  // Handle external page navigation from dropdown
+  useEffect(() => {
+    if (initialPageIndex !== currentPageIndex && !isExternalNavigation.current) {
+      isExternalNavigation.current = true;
+      setCurrentPageIndex(initialPageIndex);
+      setTimeout(() => {
+        isExternalNavigation.current = false;
+      }, 0);
+    }
+  }, [initialPageIndex]);
+
+  // Notify parent of page changes
+  useEffect(() => {
+    if (onPageChange && !isExternalNavigation.current) {
+      onPageChange(currentPageIndex);
+    }
+  }, [currentPageIndex, onPageChange]);
 
   useEffect(() => {
     const newProgress = {
@@ -37,7 +55,10 @@ const TenantFormFlow = ({ onClose, onTenantCreated }) => {
 
     if (currentPageIndex >= 1) newProgress.tenantDetails = 100;
     if (currentPageIndex >= 2) newProgress.uploadDocuments = 100;
-    if (currentPageIndex >= 3) newProgress.review = 100;
+    if (currentPageIndex >= 3) {
+      newProgress.review = 100;
+      newProgress.submitted = 100;
+    }
 
     if (currentPageIndex === 0 && formData.tenant) {
       const requiredFields = [
@@ -110,6 +131,7 @@ const TenantFormFlow = ({ onClose, onTenantCreated }) => {
       review: 0,
       submitted: 0,
     });
+    setAnimating(false);
     onClose();
   };
 
