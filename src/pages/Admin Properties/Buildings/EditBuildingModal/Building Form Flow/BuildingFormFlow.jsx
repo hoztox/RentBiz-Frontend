@@ -61,6 +61,7 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated, onPageChange
           }
         );
         const buildingData = response.data;
+        console.log("Fetched building data:", buildingData);
         setFormData({
           building: {
             building_no: buildingData.building_no || "",
@@ -74,6 +75,8 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated, onPageChange
             longitude: buildingData.longitude || "",
             remarks: buildingData.remarks || "",
             land_mark: buildingData.land_mark || "",
+            country: buildingData?.country || "",
+            state: buildingData?.state || "",
           },
           documents: {
             documents: Array.isArray(buildingData.build_comp)
