@@ -36,7 +36,7 @@ import UpdateTaxModal from "./Admin Masters/Taxes/UpdateTaxModal/UpdateTaxModal"
 import CreateTenantModal from "./Admin Tenants/CreateTenantModal/CreateTenantModal";
 
 const Layout = () => {
-  const { modalState } = useModal();
+  const { modalState, closeModal } = useModal();
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -50,7 +50,7 @@ const Layout = () => {
       {/* Conditionally render modals */}
       {modalState.isOpen && modalState.type === "user-create" && <AdminCreateUserModal />}
       {modalState.isOpen && modalState.type === "user-update" && <EditUserModal />}
-      {modalState.isOpen && modalState.type === "create-tenant" && <CreateTenantModal open={modalState.isOpen}  />}   
+      {modalState.isOpen && modalState.type === "create-tenant" && <CreateTenantModal open={modalState.isOpen} onClose={closeModal}  />}   
       {modalState.isOpen && modalState.type === "tenancy-create" && <CreateTenancyModal />}
       {modalState.isOpen && modalState.type === "tenancy-update" && <UpdateTenancyModal />}
       {modalState.isOpen && modalState.type === "tenancy-view" && <TenancyViewModal />}

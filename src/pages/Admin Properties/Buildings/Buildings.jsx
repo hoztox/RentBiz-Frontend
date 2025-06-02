@@ -12,6 +12,7 @@ import AddBuildingModal from "./Add Building Modal/AddBuildingModal";
 import EditBuildingModal from "./EditBuildingModal/EditBuildingModal";
 import { BASE_URL } from "../../../utils/config";
 import DeleteBuildingModal from "./DeleteBuildingModal/DeleteBuildingModal";
+import { useModal } from "../../../context/ModalContext";
 
 const Buildings = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -23,7 +24,8 @@ const Buildings = () => {
   const [buildings, setBuildings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedBuildingId, setSelectedBuildingId] = useState(null);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  // const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const { openModal} = useModal();
   const [buildingToDelete, setBuildingToDelete] = useState(null);
   const [error, setError] = useState(null);
   const itemsPerPage = 10;
