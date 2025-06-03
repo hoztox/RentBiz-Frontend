@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./CreateChargesModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { ChevronDown } from "lucide-react";
@@ -10,24 +10,39 @@ const CreateChargesModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
   const [name, setName] = useState("");
   const [chargeCodeId, setChargeCodeId] = useState("");
-  const [vatPercentage, setVatPercentage] = useState("");
+  const [selectedTaxTypes, setSelectedTaxTypes] = useState([]);
   const [isSelectOpen, setIsSelectOpen] = useState(false);
+  const [isTaxTypeOpen, setIsTaxTypeOpen] = useState(false);
   const [chargeCodes, setChargeCodes] = useState([]);
+  const [taxTypes, setTaxTypes] = useState([]); // State for dynamic tax types
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
+  const taxTypeDropdownRef = useRef(null);
 
-  // Reset form state when modal opens
+  // Reset form state and fetch data when modal opens
   useEffect(() => {
     if (modalState.isOpen && modalState.type === "create-charges-master") {
       setName("");
       setChargeCodeId("");
-      setVatPercentage("");
+      setSelectedTaxTypes([]);
       setError(null);
       setFieldErrors({});
       fetchChargeCodes();
+      fetchTaxTypes(); // Fetch tax types when modal opens
     }
   }, [modalState.isOpen, modalState.type]);
+
+  // Handle clicks outside tax type dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (taxTypeDropdownRef.current && !taxTypeDropdownRef.current.contains(event.target)) {
+        setIsTaxTypeOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Only render for "create-charges-master" type
   if (!modalState.isOpen || modalState.type !== "create-charges-master") {
@@ -38,10 +53,8 @@ const CreateChargesModal = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
 
     if (role === "company") {
-      // When a company logs in, their own ID is stored as company_id
       return localStorage.getItem("company_id");
     } else if (role === "user" || role === "admin") {
-      // When a user logs in, company_id is directly stored
       try {
         const userCompanyId = localStorage.getItem("company_id");
         return userCompanyId ? JSON.parse(userCompanyId) : null;
@@ -50,7 +63,6 @@ const CreateChargesModal = () => {
         return null;
       }
     }
-
     return null;
   };
 
@@ -61,7 +73,6 @@ const CreateChargesModal = () => {
       const userId = localStorage.getItem("user_id");
       if (userId) return userId;
     }
-
     return null;
   };
 
@@ -83,8 +94,41 @@ const CreateChargesModal = () => {
       setChargeCodes(response.data || []);
     } catch (error) {
       console.error("Error fetching charge codes:", error);
-      // setError("Failed to load charge codes");
+      setError("Failed to fetch charge codes");
     }
+  };
+
+  // Fetch tax types from API
+  const fetchTaxTypes = async () => {
+    try {
+      const companyId = getUserCompanyId();
+      if (!companyId) {
+        throw new Error("Company ID is missing or invalid");
+      }
+
+      const response = await axios.get(
+        `${BASE_URL}/company/taxes/${companyId}/`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setTaxTypes(response.data || []);
+      console.log('tax types:', response.data);
+      
+    } catch (error) {
+      console.error("Error fetching tax types:", error);
+      setError("Failed to fetch tax types");
+    }
+  };
+
+  const handleTaxTypeToggle = (taxTypeId) => {
+    setSelectedTaxTypes((prev) =>
+      prev.includes(taxTypeId)
+        ? prev.filter((id) => id !== taxTypeId)
+        : [...prev, taxTypeId]
+    );
   };
 
   const validateForm = () => {
@@ -96,9 +140,9 @@ const CreateChargesModal = () => {
     if (!chargeCodeId) {
       errors.chargeCodeId = "Please select a Charge Code Type";
     }
-    if (!vatPercentage || vatPercentage < 0) {
-      errors.vatPercentage = "Please enter a valid VAT percentage";
-    }
+    // if (selectedTaxTypes.length === 0) {
+    //   errors.taxTypes = "Please select at least one Tax Type";
+    // }
 
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -116,14 +160,6 @@ const CreateChargesModal = () => {
     try {
       const companyId = getUserCompanyId();
       const userId = getRelevantUserId();
-      
-      console.log("Request payload:", { 
-        name, 
-        chargeCodeId, 
-        vatPercentage, 
-        companyId, 
-        userId 
-      });
 
       if (!companyId) {
         throw new Error("Company ID is missing or invalid");
@@ -134,7 +170,7 @@ const CreateChargesModal = () => {
         {
           name: name,
           charge_code: parseInt(chargeCodeId),
-          vat_percentage: parseFloat(vatPercentage),
+          tax_types: selectedTaxTypes,
           company: companyId,
           user: userId,
         },
@@ -149,12 +185,12 @@ const CreateChargesModal = () => {
         throw new Error("Failed to create charges");
       }
 
-      console.log("New Charges Created:", { 
-        name, 
-        chargeCodeId, 
-        vatPercentage, 
-        companyId, 
-        userId 
+      console.log("New Charges Created:", {
+        name,
+        chargeCodeId,
+        selectedTaxTypes,
+        companyId,
+        userId,
       });
       triggerRefresh();
       closeModal();
@@ -166,7 +202,7 @@ const CreateChargesModal = () => {
             err.response?.data?.company_id ||
             err.response?.data?.name ||
             err.response?.data?.charge_code ||
-            err.response?.data?.vat_percentage ||
+            err.response?.data?.tax_types ||
             err.message)
       );
     } finally {
@@ -267,27 +303,55 @@ const CreateChargesModal = () => {
             )}
           </div>
 
-          <label className="block pt-2 mb-2 text-[#201D1E] modal-label">
-            VAT Percentage *
+          <label className="block pt-2 !mb-[10px] text-[#201D1E] modal-label">
+            Select Tax *
           </label>
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            max="100"
-            className={`w-full border rounded-md mt-1 px-3 py-2 focus:outline-none input-style transition-colors duration-200 ${
-              fieldErrors.vatPercentage
-                ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-                : "border-[#E9E9E9] focus:ring-gray-500"
-            }`}
-            placeholder="0.00"
-            value={vatPercentage}
-            onChange={(e) => setVatPercentage(e.target.value)}
-            disabled={loading}
-          />
+          <div className="relative" ref={taxTypeDropdownRef}>
+            <div
+              className={`w-full border rounded-md mt-1 px-3 py-2 cursor-pointer focus:outline-none input-style transition-colors duration-200 flex items-center`}
+              onClick={() => setIsTaxTypeOpen(!isTaxTypeOpen)}
+            >
+              {selectedTaxTypes.length > 0
+                ? selectedTaxTypes
+                    .map((id) => taxTypes.find((t) => t.id === id)?.tax_type)
+                    .filter(Boolean)
+                    .join(", ")
+                : "Select Tax"}
+            </div>
+            <ChevronDown
+              className={`absolute right-3 top-3 w-[18px] h-[18px] md:w-[20px] md:h-[20px] transition-transform duration-300 ${
+                isTaxTypeOpen ? "rotate-180" : "rotate-0"
+              }`}
+            />
+            {isTaxTypeOpen && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-[#E9E9E9] rounded-md shadow-lg max-h-60 overflow-y-auto">
+                {taxTypes.length > 0 ? (
+                  taxTypes.map((taxType) => (
+                    <label
+                      key={taxType.id}
+                      className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer tax-types"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedTaxTypes.includes(taxType.id)}
+                        onChange={() => handleTaxTypeToggle(taxType.id)}
+                        className="mr-2"
+                        disabled={loading}
+                      />
+                      {taxType.tax_type}
+                    </label>
+                  ))
+                ) : (
+                  <div className="px-3 py-2 text-gray-500">
+                    No tax types available
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
           <div className="text-sm mt-1" style={{ minHeight: "20px" }}>
-            {fieldErrors.vatPercentage && (
-              <span className="text-[#dc2626]">{fieldErrors.vatPercentage}</span>
+            {fieldErrors.taxTypes && (
+              <span className="text-[#dc2626]">{fieldErrors.taxTypes}</span>
             )}
           </div>
         </div>

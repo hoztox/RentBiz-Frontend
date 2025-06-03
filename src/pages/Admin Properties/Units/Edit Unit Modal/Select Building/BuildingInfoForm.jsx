@@ -25,6 +25,7 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
     return role === "company" || role === "user" || role === "admin" ? storedCompanyId : null;
   };
 
+  // Fetch buildings list on component mount
   useEffect(() => {
     const fetchBuildings = async () => {
       setLoading(true);
@@ -46,6 +47,7 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
     fetchBuildings();
   }, []);
 
+  // Initialize form with initialData
   useEffect(() => {
     if (initialData) {
       const buildingId = initialData.buildingId?.id || initialData.buildingId || "";
@@ -60,21 +62,52 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
     }
   }, [initialData]);
 
+  // Fetch building details when buildingId changes
   useEffect(() => {
-    if (formState.buildingId && buildings.length > 0) {
-      const selectedBuilding = buildings.find((b) => b.id === formState.buildingId);
-      if (selectedBuilding) {
+    const fetchBuildingDetails = async () => {
+      if (!formState.buildingId) {
+        // Reset form fields if no building is selected
         setFormState((prev) => ({
           ...prev,
-          building_name: selectedBuilding.building_name || "",
-          description: selectedBuilding.description || "",
-          building_address: selectedBuilding.building_address || "",
-          building_no: selectedBuilding.building_no || "",
-          plot_no: selectedBuilding.plot_no || "",
+          building_name: "",
+          description: "",
+          building_address: "",
+          building_no: "",
+          plot_no: "",
         }));
+        return;
       }
-    }
-  }, [formState.buildingId, buildings]);
+
+      setLoading(true);
+      try {
+        const response = await axios.get(`${BASE_URL}/company/buildings/${formState.buildingId}`);
+        const building = response.data;
+        setFormState((prev) => ({
+          ...prev,
+          building_name: building.building_name || "",
+          description: building.description || "",
+          building_address: building.building_address || "",
+          building_no: building.building_no || "",
+          plot_no: building.plot_no || "",
+        }));
+        setError(null);
+      } catch (error) {
+        console.error("Error fetching building details:", error);
+        setError("Failed to load building details.");
+        setFormState((prev) => ({
+          ...prev,
+          building_name: "",
+          description: "",
+          building_address: "",
+          building_no: "",
+          plot_no: "",
+        }));
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBuildingDetails();
+  }, [formState.buildingId]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -161,9 +194,10 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
             value={formState.description}
             onChange={handleInputChange}
             placeholder="Enter building description"
-            className="w-full building-info-form-inputs focus:border-gray-300 resize-none duration-200"
+            className="w-full building-info-form-inputs focus:border-gray-300 resize-none duration-200 cursor-not-allowed"
             required
             disabled={loading}
+            readOnly
           />
         </div>
         <div className="col-span-1">
@@ -173,9 +207,10 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
             value={formState.building_address}
             onChange={handleInputChange}
             placeholder="Enter building address"
-            className="w-full building-info-form-inputs focus:border-gray-300 resize-none duration-200"
+            className="w-full building-info-form-inputs focus:border-gray-300 resize-none duration-200 cursor-not-allowed"
             required
             disabled={loading}
+            readOnly
           />
         </div>
         <div className="col-span-1">
@@ -186,9 +221,10 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
             value={formState.building_no}
             onChange={handleInputChange}
             placeholder="Enter building number"
-            className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
+            className="w-full building-info-form-inputs focus:border-gray-300 duration-200 cursor-not-allowed"
             required
             disabled={loading}
+            readOnly
           />
         </div>
         <div className="col-span-1">
@@ -199,9 +235,10 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
             value={formState.plot_no}
             onChange={handleInputChange}
             placeholder="Enter plot number"
-            className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
+            className="w-full building-info-form-inputs focus:border-gray-300 duration-200 cursor-not-allowed"
             required
             disabled={loading}
+            readOnly
           />
         </div>
         <div className="next-btn-container mt-[29px] col-span-1 text-right">

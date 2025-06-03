@@ -369,7 +369,6 @@ const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
             >
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
-              <option value="pending">Pending</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
