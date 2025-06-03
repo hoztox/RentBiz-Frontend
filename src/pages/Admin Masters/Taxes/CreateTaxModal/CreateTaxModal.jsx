@@ -3,30 +3,115 @@ import "./CreateTaxModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { ChevronDown } from "lucide-react";
 import { useModal } from "../../../../context/ModalContext";
+import axios from "axios";
+import { BASE_URL } from "../../../../utils/config";
+import { toast } from "react-hot-toast";
 
+/**
+ * CreateTaxModal Component
+ * A modal for creating a new tax record, with dynamic country and state dropdowns fetched from the backend.
+ * Integrates with the /taxes/<company_id>/ endpoint to create a tax record with versioning support.
+ * The `applicable_to` field is optional, as the backend allows null for active taxes.
+ */
 const CreateTaxModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
   const [country, setCountry] = useState("");
+  const [state, setState] = useState("");
   const [taxType, setTaxType] = useState("");
   const [taxPercentage, setTaxPercentage] = useState("");
   const [applicableFrom, setApplicableFrom] = useState("");
   const [applicableTo, setApplicableTo] = useState("");
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
-  const [countries, setCountries] = useState([
-    { id: 1, name: "United States" },
-    { id: 2, name: "Canada" },
-    { id: 3, name: "United Kingdom" },
-    { id: 4, name: "India" },
-    { id: 5, name: "Australia" },
-  ]);
+  const [isCountrySelectOpen, setIsCountrySelectOpen] = useState(false);
+  const [isStateSelectOpen, setIsStateSelectOpen] = useState(false);
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
 
-  // Reset form state when modal opens
+  /**
+   * Retrieves the company ID from localStorage based on the user's role.
+   * @returns {string|null} The company ID or null if not found/invalid.
+   */
+  const getUserCompanyId = () => {
+    const role = localStorage.getItem("role")?.toLowerCase();
+    if (role === "company") {
+      return localStorage.getItem("company_id");
+    } else if (role === "user" || role === "admin") {
+      try {
+        const userCompanyId = localStorage.getItem("company_id");
+        return userCompanyId ? JSON.parse(userCompanyId) : null;
+      } catch (e) {
+        console.error("Error parsing user company ID:", e);
+        return null;
+      }
+    }
+    return null;
+  };
+
+  /**
+   * Fetches countries from the backend.
+   * Request: GET /countries/
+   * Response: Array of country objects [{ id, name }, ...]
+   */
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/accounts/countries/`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        });
+        setCountries(Array.isArray(response.data) ? response.data : []);
+      } catch (err) {
+        console.error("Error fetching countries:", err);
+        toast.error("Failed to load countries");
+      }
+    };
+
+    fetchCountries();
+  }, []);
+
+  /**
+   * Fetches states based on the selected country.
+   * Request: GET /states/?country_id=<id>
+   * Response: Array of state objects [{ id, name }, ...]
+   */
+  useEffect(() => {
+    const fetchStates = async () => {
+      if (!country) {
+        setStates([]);
+        setState("");
+        return;
+      }
+
+      try {
+        const response = await axios.get(
+          `${BASE_URL}/accounts/countries/${country}/states/`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+        setStates(Array.isArray(response.data) ? response.data : []);
+      } catch (err) {
+        console.error("Error fetching states:", err);
+        toast.error("Failed to load states");
+        setStates([]);
+      }
+    };
+
+    fetchStates();
+  }, [country]);
+
+  /**
+   * Resets form state when the modal opens.
+   */
   useEffect(() => {
     if (modalState.isOpen && modalState.type === "create-tax-master") {
       setCountry("");
+      setState("");
       setTaxType("");
       setTaxPercentage("");
       setApplicableFrom("");
@@ -41,35 +126,10 @@ const CreateTaxModal = () => {
     return null;
   }
 
-  const getUserCompanyId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-
-    if (role === "company") {
-      return localStorage.getItem("company_id");
-    } else if (role === "user") {
-      try {
-        const userCompanyId = localStorage.getItem("company_id");
-        return userCompanyId ? JSON.parse(userCompanyId) : null;
-      } catch (e) {
-        console.error("Error parsing user company ID:", e);
-        return null;
-      }
-    }
-
-    return null;
-  };
-
-  const getRelevantUserId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-
-    if (role === "user") {
-      const userId = localStorage.getItem("user_id");
-      if (userId) return userId;
-    }
-
-    return null;
-  };
-
+  /**
+   * Validates form fields before submission.
+   * @returns {boolean} True if valid, false otherwise.
+   */
   const validateForm = () => {
     const errors = {};
 
@@ -79,18 +139,13 @@ const CreateTaxModal = () => {
     if (!taxType.trim()) {
       errors.taxType = "Please fill the Tax Type field";
     }
-    if (!taxPercentage || taxPercentage < 0) {
-      errors.taxPercentage = "Please enter a valid Tax percentage";
+    if (!taxPercentage || taxPercentage < 0 || taxPercentage > 100) {
+      errors.taxPercentage = "Please enter a valid Tax percentage (0-100)";
     }
     if (!applicableFrom) {
       errors.applicableFrom = "Please select an Applicable From date";
     }
-    if (!applicableTo) {
-      errors.applicableTo = "Please select an Applicable To date";
-    } else if (
-      applicableFrom &&
-      new Date(applicableTo) < new Date(applicableFrom)
-    ) {
+    if (applicableTo && new Date(applicableTo) < new Date(applicableFrom)) {
       errors.applicableTo =
         "Applicable To date must be after Applicable From date";
     }
@@ -99,6 +154,15 @@ const CreateTaxModal = () => {
     return Object.keys(errors).length === 0;
   };
 
+  /**
+   * Handles form submission by sending a POST request to create a new tax.
+   * Request: POST /taxes/<company_id>/
+   * Body: { tax_type, tax_percentage, country, state, applicable_from, applicable_to }
+   * Response:
+   * - Success (201): { id, tax_type, tax_percentage, country, state, applicable_from, applicable_to, is_active }
+   * - Error (400): { tax_type: ["Error"], ... }
+   * - Error (404): { detail: "Company not found." }
+   */
   const handleSave = async () => {
     if (!validateForm()) {
       return;
@@ -108,30 +172,51 @@ const CreateTaxModal = () => {
     setError(null);
     setFieldErrors({});
 
-    try {
-      const companyId = getUserCompanyId();
-      const userId = getRelevantUserId();
+    const companyId = getUserCompanyId();
+    if (!companyId) {
+      setError("Company ID is missing or invalid. Please log in again.");
+      toast.error("Company ID is missing or invalid. Please log in again.");
+      setLoading(false);
+      return;
+    }
 
-      if (!companyId) {
-        throw new Error("Company ID is missing or invalid");
+    try {
+      const payload = {
+        tax_type: taxType,
+        tax_percentage: parseFloat(taxPercentage),
+        country: parseInt(country),
+        state: state ? parseInt(state) : null,
+        applicable_from: applicableFrom,
+      };
+      if (applicableTo) {
+        payload.applicable_to = applicableTo;
       }
 
-      // Simulate a successful save without API call
-      console.log("New Tax Created:", {
-        country,
-        taxType,
-        taxPercentage,
-        applicableFrom,
-        applicableTo,
-        companyId,
-        userId,
-      });
+      const response = await axios.post(
+        `${BASE_URL}/company/taxes/${companyId}/`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
 
+      toast.success(
+        response.data.applicable_to
+          ? "Tax created successfully"
+          : "New tax created and set as active. Previous tax (if any) was closed."
+      );
       triggerRefresh();
       closeModal();
     } catch (err) {
-      console.error("Error:", err.message);
-      setError("Failed to save tax: " + err.message);
+      console.error("Error creating tax:", err);
+      const errorMessage =
+        err.response?.data?.detail ||
+        Object.values(err.response?.data || {}).flat().join(", ") ||
+        "Failed to create tax";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -162,50 +247,103 @@ const CreateTaxModal = () => {
         )}
 
         <div className="mb-6">
-          <label className="block pt-2 mb-2 text-[#201D1E] tax-modal-label">
-            Country *
-          </label>
-          <div className="relative">
-            <select
-              value={country}
-              onChange={(e) => {
-                setCountry(e.target.value);
-                if (e.target.value === "") {
-                  e.target.classList.add("tax-choose-selected");
-                } else {
-                  e.target.classList.remove("tax-choose-selected");
-                }
-              }}
-              className={`w-full border rounded-md mt-1 px-3 py-2 appearance-none bg-transparent cursor-pointer focus:outline-none tax-input-style transition-colors duration-200 ${
-                fieldErrors.country
-                  ? "border-red-500 focus:ring-red-500 focus:border-red-500 tax-choose-selected"
-                  : country === ""
-                  ? "border-[#E9E9E9] focus:ring-gray-500 tax-choose-selected"
-                  : "border-[#E9E9E9] focus:ring-gray-500"
-              }`}
-              onFocus={() => setIsSelectOpen(true)}
-              onBlur={() => setIsSelectOpen(false)}
-              disabled={loading}
-            >
-              <option value="" disabled hidden>
-                Choose
-              </option>
-              {countries.map((country) => (
-                <option key={country.id} value={country.id}>
-                  {country.name || `Country ${country.id}`}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              className={`absolute right-3 top-3 w-[18px] h-[18px] md:w-[20px] md:h-[20px] transition-transform duration-300 ${
-                isSelectOpen ? "rotate-180" : "rotate-0"
-              }`}
-            />
-          </div>
-          <div className="text-sm mt-1" style={{ minHeight: "20px" }}>
-            {fieldErrors.country && (
-              <span className="text-[#dc2626]">{fieldErrors.country}</span>
-            )}
+          <div className="flex flex-col md:flex-row md:gap-4">
+            <div className="flex-1">
+              <label className="block pt-2 mb-2 text-[#201D1E] tax-modal-label">
+                Country *
+              </label>
+              <div className="relative">
+                <select
+                  value={country}
+                  onChange={(e) => {
+                    setCountry(e.target.value);
+                    setState(""); // Reset state when country changes
+                    if (e.target.value === "") {
+                      e.target.classList.add("tax-choose-selected");
+                    } else {
+                      e.target.classList.remove("tax-choose-selected");
+                    }
+                  }}
+                  className={`w-full border rounded-md mt-1 px-3 py-2 appearance-none bg-transparent cursor-pointer focus:outline-none tax-input-style transition-colors duration-200 ${
+                    fieldErrors.country
+                      ? "border-red-500 focus:ring-red-500 focus:border-red-500 tax-choose-selected"
+                      : country === ""
+                      ? "border-[#E9E9E9] focus:ring-gray-500 tax-choose-selected"
+                      : "border-[#E9E9E9] focus:ring-gray-500"
+                  }`}
+                  onFocus={() => setIsCountrySelectOpen(true)}
+                  onBlur={() => setIsCountrySelectOpen(false)}
+                  disabled={loading || countries.length === 0}
+                >
+                  <option value="" disabled hidden>
+                    Choose
+                  </option>
+                  {countries.map((country) => (
+                    <option key={country.id} value={country.id}>
+                      {country.name || `Country ${country.id}`}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown
+                  className={`absolute right-3 top-3 w-[18px] h-[18px] md:w-[20px] md:h-[20px] transition-transform duration-300 ${
+                    isCountrySelectOpen ? "rotate-180" : "rotate-0"
+                  }`}
+                />
+              </div>
+              <div className="text-sm mt-1" style={{ minHeight: "20px" }}>
+                {fieldErrors.country && (
+                  <span className="text-[#dc2626]">{fieldErrors.country}</span>
+                )}
+              </div>
+            </div>
+
+            <div className="flex-1">
+              <label className="block pt-2 mb-2 text-[#201D1E] tax-modal-label">
+                State
+              </label>
+              <div className="relative">
+                <select
+                  value={state}
+                  onChange={(e) => {
+                    setState(e.target.value);
+                    if (e.target.value === "") {
+                      e.target.classList.add("tax-choose-selected");
+                    } else {
+                      e.target.classList.remove("tax-choose-selected");
+                    }
+                  }}
+                  className={`w-full border rounded-md mt-1 px-3 py-2 appearance-none bg-transparent cursor-pointer focus:outline-none tax-input-style transition-colors duration-200 ${
+                    fieldErrors.state
+                      ? "border-red-500 focus:ring-red-500 focus:border-red-500 tax-choose-selected"
+                      : state === ""
+                      ? "border-[#E9E9E9] focus:ring-gray-500 tax-choose-selected"
+                      : "border-[#E9E9E9] focus:ring-gray-500"
+                  }`}
+                  onFocus={() => setIsStateSelectOpen(true)}
+                  onBlur={() => setIsStateSelectOpen(false)}
+                  disabled={loading || !country || states.length === 0}
+                >
+                  <option value="" disabled hidden>
+                    Choose
+                  </option>
+                  {states.map((state) => (
+                    <option key={state.id} value={state.id}>
+                      {state.name || `State ${state.id}`}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown
+                  className={`absolute right-3 top-3 w-[18px] h-[18px] md:w-[20px] md:h-[20px] transition-transform duration-300 ${
+                    isStateSelectOpen ? "rotate-180" : "rotate-0"
+                  }`}
+                />
+              </div>
+              <div className="text-sm mt-1" style={{ minHeight: "20px" }}>
+                {fieldErrors.state && (
+                  <span className="text-[#dc2626]">{fieldErrors.state}</span>
+                )}
+              </div>
+            </div>
           </div>
 
           <label className="block pt-2 mb-2 text-[#201D1E] tax-modal-label">
@@ -218,7 +356,7 @@ const CreateTaxModal = () => {
                 ? "border-red-500 focus:ring-red-500 focus:border-red-500"
                 : "border-[#E9E9E9] focus:ring-gray-500"
             }`}
-            placeholder="Enter Tax Type"
+            placeholder="Enter Tax Type (e.g., GST, VAT)"
             value={taxType}
             onChange={(e) => setTaxType(e.target.value)}
             disabled={loading}
@@ -279,7 +417,7 @@ const CreateTaxModal = () => {
           </div>
 
           <label className="block pt-2 mb-2 text-[#201D1E] tax-modal-label">
-            Applicable To *
+            Applicable To
           </label>
           <input
             type="date"
@@ -296,6 +434,9 @@ const CreateTaxModal = () => {
             {fieldErrors.applicableTo && (
               <span className="text-[#dc2626]">{fieldErrors.applicableTo}</span>
             )}
+            <span className="text-gray-500">
+              Leave blank to keep the tax active until superseded.
+            </span>
           </div>
         </div>
 
