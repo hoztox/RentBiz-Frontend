@@ -10,6 +10,7 @@ import axios from "axios";
 const UpdateChargesModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
   const [name, setName] = useState("");
+  const [companyId, setCompanyId] = useState(null);
   const [chargeCode, setChargeCode] = useState("");
   const [vatPercentage, setVatPercentage] = useState("");
   const [chargeCodeOptions, setChargeCodeOptions] = useState([]);

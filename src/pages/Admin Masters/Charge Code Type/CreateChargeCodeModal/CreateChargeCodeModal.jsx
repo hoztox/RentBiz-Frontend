@@ -116,7 +116,7 @@ const CreateChargeCodeModal = () => {
         className="create-id-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[262px] p-6"
       >
         <div className="flex justify-between items-center md:mb-6">
-          <h2 className="modal-head">Create New Charge Code</h2>
+          <h2 className="modal-head">Create New Charge Code Master</h2>
           <button
             onClick={closeModal}
             className="close-btn hover:bg-gray-100 duration-200"

@@ -45,7 +45,11 @@ const UpdateUnitTypeModal = () => {
 
   // Reset form state when modal opens or unit data changes
   useEffect(() => {
-    if (modalState.isOpen && modalState.type === "update-unit-type-master" && modalState.data) {
+      if (
+      modalState.isOpen &&
+      modalState.type === "update-unit-type-master" &&
+      modalState.data
+    ) {
       setTitle(modalState.data.title || "");
       setCompanyId(getUserCompanyId());
       setError(null);
@@ -151,7 +155,7 @@ const UpdateUnitTypeModal = () => {
         </div>
 
         <div className="mb-6">
-          <label className="block pt-2 update-modal-label">Title*</label>
+          <label className="block pt-2 update-modal-label">Title *</label>
           <input
             type="text"
             className={`w-full border rounded-md mt-1 px-3 py-2 focus:outline-none transition-colors duration-200 update-modal-input-style ${

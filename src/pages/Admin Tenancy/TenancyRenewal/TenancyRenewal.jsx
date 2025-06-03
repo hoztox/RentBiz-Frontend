@@ -40,12 +40,22 @@ const TenancyRenewal = () => {
     return null;
   };
 
-  const openUpdateModal = (tenancy) => {
-    openModal("tenancy-update", tenancy);
+ const handleViewClick = (tenancy) => {
+    console.log("Tenancy ID: Selected Tenancy:", tenancy);
+    openModal("tenancy-view", "View Tenancy", tenancy);
   };
 
+  const handleEditClick = (tenancy) => {
+    console.log("Tenancy ID: Selected Tenancy:", tenancy);
+    openModal("tenancy-update", "Update Tenancy", tenancy);
+  };
+
+  // const openUpdateModal = (tenancy) => {
+  //   openModal("tenancy-update", tenancy);
+  // };
+
   const handleRenewClick = (tenancy) => {
-    openModal("tenancy-renew", {
+    openModal("tenancy-renew", "Renew Tenancy", {
       tenancyId: tenancy.id,
       tenant: tenancy.tenant || { id: tenancy.tenant?.id, tenant_name: tenancy.tenant?.tenant_name },
       building: tenancy.building || { id: tenancy.building?.id, building_name: tenancy.building?.building_name },
@@ -221,7 +231,7 @@ const TenancyRenewal = () => {
                   </button>
                 </td>
                 <td className="pl-14 text-center pr-5 pt-2">
-                  <button onClick={() => openModal("tenancy-view", tenancy)}>
+                  <button onClick={() => handleViewClick(tenancy)}>
                     <img
                       src={viewicon}
                       alt="View"
@@ -231,7 +241,7 @@ const TenancyRenewal = () => {
                 </td>
                 <td className="pr-5 flex gap-[23px] items-center justify-end h-[57px]">
                   <button
-                    onClick={() => openUpdateModal(tenancy)}>
+                    onClick={() => handleEditClick(tenancy)}>
                     <img
                       src={editicon}
                       alt="Edit"
@@ -361,7 +371,7 @@ const TenancyRenewal = () => {
                           <div className="trenew-grid-item w-[26%]">
                             <div className="trenew-dropdown-label">VIEW</div>
                             <div className="trenew-dropdown-value">
-                              <button onClick={() => openModal("tenancy-view", tenancy)}>
+                              <button onClick={() => handleViewClick(tenancy)}>
                                 <img
                                   src={viewicon}
                                   alt="View"
@@ -373,7 +383,7 @@ const TenancyRenewal = () => {
                           <div className="trenew-grid-item w-[20%]">
                             <div className="trenew-dropdown-label">ACTION</div>
                             <div className="trenew-dropdown-value trenew-flex trenew-items-center mt-[10px] ml-[7px]">
-                              <button onClick={() => openUpdateModal(tenancy)}>
+                              <button onClick={() => handleEditClick(tenancy)}>
                                 <img
                                   src={editicon}
                                   alt="Edit"

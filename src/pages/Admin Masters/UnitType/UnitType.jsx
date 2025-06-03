@@ -167,9 +167,14 @@ const UnitType = () => {
     fetchUnitTypes();
   }, [companyId, refreshCounter]);
 
-  const openUpdateModal = (unit) => {
-    openModal("update-unit-type-master", unit);
-  };
+  // const openUpdateModal = (unit) => {
+  //   openModal("update-unit-type-master", unit);
+  // };
+
+  const handleEditClick = (unit) => {
+    console.log("ID Types: Selected IdType:", unit)
+    openModal("update-unit-type-master", "Update Unit Type Master", unit)
+  }
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -308,7 +313,7 @@ const UnitType = () => {
                           {unit.title || "N/A"}
                         </td>
                         <td className="px-5 utype-flex-gap-23 h-[57px]">
-                          <button onClick={() => openUpdateModal(unit)}>
+                          <button onClick={() => handleEditClick(unit)}>
                             <img
                               src={editicon}
                               alt="Edit"
@@ -458,7 +463,7 @@ const UnitType = () => {
                             <div className="utype-grid-items">
                               <div className="utype-dropdown-label">ACTION</div>
                               <div className="utype-dropdown-value utype-flex-items-center-gap-2 p-1 ml-[5px]">
-                                <button onClick={() => openUpdateModal(unit)}>
+                                <button onClick={() => handleEditClick(unit)}>
                                   <img
                                     src={editicon}
                                     alt="Edit"

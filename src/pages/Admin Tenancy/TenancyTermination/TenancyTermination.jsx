@@ -47,12 +47,14 @@ const TenancyTermination = () => {
       try {
         const companyId = getUserCompanyId();
         setLoading(true);
-        const response = await axios.get(`${BASE_URL}/company/tenancies/occupied/${companyId}/`);
+        const response = await axios.get(
+          `${BASE_URL}/company/tenancies/occupied/${companyId}/`
+        );
         // Sort tenancies by id in ascending order
         const sortedTenancies = response.data.sort((a, b) => a.id - b.id);
         setTenancies(sortedTenancies);
         setLoading(false);
-        console.log('Fetched and sorted tenancies:', sortedTenancies);
+        console.log("Fetched and sorted tenancies:", sortedTenancies);
       } catch (err) {
         console.error("Error fetching tenancies:", err);
         setError("Failed to fetch tenancies. Please try again later.");
@@ -62,6 +64,11 @@ const TenancyTermination = () => {
     fetchTenancies();
   }, [refreshCounter]);
 
+  const handleEditClick = (tenancy) => {
+    console.log("Tenancy ID: Selected Tenancy:", tenancy);
+    openModal("tenancy-update", "Update Tenancy", tenancy);
+  };
+
   const openTerminateModal = (tenancy) => {
     setSelectedTenancy(tenancy);
     setTerminateModalOpen(true);
@@ -70,10 +77,13 @@ const TenancyTermination = () => {
   const handleTerminateAction = async () => {
     if (selectedTenancy) {
       try {
-        const response = await axios.put(`${BASE_URL}/company/tenancies/${selectedTenancy.id}/`, {
-          is_termination: true,
-          status: "terminated",
-        });
+        const response = await axios.put(
+          `${BASE_URL}/company/tenancies/${selectedTenancy.id}/`,
+          {
+            is_termination: true,
+            status: "terminated",
+          }
+        );
         if (response.status === 200) {
           // Update local state to reflect termination
           setTenancies((prev) =>
@@ -105,10 +115,18 @@ const TenancyTermination = () => {
     (tenancy) =>
       tenancy.status !== "terminated" &&
       tenancy.status !== "closed" &&
-      (tenancy.tenant?.tenant_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        tenancy.building?.building_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        tenancy.tenancy_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        tenancy.unit?.unit_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (tenancy.tenant?.tenant_name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+        tenancy.building?.building_name
+          ?.toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        tenancy.tenancy_code
+          ?.toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        tenancy.unit?.unit_name
+          ?.toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
         (tenancy.end_date &&
           tenancy.end_date.toLowerCase().includes(searchTerm.toLowerCase())))
   );
@@ -156,8 +174,9 @@ const TenancyTermination = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
-                  }`}
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
+                  isSelectOpen ? "rotate-180" : "rotate-0"
+                }`}
               />
             </div>
             <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 tterm-download-btn">
@@ -201,14 +220,24 @@ const TenancyTermination = () => {
                 key={index}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-4 text-left tenancy-data">{tenancy.tenancy_code}</td>
-                <td className="px-4 text-left tenancy-data">{tenancy.tenant?.tenant_name || "N/A"}</td>
-                <td className="px-4 text-left tenancy-data">{tenancy.building?.building_name || "N/A"}</td>
-                <td className="px-4 text-left tenancy-data">{tenancy.unit?.unit_name || "N/A"}</td>
-                <td className="px-4 text-left tenancy-data">{tenancy.end_date}</td>
+                <td className="px-4 text-left tenancy-data">
+                  {tenancy.tenancy_code}
+                </td>
+                <td className="px-4 text-left tenancy-data">
+                  {tenancy.tenant?.tenant_name || "N/A"}
+                </td>
+                <td className="px-4 text-left tenancy-data">
+                  {tenancy.building?.building_name || "N/A"}
+                </td>
+                <td className="px-4 text-left tenancy-data">
+                  {tenancy.unit?.unit_name || "N/A"}
+                </td>
+                <td className="px-4 text-left tenancy-data">
+                  {tenancy.end_date}
+                </td>
                 <td className="px-4 text-right">
                   <div className="flex gap-3 justify-end items-center">
-                    <button onClick={() => openModal("tenancy-update")}>
+                    <button onClick={() => handleEditClick(tenancy)}>
                       <img
                         src={editicon}
                         alt="Edit"
@@ -246,10 +275,11 @@ const TenancyTermination = () => {
             {paginatedData.map((tenancy) => (
               <React.Fragment key={tenancy.tenancy_code}>
                 <tr
-                  className={`${expandedRows[tenancy.tenancy_code]
-                    ? "tterm-mobile-no-border"
-                    : "tterm-mobile-with-border"
-                    } border-b border-[#E9E9E9] h-[57px]`}
+                  className={`${
+                    expandedRows[tenancy.tenancy_code]
+                      ? "tterm-mobile-no-border"
+                      : "tterm-mobile-with-border"
+                  } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left tenancy-data tterm-id-column">
                     {tenancy.tenancy_code}
@@ -259,15 +289,17 @@ const TenancyTermination = () => {
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
-                      className={`tenancy-dropdown-field ${expandedRows[tenancy.tenancy_code] ? "active" : ""
-                        }`}
+                      className={`tenancy-dropdown-field ${
+                        expandedRows[tenancy.tenancy_code] ? "active" : ""
+                      }`}
                       onClick={() => toggleRowExpand(tenancy.tenancy_code)}
                     >
                       <img
                         src={downarrow}
                         alt="drop-down-arrow"
-                        className={`tenancy-dropdown-img ${expandedRows[tenancy.tenancy_code] ? "text-white" : ""
-                          }`}
+                        className={`tenancy-dropdown-img ${
+                          expandedRows[tenancy.tenancy_code] ? "text-white" : ""
+                        }`}
                       />
                     </div>
                   </td>
@@ -278,64 +310,103 @@ const TenancyTermination = () => {
                       <div className="tenancy-dropdown-content">
                         <div className="tterm-grid">
                           <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">BUILDING NAME</div>
-                            <div className="tterm-dropdown-value">{tenancy.building?.building_name || "N/A"}</div>
+                            <div className="tterm-dropdown-label">
+                              BUILDING NAME
+                            </div>
+                            <div className="tterm-dropdown-value">
+                              {tenancy.building?.building_name || "N/A"}
+                            </div>
                           </div>
                           <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">UNIT NAME</div>
-                            <div className="tterm-dropdown-value">{tenancy.unit?.unit_name || "N/A"}</div>
+                            <div className="tterm-dropdown-label">
+                              UNIT NAME
+                            </div>
+                            <div className="tterm-dropdown-value">
+                              {tenancy.unit?.unit_name || "N/A"}
+                            </div>
                           </div>
                         </div>
                         <div className="tterm-grid">
                           <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">START DATE</div>
-                            <div className="tterm-dropdown-value">{tenancy.start_date || "N/A"}</div>
+                            <div className="tterm-dropdown-label">
+                              START DATE
+                            </div>
+                            <div className="tterm-dropdown-value">
+                              {tenancy.start_date || "N/A"}
+                            </div>
                           </div>
                           <div className="tterm-grid-item">
                             <div className="tterm-dropdown-label">END DATE</div>
-                            <div className="tterm-dropdown-value">{tenancy.end_date || "N/A"}</div>
+                            <div className="tterm-dropdown-value">
+                              {tenancy.end_date || "N/A"}
+                            </div>
                           </div>
                         </div>
                         <div className="tterm-grid">
                           <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">RENTAL MONTHS</div>
-                            <div className="tterm-dropdown-value">{tenancy.rental_months || "N/A"}</div>
+                            <div className="tterm-dropdown-label">
+                              RENTAL MONTHS
+                            </div>
+                            <div className="tterm-dropdown-value">
+                              {tenancy.rental_months || "N/A"}
+                            </div>
                           </div>
                           <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">RENT PER FREQUENCY</div>
-                            <div className="tterm-dropdown-value">${tenancy.rent_per_frequency || "N/A"}</div>
+                            <div className="tterm-dropdown-label">
+                              RENT PER FREQUENCY
+                            </div>
+                            <div className="tterm-dropdown-value">
+                              ${tenancy.rent_per_frequency || "N/A"}
+                            </div>
                           </div>
                         </div>
                         <div className="tterm-grid">
                           <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">TOTAL RENT</div>
-                            <div className="tterm-dropdown-value">${tenancy.total_rent_receivable || "N/A"}</div>
+                            <div className="tterm-dropdown-label">
+                              TOTAL RENT
+                            </div>
+                            <div className="tterm-dropdown-value">
+                              ${tenancy.total_rent_receivable || "N/A"}
+                            </div>
                           </div>
                           <div className="tterm-grid-item">
                             <div className="tterm-dropdown-label">DEPOSIT</div>
-                            <div className="tterm-dropdown-value">${tenancy.deposit || "N/A"}</div>
+                            <div className="tterm-dropdown-value">
+                              ${tenancy.deposit || "N/A"}
+                            </div>
                           </div>
                         </div>
                         <div className="tterm-grid">
                           <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">COMMISSION</div>
-                            <div className="tterm-dropdown-value">${tenancy.commision || "N/A"}</div>
+                            <div className="tterm-dropdown-label">
+                              COMMISSION
+                            </div>
+                            <div className="tterm-dropdown-value">
+                              ${tenancy.commision || "N/A"}
+                            </div>
                           </div>
                           <div className="tterm-grid-item">
                             <div className="tterm-dropdown-label">STATUS</div>
-                            <div className="tterm-dropdown-value">{tenancy.status || "N/A"}</div>
+                            <div className="tterm-dropdown-value">
+                              {tenancy.status || "N/A"}
+                            </div>
                           </div>
                         </div>
                         {tenancy.additional_charges?.length > 0 && (
                           <div className="tterm-grid">
                             <div className="tterm-grid-item">
-                              <div className="tterm-dropdown-label">ADDITIONAL CHARGES</div>
+                              <div className="tterm-dropdown-label">
+                                ADDITIONAL CHARGES
+                              </div>
                               <div className="tterm-dropdown-value">
-                                {tenancy.additional_charges.map((charge, index) => (
-                                  <div key={index} className="mb-2">
-                                    {charge.reason}: ${charge.amount} (Due: {charge.due_date})
-                                  </div>
-                                ))}
+                                {tenancy.additional_charges.map(
+                                  (charge, index) => (
+                                    <div key={index} className="mb-2">
+                                      {charge.reason}: ${charge.amount} (Due:{" "}
+                                      {charge.due_date})
+                                    </div>
+                                  )
+                                )}
                               </div>
                             </div>
                           </div>
@@ -343,19 +414,25 @@ const TenancyTermination = () => {
                         <div className="tterm-grid">
                           <div className="tterm-grid-item">
                             <div className="tterm-dropdown-label">REMARKS</div>
-                            <div className="tterm-dropdown-value">{tenancy.remarks || "N/A"}</div>
+                            <div className="tterm-dropdown-value">
+                              {tenancy.remarks || "N/A"}
+                            </div>
                           </div>
                           <div className="tterm-grid-item">
                             <div className="tterm-dropdown-label">ACTION</div>
                             <div className="tterm-dropdown-value tterm-flex tterm-items-center mt-[10px] ml-[5px]">
-                              <button onClick={() => openModal("tenancy-update")}>
+                              <button
+                                onClick={() => handleEditClick(tenancy)}
+                              >
                                 <img
                                   src={editicon}
                                   alt="Edit"
                                   className="w-[18px] h-[18px] tterm-action-btn duration-200"
                                 />
                               </button>
-                              <button onClick={() => openTerminateModal(tenancy)}>
+                              <button
+                                onClick={() => openTerminateModal(tenancy)}
+                              >
                                 <img
                                   src={terminateicon}
                                   alt="Terminate"
@@ -401,10 +478,11 @@ const TenancyTermination = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${currentPage === startPage + i
-                ? "bg-[#1458A2] text-white"
-                : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-                }`}
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+                currentPage === startPage + i
+                  ? "bg-[#1458A2] text-white"
+                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+              }`}
               onClick={() => setCurrentPage(startPage + i)}
             >
               {startPage + i}

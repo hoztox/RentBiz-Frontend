@@ -133,22 +133,22 @@ const IdType = () => {
   };
 
   // Get ID type statistics (for functional alignment, not displayed in UI)
-  const getIdTypeStats = () => {
-    const stats = idTypes.reduce(
-      (acc, idType) => {
-        const idName = idType.title?.toLowerCase();
-        if (idName?.includes("passport")) {
-          acc.passports += 1;
-        } else if (idName?.includes("license")) {
-          acc.licenses += 1;
-        }
-        acc.total += 1;
-        return acc;
-      },
-      { total: 0, passports: 0, licenses: 0 }
-    );
-    return stats;
-  };
+  // const getIdTypeStats = () => {
+  //   const stats = idTypes.reduce(
+  //     (acc, idType) => {
+  //       const idName = idType.title?.toLowerCase();
+  //       if (idName?.includes("passport")) {
+  //         acc.passports += 1;
+  //       } else if (idName?.includes("license")) {
+  //         acc.licenses += 1;
+  //       }
+  //       acc.total += 1;
+  //       return acc;
+  //     },
+  //     { total: 0, passports: 0, licenses: 0 }
+  //   );
+  //   return stats;
+  // };
 
   // Filter data based on search term
   const filteredData = idTypes.filter((idType) => {
@@ -177,9 +177,10 @@ const IdType = () => {
     }
   }, [companyId, currentPage, searchTerm, refreshCounter]);
 
-  const openUpdateModal = (idType) => {
-    openModal("update-id-type-master", idType);
-  };
+  const handleEditClick = (idType) => {
+    console.log("ID Types: Selected IdType:", idType)
+    openModal("update-id-type-master", "Update Id Type Master", idType)
+  }
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -329,7 +330,7 @@ const IdType = () => {
                         </td>
                         <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
                           <button
-                            onClick={() => openUpdateModal(idType)}
+                            onClick={() => handleEditClick(idType)}
                             disabled={loading}
                           >
                             <img
@@ -436,7 +437,7 @@ const IdType = () => {
                               <div className="dropdown-label">ACTION</div>
                               <div className="dropdown-value flex items-center gap-2 p-1 ml-[5px]">
                                 <button
-                                  onClick={() => openUpdateModal(idType)}
+                                  onClick={() => handleEditClick(idType)}
                                   disabled={loading}
                                 >
                                   <img

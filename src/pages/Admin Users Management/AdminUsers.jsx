@@ -74,7 +74,7 @@ const AdminUsers = () => {
 
   const handleEditUser = (user) => {
     console.log("User data passed to modal:", user);
-    openModal("user-update", {
+    openModal("user-update", "Edit User", {
       id: user.id,
       name: user.name,
       username: user.username,
