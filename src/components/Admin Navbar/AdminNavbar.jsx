@@ -103,6 +103,7 @@ const modalTitles = {
   "user-create": "Create User",
   "user-update": "Update User",
   "create-building": "Create New Building",
+  "edit-building": "Update Building",
   "create-tenant": "Create New Tenant",
   "tenancy-create": "Create New Tenancy",
   "tenancy-update": "Update Tenancy",

@@ -7,8 +7,15 @@ import DocumentsForm from "../Upload Documents/DocumentsForm";
 import ReviewPage from "../ReviewPage/ReviewPage";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 import { BASE_URL } from "../../../../../utils/config";
+import { useModal } from "../../../../../context/ModalContext";
 
-const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated, onPageChange, initialPageIndex = 0 }) => {
+const BuildingFormFlow = ({
+  onClose,
+  buildingId,
+  onPageChange,
+  initialPageIndex = 0,
+}) => {
+  const { triggerRefresh } = useModal();
   const [currentPageIndex, setCurrentPageIndex] = useState(initialPageIndex);
   const [formData, setFormData] = useState({
     building: null,
@@ -23,16 +30,17 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated, onPageChange
   const [animating, setAnimating] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  // Use ref to track if we're handling external navigation
+
   const isExternalNavigation = useRef(false);
 
   const pageTitles = ["Update Building", "Upload Documents", "Review", ""];
   const currentTitle = pageTitles[currentPageIndex];
 
-  // Handle external page navigation from dropdown
   useEffect(() => {
-    if (initialPageIndex !== currentPageIndex && !isExternalNavigation.current) {
+    if (
+      initialPageIndex !== currentPageIndex &&
+      !isExternalNavigation.current
+    ) {
       isExternalNavigation.current = true;
       setCurrentPageIndex(initialPageIndex);
       setTimeout(() => {
@@ -41,7 +49,6 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated, onPageChange
     }
   }, [initialPageIndex]);
 
-  // Notify parent of page changes
   useEffect(() => {
     if (onPageChange && !isExternalNavigation.current) {
       onPageChange(currentPageIndex);
@@ -171,7 +178,7 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated, onPageChange
 
   const handleClose = () => {
     if (currentPageIndex === 3) {
-      onBuildingCreated();
+      triggerRefresh(); // Trigger refresh after submission
     }
     setCurrentPageIndex(0);
     setFormData({ building: null, documents: { documents: [] } });
@@ -203,7 +210,7 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated, onPageChange
         />
       </div>
       <div className="w-full h-[700px] desktop:h-[780px] px-[20px] sm:px-[26px] pt-[8px] sm:pt-[50px] pb-[285px] sm:pb-[40px] overflow-y-scroll">
-        <div className="building-modal-header flex justify-between items-center mb-[35px]">
+        <div className="building-modal-header flex justify-between items-center mb-5">
           <h3 className="building-modal-title">{currentTitle}</h3>
           <button
             onClick={handleClose}
@@ -215,7 +222,7 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated, onPageChange
         <div
           className={`transition-all duration-500 ease-in-out ${
             animating
-              ? "opacity-0 transform translate-x-10"
+              ? "opacity-30 transform translate-x-10"
               : "opacity-100 transform translate-x-0"
           }`}
         >
@@ -244,6 +251,7 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated, onPageChange
               <SubmissionConfirmation
                 key="confirm"
                 formData={formData}
+                onClose={handleClose}
               />,
             ][currentPageIndex]
           }
