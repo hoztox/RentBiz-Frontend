@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./buildings.css";
 import { ChevronDown } from "lucide-react";
-// import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import plusicon from "../../../assets/Images/Admin Buildings/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Buildings/download-icon.svg";
@@ -25,11 +24,10 @@ const Buildings = () => {
   const [loading, setLoading] = useState(true);
   const [selectedBuildingId, setSelectedBuildingId] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const { openModal} = useModal();
+  const { openModal, refreshCounter } = useModal();
   const [buildingToDelete, setBuildingToDelete] = useState(null);
   const [error, setError] = useState(null);
   const itemsPerPage = 10;
-  // const navigate = useNavigate();
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -49,14 +47,8 @@ const Buildings = () => {
 
   const companyId = getUserCompanyId();
 
-  // const isMobileView = () => window.innerWidth < 480;
-
-  // const openBuildingModal = () => {
-  //     setBuildingModalOpen(true);
-  // };
-
   const openEditBuildingModal = () => {
-      setEditBuildingModalOpen(true);
+    setEditBuildingModalOpen(true);
   };
 
   const closeBuildingModal = () => {
@@ -65,7 +57,7 @@ const Buildings = () => {
 
   const closeEditBuildingModal = () => {
     setEditBuildingModalOpen(false);
-    setSelectedBuildingId(null); // Reset selectedBuildingId on close
+    setSelectedBuildingId(null);
   };
 
   const toggleRowExpand = (id) => {
@@ -97,14 +89,9 @@ const Buildings = () => {
     }
   };
 
-  const refreshBuildings = () => {
-    console.log("Buildings: Refreshing building list");
-    fetchBuildings();
-  };
-
   useEffect(() => {
     fetchBuildings();
-  }, [companyId]);
+  }, [companyId, refreshCounter]);
 
   const filteredData = buildings.filter(
     (building) =>
@@ -158,7 +145,7 @@ const Buildings = () => {
   const handleEditClick = (buildingId) => {
     console.log("Buildings: Selected buildingId:", buildingId);
     setSelectedBuildingId(buildingId);
-    openEditBuildingModal(buildingId); // Pass buildingId directly
+    openEditBuildingModal(buildingId);
   };
 
   const maxPageButtons = 5;
@@ -201,7 +188,7 @@ const Buildings = () => {
           <div className="flex gap-[10px] bldg-action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md bldg-add-new-building duration-200"
-              onClick={()=>openModal("create-building")}
+              onClick={() => openModal("create-building")}
             >
               Add New Building
               <img
@@ -491,16 +478,11 @@ const Buildings = () => {
           </button>
         </div>
       </div>
-      <AddBuildingModal
-        open={buildingModalOpen}
-        onClose={closeBuildingModal}
-        onBuildingCreated={refreshBuildings}
-      />
+      <AddBuildingModal open={buildingModalOpen} onClose={closeBuildingModal} />
       <EditBuildingModal
         open={editbuildingModalOpen}
         onClose={closeEditBuildingModal}
         buildingId={selectedBuildingId}
-        onBuildingCreated={refreshBuildings}
       />
       <DeleteBuildingModal
         isOpen={deleteModalOpen}
