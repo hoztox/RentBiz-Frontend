@@ -457,7 +457,7 @@ const AdminUsers = () => {
                                   className={`px-[10px] py-[5px] w-[53px] h-[24px] rounded-[4px] user-status ${
                                     user.status === "active"
                                       ? "bg-[#e1ffea] text-[#28C76F]"
-                                      : "bg-[#FFE1E1] text-[#C72828] !pr-[0px] !pl-[5px]"
+                                      : "bg-[#FFE1E1] text-[#C72828] !pr-[5px] !pl-[5px]"
                                   }`}
                                 >
                                   {user.status.charAt(0).toUpperCase() +
