@@ -33,3 +33,9 @@
     height: 780px;
   }
 }
+
+@media (max-width: 480px) { 
+  .tenant-modal-styles {
+    height: 100vh !important;
+  }
+}
