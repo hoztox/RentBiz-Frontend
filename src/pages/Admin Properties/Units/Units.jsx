@@ -7,27 +7,25 @@ import downloadicon from "../../../assets/Images/Admin Units/download-icon.svg";
 import editicon from "../../../assets/Images/Admin Units/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Units/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Units/downarrow.svg";
-import AddUnitModal from "./Add Unit Modal/AddUnitModal";
-import EditUnitModal from "./Edit Unit Modal/EditUnitModal";
+// import AddUnitModal from "./Add Unit Modal/AddUnitModal";
+// import EditUnitModal from "./Edit Unit Modal/EditUnitModal";
 import { BASE_URL } from "../../../utils/config";
 import DeleteUnitModal from "./DeleteUnitModal/DeleteUnitModal";
+import { useModal } from "../../../context/ModalContext";
 
 const Units = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [unitModalOpen, setUnitModalOpen] = useState(false);
-  const [updateUnitModalOpen, setUpdateUnitModalOpen] = useState(false);
+  // const [unitModalOpen, setUnitModalOpen] = useState(false);
+  // const [updateUnitModalOpen, setUpdateUnitModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
   const [units, setUnits] = useState([]);
   const [selectedUnitId, setSelectedUnitId] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [unitToDelete, setUnitToDelete] = useState(null);
+  const { openModal, refreshCounter } = useModal();
   const itemsPerPage = 10;
-
-  // const navigate = useNavigate();
-
-  // const isMobileView = () => window.innerWidth < 480;
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -61,35 +59,32 @@ const Units = () => {
     }
   };
 
-  const refreshUnits = () => {
-    console.log("Units: Refreshing unit list");
-    fetchUnits();
-  };
+  // const refreshUnits = () => {
+  //   console.log("Units: Refreshing unit list");
+  //   fetchUnits();
+  // };
 
   useEffect(() => {
     fetchUnits();
-  }, [companyId]);
+  }, [companyId, refreshCounter]);
 
-  const openUnitModal = () => {
-      setUnitModalOpen(true);
-  };
+  // const openUnitModal = () => {
+  //     setUnitModalOpen(true);
+  // };
 
-  const closeUnitModal = () => {
-    setUnitModalOpen(false);
-  };
+  // const closeUnitModal = () => {
+  //   setUnitModalOpen(false);
+  // };
 
   const handleEditUnitClick = (unitId) => {
     console.log("Units: Selected unitId:", unitId);
-    setSelectedUnitId(unitId);
-    setTimeout(() => {
-      setUpdateUnitModalOpen(true);
-    });
+    openModal("edit-unit", "Select Building", {unitId});
   };
 
-  const closeUpdateUnitModal = () => {
-    setUpdateUnitModalOpen(false);
-    setSelectedUnitId(null);
-  };
+  // const closeUpdateUnitModal = () => {
+  //   setUpdateUnitModalOpen(false);
+  //   setSelectedUnitId(null);
+  // };
 
   const handleDeleteUnitClick = (unitId) => {
     setUnitToDelete(unitId);
@@ -174,7 +169,7 @@ const Units = () => {
           <div className="flex gap-[10px] unit-action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md unit-add-new-unit duration-200"
-              onClick={openUnitModal}
+              onClick={()=>openModal("create-unit")}
             >
               Add New Unit
               <img
@@ -463,17 +458,17 @@ const Units = () => {
           </button>
         </div>
       </div>
-      <AddUnitModal
+      {/* <AddUnitModal
         open={unitModalOpen}
         onClose={closeUnitModal}
         onUnitCreated={refreshUnits}
-      />
-      <EditUnitModal
+      /> */}
+      {/* <EditUnitModal
         open={updateUnitModalOpen}
         onClose={closeUpdateUnitModal}
         unitId={selectedUnitId}
-        onUnitCreated={refreshUnits}
-      />
+        // onUnitCreated={refreshUnits}
+      /> */}
       <DeleteUnitModal
         isOpen={deleteModalOpen}
         onCancel={handleCancelDelete}

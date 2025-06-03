@@ -8,8 +8,10 @@ import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 import axios from "axios";
 import { BASE_URL } from "../../../../../utils/config";
 import ReviewPage from "../ReviewPage/ReviewPage";
+import { useModal } from "../../../../../context/ModalContext";
 
-const UnitFormFlow = ({ onClose, unitId, onUnitCreated, onPageChange, initialPageIndex = 0 }) => {
+const UnitFormFlow = ({ onClose, unitId, onPageChange, initialPageIndex = 0 }) => {
+  const { triggerRefresh } = useModal();
   const [currentPageIndex, setCurrentPageIndex] = useState(initialPageIndex);
   const [formData, setFormData] = useState({
     building: null,
@@ -204,7 +206,7 @@ const UnitFormFlow = ({ onClose, unitId, onUnitCreated, onPageChange, initialPag
   const handleClose = () => {
     if (currentPageIndex === 4) {
       // Only trigger refresh if closing from SubmissionConfirmation
-      onUnitCreated();
+      triggerRefresh();
     }
     setCurrentPageIndex(0);
     setFormData({ building: null, unit: null, documents: null });
