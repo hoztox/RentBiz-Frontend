@@ -195,6 +195,10 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
               <p className="review-page-data">{building.building_name || "N/A"}</p>
             </div>
             <div>
+              <p className="review-page-label">Country*</p>
+              <p className="review-page-data">{building.country || "N/A"}</p>
+            </div>
+            <div>
               <p className="review-page-label">Description</p>
               <p className="review-page-data">{building.description || "N/A"}</p>
             </div>
@@ -219,6 +223,10 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
             <div>
               <p className="review-page-label">Address*</p>
               <p className="review-page-data">{building.building_address || "N/A"}</p>
+            </div>
+            <div>
+              <p className="review-page-label">State*</p>
+              <p className="review-page-data">{building.state || "N/A"}</p>
             </div>
             <div>
               <p className="review-page-label">Remarks</p>
