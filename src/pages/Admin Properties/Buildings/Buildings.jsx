@@ -7,7 +7,6 @@ import downloadicon from "../../../assets/Images/Admin Buildings/download-icon.s
 import downarrow from "../../../assets/Images/Admin Buildings/downarrow.svg";
 import editicon from "../../../assets/Images/Admin Buildings/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Buildings/delete-icon.svg";
-import AddBuildingModal from "./Add Building Modal/AddBuildingModal";
 import { BASE_URL } from "../../../utils/config";
 import DeleteBuildingModal from "./DeleteBuildingModal/DeleteBuildingModal";
 import { useModal } from "../../../context/ModalContext";
@@ -16,7 +15,6 @@ const Buildings = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [buildingModalOpen, setBuildingModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
   const [buildings, setBuildings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,10 +41,6 @@ const Buildings = () => {
   };
 
   const companyId = getUserCompanyId();
-
-  const closeBuildingModal = () => {
-    setBuildingModalOpen(false);
-  };
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -464,7 +458,6 @@ const Buildings = () => {
           </button>
         </div>
       </div>
-      <AddBuildingModal open={buildingModalOpen} onClose={closeBuildingModal} />
       <DeleteBuildingModal
         isOpen={deleteModalOpen}
         onCancel={() => {

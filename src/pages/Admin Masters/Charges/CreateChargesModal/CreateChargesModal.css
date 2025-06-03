@@ -45,7 +45,8 @@
 }
 
 input::placeholder,
-select.choose-selected {
+select.choose-selected, 
+.tax-types {
   font-family: "Inter Tight";
   font-weight: 400;
   font-size: 15px;
@@ -80,6 +81,7 @@ select.choose-selected {
   box-sizing: border-box;
 }
 
+
 @media (min-width: 768px) {
   .create-charges-modal-container {
     width: 522px;
@@ -111,6 +113,58 @@ select.choose-selected {
   align-items: center;
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.5);
+}
+
+
+/* Custom Checkbox Styles for Tax Type Dropdown */
+.tax-types input[type="checkbox"] {
+  appearance: none; /* Remove default checkbox appearance */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #9ca3af; /* Gray stroke color when unchecked */
+  border-radius: 3px;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  margin-right: 8px;
+  background-color: #ffffff;
+}
+
+/* Style for checked state */
+.tax-types input[type="checkbox"]:checked {
+  background-color: #2892CE; /* Blue fill when checked */
+  border-color: #2892CE; /* Blue stroke when checked */
+}
+
+/* Custom checkmark */
+.tax-types input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 4px;
+  height: 8px;
+  border: solid #ffffff; /* White checkmark for contrast */
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Disabled state */
+.tax-types input[type="checkbox"]:disabled {
+  border-color: #d1d5db; /* Lighter gray stroke for disabled */
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+/* Ensure label alignment */
+.tax-types label {
+  display: flex;
+  align-items: center;
+  font-family: "Inter Tight";
+  font-size: 14px;
+  color: #201D1E;
 }
 
 @media (max-width: 480px) {
