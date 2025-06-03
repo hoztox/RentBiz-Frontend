@@ -5,8 +5,8 @@ import BuildingFormFlow from "./Building Form Flow/BuildingFormFlow";
 import { ChevronDown } from "lucide-react";
 import { useModal } from "../../../../context/ModalContext";
 
-const AddBuildingModal = ({ open, onClose, onBuildingCreated }) => {
-  const { modalState, updateModal } = useModal();
+const AddBuildingModal = ({ open, onClose }) => {
+  const { modalState, updateModal, triggerRefresh } = useModal();
   const [isExpanded, setIsExpanded] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -29,31 +29,35 @@ const AddBuildingModal = ({ open, onClose, onBuildingCreated }) => {
   const handleStepSelect = (stepId) => {
     setCurrentStep(stepId);
     setIsExpanded(false);
-    // You'll need to pass this to BuildingFormFlow to handle page navigation
-
-    // Update modal title when step is selected
     const newStep = steps.find((step) => step.id === stepId);
     if (newStep) {
       updateModal({ title: newStep.title });
     }
   };
 
-  // Function to be called when BuildingFormFlow changes pages
-const handlePageChange = (pageIndex) => {
-  const newStep = steps.find(step => step.pageIndex === pageIndex);
-  if (newStep && newStep.id !== currentStep) { // Only update if step changes
-    setCurrentStep(newStep.id);
-    updateModal({ title: newStep.title });
-  }
-};
+  const handlePageChange = (pageIndex) => {
+    const newStep = steps.find((step) => step.pageIndex === pageIndex);
+    if (newStep && newStep.id !== currentStep) {
+      setCurrentStep(newStep.id);
+      updateModal({ title: newStep.title });
+    }
+  };
+
+  // Modified handleClose to trigger refresh when closing after submission
+  const handleClose = () => {
+    if (currentStep === 4) {
+      triggerRefresh(); // Trigger refresh only after submission (step 4)
+    }
+    onClose();
+  };
 
   if (!modalState.isOpen || modalState.type !== "create-building") {
-    return null; // Prevent rendering if modal is not open
+    return null;
   }
 
   return (
     <div
-      onClick={onClose}
+      onClick={handleClose}
       className={`fixed inset-0 flex justify-center items-center transition-colors z-50 add-building-modal
             ${
               open
@@ -90,7 +94,6 @@ const handlePageChange = (pageIndex) => {
               </span>
             </div>
 
-            {/* Chevron with smooth rotation */}
             <ChevronDown
               className={`w-5 h-5 transition-transform duration-300 text-[#1458A2] ${
                 isExpanded ? "rotate-180" : "rotate-0"
@@ -140,8 +143,7 @@ const handlePageChange = (pageIndex) => {
 
         {/* Content */}
         <BuildingFormFlow
-          onClose={onClose}
-          onBuildingCreated={onBuildingCreated}
+          onClose={handleClose}
           onPageChange={handlePageChange}
           initialPageIndex={
             steps.find((step) => step.id === currentStep)?.pageIndex || 0
