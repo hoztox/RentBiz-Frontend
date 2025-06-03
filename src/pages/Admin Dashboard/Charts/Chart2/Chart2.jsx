@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from 'recharts';
 import { ChevronDown } from 'lucide-react';
+import {motion} from 'framer-motion'
 import moneyin from "../../../../assets/Images/Dashboard/money-in.svg"
 import moneyout from '../../../../assets/Images/Dashboard/money-out.svg';
 import "./chart2.css"
