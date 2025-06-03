@@ -58,7 +58,7 @@ const AddBuildingModal = ({ open, onClose }) => {
   return (
     <div
       onClick={handleClose}
-      className={`fixed inset-0 flex justify-center items-center transition-colors z-50 add-building-modal
+      className={`fixed inset-0 flex justify-center items-center transition-colors z-50 max-[480px]:items-start add-building-modal
             ${
               open
                 ? "visible bg-black/70 max-[480px]:bg-transparent"
@@ -67,7 +67,7 @@ const AddBuildingModal = ({ open, onClose }) => {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`max-[480px]:relative building-modal-styles transition-all top-[90px]
+        className={`max-[480px]:relative building-modal-styles transition-all top-[40px]
                 ${open ? "scale-100 opacity-100" : "scale-125 opacity-0"}`}
       >
         {/* Mobile Image */}

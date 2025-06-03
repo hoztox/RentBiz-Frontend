@@ -33,3 +33,9 @@
     height: 780px;
   }
 }
+
+@media (max-width: 480px) {
+  .building-modal-styles {
+    height: 100vh !important;
+  }
+}

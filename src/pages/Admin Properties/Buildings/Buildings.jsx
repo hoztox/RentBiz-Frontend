@@ -8,7 +8,6 @@ import downarrow from "../../../assets/Images/Admin Buildings/downarrow.svg";
 import editicon from "../../../assets/Images/Admin Buildings/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Buildings/delete-icon.svg";
 import AddBuildingModal from "./Add Building Modal/AddBuildingModal";
-import EditBuildingModal from "./EditBuildingModal/EditBuildingModal";
 import { BASE_URL } from "../../../utils/config";
 import DeleteBuildingModal from "./DeleteBuildingModal/DeleteBuildingModal";
 import { useModal } from "../../../context/ModalContext";
@@ -18,11 +17,9 @@ const Buildings = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [buildingModalOpen, setBuildingModalOpen] = useState(false);
-  const [editbuildingModalOpen, setEditBuildingModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
   const [buildings, setBuildings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedBuildingId, setSelectedBuildingId] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const { openModal, refreshCounter } = useModal();
   const [buildingToDelete, setBuildingToDelete] = useState(null);
@@ -47,17 +44,8 @@ const Buildings = () => {
 
   const companyId = getUserCompanyId();
 
-  const openEditBuildingModal = () => {
-    setEditBuildingModalOpen(true);
-  };
-
   const closeBuildingModal = () => {
     setBuildingModalOpen(false);
-  };
-
-  const closeEditBuildingModal = () => {
-    setEditBuildingModalOpen(false);
-    setSelectedBuildingId(null);
   };
 
   const toggleRowExpand = (id) => {
@@ -144,8 +132,7 @@ const Buildings = () => {
 
   const handleEditClick = (buildingId) => {
     console.log("Buildings: Selected buildingId:", buildingId);
-    setSelectedBuildingId(buildingId);
-    openEditBuildingModal(buildingId);
+    openModal("edit-building", "Update Building", { buildingId }); // Fixed to pass title and data
   };
 
   const maxPageButtons = 5;
@@ -166,9 +153,9 @@ const Buildings = () => {
               placeholder="Search"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 bldg-search"
+              className="px-[14px] py-[10px] outline-none border rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 bldg-search"
             />
-            <div className="relative w-[40%] md:w-auto">
+         <div className="relative w-[40%] md:w-auto">
               <select
                 name="select"
                 className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 bldg-selection"
@@ -187,8 +174,8 @@ const Buildings = () => {
           </div>
           <div className="flex gap-[10px] bldg-action-buttons-container">
             <button
-              className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md bldg-add-new-building duration-200"
-              onClick={() => openModal("create-building")}
+              className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[40px] rounded-md bldg-add-new-building duration-200"
+              onClick={() => openModal("create-building", "Add New Building")}
             >
               Add New Building
               <img
@@ -197,11 +184,11 @@ const Buildings = () => {
                 className="relative right-[5px] md:right-0 w-[15px] h-[15px]"
               />
             </button>
-            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 bldg-download-btn">
+            <button className="flex items-center justify-center gap-[2] w-full md:w-[122px] h-[40px] rounded-md duration-200 bldg-download-btn">
               Download
               <img
                 src={downloadicon}
-                alt="Download Icon"
+                alt="Download icon"
                 className="w-[15px] h-[15px] bldg-download-img"
               />
             </button>
@@ -209,95 +196,94 @@ const Buildings = () => {
         </div>
       </div>
       <div className="bldg-desktop-only">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b border-[#E9E9E9] h-[57px]">
-              <th className="px-5 text-left bldg-thead">ID</th>
-              <th className="px-5 text-left bldg-thead w-[12%]">DATE</th>
-              <th className="pl-5 text-left bldg-thead w-[15%]">NAME</th>
-              <th className="px-5 text-left bldg-thead">ADDRESS</th>
-              <th className="pl-12 pr-5 text-left bldg-thead w-[18%]">
-                NO. OF UNITS
-              </th>
-              <th className="px-5 text-left bldg-thead w-[12%]">STATUS</th>
-              <th className="px-5 pr-6 text-right bldg-thead">ACTION</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedData.map((building, index) => (
-              <tr
-                key={building.id || index}
-                className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
-              >
-                <td className="px-5 text-left bldg-data">
-                  {building.code || "N/A"}
-                </td>
-                <td className="px-5 text-left bldg-data">
-                  {new Date(building.created_at).toLocaleDateString("en-GB", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </td>
-                <td className="pl-5 text-left bldg-data">
-                  {building.building_name || "N/A"}
-                </td>
-                <td className="px-5 text-left bldg-data">
-                  {building.building_address || "N/A"}
-                </td>
-                <td className="pl-12 pr-5 text-left bldg-data">
-                  {building.unit_count || "N/A"}
-                </td>
-                <td className="px-5 text-left bldg-data">
-                  <span
-                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
-                      building.status === "active"
-                        ? "bg-[#e1ffea] text-[#28C76F]"
-                        : building.status === "inactive"
-                        ? "bg-[#FFE1E1] text-[#C72828]"
-                        : "bg-[#FFF4E1] text-[#FFA500]"
-                    }`}
-                  >
-                    {building.status
-                      ? building.status.charAt(0).toUpperCase() +
-                        building.status.slice(1)
-                      : "N/A"}
-                  </span>
-                </td>
-                <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={() => handleEditClick(building.id)}>
-                    <img
-                      src={editicon}
-                      alt="Edit"
-                      className="w-[18px] h-[18px] bldg-action-btn duration-200"
-                    />
-                  </button>
-                  <button
-                    onClick={() => {
-                      setBuildingToDelete(building.id);
-                      setDeleteModalOpen(true);
-                    }}
-                  >
-                    <img
-                      src={deletesicon}
-                      alt="Delete"
-                      className="w-[18px] h-[18px] bldg-action-btn duration-200"
-                    />
-                  </button>
-                </td>
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="border-b border-[#E9E9E9] h-[57px]">
+                <th className="px-5 text-left bldg-thead">ID</th>
+                <th className="px-5 text-left bldg-thead w-[12%]">DATE</th>
+                <th className="pl-5 text-left bldg-thead w-[15%]">NAME</th>
+                <th className="px-5 text-left bldg-thead">ADDRESS</th>
+                <th className="pl-12 pr-5 text-left bldg-thead w-[18%]">
+                  NO. OF UNITS
+                </th>
+                <th className="px-5 text-left bldg-thead w-[12%]">STATUS</th>
+                <th className="px-5 pr-6 text-right bldg-thead">ACTION</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {paginatedData.map((building, index) => (
+                <tr
+                  key={building.id || index}
+                  className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
+                >
+                  <td className="px-5 text-left bldg-data">
+                    {building.code || "N/A"}
+                  </td>
+                  <td className="px-5 text-left bldg-data">
+                    {new Date(building.created_at).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </td>
+                  <td className="pl-5 text-left bldg-data">
+                    {building.building_name || "N/A"}
+                  </td>
+                  <td className="px-5 text-left bldg-data">
+                    {building.building_address || "N/A"}
+                  </td>
+                  <td className="pl-12 pr-5 text-left bldg-data">
+                    {building.unit_count || "N/A"}
+                  </td>
+                  <td className="px-5 text-left bldg-data">
+                    <span
+                      className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
+                        building.status === "active"
+                          ? "bg-[#e1ffea] text-[#28c76f]"
+                          : building.status === "inactive"
+                            ? "bg-[#FFE1E1] text-[#c72828]"
+                            : "bg-[#FFF4E1] text-[#FFA500]"
+                      }`}
+                    >
+                      {building.status
+                        ? building.status.charAt(0).toUpperCase() +
+                          building.status.slice(1)
+                        : "N/A"}
+                    </span>
+                  </td>
+                  <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
+                    <button onClick={() => handleEditClick(building.id)}>
+                      <img
+                        src={editicon}
+                        alt="Edit"
+                        className="w-[18px] h-[18px] bldg-action-btn duration-200"
+                      />
+                    </button>
+                    <button
+                      onClick={() => {
+                        setBuildingToDelete(building.id);
+                        setDeleteModalOpen(true);
+                      }}
+                    >
+                      <img
+                        src={deletesicon}
+                        alt="Delete"
+                        className="w-[18px] h-[18px] bldg-action-btn duration-200"
+                      />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+       
       </div>
       <div className="block md:hidden">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bldg-table-row-head">
               <th className="px-5 text-left bldg-thead bldg-id-column">ID</th>
-              <th className="px-5 text-left bldg-thead bldg-date-column">
-                NAME
-              </th>
+              <th className="px-5 text-left bldg-thead bldg-date-column">NAME</th>
               <th className="px-5 text-right bldg-thead"></th>
             </tr>
           </thead>
@@ -370,13 +356,13 @@ const Buildings = () => {
                             <div className="bldg-dropdown-label">STATUS</div>
                             <div className="bldg-dropdown-value">
                               <span
-                                className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] bldg-status ${
+                                className={`px-[10px] py-[5px] w-[65px] h-[5px] rounded-[24px] bldg-status ${
                                   building.status === "active"
-                                    ? "bg-[#e1ffea] text-[#28C76F]"
+                                    ? "bg-[#e1ffea] text-[#28c76f]"
                                     : building.status === "inactive"
-                                    ? "bg-[#FFE1E1] text-[#C72828]"
-                                    : "bg-[#FFF4E1] text-[#FFA500]"
-                                }`}
+                                      ? "bg-[#FFE1E1] text-[#c72828]"
+                                      : "bg-[#FFF4E1] text-[#FFA500]"
+                                } `}
                               >
                                 {building.status
                                   ? building.status.charAt(0).toUpperCase() +
@@ -479,11 +465,6 @@ const Buildings = () => {
         </div>
       </div>
       <AddBuildingModal open={buildingModalOpen} onClose={closeBuildingModal} />
-      <EditBuildingModal
-        open={editbuildingModalOpen}
-        onClose={closeEditBuildingModal}
-        buildingId={selectedBuildingId}
-      />
       <DeleteBuildingModal
         isOpen={deleteModalOpen}
         onCancel={() => {
