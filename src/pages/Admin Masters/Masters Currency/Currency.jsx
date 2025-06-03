@@ -166,9 +166,10 @@ const Currency = () => {
     }
   }, [companyId, currentPage, searchTerm, refreshCounter]);
 
-  const openUpdateModal = (currency) => {
-    openModal("update-currency-master", currency);
-  };
+  const handelEditClick = (currency) => {
+    console.log("Currency Id:", currency)
+    openModal("update-currency-master", "Update Currency", currency)
+  }
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -321,7 +322,7 @@ const Currency = () => {
                     </td>
                     <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
                       <button
-                        onClick={() => openUpdateModal(currency)}
+                        onClick={() => handelEditClick(currency)}
                         disabled={loading}
                       >
                         <img
@@ -436,7 +437,7 @@ const Currency = () => {
                               <div className="dropdown-label">ACTION</div>
                               <div className="dropdown-value flex items-center gap-2 p-[5px]">
                                 <button
-                                  onClick={() => openUpdateModal(currency)}
+                                  onClick={() => handelEditClick(currency)}
                                   disabled={loading}
                                 >
                                   <img

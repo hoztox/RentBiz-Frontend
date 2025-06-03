@@ -86,20 +86,9 @@ const Refund = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const openAddModal = () => {
-    setIsAddModalOpen(true);
-  };
-
-  const closeAddModal = () => {
-    setIsAddModalOpen(false);
-  };
-
-  const openUpdateModal = (refund) => {
-    openModal("update-refund", refund);
-  };
-
-  const closeUpdateModal = () => {
-    setIsUpdateModalOpen(false);
+  const handleEditClick = (refund) => {
+    console.log("Refund ID:", refund);
+    openModal("update-refund", "Update Refund", refund);
   };
 
   const toggleRowExpand = (id) => {
@@ -207,7 +196,7 @@ const Refund = () => {
                   </span>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={() => openUpdateModal(refund)}>
+                  <button onClick={() => handleEditClick(refund)}>
                     <img
                       src={editicon}
                       alt="Edit"
@@ -332,7 +321,7 @@ const Refund = () => {
                           <div className="refund-dropdown-item refund-action-column">
                             <div className="refund-dropdown-label">ACTION</div>
                             <div className="refund-dropdown-value flex items-center gap-4 p-[5px]">
-                              <button onClick={() => openUpdateModal(refund)}>
+                              <button onClick={() => handleEditClick(refund)}>
                                 <img
                                   src={editicon}
                                   alt="Edit"
