@@ -36,6 +36,8 @@ import UpdateTaxModal from "./Admin Masters/Taxes/UpdateTaxModal/UpdateTaxModal"
 import CreateTenantModal from "./Admin Tenants/CreateTenantModal/CreateTenantModal";
 import AddBuildingModal from "./Admin Properties/Buildings/Add Building Modal/AddBuildingModal";
 import EditBuildingModal from "./Admin Properties/Buildings/EditBuildingModal/EditBuildingModal";
+import AddUnitModal from "./Admin Properties/Units/Add Unit Modal/AddUnitModal";
+import EditUnitModal from "./Admin Properties/Units/Edit Unit Modal/EditUnitModal";
 
 const Layout = () => {
   const { modalState, closeModal } = useModal();
@@ -58,6 +60,14 @@ const Layout = () => {
           open={modalState.isOpen}
           onClose={closeModal}
           buildingId={modalState.data?.buildingId}
+        />
+      )}
+      {modalState.isOpen && modalState.type === "create-unit" && <AddUnitModal open={modalState.isOpen} onClose={closeModal} />}
+        {modalState.isOpen && modalState.type === "edit-unit" && (
+        <EditUnitModal
+          open={modalState.isOpen}
+          onClose={closeModal}
+          unitId={modalState.data?.unitId}
         />
       )}
       {modalState.isOpen && modalState.type === "create-tenant" && <CreateTenantModal open={modalState.isOpen} onClose={closeModal}  />}   

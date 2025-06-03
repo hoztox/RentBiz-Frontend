@@ -6,8 +6,14 @@ import UnitInfoForm from "../Create Unit/UnitInfoForm";
 import DocumentsForm from "../Upload Documents/DocumentsForm";
 import UnitReview from "../Review/UnitReview";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
+import { useModal } from "../../../../../context/ModalContext";
 
-const UnitFormFlow = ({ onClose, onUnitCreated, onPageChange, initialPageIndex = 0 }) => {
+const UnitFormFlow = ({
+  onClose,
+  onPageChange,
+  initialPageIndex = 0,
+}) => {
+  const { triggerRefresh } = useModal();
   const [currentPageIndex, setCurrentPageIndex] = useState(initialPageIndex);
   const [formData, setFormData] = useState({
     building: null,
@@ -37,7 +43,10 @@ const UnitFormFlow = ({ onClose, onUnitCreated, onPageChange, initialPageIndex =
 
   // Handle external page navigation from dropdown
   useEffect(() => {
-    if (initialPageIndex !== currentPageIndex && !isExternalNavigation.current) {
+    if (
+      initialPageIndex !== currentPageIndex &&
+      !isExternalNavigation.current
+    ) {
       isExternalNavigation.current = true;
       setCurrentPageIndex(initialPageIndex);
       setTimeout(() => {
@@ -147,7 +156,7 @@ const UnitFormFlow = ({ onClose, onUnitCreated, onPageChange, initialPageIndex =
   const handleClose = () => {
     if (currentPageIndex === 4) {
       // Trigger refresh only when closing from SubmissionConfirmation
-      onUnitCreated();
+      triggerRefresh();
     }
     setCurrentPageIndex(0);
     setFormData({ building: null, unit: null, documents: null });
@@ -186,7 +195,11 @@ const UnitFormFlow = ({ onClose, onUnitCreated, onPageChange, initialPageIndex =
       onNext={handleNextPage}
       onBack={handlePreviousPage}
     />,
-    <SubmissionConfirmation key="confirm" />,
+    <SubmissionConfirmation
+      key="confirm"
+      formData={formData}
+      onClose={handleClose}
+    />,
   ];
 
   return (

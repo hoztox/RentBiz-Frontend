@@ -3,8 +3,10 @@ import "./addunit.css";
 import buildingimg from "../../../../assets/Images/Admin Buildings/building-top.svg";
 import UnitFormFlow from "./Unit Form Flow/UnitFormFlow";
 import { ChevronDown } from "lucide-react";
+import { useModal } from "../../../../context/ModalContext";
 
-const AddUnitModal = ({ open, onClose, onUnitCreated }) => {
+const AddUnitModal = ({ open, onClose }) => {
+  const { modalState, updateModal, triggerRefresh } = useModal();
   const [isExpanded, setIsExpanded] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -19,35 +21,51 @@ const AddUnitModal = ({ open, onClose, onUnitCreated }) => {
 
   // Get the current step title based on currentStep
   const getCurrentStepTitle = () => {
-    return steps.find(step => step.id === currentStep)?.title || "Select Building";
+    return (
+      steps.find((step) => step.id === currentStep)?.title || "Select Building"
+    );
   };
 
   // Toggle dropdown visibility
-  const handleToggle = () => setIsExpanded(prev => !prev);
+  const handleToggle = () => setIsExpanded((prev) => !prev);
 
   // Handle step selection from dropdown
   const handleStepSelect = (stepId) => {
     setCurrentStep(stepId);
     setIsExpanded(false);
+    const newStep = steps.find((step) => step.id === stepId);
+    if (newStep) {
+      updateModal({ title: newStep.title });
+    }
   };
 
   // Handle page changes from UnitFormFlow
   const handlePageChange = (pageIndex) => {
-    const newStep = steps.find(step => step.pageIndex === pageIndex);
-    if (newStep) {
+    const newStep = steps.find((step) => step.pageIndex === pageIndex);
+    if (newStep && newStep.id !== currentStep) {
       setCurrentStep(newStep.id);
+      updateModal({ title: newStep.title });
     }
   };
 
-  if (!open) {
-    return null; // Prevent rendering if modal is not open
+  const handleClose = () => {
+    if (currentStep === 5) {
+      triggerRefresh();
+    }
+    onClose();
+  };
+
+  if (!modalState.isOpen || modalState.type !== "create-unit") {
+    return null;
   }
 
   return (
     <div
-      onClick={onClose}
+      onClick={handleClose}
       className={`fixed inset-0 flex justify-center items-center transition-colors z-50 add-building-modal max-[480px]:items-start 
-        ${open ? "visible bg-black/70 max-[480px]:bg-transparent" : "invisible"}`}
+        ${
+          open ? "visible bg-black/70 max-[480px]:bg-transparent" : "invisible"
+        }`}
     >
       <div
         onClick={(e) => e.stopPropagation()}
@@ -55,8 +73,12 @@ const AddUnitModal = ({ open, onClose, onUnitCreated }) => {
           ${open ? "scale-100 opacity-100" : "scale-125 opacity-0"}`}
       >
         {/* Mobile Image */}
-        <div className='min-[480px]:hidden w-full h-[117px] bg-[#1458A2] flex justify-center relative top-[-42px]'>
-          <img src={buildingimg} alt="Building Top" className='top-[17px] absolute w-[85%]' />
+        <div className="min-[480px]:hidden w-full h-[117px] bg-[#1458A2] flex justify-center relative top-[-42px]">
+          <img
+            src={buildingimg}
+            alt="Building Top"
+            className="top-[17px] absolute w-[85%]"
+          />
         </div>
 
         {/* Mobile Header Bar with Dropdown */}
@@ -76,7 +98,9 @@ const AddUnitModal = ({ open, onClose, onUnitCreated }) => {
 
             {/* Chevron with smooth rotation */}
             <ChevronDown
-              className={`w-5 h-5 transition-transform duration-300 text-[#1458A2] ${isExpanded ? "rotate-180" : "rotate-0"}`}
+              className={`w-5 h-5 transition-transform duration-300 text-[#1458A2] ${
+                isExpanded ? "rotate-180" : "rotate-0"
+              }`}
             />
           </div>
 
@@ -87,21 +111,31 @@ const AddUnitModal = ({ open, onClose, onUnitCreated }) => {
                 <div
                   key={step.id}
                   className={`flex items-center space-x-5 p-3 cursor-pointer transition-colors duration-200 ${
-                    currentStep === step.id ? 'bg-[#1458A210]' : 'hover:bg-gray-50'
+                    currentStep === step.id
+                      ? "bg-[#1458A210]"
+                      : "hover:bg-gray-50"
                   }`}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleStepSelect(step.id);
                   }}
                 >
-                  <div className={`w-[30px] h-[30px] rounded-full flex items-center justify-center toggle-count ${
-                    currentStep === step.id ? 'bg-[#1458A2] text-white' : 'bg-[#1458A210] text-[#0a5ebf]'
-                  }`}>
+                  <div
+                    className={`w-[30px] h-[30px] rounded-full flex items-center justify-center toggle-count ${
+                      currentStep === step.id
+                        ? "bg-[#1458A2] text-white"
+                        : "bg-[#1458A210] text-[#0a5ebf]"
+                    }`}
+                  >
                     {step.id}
                   </div>
-                  <span className={`mob-toggle-head text-[16px] ${
-                    currentStep === step.id ? 'text-[#1458A2] font-medium' : 'text-[#1458A2]'
-                  }`}>
+                  <span
+                    className={`mob-toggle-head text-[16px] ${
+                      currentStep === step.id
+                        ? "text-[#1458A2] font-medium"
+                        : "text-[#1458A2]"
+                    }`}
+                  >
                     {step.title}
                   </span>
                 </div>
@@ -111,10 +145,11 @@ const AddUnitModal = ({ open, onClose, onUnitCreated }) => {
         </div>
 
         <UnitFormFlow
-          onClose={onClose}
-          onUnitCreated={onUnitCreated}
+          onClose={handleClose}
           onPageChange={handlePageChange}
-          initialPageIndex={steps.find(step => step.id === currentStep)?.pageIndex || 0}
+          initialPageIndex={
+            steps.find((step) => step.id === currentStep)?.pageIndex || 0
+          }
         />
       </div>
     </div>

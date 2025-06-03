@@ -1,9 +1,25 @@
-import React from "react";
 import "./submissionconfirmation.css";
 import success from "../../../../../assets/Images/Admin Units/success.png";
 import successtick from "../../../../../assets/Images/Admin Buildings/success_tick.png";
+import { useModal } from "../../../../../context/ModalContext";
+import { useEffect } from "react";
 
-const SubmissionConfirmation = () => {
+const SubmissionConfirmation = ({onClose}) => {
+  const {triggerRefresh} = useModal();
+
+    useEffect(() => {
+      const isMobile = window.matchMedia("(max-width: 480px)").matches;
+  
+      if (isMobile) {
+        const timer = setTimeout(() => {
+          triggerRefresh(); // Trigger refresh on auto-close
+          onClose();
+        }, 3000);
+  
+        return () => clearTimeout(timer);
+      }
+    }, [onClose, triggerRefresh]);
+
   return (
     <div className="submit-confirm-container">
       <div className="submit-confirm-box">
