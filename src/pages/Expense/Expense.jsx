@@ -86,9 +86,10 @@ const Expense = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const openUpdateModal = (expense) => {
-    openModal("update-expense", expense);
-  };
+  const handleEditClick = (expense) => {
+    console.log("ExpenseId: ", expense)
+    openModal("update-expense", "Update Expense", expense)
+  }
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -197,7 +198,7 @@ const Expense = () => {
                   </span>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={() => openUpdateModal(expense)}>
+                  <button onClick={() => handleEditClick(expense)}>
                     <img
                       src={editicon}
                       alt="Edit"

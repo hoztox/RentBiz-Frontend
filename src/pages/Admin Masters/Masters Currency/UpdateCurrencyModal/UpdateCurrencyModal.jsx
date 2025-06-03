@@ -162,7 +162,7 @@ const UpdateCurrencyModal = () => {
           </button>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-2">
           <label className="block pt-2 mb-2 text-[#201D1E] currency-modal-label">
             Country *
           </label>
