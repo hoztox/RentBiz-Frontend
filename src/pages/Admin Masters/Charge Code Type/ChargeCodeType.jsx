@@ -157,9 +157,14 @@ const ChargeCodeType = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const openUpdateModal = (chargecodetype) => {
-    openModal("update-charge-code-type", chargecodetype);
-  };
+//  const openUpdateModal = (chargecodetype) => {
+//     openModal("update-charge-code-type", chargecodetype);
+//   }; 
+
+   const handleEditClick = (chargecodetype) => {
+    console.log("Charge Code: Selected Charge Code:", chargecodetype)
+    openModal("update-charge-code-type", "Update Charge Code Master", chargecodetype)
+  }
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -313,7 +318,7 @@ const ChargeCodeType = () => {
                             </td>
                             <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
                               <button
-                                onClick={() => openUpdateModal(chargecodetype)}
+                                onClick={() => handleEditClick(chargecodetype)}
                                 disabled={loading}
                               >
                                 <img
@@ -426,7 +431,7 @@ const ChargeCodeType = () => {
                                   <div className="dropdown-value flex items-center gap-2 p-1 ml-[5px]">
                                     <button
                                       onClick={() =>
-                                        openUpdateModal(chargecodetype)
+                                        handleEditClick(chargecodetype)
                                       }
                                       disabled={loading}
                                     >

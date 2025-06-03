@@ -55,17 +55,23 @@ const DocumentType = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(`${BASE_URL}/company/doc_type/company/${companyId}`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const docData = Array.isArray(response.data) ? response.data : response.data.results || [];
+      const response = await axios.get(
+        `${BASE_URL}/company/doc_type/company/${companyId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const docData = Array.isArray(response.data)
+        ? response.data
+        : response.data.results || [];
       setDocTypes(docData);
     } catch (err) {
       console.error("Error fetching document types:", err);
       const errorMessage =
-        err.response?.data?.message || "Failed to fetch document types. Please try again.";
+        err.response?.data?.message ||
+        "Failed to fetch document types. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
       setDocTypes([]);
@@ -93,7 +99,9 @@ const DocumentType = () => {
           "Content-Type": "application/json",
         },
       });
-      setDocTypes((prev) => prev.filter((item) => item.id !== docTypeIdToDelete));
+      setDocTypes((prev) =>
+        prev.filter((item) => item.id !== docTypeIdToDelete)
+      );
       toast.success("Document Type deleted successfully.");
       if (paginatedData.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
@@ -101,7 +109,8 @@ const DocumentType = () => {
     } catch (error) {
       console.error("Error deleting document type:", error);
       const errorMessage =
-        error.response?.data?.message || "Failed to delete document type. Please try again.";
+        error.response?.data?.message ||
+        "Failed to delete document type. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -152,8 +161,13 @@ const DocumentType = () => {
     }
   }, [companyId, currentPage, searchTerm, refreshCounter]);
 
-  const openUpdateModal = (docType) => {
-    openModal("update-document-type-master", docType);
+  // const openUpdateModal = (docType) => {
+  //   openModal("update-document-type-master", docType);
+  // };
+
+  const handleEditClick = (docType) => {
+    console.log("Document Types: Selected Document:", docType);
+    openModal("update-document-type-master", "Update Document Type Master", docType);
   };
 
   const toggleRowExpand = (id) => {
@@ -264,7 +278,9 @@ const DocumentType = () => {
               <thead>
                 <tr className="border-b border-[#E9E9E9] h-[57px]">
                   <th className="px-4 py-3 text-left doctype-thead">ID</th>
-                  <th className="px-4 py-3 text-left doctype-thead">ENTRY DATE</th>
+                  <th className="px-4 py-3 text-left doctype-thead">
+                    ENTRY DATE
+                  </th>
                   <th className="px-4 py-3 text-left doctype-thead">TITLE</th>
                   <th className="px-4 py-3 text-right doctype-thead">ACTION</th>
                 </tr>
@@ -302,7 +318,7 @@ const DocumentType = () => {
                         </td>
                         <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
                           <button
-                            onClick={() => openUpdateModal(docType)}
+                            onClick={() => handleEditClick(docType)}
                             disabled={loading}
                           >
                             <img
@@ -375,7 +391,7 @@ const DocumentType = () => {
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
                     <td className="px-3 text-left doctype-data doctype-entry-date-column">
-                     {docType.title || "N/A"}
+                      {docType.title || "N/A"}
                     </td>
                     <td className="py-4 flex items-center justify-end h-[57px]">
                       <div
@@ -402,15 +418,14 @@ const DocumentType = () => {
                             <div className="doctype-grid-items">
                               <div className="dropdown-label">ENTRY DATE</div>
                               <div className="dropdown-value">
-                                 {formatDate(docType.created_at)}
-                                
+                                {formatDate(docType.created_at)}
                               </div>
                             </div>
                             <div className="doctype-grid-items">
                               <div className="dropdown-label">ACTION</div>
                               <div className="dropdown-value flex items-center gap-2 p-1 ml-[5px]">
                                 <button
-                                  onClick={() => openUpdateModal(docType)}
+                                  onClick={() => handleEditClick(docType)}
                                   disabled={loading}
                                 >
                                   <img
@@ -447,9 +462,13 @@ const DocumentType = () => {
       {filteredData.length > 0 && (
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
           <span className="collection-list-pagination">
-            Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-            {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length}{" "}
-            entries
+            Showing{" "}
+            {Math.min(
+              (currentPage - 1) * itemsPerPage + 1,
+              filteredData.length
+            )}{" "}
+            to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+            {filteredData.length} entries
           </span>
           <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
             <button

@@ -152,8 +152,13 @@ const Charges = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const openUpdateModal = (charge) => {
-    openModal("update-charges-master", charge);
+  // const openUpdateModal = (charge) => {
+  //   openModal("update-charges-master", charge);
+  // };
+
+  const handleEditClick = (charge) => {
+    console.log("Charge Master: Selected Charge:", charge);
+    openModal("update-charges-master", "Update Charges Master", charge);
   };
 
   const toggleRowExpand = (id) => {
@@ -313,7 +318,7 @@ const Charges = () => {
                               {charge.charge_code?.title || "N/A"}
                             </td>
                             <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                              <button onClick={() => openUpdateModal(charge)}>
+                              <button onClick={() => handleEditClick(charge)}>
                                 <img
                                   src={editicon}
                                   alt="Edit"
@@ -428,7 +433,7 @@ const Charges = () => {
                                   <div className="dropdown-label">ACTION</div>
                                   <div className="dropdown-value flex items-center gap-4 p-1">
                                     <button
-                                      onClick={() => openUpdateModal(charge)}
+                                      onClick={() => handleEditClick(charge)}
                                     >
                                       <img
                                         src={editicon}

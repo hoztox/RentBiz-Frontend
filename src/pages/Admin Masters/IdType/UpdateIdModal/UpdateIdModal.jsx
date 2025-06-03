@@ -45,7 +45,11 @@ const UpdateIdModal = () => {
 
   // Reset form state when modal opens or ID type data changes
   useEffect(() => {
-    if (modalState.isOpen && modalState.type === "update-id-type-master" && modalState.data) {
+    if (
+      modalState.isOpen &&
+      modalState.type === "update-id-type-master" &&
+      modalState.data
+    ) {
       setTitle(modalState.data.title || "");
       setCompanyId(getUserCompanyId());
       setError(null);
@@ -54,7 +58,11 @@ const UpdateIdModal = () => {
   }, [modalState.isOpen, modalState.type, modalState.data]);
 
   // Only render for "update-id-type-master" type and valid data
-  if (!modalState.isOpen || modalState.type !== "update-id-type-master" || !modalState.data) {
+  if (
+    !modalState.isOpen ||
+    modalState.type !== "update-id-type-master" ||
+    !modalState.data
+  ) {
     return null;
   }
 
@@ -82,7 +90,12 @@ const UpdateIdModal = () => {
 
     try {
       const userId = getRelevantUserId();
-      console.log("Update payload:", { title, company: companyId, user: userId, id: idTypeId });
+      console.log("Update payload:", {
+        title,
+        company: companyId,
+        user: userId,
+        id: idTypeId,
+      });
 
       const response = await axios.put(
         `${BASE_URL}/company/id_type/${idTypeId}/`,
@@ -111,7 +124,10 @@ const UpdateIdModal = () => {
       triggerRefresh();
       closeModal();
     } catch (err) {
-      console.error("Error updating ID type:", err.response?.data || err.message);
+      console.error(
+        "Error updating ID type:",
+        err.response?.data || err.message
+      );
       const errorMessage =
         err.response?.data?.detail ||
         err.response?.data?.company_id ||
@@ -151,7 +167,7 @@ const UpdateIdModal = () => {
         </div>
 
         <div className="mb-6">
-          <label className="block pt-2 update-modal-label">Title*</label>
+          <label className="block pt-2 pb-1 update-modal-label">Title *</label>
           <input
             type="text"
             className={`input-style border transition-colors duration-200 ${

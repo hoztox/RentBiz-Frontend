@@ -9,6 +9,7 @@ import axios from "axios";
 const UpdateChargeCode = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
   const [title, setTitle] = useState("");
+  const [companyId, setCompanyId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [fieldError, setFieldError] = useState(null);
@@ -44,12 +45,13 @@ const UpdateChargeCode = () => {
 
   // Reset form state when modal opens or data changes
   useEffect(() => {
-    if (modalState.isOpen && modalState.type === "update-charge-code-type" && modalState.data) {
+      if (
+      modalState.isOpen &&
+      modalState.type === "update-charge-code-type" &&
+      modalState.data
+    ) {
       setTitle(modalState.data.title || "");
-      setError(null);
-      setFieldError(null);
-    } else {
-      setTitle("");
+      setCompanyId(getUserCompanyId());
       setError(null);
       setFieldError(null);
     }
@@ -149,7 +151,7 @@ const UpdateChargeCode = () => {
         className="update-id-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[262px] p-6"
       >
         <div className="flex justify-between items-center md:mb-6">
-          <h2 className="modal-head">Update Charge Code</h2>
+          <h2 className="modal-head">Update Charge Code Master</h2>
           <button
             onClick={handleClose}
             className="close-btn hover:bg-gray-100 duration-200"

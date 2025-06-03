@@ -47,9 +47,12 @@ const CloseTenancy = () => {
           console.error("No company ID found");
           return;
         }
-        const response = await axios.get(`${BASE_URL}/company/tenancies/termination/${companyId}/`, {
-          params: { status: "closed" },
-        });
+        const response = await axios.get(
+          `${BASE_URL}/company/tenancies/termination/${companyId}/`,
+          {
+            params: { status: "closed" },
+          }
+        );
         const sortedTenancies = response.data.sort((a, b) => a.id - b.id);
         setTenancies(sortedTenancies);
         console.log("Fetched and sorted Tenancies:", sortedTenancies);
@@ -80,10 +83,16 @@ const CloseTenancy = () => {
 
   const filteredData = formattedData.filter(
     (tenancy) =>
-      (tenancy.tenant || "N/A").toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (tenancy.building || "N/A").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (tenancy.tenant || "N/A")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      (tenancy.building || "N/A")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       (tenancy.id || "N/A").toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (tenancy.unit || "N/A").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (tenancy.unit || "N/A")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       (tenancy.renew || "N/A").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -126,6 +135,16 @@ const CloseTenancy = () => {
     } catch (error) {
       console.error("Error deleting tenancy:", error);
     }
+  };
+
+  const handleViewClick = (tenancy) => {
+    console.log("View Tenancy Data:", tenancy);
+    openModal("tenancy-view", "View Tenancy", tenancy);
+  };
+
+  const handleEditClick = (tenancy) => {
+    console.log("Edit Tenancy Data:", tenancy);
+    openModal("tenancy-update", "Update Tenancy", tenancy);
   };
 
   // Handle close tenancy action
@@ -176,8 +195,9 @@ const CloseTenancy = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
-                  }`}
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
+                  isSelectOpen ? "rotate-180" : "rotate-0"
+                }`}
               />
             </div>
             <button className="flex items-center justify-center gap-2 md:w-[122px] h-[38px] rounded-md duration-200 tclose-download-btn">
@@ -197,11 +217,17 @@ const CloseTenancy = () => {
             <tr className="border-b border-[#E9E9E9] h-[57px]">
               <th className="px-5 text-left tenancy-thead">ID</th>
               <th className="px-5 text-left tenancy-thead w-[12%]">NAME</th>
-              <th className="pl-5 text-left tenancy-thead w-[15%]">BUILDING NAME</th>
-              <th className="pl-5 text-left tenancy-thead w-[12%]">UNIT NAME</th>
+              <th className="pl-5 text-left tenancy-thead w-[15%]">
+                BUILDING NAME
+              </th>
+              <th className="pl-5 text-left tenancy-thead w-[12%]">
+                UNIT NAME
+              </th>
               <th className="px-5 text-left tenancy-thead">RENTAL MONTHS</th>
               <th className="px-5 text-left tenancy-thead w-[12%]">END DATE</th>
-              <th className="pl-12 pr-5 text-center tenancy-thead w-[10%]">VIEW</th>
+              <th className="pl-12 pr-5 text-center tenancy-thead w-[10%]">
+                VIEW
+              </th>
               <th className="px-5 text-center tenancy-thead w-[11%]">CLOSE</th>
               <th className="px-5 pr-6 text-right tenancy-thead">ACTION</th>
             </tr>
@@ -219,16 +245,26 @@ const CloseTenancy = () => {
                   key={index}
                   className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
                 >
-                  <td className="px-5 text-left tenancy-data">{tenancy.id}</td>
-                  <td className="px-5 text-left tenancy-data">{tenancy.tenant}</td>
-                  <td className="pl-5 text-left tenancy-data">{tenancy.building}</td>
-                  <td className="pl-5 text-left tenancy-data">{tenancy.unit}</td>
-                  <td className="px-5 tenancy-data">
-                    <div className="w-[63%] flex justify-center">{tenancy.months}</div>
+                  <td className="px-5 text-left tenancy-data">{tenancy.tenancy_code}</td>
+                  <td className="px-5 text-left tenancy-data">
+                    {tenancy.tenant}
                   </td>
-                  <td className="pl-5 text-left tenancy-data">{tenancy.endDate}</td>
+                  <td className="pl-5 text-left tenancy-data">
+                    {tenancy.building}
+                  </td>
+                  <td className="pl-5 text-left tenancy-data">
+                    {tenancy.unit}
+                  </td>
+                  <td className="px-5 tenancy-data">
+                    <div className="w-[63%] flex justify-center">
+                      {tenancy.months}
+                    </div>
+                  </td>
+                  <td className="pl-5 text-left tenancy-data">
+                    {tenancy.endDate}
+                  </td>
                   <td className="pl-14 text-center pr-5 pt-2">
-                    <button onClick={() => openModal("tenancy-view", tenancy)}>
+                    <button onClick={() => handleViewClick(tenancy)}>
                       <img
                         src={viewicon}
                         alt="View"
@@ -240,16 +276,17 @@ const CloseTenancy = () => {
                     <button
                       onClick={() => handleCloseTenancy(tenancy.id)}
                       disabled={tenancy.isClose}
-                      className={`px-4 py-2 rounded-md tenancy-data ${tenancy.isClose
-                        ? "!text-gray-400 cursor-not-allowed"
-                        : "!text-blue-600 hover:text-blue-800"
-                        } duration-200`}
+                      className={`px-4 py-2 rounded-md tenancy-data ${
+                        tenancy.isClose
+                          ? "!text-gray-400 cursor-not-allowed"
+                          : "!text-blue-600 hover:text-blue-800"
+                      } duration-200`}
                     >
                       {tenancy.isClose ? "Closed" : "Click to Close"}
                     </button>
                   </td>
                   <td className="px-5 tclose-flex-gap-23 h-[57px]">
-                    <button onClick={() => openModal("tenancy-update")}>
+                    <button onClick={() => handleEditClick(tenancy)}>
                       <img
                         src={editicon}
                         alt="Edit"
@@ -274,8 +311,12 @@ const CloseTenancy = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="tenancy-table-row-head">
-              <th className="px-5 w-[53%] text-left tenancy-thead tclose-id-column">ID</th>
-              <th className="px-5 w-[47%] text-left tenancy-thead tclose-end-date-column">NAME</th>
+              <th className="px-5 w-[53%] text-left tenancy-thead tclose-id-column">
+                ID
+              </th>
+              <th className="px-5 w-[47%] text-left tenancy-thead tclose-end-date-column">
+                NAME
+              </th>
               <th className="px-5 text-right tenancy-thead"></th>
             </tr>
           </thead>
@@ -290,26 +331,31 @@ const CloseTenancy = () => {
               paginatedData.map((tenancy) => (
                 <React.Fragment key={tenancy.id}>
                   <tr
-                    className={`${expandedRows[tenancy.id]
-                      ? "tclose-mobile-no-border"
-                      : "tclose-mobile-with-border"
-                      } border-b border-[#E9E9E9] h-[57px]`}
+                    className={`${
+                      expandedRows[tenancy.id]
+                        ? "tclose-mobile-no-border"
+                        : "tclose-mobile-with-border"
+                    } border-b border-[#E9E9E9] h-[57px]`}
                   >
-                    <td className="px-5 text-left tenancy-data">{tenancy.id}</td>
+                    <td className="px-5 text-left tenancy-data">
+                      {tenancy.tenancy_code}
+                    </td>
                     <td className="px-5 text-left tenancy-data tclose-end-date-column">
                       {tenancy.tenant}
                     </td>
                     <td className="py-4 flex items-center justify-end h-[57px]">
                       <div
-                        className={`tenancy-dropdown-field ${expandedRows[tenancy.id] ? "active" : ""
-                          }`}
+                        className={`tenancy-dropdown-field ${
+                          expandedRows[tenancy.id] ? "active" : ""
+                        }`}
                         onClick={() => toggleRowExpand(tenancy.id)}
                       >
                         <img
                           src={downarrow}
                           alt="drop-down-arrow"
-                          className={`tenancy-dropdown-img ${expandedRows[tenancy.id] ? "text-white" : ""
-                            }`}
+                          className={`tenancy-dropdown-img ${
+                            expandedRows[tenancy.id] ? "text-white" : ""
+                          }`}
                         />
                       </div>
                     </td>
@@ -320,29 +366,49 @@ const CloseTenancy = () => {
                         <div className="tenancy-dropdown-content">
                           <div className="tclose-grid">
                             <div className="tclose-grid-item">
-                              <div className="tclose-dropdown-label">BULDING NAME</div>
-                              <div className="tclose-dropdown-value">{tenancy.building}</div>
+                              <div className="tclose-dropdown-label">
+                                BULDING NAME
+                              </div>
+                              <div className="tclose-dropdown-value">
+                                {tenancy.building}
+                              </div>
                             </div>
                             <div className="tclose-grid-item">
-                              <div className="tclose-dropdown-label">UNIT NAME</div>
-                              <div className="tclose-dropdown-value">{tenancy.unit}</div>
+                              <div className="tclose-dropdown-label">
+                                UNIT NAME
+                              </div>
+                              <div className="tclose-dropdown-value">
+                                {tenancy.unit}
+                              </div>
                             </div>
                           </div>
                           <div className="tclose-grid">
                             <div className="tclose-grid-item">
-                              <div className="tclose-dropdown-label">RENTAL MONTHS</div>
-                              <div className="tclose-dropdown-value">{tenancy.months}</div>
+                              <div className="tclose-dropdown-label">
+                                RENTAL MONTHS
+                              </div>
+                              <div className="tclose-dropdown-value">
+                                {tenancy.months}
+                              </div>
                             </div>
                             <div className="tclose-grid-item">
-                              <div className="tclose-dropdown-label">END DATE</div>
-                              <div className="tclose-dropdown-value">{tenancy.endDate}</div>
+                              <div className="tclose-dropdown-label">
+                                END DATE
+                              </div>
+                              <div className="tclose-dropdown-value">
+                                {tenancy.endDate}
+                              </div>
                             </div>
                           </div>
                           <div className="tclose-grid">
                             <div className="tclose-grid-item">
                               <div className="tclose-dropdown-label">VIEW</div>
                               <div className="tclose-dropdown-value">
-                                <button onClick={() => openModal("tenancy-view", tenancy)}>
+                                <button
+                                  onClick={() =>
+                                    handleViewClick(tenancy)
+                                  }
+                                >
                                   <img
                                     src={tenancy.view}
                                     alt="View"
@@ -357,28 +423,37 @@ const CloseTenancy = () => {
                                 <button
                                   onClick={() => handleCloseTenancy(tenancy.id)}
                                   disabled={tenancy.isClose}
-                                  className={` py-2 rounded-md font-medium ${tenancy.isClose
-                                    ? "text-gray-400 cursor-not-allowed"
-                                    : "text-blue-600 hover:text-blue-800"
-                                    } duration-200`}
+                                  className={` py-2 rounded-md font-medium ${
+                                    tenancy.isClose
+                                      ? "text-gray-400 cursor-not-allowed"
+                                      : "text-blue-600 hover:text-blue-800"
+                                  } duration-200`}
                                 >
-                                  {tenancy.isClose ? "Closed" : "Click to Close"}
+                                  {tenancy.isClose
+                                    ? "Closed"
+                                    : "Click to Close"}
                                 </button>
                               </div>
                             </div>
                           </div>
                           <div className="tclose-grid">
                             <div className="tclose-grid-item">
-                              <div className="tclose-dropdown-label">ACTION</div>
+                              <div className="tclose-dropdown-label">
+                                ACTION
+                              </div>
                               <div className="tclose-dropdown-value tclose-flex-items-center-gap-2 mt-[10px] ml-[5px]">
-                                <button onClick={() => openModal("tenancy-update")}>
+                                <button
+                                  onClick={() => handleEditClick(tenancy)}
+                                >
                                   <img
                                     src={editicon}
                                     alt="Edit"
                                     className="w-[18px] h-[18px] tclose-action-btn duration-200"
                                   />
                                 </button>
-                                <button onClick={() => handleDelete(tenancy.id)}>
+                                <button
+                                  onClick={() => handleDelete(tenancy.id)}
+                                >
                                   <img
                                     src={deleteicon}
                                     alt="Delete"
@@ -400,9 +475,10 @@ const CloseTenancy = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 tclose-pagination-container">
         <span className="tclose-pagination collection-list-pagination">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length}{" "}
-          entries
+          Showing{" "}
+          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+          {filteredData.length} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto tclose-pagination-buttons">
           <button
@@ -424,16 +500,19 @@ const CloseTenancy = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${currentPage === startPage + i
-                ? "bg-[#1458A2] text-white"
-                : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-                }`}
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+                currentPage === startPage + i
+                  ? "bg-[#1458A2] text-white"
+                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+              }`}
               onClick={() => setCurrentPage(startPage + i)}
             >
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
+          {endPage < totalPages - 1 && (
+            <span className="px-2 flex items-center">...</span>
+          )}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"

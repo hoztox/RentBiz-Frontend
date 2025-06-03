@@ -85,8 +85,13 @@ const AdminAdditionalCharges = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const openUpdateModal = (charge) => {
-    openModal("update-additional-charges", charge);
+  // const openUpdateModal = (charge) => {
+  //   openModal("update-additional-charges", charge);
+  // };
+
+  const handleEditClick = (charges) => {
+    console.log("ID Types: Selected IdType:", charges);
+    openModal("update-additional-charges", "Update Additional Charges", charges);
   };
 
   const toggleRowExpand = (id) => {
@@ -210,7 +215,7 @@ const AdminAdditionalCharges = () => {
                   </span>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={() => openUpdateModal(charges)}>
+                  <button onClick={() => handleEditClick(charges)}>
                     <img
                       src={editicon}
                       alt="Edit"
@@ -334,7 +339,7 @@ const AdminAdditionalCharges = () => {
                               ACTION
                             </div>
                             <div className="admin-add-charges-dropdown-value flex items-center gap-4">
-                              <button onClick={() => openUpdateModal(charges)}>
+                              <button onClick={() => handleEditClick(charges)}>
                                 <img
                                   src={editicon}
                                   alt="Edit"
