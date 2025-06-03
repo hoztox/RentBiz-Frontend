@@ -46,12 +46,12 @@ const EditUnitModal = ({ open, onClose, title, unitId, onUnitCreated }) => {
   return (
     <div
       onClick={onClose}
-      className={`fixed inset-0 flex justify-center items-center transition-colors z-50 add-building-modal 
+      className={`fixed inset-0 flex justify-center items-center transition-colors z-50 add-building-modal max-[480px]:items-start 
         ${open ? "visible bg-black/70 max-[480px]:bg-transparent" : "invisible"}`}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`max-[480px]:relative unit-modal-styles transition-all top-[90px] 
+        className={`max-[480px]:relative unit-modal-styles transition-all top-[40px]
           ${open ? "scale-100 opacity-100" : "scale-125 opacity-0"}`}
       >
         {/* Mobile Image */}
