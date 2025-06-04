@@ -235,7 +235,7 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
       </div>
       {/* Documents Section */}
       <div className="py-5">
-        <h2 className="review-page-head">_documents</h2>
+        <h2 className="review-page-head">Documents</h2>
         <DocumentsView documents={documents} />
       </div>
       <div className="flex justify-end gap-4 pt-5 mt-auto">

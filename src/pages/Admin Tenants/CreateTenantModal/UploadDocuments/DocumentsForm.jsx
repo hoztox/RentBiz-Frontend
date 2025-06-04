@@ -39,6 +39,24 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Helper function to display file names
+  const getFileDisplayText = (files) => {
+    if (!files || files.length === 0) {
+      return "Attach Files";
+    }
+    
+    if (files.length === 1) {
+      return files[0].name;
+    }
+    
+    if (files.length === 2) {
+      return `${files[0].name}, ${files[1].name}`;
+    }
+    
+    // For more than 2 files, show first file name and count
+    return `${files[0].name} and ${files.length - 1} more`;
+  };
+
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
     const storedCompanyId = localStorage.getItem("company_id");
@@ -225,11 +243,10 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
                         <label
                           htmlFor={`fileInput-${doc.id}`}
                           className="flex items-center justify-between documents-inputs cursor-pointer w-[161px] !py-2"
+                          title={doc.upload_file.length > 0 ? doc.upload_file.map(file => file.name).join(', ') : ''}
                         >
                           <span className="text-[#4B465C60] text-sm truncate">
-                            {doc.upload_file.length > 0
-                              ? `${doc.upload_file.length} file(s)`
-                              : "Attach Files"}
+                            {getFileDisplayText(doc.upload_file)}
                           </span>
                           <img
                             src={documentIcon}
