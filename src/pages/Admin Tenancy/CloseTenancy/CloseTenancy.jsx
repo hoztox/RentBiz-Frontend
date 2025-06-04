@@ -3,7 +3,7 @@ import "./CloseTenancy.css";
 import { ChevronDown } from "lucide-react";
 import axios from "axios";
 import downloadicon from "../../../assets/Images/Admin Tenancy/download-icon.svg";
-import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
+// import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
 import deleteicon from "../../../assets/Images/Admin Tenancy/delete-icon.svg";
 import viewicon from "../../../assets/Images/Admin Tenancy/view-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
@@ -55,7 +55,7 @@ const CloseTenancy = () => {
         );
         const sortedTenancies = response.data.sort((a, b) => a.id - b.id);
         setTenancies(sortedTenancies);
-        console.log("Fetched and sorted Tenancies:", sortedTenancies);
+        console.log("Fetched Tenancies:", response.data);
       } catch (error) {
         console.error("Error fetching tenancies:", error);
       }
@@ -126,26 +126,32 @@ const CloseTenancy = () => {
     });
   };
 
-  // Handle delete action
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(`${BASE_URL}/company/tenancies/${id}/`);
-      setTenancies(tenancies.filter((tenancy) => tenancy.tenancy_code !== id));
-      console.log("Deleted Tenancy ID:", id); // Debug log
-    } catch (error) {
-      console.error("Error deleting tenancy:", error);
-    }
-  };
+const handleDelete = async (id) => {
+  try {
+    await axios.delete(`${BASE_URL}/company/tenancies/${id}/`);
+    setTenancies(tenancies.filter((tenancy) => tenancy.id !== id));
+    console.log("Deleted Tenancy ID:", id);
+  } catch (error) {
+    console.error("Error deleting tenancy:", error);
+  }
+};
 
-  const handleViewClick = (tenancy) => {
-    console.log("View Tenancy Data:", tenancy);
-    openModal("tenancy-view", "View Tenancy", tenancy);
-  };
-
-  const handleEditClick = (tenancy) => {
-    console.log("Edit Tenancy Data:", tenancy);
-    openModal("tenancy-update", "Update Tenancy", tenancy);
-  };
+const handleViewClick = (formattedTenancy) => {
+  const originalTenancy = tenancies.find(t => t.tenancy_code === formattedTenancy.tenancy_code);
+  
+  if (originalTenancy) {
+    console.log("View Original Tenancy Data:", originalTenancy);
+    openModal("tenancy-view", "View Tenancy", originalTenancy);
+  } else {
+    console.error("Original tenancy data not found for:", formattedTenancy.tenancy_code);
+    // Fallback: pass the formatted data anyway
+    openModal("tenancy-view", "View Tenancy", formattedTenancy);
+  }
+};
+  // const handleEditClick = (tenancy) => {
+  //   console.log("Edit Tenancy Data:", tenancy);
+  //   openModal("tenancy-update", "Update Tenancy", tenancy);
+  // };
 
   // Handle close tenancy action
   const handleCloseTenancy = async (id) => {
@@ -285,14 +291,14 @@ const CloseTenancy = () => {
                       {tenancy.isClose ? "Closed" : "Click to Close"}
                     </button>
                   </td>
-                  <td className="px-5 tclose-flex-gap-23 h-[57px]">
-                    <button onClick={() => handleEditClick(tenancy)}>
+                  <td className="px-5 tclose-flex-gap-23 h-[57px] flex !justify-center">
+                    {/* <button onClick={() => handleEditClick(tenancy)}>
                       <img
                         src={editicon}
                         alt="Edit"
                         className="w-[18px] h-[18px] tclose-action-btn duration-200"
                       />
-                    </button>
+                    </button> */}
                     <button onClick={() => handleDelete(tenancy.id)}>
                       <img
                         src={deleteicon}
@@ -442,7 +448,7 @@ const CloseTenancy = () => {
                                 ACTION
                               </div>
                               <div className="tclose-dropdown-value tclose-flex-items-center-gap-2 mt-[10px] ml-[5px]">
-                                <button
+                                {/* <button
                                   onClick={() => handleEditClick(tenancy)}
                                 >
                                   <img
@@ -450,14 +456,14 @@ const CloseTenancy = () => {
                                     alt="Edit"
                                     className="w-[18px] h-[18px] tclose-action-btn duration-200"
                                   />
-                                </button>
+                                </button> */}
                                 <button
                                   onClick={() => handleDelete(tenancy.id)}
                                 >
                                   <img
                                     src={deleteicon}
                                     alt="Delete"
-                                    className="w-[18px] h-[18px] ml-[5px] tclose-delete-btn duration-200"
+                                    className="w-[18px] h-[18px] ml-[10px] tclose-delete-btn duration-200"
                                   />
                                 </button>
                               </div>
