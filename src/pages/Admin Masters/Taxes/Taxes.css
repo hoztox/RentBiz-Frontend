@@ -134,7 +134,7 @@
     margin-bottom: 50px;
   }
   .tax-search {
-    width: 60%;
+    width: 100%;
   }
   .tax-selection {
     width: 100%;
@@ -249,7 +249,7 @@
     flex-wrap: nowrap;
   }
   .tax-search {
-    width: 60%;
+    width: 100%;
   }
   .tax-selection {
     width: 100%;
