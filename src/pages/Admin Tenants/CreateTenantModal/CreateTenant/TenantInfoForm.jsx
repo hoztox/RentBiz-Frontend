@@ -127,7 +127,7 @@ const TenantInfoForm = ({ onNext, onBack, initialData }) => {
       description: formState.description || null,
       address: formState.address || null,
       tenant_type: formState.tenant_type || null,
-      license_no: formState.tenant_type === "Individual" ? null : formState.license_no || null,
+      license_no: formState.license_no || null,
       id_type: formState.id_type || null, // Keep as string to match select options
       id_number: formState.id_number || null,
       id_validity_date: formState.id_validity_date || null,
@@ -153,7 +153,7 @@ const TenantInfoForm = ({ onNext, onBack, initialData }) => {
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">Name*</label>
+          <label className="block tenant-info-form-label">Name *</label>
           <input
             type="text"
             name="tenant_name"
@@ -165,7 +165,7 @@ const TenantInfoForm = ({ onNext, onBack, initialData }) => {
         </div>
 
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">Nationality*</label>
+          <label className="block tenant-info-form-label">Nationality *</label>
           <div className="relative">
             <select
               name="nationality"
@@ -194,7 +194,7 @@ const TenantInfoForm = ({ onNext, onBack, initialData }) => {
         </div>
 
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">Mobile Number*</label>
+          <label className="block tenant-info-form-label">Mobile Number *</label>
           <PhoneInput
             country={"ae"}
             name="phone"
@@ -223,7 +223,7 @@ const TenantInfoForm = ({ onNext, onBack, initialData }) => {
         </div>
 
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">Email*</label>
+          <label className="block tenant-info-form-label">Email *</label>
           <input
             type="email"
             name="email"
@@ -247,7 +247,7 @@ const TenantInfoForm = ({ onNext, onBack, initialData }) => {
         </div>
 
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">Address*</label>
+          <label className="block tenant-info-form-label">Address *</label>
           <textarea
             name="address"
             value={formState.address}
@@ -258,7 +258,7 @@ const TenantInfoForm = ({ onNext, onBack, initialData }) => {
         </div>
 
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">Tenant Type*</label>
+          <label className="block tenant-info-form-label">Tenant Type *</label>
           <div className="relative">
             <select
               name="tenant_type"
@@ -285,7 +285,7 @@ const TenantInfoForm = ({ onNext, onBack, initialData }) => {
 
         <div className="col-span-1">
           <label className="block tenant-info-form-label">
-            Trade License Number{formState.tenant_type === "Organization" ? "*" : ""}
+            Trade License Number {formState.tenant_type === "Organization" ? "*" : ""}
           </label>
           <input
             type="text"
@@ -298,7 +298,7 @@ const TenantInfoForm = ({ onNext, onBack, initialData }) => {
         </div>
 
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">ID Type*</label>
+          <label className="block tenant-info-form-label">ID Type *</label>
           <div className="relative">
             <select
               name="id_type"
@@ -328,7 +328,7 @@ const TenantInfoForm = ({ onNext, onBack, initialData }) => {
         </div>
 
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">ID Number*</label>
+          <label className="block tenant-info-form-label">ID Number *</label>
           <input
             type="text"
             name="id_number"
@@ -340,7 +340,7 @@ const TenantInfoForm = ({ onNext, onBack, initialData }) => {
         </div>
 
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">ID Validity*</label>
+          <label className="block tenant-info-form-label">ID Validity *</label>
           <input
             type="date"
             name="id_validity_date"
@@ -353,7 +353,7 @@ const TenantInfoForm = ({ onNext, onBack, initialData }) => {
         <div></div>
 
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">Sponsor Name*</label>
+          <label className="block tenant-info-form-label">Sponsor Name *</label>
           <input
             type="text"
             name="sponser_name"
@@ -365,7 +365,7 @@ const TenantInfoForm = ({ onNext, onBack, initialData }) => {
         </div>
 
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">Sponsor ID Type*</label>
+          <label className="block tenant-info-form-label">Sponsor ID Type *</label>
           <div className="relative">
             <select
               name="sponser_id_type"
@@ -402,7 +402,7 @@ const TenantInfoForm = ({ onNext, onBack, initialData }) => {
         </div>
 
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">Sponsor ID Number*</label>
+          <label className="block tenant-info-form-label">Sponsor ID Number *</label>
           <input
             type="text"
             name="sponser_id_number"
@@ -414,7 +414,7 @@ const TenantInfoForm = ({ onNext, onBack, initialData }) => {
         </div>
 
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">Sponsor ID Validity*</label>
+          <label className="block tenant-info-form-label">Sponsor ID Validity *</label>
           <input
             type="date"
             name="sponser_id_validity_date"
@@ -426,7 +426,7 @@ const TenantInfoForm = ({ onNext, onBack, initialData }) => {
         </div>
 
         <div className="col-span-1">
-          <label className="block tenant-info-form-label">Status*</label>
+          <label className="block tenant-info-form-label">Status *</label>
           <div className="relative">
             <select
               name="status"

@@ -3,10 +3,12 @@ import './createtenantmodal.css';
 import buildingimg from "../../../assets/Images/Admin Buildings/building-top.svg";
 import TenantFormFlow from './TenantFormFlow/TenantFormFlow';
 import { ChevronDown } from 'lucide-react';
-import { useModal } from '../../../context/ModalContext';
+import { useModal } from "../../../context/ModalContext";
 
-const CreateTenantModal = ({ open, onClose, onTenantCreated }) => {
-  const { modalState } = useModal();
+
+
+const CreateTenantModal = ({ open, onClose }) => {
+  const { modalState, updateModal } = useModal();
   const [isExpanded, setIsExpanded] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -20,7 +22,7 @@ const CreateTenantModal = ({ open, onClose, onTenantCreated }) => {
 
   // Get the current step title based on currentStep
   const getCurrentStepTitle = () => {
-    return steps.find(step => step.id === currentStep)?.title || "Create New Tenant";
+    return steps.find(step => step.id === currentStep)?.title || "Tenant Details";
   };
 
   // Toggle dropdown visibility
@@ -30,18 +32,24 @@ const CreateTenantModal = ({ open, onClose, onTenantCreated }) => {
   const handleStepSelect = (stepId) => {
     setCurrentStep(stepId);
     setIsExpanded(false);
+    const newStep = steps.find(step => step.id === stepId);
+    if (newStep) {
+      updateModal({ title: newStep.title }); // Update modal title
+    }
   };
 
   // Handle page changes from TenantFormFlow
   const handlePageChange = (pageIndex) => {
     const newStep = steps.find(step => step.pageIndex === pageIndex);
-    if (newStep) {
+    if (newStep && newStep.id !== currentStep) {
       setCurrentStep(newStep.id);
+      updateModal({ title: newStep.title }); // Update modal title
     }
   };
 
-  if (!modalState.isOpen || modalState.type !== "create-tenant") {
-    return null; // Prevent rendering if modal is not open
+  // Ensure modal only renders for correct type
+  if (!open || modalState.type !== "create-tenant") {
+    return null;
   }
 
   return (
@@ -52,8 +60,8 @@ const CreateTenantModal = ({ open, onClose, onTenantCreated }) => {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`max-[480px]:relative tenant-modal-styles transition-all top-[40px]
-          ${open ? "scale-100 opacity-100" : "scale-125 opacity-0"}`}
+        className="flex flex-col max-[480px]:relative tenant-modal-styles transition-all top-[40px]
+          ${open ? 'scale-100 opacity-100' : 'scale-125 opacity-0'}"
       >
         {/* Mobile Image */}
         <div className='min-[480px]:hidden w-full h-[117px] bg-[#1458A2] flex justify-center relative top-[-42px]'>
@@ -77,7 +85,7 @@ const CreateTenantModal = ({ open, onClose, onTenantCreated }) => {
 
             {/* Chevron with smooth rotation */}
             <ChevronDown
-              className={`w-5 h-5 transition-transform duration-300 text-[#1458A2] ${isExpanded ? "rotate-180" : "rotate-0"}`}
+              className={`w-5 h-5 transition-transform duration-300 text-[#1458A2] ${isExpanded ? 'rotate-180' : 'rotate-0'}`}
             />
           </div>
 
@@ -113,7 +121,6 @@ const CreateTenantModal = ({ open, onClose, onTenantCreated }) => {
 
         <TenantFormFlow
           onClose={onClose}
-          onTenantCreated={onTenantCreated}
           onPageChange={handlePageChange}
           initialPageIndex={steps.find(step => step.id === currentStep)?.pageIndex || 0}
         />

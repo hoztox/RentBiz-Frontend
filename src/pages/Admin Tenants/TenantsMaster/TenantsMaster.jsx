@@ -7,30 +7,22 @@ import downloadicon from "../../../assets/Images/Admin Tenants/download-icon.svg
 import editicon from "../../../assets/Images/Admin Tenants/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Tenants/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenants/downarrow.svg";
-import CreateTenantModal from "../CreateTenantModal/CreateTenantModal";
-import EditTenantModal from "../EditTenantModal/EditTenantModal";
-import { BASE_URL } from "../../../utils/config";
 import DeleteTenantModal from "../DeleteTenantModal/DeleteTenantModal";
+import { BASE_URL } from "../../../utils/config";
 import { useModal } from "../../../context/ModalContext";
 
 const TenantsMaster = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [createTenantModalOpen, setCreateTenantModalOpen] = useState(false);
-  const [updateTenantModalOpen, setUpdateTenantModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
   const [tenants, setTenants] = useState([]);
-  const [selectedTenantId, setSelectedTenantId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [tenantToDelete, setTenantToDelete] = useState(null);
-  const { openModal } = useModal();
+  const { openModal, refreshCounter } = useModal();
   const itemsPerPage = 10;
-  // const navigate = useNavigate();
-
-  // const isMobileView = () => window.innerWidth < 480;
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -77,11 +69,6 @@ const TenantsMaster = () => {
     }
   };
 
-  const refreshTenants = () => {
-    console.log("Tenants: Refreshing tenant list");
-    fetchTenants();
-  };
-
   useEffect(() => {
     if (companyId) {
       fetchTenants();
@@ -89,28 +76,7 @@ const TenantsMaster = () => {
       setError("Company ID not found.");
       setLoading(false);
     }
-  }, [companyId]);
-
-  // const openCreateTenantModal = () => {
-  //     setCreateTenantModalOpen(true);
-  // };
-
-  const closeCreateTenantModal = () => {
-    setCreateTenantModalOpen(false);
-  };
-
-  const openUpdateTenantModal = (tenantId) => {
-    console.log("Tenants: Selected tenantId:", tenantId);
-    setSelectedTenantId(tenantId);
-      setTimeout(() => {
-        setUpdateTenantModalOpen(true);
-      });
-  };
-
-  const closeUpdateTenantModal = () => {
-    setUpdateTenantModalOpen(false);
-    setSelectedTenantId(null);
-  };
+  }, [companyId, refreshCounter]);
 
   const handleDeleteTenant = async () => {
     if (!tenantToDelete) return;
@@ -214,7 +180,7 @@ const TenantsMaster = () => {
           <div className="flex gap-[10px] action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md add-new-tenant duration-200"
-              onClick={()=>openModal("create-tenant")}
+              onClick={() => openModal("create-tenant", "Create New Tenant")}
             >
               Add New Tenant
               <img
@@ -286,7 +252,7 @@ const TenantsMaster = () => {
                   {tenant.id_type?.title || "N/A"}
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={() => openUpdateTenantModal(tenant.id)}>
+                  <button onClick={() => openModal("edit-tenant", "Tenant Details", { tenantId: tenant.id })}>
                     <img
                       src={editicon}
                       alt="Edit"
@@ -409,7 +375,7 @@ const TenantsMaster = () => {
                             <div className="dropdown-label">ACTION</div>
                             <div className="dropdown-value flex items-center gap-2 mt-[10px]">
                               <button
-                                onClick={() => openUpdateTenantModal(tenant.id)}
+                                onClick={() => openModal("edit-tenant", "Tenant Details", { tenantId: tenant.id })}
                               >
                                 <img
                                   src={editicon}
@@ -498,17 +464,6 @@ const TenantsMaster = () => {
           </button>
         </div>
       </div>
-      <CreateTenantModal
-        open={createTenantModalOpen}
-        onClose={closeCreateTenantModal}
-        onTenantCreated={refreshTenants}
-      />
-      <EditTenantModal
-        open={updateTenantModalOpen}
-        onClose={closeUpdateTenantModal}
-        tenantId={selectedTenantId}
-        onTenantUpdated={refreshTenants}
-      />
       <DeleteTenantModal
         isOpen={deleteModalOpen}
         onCancel={() => {

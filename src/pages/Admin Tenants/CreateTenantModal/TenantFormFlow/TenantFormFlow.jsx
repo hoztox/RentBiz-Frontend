@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import closeicon from "../../../../assets/Images/Admin Tenants/close-icon.svg";
 import FormTimeline from "../FormTimeline";
 import TenantInfoForm from "../CreateTenant/TenantInfoForm";
@@ -6,8 +6,10 @@ import DocumentsForm from "../UploadDocuments/DocumentsForm";
 import ReviewPage from "../ReviewPage/ReviewPage";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 import "./tenantformflow.css";
+import { useModal } from "../../../../context/ModalContext";
 
-const TenantFormFlow = ({ onClose, onTenantCreated, onPageChange, initialPageIndex = 0 }) => {
+const TenantFormFlow = ({ onClose, onPageChange, initialPageIndex = 0 }) => {
+  const { modalState, triggerRefresh } = useModal();
   const [currentPageIndex, setCurrentPageIndex] = useState(initialPageIndex);
   const [formData, setFormData] = useState({
     tenant: null,
@@ -20,10 +22,8 @@ const TenantFormFlow = ({ onClose, onTenantCreated, onPageChange, initialPageInd
     submitted: 0,
   });
   const [animating, setAnimating] = useState(false);
-  // Use ref to track external navigation
   const isExternalNavigation = useRef(false);
 
-  // Dynamic page titles based on current page
   const pageTitles = ["Create New Tenant", "Upload Documents", "Review", ""];
   const currentTitle = pageTitles[currentPageIndex];
 
@@ -121,7 +121,7 @@ const TenantFormFlow = ({ onClose, onTenantCreated, onPageChange, initialPageInd
 
   const handleClose = () => {
     if (currentPageIndex === 3) {
-      onTenantCreated();
+      triggerRefresh(); // Trigger refresh for parent component
     }
     setCurrentPageIndex(0);
     setFormData({ tenant: null, documents: null });
