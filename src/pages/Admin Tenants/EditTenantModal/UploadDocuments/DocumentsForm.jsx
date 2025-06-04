@@ -31,6 +31,39 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Helper function to display file names
+  const getFileDisplayText = (files) => {
+    if (!files || files.length === 0) {
+      return "Attach Files";
+    }
+    
+    const getFileName = (file) => {
+      if (file && file.name) {
+        return file.name;
+      } else if (typeof file === 'string') {
+        const parts = file.split('/');
+        return parts[parts.length - 1] || file;
+      } else if (file && file.upload_file) {
+        const fileName = file.upload_file;
+        if (typeof fileName === 'string') {
+          const parts = fileName.split('/');
+          return parts[parts.length - 1] || fileName;
+        }
+      }
+      return 'Unknown file';
+    };
+    
+    if (files.length === 1) {
+      return getFileName(files[0]);
+    }
+    
+    if (files.length === 2) {
+      return `${getFileName(files[0])}, ${getFileName(files[1])}`;
+    }
+    
+    return `${getFileName(files[0])} and ${files.length - 1} more`;
+  };
+
   useEffect(() => {
     const fetchDocTypes = async () => {
       setLoading(true);
@@ -76,9 +109,9 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
     }
 
     const tempData = {
-      ...initialData, // Include all TenantInfoForm data
+      ...initialData,
       documents: validDocuments.map((doc) => ({
-        doc_type: doc.doc_type || null, // Keep as string
+        doc_type: doc.doc_type || null,
         number: doc.number || null,
         issued_date: doc.issued_date || null,
         expiry_date: doc.expiry_date || null,
@@ -91,9 +124,9 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
 
   const handleBack = () => {
     const tempData = {
-      ...initialData, // Include all TenantInfoForm data
+      ...initialData,
       documents: documents.map((doc) => ({
-        doc_type: doc.doc_type || null, // Keep as string
+        doc_type: doc.doc_type || null,
         number: doc.number || null,
         issued_date: doc.issued_date || null,
         expiry_date: doc.expiry_date || null,
@@ -211,11 +244,10 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
                         <label
                           htmlFor={`fileInput-${doc.id}`}
                           className="flex items-center justify-between documents-inputs cursor-pointer w-[161px] !py-2"
+                          title={getFileDisplayText(doc.upload_file)}
                         >
                           <span className="text-[#4B465C60] text-sm truncate">
-                            {doc.upload_file.length > 0
-                              ? `${doc.upload_file.length} file(s)`
-                              : "Attach Files"}
+                            {getFileDisplayText(doc.upload_file)}
                           </span>
                           <img
                             src={documentIcon}
