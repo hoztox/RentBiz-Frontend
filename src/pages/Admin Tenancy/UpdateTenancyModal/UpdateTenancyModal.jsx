@@ -608,7 +608,7 @@ const UpdateTenancyModal = () => {
       <Toaster />
       <div
         onClick={(e) => e.stopPropagation()}
-        className="update-tenancy-modal-container relative bg-white rounded-md w-full max-w-[90%] md:max-w-[80%] p-6 md:p-8"
+        className="update-tenancy-modal-container relative bg-white rounded-md w-full max-w-[100%] md:max-w-[80%] p-6 md:p-8"
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="update-tenancy-modal-head">Update Tenancy</h2>
