@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import "./IdType.css";
 import { ChevronDown } from "lucide-react";
 import { toast, Toaster } from "react-hot-toast";
-import plusicon from "../../../assets/Images/Admin Masters/plus-icon.svg";
-import downloadicon from "../../../assets/Images/Admin Masters/download-icon.svg";
-import editicon from "../../../assets/Images/Admin Masters/edit-icon.svg";
-import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
-import buildingimg from "../../../assets/Images/Admin Masters/building-img2.svg";
-import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
+import plusIcon from "../../../assets/Images/Admin Masters/plus-icon.svg";
+import downloadIcon from "../../../assets/Images/Admin Masters/download-icon.svg";
+import editIcon from "../../../assets/Images/Admin Masters/edit-icon.svg";
+import deleteIcon from "../../../assets/Images/Admin Masters/delete-icon.svg";
+import buildingImg from "../../../assets/Images/Admin Masters/building-img2.svg";
+import downArrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
-import { BASE_URL } from "../../../utils/config";
 import IdTypeDeleteModal from "./IdTypeDeleteModal/IdTypeDeleteModal";
+import { fetchIdTypes, deleteIdType } from "./api";
 
 const IdType = () => {
   const { openModal, refreshCounter } = useModal();
@@ -26,52 +25,16 @@ const IdType = () => {
   const [idTypeIdToDelete, setIdTypeIdToDelete] = useState(null);
   const itemsPerPage = 10;
 
-  const getUserCompanyId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-    if (role === "company") {
-      return localStorage.getItem("company_id");
-    } else if (role === "user" || role === "admin") {
-      try {
-        const userCompanyId = localStorage.getItem("company_id");
-        return userCompanyId ? JSON.parse(userCompanyId) : null;
-      } catch (e) {
-        console.error("Error parsing user company ID:", e);
-        return null;
-      }
-    }
-    return null;
-  };
-
-  const companyId = getUserCompanyId();
-
   // Fetch ID types from backend
-  const fetchIdTypes = async () => {
-    if (!companyId) {
-      setError("Company ID not found. Please log in again.");
-      setLoading(false);
-      toast.error("Company ID not found. Please log in again.");
-      return;
-    }
+  const fetchData = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(
-        `${BASE_URL}/company/id_type/company/${companyId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const idData = Array.isArray(response.data)
-        ? response.data
-        : response.data.results || [];
+      const idData = await fetchIdTypes();
       setIdTypes(idData);
     } catch (err) {
       console.error("Error fetching ID types:", err);
-      const errorMessage =
-        err.response?.data?.message ||
-        "Failed to fetch ID types. Please try again.";
+      const errorMessage = err.message || "Failed to fetch ID types. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
       setIdTypes([]);
@@ -82,11 +45,6 @@ const IdType = () => {
 
   // Handle delete confirmation
   const handleDelete = (id) => {
-    if (!companyId) {
-      setError("Company ID not found. Please log in again.");
-      toast.error("Company ID not found. Please log in again.");
-      return;
-    }
     setIdTypeIdToDelete(id);
     setIsDeleteModalOpen(true);
   };
@@ -94,11 +52,7 @@ const IdType = () => {
   const handleConfirmDelete = async () => {
     if (!idTypeIdToDelete) return;
     try {
-      await axios.delete(`${BASE_URL}/company/id_type/${idTypeIdToDelete}/`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      await deleteIdType(idTypeIdToDelete);
       setIdTypes((prev) => prev.filter((item) => item.id !== idTypeIdToDelete));
       toast.success("ID Type deleted successfully.");
       if (paginatedData.length === 1 && currentPage > 1) {
@@ -106,9 +60,7 @@ const IdType = () => {
       }
     } catch (error) {
       console.error("Error deleting ID type:", error);
-      const errorMessage =
-        error.response?.data?.message ||
-        "Failed to delete ID type. Please try again.";
+      const errorMessage = error.message || "Failed to delete ID type. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -132,24 +84,6 @@ const IdType = () => {
     });
   };
 
-  // Get ID type statistics (for functional alignment, not displayed in UI)
-  // const getIdTypeStats = () => {
-  //   const stats = idTypes.reduce(
-  //     (acc, idType) => {
-  //       const idName = idType.title?.toLowerCase();
-  //       if (idName?.includes("passport")) {
-  //         acc.passports += 1;
-  //       } else if (idName?.includes("license")) {
-  //         acc.licenses += 1;
-  //       }
-  //       acc.total += 1;
-  //       return acc;
-  //     },
-  //     { total: 0, passports: 0, licenses: 0 }
-  //   );
-  //   return stats;
-  // };
-
   // Filter data based on search term
   const filteredData = idTypes.filter((idType) => {
     const searchLower = searchTerm.toLowerCase();
@@ -171,16 +105,16 @@ const IdType = () => {
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
   useEffect(() => {
-    fetchIdTypes();
+    fetchData();
     if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(totalPages);
     }
-  }, [companyId, currentPage, searchTerm, refreshCounter]);
+  }, [currentPage, searchTerm, refreshCounter]);
 
   const handleEditClick = (idType) => {
-    console.log("ID Types: Selected IdType:", idType)
-    openModal("update-id-type-master", "Update Id Type Master", idType)
-  }
+    console.log("ID Types: Selected IdType:", idType);
+    openModal("update-id-type-master", "Update Id Type Master", idType);
+  };
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -207,7 +141,7 @@ const IdType = () => {
         <div className="flex flex-col justify-center items-center h-64 gap-4">
           <div className="text-lg text-red-600">{error}</div>
           <button
-            onClick={fetchIdTypes}
+            onClick={fetchData}
             className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
           >
             Retry
@@ -261,7 +195,7 @@ const IdType = () => {
             >
               Add New Master
               <img
-                src={plusicon}
+                src={plusIcon}
                 alt="plus icon"
                 className="relative right-[5px] md:right-0 w-[15px] h-[15px]"
               />
@@ -272,7 +206,7 @@ const IdType = () => {
             >
               Download
               <img
-                src={downloadicon}
+                src={downloadIcon}
                 alt="Download Icon"
                 className="w-[15px] h-[15px] download-img"
               />
@@ -334,7 +268,7 @@ const IdType = () => {
                             disabled={loading}
                           >
                             <img
-                              src={editicon}
+                              src={editIcon}
                               alt="Edit"
                               className="w-[18px] h-[18px] action-btn duration-200"
                             />
@@ -344,7 +278,7 @@ const IdType = () => {
                             disabled={loading}
                           >
                             <img
-                              src={deleteicon}
+                              src={deleteIcon}
                               alt="Delete"
                               className="w-[18px] h-[18px] action-btn duration-200"
                             />
@@ -360,7 +294,7 @@ const IdType = () => {
           {/* Image Section */}
           <div className="w-[40%] border border-[#E9E9E9] rounded-md p-5">
             <img
-              src={buildingimg}
+              src={buildingImg}
               alt="Building exterior"
               className="h-[587px] w-full object-cover rounded-md"
             />
@@ -413,7 +347,7 @@ const IdType = () => {
                         onClick={() => toggleRowExpand(idType.id)}
                       >
                         <img
-                          src={downarrow}
+                          src={downArrow}
                           alt="drop-down-arrow"
                           className={`idtype-dropdown-img ${
                             expandedRows[idType.id] ? "text-white" : ""
@@ -441,7 +375,7 @@ const IdType = () => {
                                   disabled={loading}
                                 >
                                   <img
-                                    src={editicon}
+                                    src={editIcon}
                                     alt="Edit"
                                     className="w-[18px] h-[18px] action-btn duration-200"
                                   />
@@ -451,7 +385,7 @@ const IdType = () => {
                                   disabled={loading}
                                 >
                                   <img
-                                    src={deleteicon}
+                                    src={deleteIcon}
                                     alt="Delete"
                                     className="w-[18px] h-[18px] ml-[5px] action-btn duration-200"
                                   />
