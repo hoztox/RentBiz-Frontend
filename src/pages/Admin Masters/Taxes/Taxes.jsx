@@ -221,7 +221,7 @@ const Taxes = () => {
    * @param {object} tax - The tax object to update.
    */
   const openUpdateModal = (tax) => {
-    openModal("update-tax-master", tax);
+    openModal("update-tax-master", "Update Tax Master", tax);
   };
 
   // Filter data based on search term
@@ -278,7 +278,7 @@ const Taxes = () => {
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-[#2892CE] hover:bg-[#2276a7]"
               }`}
-              onClick={() => openModal("create-tax-master")}
+              onClick={() => openModal("create-tax-master", "Create New Tax Master")}
               disabled={loading}
             >
               Add New Tax
