@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Taxes.css";
 import { ChevronDown } from "lucide-react";
 import axios from "axios";
@@ -12,16 +12,9 @@ import { toast, Toaster } from "react-hot-toast";
 import { BASE_URL } from "../../../utils/config";
 import DeleteTaxModal from "./DeleteTaxModal/DeleteTaxModal";
 
-/**
- * Taxes Component
- * Displays a list of taxes for a specific company, allowing users to view, add, update, and delete tax records.
- * Supports viewing active taxes, full tax history, or taxes effective on a specific date.
- * The company ID is retrieved from localStorage and passed in the API URL.
- * Supports pagination, search, and responsive design for desktop and mobile views.
- */
 const Taxes = () => {
   const { openModal, refreshCounter } = useModal();
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
@@ -30,14 +23,17 @@ const Taxes = () => {
   const [error, setError] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [taxIdToDelete, setTaxIdToDelete] = useState(null);
-  const [viewMode, setViewMode] = useState("active_only"); // Options: active_only, history, effective_date
+  const [viewMode, setViewMode] = useState("active_only");
   const [effectiveDate, setEffectiveDate] = useState("");
   const itemsPerPage = 10;
+  const dropdownRef = useRef(null);
 
-  /**
-   * Retrieves the company ID from localStorage based on the user's role.
-   * @returns {string|null} The company ID or null if not found/invalid.
-   */
+  const viewModeOptions = [
+    { value: "active_only", label: "Active Taxes" },
+    { value: "history", label: "Full History" },
+    { value: "effective_date", label: "Effective on Date" },
+  ];
+
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
     if (role === "company") {
@@ -54,19 +50,6 @@ const Taxes = () => {
     return null;
   };
 
-  /**
-   * Fetches tax records for the company from the backend with optional query parameters.
-   * Request: GET /taxes/<company_id>/?history=true or ?active_only=true or ?effective_date=YYYY-MM-DD
-   * Response:
-   * - Success (200): Array of tax objects
-   *   Example: [
-   *     { id: 1, tax_type: "VAT", tax_percentage: "20.00", country: 1, state: null, applicable_from: "2025-01-01", applicable_to: null, is_active: true },
-   *     ...
-   *   ]
-   * - Error (404): { detail: "Company not found." }
-   * - Error (400): { detail: "Invalid date format. Use YYYY-MM-DD." }
-   * - Error (other): { detail: "Error message" }
-   */
   useEffect(() => {
     const fetchTaxes = async () => {
       setLoading(true);
@@ -87,7 +70,7 @@ const Taxes = () => {
         } else if (viewMode === "effective_date" && effectiveDate) {
           params.effective_date = effectiveDate;
         } else {
-          params.active_only = true; // Default to active_only
+          params.active_only = true;
         }
 
         const response = await axios.get(`${BASE_URL}/company/taxes/${companyId}/`, {
@@ -96,7 +79,6 @@ const Taxes = () => {
           },
           params,
         });
-        // Ensure response.data is an array
         const taxes = Array.isArray(response.data) ? response.data : [];
         console.log("Fetched taxes:", taxes);
         setData(taxes);
@@ -115,10 +97,6 @@ const Taxes = () => {
     fetchTaxes();
   }, [refreshCounter, viewMode, effectiveDate]);
 
-  /**
-   * Initiates the deletion process by opening the confirmation modal.
-   * @param {number} id - The ID of the tax to delete.
-   */
   const handleDelete = (id) => {
     const companyId = getUserCompanyId();
     if (!companyId) {
@@ -130,14 +108,6 @@ const Taxes = () => {
     setIsDeleteModalOpen(true);
   };
 
-  /**
-   * Confirms deletion of a tax record.
-   * Request: DELETE /taxes/<tax_id>/
-   * Response:
-   * - Success (204): No content
-   * - Error (404): { detail: "Tax not found." }
-   * - Error (other): { detail: "Error message" }
-   */
   const handleConfirmDelete = async () => {
     if (!taxIdToDelete) return;
 
@@ -163,7 +133,7 @@ const Taxes = () => {
       const errorMessage =
         err.response?.data?.detail || "Failed to delete tax";
       setError(errorMessage);
-      toast.error(errorMessage);
+      toast.error(error.message);
     } finally {
       setLoading(false);
       setIsDeleteModalOpen(false);
@@ -171,24 +141,11 @@ const Taxes = () => {
     }
   };
 
-  /**
-   * Cancels the deletion process.
-   */
   const handleCancelDelete = () => {
     setIsDeleteModalOpen(false);
     setTaxIdToDelete(null);
   };
 
-  /**
-   * Adds a new tax record.
-   * Request: POST /taxes/<company_id>/
-   * Body: { tax_type, tax_percentage, country, state, applicable_from, applicable_to }
-   * Response:
-   * - Success (201): Created tax object
-   *   Example: { id: 1, tax_type: "VAT", tax_percentage: "20.00", country: 1, state: null, applicable_from: "2025-01-01", applicable_to: null }
-   * - Error (400): { tax_type: ["This field is required."], ... }
-   * - Error (404): { detail: "Company not found." }
-   */
   const handleAddTax = async (newTax) => {
     const companyId = getUserCompanyId();
     if (!companyId) {
@@ -216,15 +173,10 @@ const Taxes = () => {
     }
   };
 
-  /**
-   * Opens the modal for updating a tax record.
-   * @param {object} tax - The tax object to update.
-   */
   const openUpdateModal = (tax) => {
     openModal("update-tax-master", "Update Tax Master", tax);
   };
 
-  // Filter data based on search term
   const filteredData = Array.isArray(data)
     ? data.filter(
         (tax) =>
@@ -242,7 +194,6 @@ const Taxes = () => {
       )
     : [];
 
-  // Paginate filtered data
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const paginatedData = filteredData.slice(
     (currentPage - 1) * itemsPerPage,
@@ -253,10 +204,6 @@ const Taxes = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  /**
-   * Toggles the expanded state of a mobile table row.
-   * @param {number} id - The ID of the tax row to toggle.
-   */
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
       ...prev,
@@ -264,12 +211,34 @@ const Taxes = () => {
     }));
   };
 
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const selectViewMode = (value) => {
+    setViewMode(value);
+    if (value !== "effective_date") {
+      setEffectiveDate("");
+    }
+    setIsDropdownOpen(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <div className="border border-[#E9E9E9] rounded-md tax-table">
       <Toaster />
-      {/* Header Section */}
       <div className="flex flex-col gap-4 p-5 border-b border-[#E9E9E9] tax-table-header">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center w-full">
           <h1 className="tax-head">Tax List</h1>
           <div className="flex gap-[10px] tax-action-buttons-container">
             <button
@@ -315,51 +284,57 @@ const Taxes = () => {
             disabled={loading}
           />
           <div className="flex flex-col md:flex-row gap-[10px] w-full md:w-auto">
-            <div className="relative w-full md:w-[200px]">
-              <select
-                value={viewMode}
-                onChange={(e) => {
-                  setViewMode(e.target.value);
-                  if (e.target.value !== "effective_date") {
-                    setEffectiveDate("");
-                  }
-                }}
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full cursor-pointer focus:border-gray-300 duration-200 tax-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-                disabled={loading}
+            <div className="relative w-full md:w-[200px]" ref={dropdownRef}>
+              <button
+                onClick={toggleDropdown}
+                className="flex items-center justify-between px-3 py-[7px] border border-[#E9E9E9] rounded-md w-full h-[38px] tax-selection"
               >
-                <option value="active_only">Active Taxes</option>
-                <option value="history">Full History</option>
-                <option value="effective_date">Effective on Date</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
+                {viewModeOptions.find((option) => option.value === viewMode)?.label || "Active Taxes"}
+                <ChevronDown
+                  size={20}
+                  className={`ml-2 transform transition-transform duration-300 ease-in-out text-[#201D1E] ${
+                    isDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+              <div
+                className={`absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden transition-all duration-300 ease-in-out ${
+                  isDropdownOpen
+                    ? "opacity-100 max-h-40 transform translate-y-0"
+                    : "opacity-0 max-h-0 transform -translate-y-2 pointer-events-none"
                 }`}
-              />
+              >
+                <div className="py-1">
+                  {viewModeOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => selectViewMode(option.value)}
+                      className="block w-full text-left px-4 py-2 text-sm text-[#201D1E] hover:bg-gray-100"
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
             {viewMode === "effective_date" && (
               <input
                 type="date"
                 value={effectiveDate}
                 onChange={(e) => setEffectiveDate(e.target.value)}
-                className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[200px] focus:border-gray-300 duration-200 tax-date-picker"
+                className="px-[14px] py-[7px] h-[38px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[200px] focus:border-gray-300 duration-200 tax-date-picker"
                 disabled={loading}
               />
             )}
           </div>
         </div>
       </div>
-
-      {/* Content Section */}
       {loading ? (
         <div className="p-5 text-center">Loading...</div>
       ) : error ? (
         <div className="p-5 text-center text-red-500">{error}</div>
       ) : (
         <>
-          {/* Desktop Table */}
           <div className="tax-desktop-only">
             <table className="w-full border-collapse">
               <thead>
@@ -431,8 +406,6 @@ const Taxes = () => {
               </tbody>
             </table>
           </div>
-
-          {/* Mobile Table */}
           <div className="block md:hidden">
             <table className="w-full border-collapse">
               <thead>
@@ -582,8 +555,6 @@ const Taxes = () => {
               </tbody>
             </table>
           </div>
-
-          {/* Pagination Section */}
           {filteredData.length > 0 && (
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
               <span className="collection-list-pagination">
