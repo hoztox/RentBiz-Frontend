@@ -297,7 +297,7 @@ const AdminSidebar = () => {
                     setActiveItem("Create Tenant");
                     // openCreateTenantModal();
                     navigate("/admin/tenants");
-                    openModal("create-tenant");
+                    openModal("create-tenant", "Create New Tenant");
                   }}
                 >
                   <p className="pl-10 py-[7px]">Create Tenant</p>

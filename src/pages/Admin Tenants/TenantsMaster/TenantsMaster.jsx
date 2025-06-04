@@ -252,7 +252,7 @@ const TenantsMaster = () => {
                   {tenant.id_type?.title || "N/A"}
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={() => openModal("edit-tenant", "Tenant Details", { tenantId: tenant.id })}>
+                  <button onClick={() => openModal("edit-tenant", "Update Tenant", { tenantId: tenant.id })}>
                     <img
                       src={editicon}
                       alt="Edit"
@@ -375,7 +375,7 @@ const TenantsMaster = () => {
                             <div className="dropdown-label">ACTION</div>
                             <div className="dropdown-value flex items-center gap-2 mt-[10px]">
                               <button
-                                onClick={() => openModal("edit-tenant", "Tenant Details", { tenantId: tenant.id })}
+                                onClick={() => openModal("edit-tenant", "Update Tenant", { tenantId: tenant.id })}
                               >
                                 <img
                                   src={editicon}

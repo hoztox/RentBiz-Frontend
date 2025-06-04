@@ -309,7 +309,7 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
                   }`}
                   onClick={() => {
                     setActiveItem("Create Tenant");
-                    openModal("create-tenant");
+                    openModal("create-tenant", "Create New Tenant");
                     toggleMobileMenu();
                   }}
                 >
