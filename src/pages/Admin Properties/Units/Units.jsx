@@ -169,7 +169,7 @@ const Units = () => {
           <div className="flex gap-[10px] unit-action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md unit-add-new-unit duration-200"
-              onClick={()=>openModal("create-unit")}
+              onClick={()=>openModal("create-unit", "Select Building")}
             >
               Add New Unit
               <img

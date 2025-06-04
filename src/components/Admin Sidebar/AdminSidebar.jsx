@@ -166,7 +166,7 @@ const AdminSidebar = () => {
                   }`}
                 onClick={() => {
                   setActiveItem("Create User");
-                  openModal("user-create");
+                  openModal("user-create", "Create User");
                 }}
               >
                 <p className="pl-10 py-[7px]">Create User</p>
@@ -297,7 +297,7 @@ const AdminSidebar = () => {
                     setActiveItem("Create Tenant");
                     // openCreateTenantModal();
                     navigate("/admin/tenants");
-                    openModal("create-tenant");
+                    openModal("create-tenant", "Create New Tenant");
                   }}
                 >
                   <p className="pl-10 py-[7px]">Create Tenant</p>
