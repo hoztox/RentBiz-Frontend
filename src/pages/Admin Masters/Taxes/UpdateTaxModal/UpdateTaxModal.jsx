@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./UpdateTaxModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { ChevronDown } from "lucide-react";
@@ -7,13 +7,6 @@ import axios from "axios";
 import { BASE_URL } from "../../../../utils/config";
 import { toast } from "react-hot-toast";
 
-/**
- * UpdateTaxModal Component
- * A modal for updating an existing tax record, with dynamic country and state dropdowns fetched from the backend.
- * Integrates with the /taxes/<company_id>/<tax_id>/ endpoint to either create a new tax version (if tax_percentage,
- * applicable_from, or applicable_to changes) or update the existing record (for non-critical fields like tax_type,
- * country, or state). The `applicable_to` field is optional, as the backend allows null for active taxes.
- */
 const UpdateTaxModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
   const [country, setCountry] = useState("");
@@ -22,18 +15,18 @@ const UpdateTaxModal = () => {
   const [taxPercentage, setTaxPercentage] = useState("");
   const [applicableFrom, setApplicableFrom] = useState("");
   const [applicableTo, setApplicableTo] = useState("");
-  const [isCountrySelectOpen, setIsCountrySelectOpen] = useState(false);
-  const [isStateSelectOpen, setIsStateSelectOpen] = useState(false);
+  const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
+  const [isStateDropdownOpen, setIsStateDropdownOpen] = useState(false);
   const [countries, setCountries] = useState([]);
+  const [filteredCountries, setFilteredCountries] = useState([]);
+  const [countryFilter, setCountryFilter] = useState("");
   const [states, setStates] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
+  const countryDropdownRef = useRef(null);
+  const stateDropdownRef = useRef(null);
 
-  /**
-   * Retrieves the company ID from localStorage based on the user's role.
-   * @returns {string|null} The company ID or null if not found/invalid.
-   */
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
     if (role === "company") {
@@ -50,11 +43,6 @@ const UpdateTaxModal = () => {
     return null;
   };
 
-  /**
-   * Fetches countries from the backend.
-   * Request: GET /accounts/countries/
-   * Response: Array of country objects [{ id, name }, ...]
-   */
   useEffect(() => {
     const fetchCountries = async () => {
       try {
@@ -63,7 +51,9 @@ const UpdateTaxModal = () => {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         });
-        setCountries(Array.isArray(response.data) ? response.data : []);
+        const fetchedCountries = Array.isArray(response.data) ? response.data : [];
+        setCountries(fetchedCountries);
+        setFilteredCountries(fetchedCountries);
       } catch (err) {
         console.error("Error fetching countries:", err);
         toast.error("Failed to load countries");
@@ -73,11 +63,6 @@ const UpdateTaxModal = () => {
     fetchCountries();
   }, []);
 
-  /**
-   * Fetches states based on the selected country.
-   * Request: GET /accounts/countries/<country_id>/states/
-   * Response: Array of state objects [{ id, name }, ...]
-   */
   useEffect(() => {
     const fetchStates = async () => {
       if (!country) {
@@ -106,9 +91,6 @@ const UpdateTaxModal = () => {
     fetchStates();
   }, [country]);
 
-  /**
-   * Populates form with existing tax data when the modal opens.
-   */
   useEffect(() => {
     if (
       modalState.isOpen &&
@@ -122,20 +104,70 @@ const UpdateTaxModal = () => {
       setTaxPercentage(taxData.tax_percentage || "");
       setApplicableFrom(taxData.applicable_from || "");
       setApplicableTo(taxData.applicable_to || "");
+      setCountryFilter("");
+      setFilteredCountries(countries);
       setError(null);
       setFieldErrors({});
     }
-  }, [modalState.isOpen, modalState.type, modalState.data]);
+  }, [modalState.isOpen, modalState.type, modalState.data, countries]);
 
-  // Only render for "update-tax-master" type
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        countryDropdownRef.current &&
+        !countryDropdownRef.current.contains(event.target)
+      ) {
+        setIsCountryDropdownOpen(false);
+        setCountryFilter("");
+        setFilteredCountries(countries);
+      }
+      if (
+        stateDropdownRef.current &&
+        !stateDropdownRef.current.contains(event.target)
+      ) {
+        setIsStateDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [countries]);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (isCountryDropdownOpen && event.key.length === 1 && /[a-zA-Z]/.test(event.key)) {
+        event.preventDefault();
+        setCountryFilter((prev) => prev + event.key);
+      } else if (isCountryDropdownOpen && event.key === "Backspace") {
+        event.preventDefault();
+        setCountryFilter((prev) => prev.slice(0, -1));
+      } else if (isCountryDropdownOpen && event.key === "Escape") {
+        setIsCountryDropdownOpen(false);
+        setCountryFilter("");
+        setFilteredCountries(countries);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isCountryDropdownOpen, countries]);
+
+  useEffect(() => {
+    if (countryFilter) {
+      setFilteredCountries(
+        countries.filter((c) =>
+          c.name.toLowerCase().startsWith(countryFilter.toLowerCase())
+        )
+      );
+    } else {
+      setFilteredCountries(countries);
+    }
+  }, [countryFilter, countries]);
+
   if (!modalState.isOpen || modalState.type !== "update-tax-master") {
     return null;
   }
 
-  /**
-   * Validates form fields before submission.
-   * @returns {boolean} True if valid, false otherwise.
-   */
   const validateForm = () => {
     const errors = {};
 
@@ -160,10 +192,6 @@ const UpdateTaxModal = () => {
     return Object.keys(errors).length === 0;
   };
 
-  /**
-   * Checks if critical fields have changed compared to the original data.
-   * @returns {boolean} True if tax_percentage, applicable_from, or applicable_to has changed.
-   */
   const hasCriticalFieldsChanged = () => {
     const originalData = modalState.data;
     return (
@@ -173,16 +201,6 @@ const UpdateTaxModal = () => {
     );
   };
 
-  /**
-   * Handles form submission by sending a PUT request to either create a new tax version
-   * or update the existing tax record.
-   * Request: PUT /company/taxes/<company_id>/<tax_id>/
-   * Body: { tax_type, tax_percentage, country, state, applicable_from, applicable_to }
-   * Response:
-   * - Success (200): { id, tax_type, tax_percentage, country, state, applicable_from, applicable_to, is_active }
-   * - Error (400): { tax_type: ["Error"], ... }
-   * - Error (404): { detail: "Company not found." } or { detail: "Tax record not found." }
-   */
   const handleUpdate = async () => {
     if (!validateForm()) {
       return;
@@ -231,7 +249,6 @@ const UpdateTaxModal = () => {
         }
       );
 
-      // Determine if a new version was created or existing record was updated
       const isNewVersion = hasCriticalFieldsChanged();
       toast.success(
         isNewVersion
@@ -249,7 +266,6 @@ const UpdateTaxModal = () => {
         if (err.response.data.detail) {
           errorMessage = err.response.data.detail;
         } else {
-          // Handle field-specific errors
           const fieldErrorsFromBackend = {};
           Object.keys(err.response.data).forEach((key) => {
             fieldErrorsFromBackend[key] = Array.isArray(err.response.data[key])
@@ -265,6 +281,31 @@ const UpdateTaxModal = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleCountryDropdown = () => {
+    setIsCountryDropdownOpen(!isCountryDropdownOpen);
+    if (!isCountryDropdownOpen) {
+      setCountryFilter("");
+      setFilteredCountries(countries);
+    }
+  };
+
+  const toggleStateDropdown = () => {
+    setIsStateDropdownOpen(!isStateDropdownOpen);
+  };
+
+  const selectCountry = (countryId, countryName) => {
+    setCountry(countryId);
+    setState("");
+    setIsCountryDropdownOpen(false);
+    setCountryFilter("");
+    setFilteredCountries(countries);
+  };
+
+  const selectState = (stateId) => {
+    setState(stateId);
+    setIsStateDropdownOpen(false);
   };
 
   return (
@@ -297,43 +338,58 @@ const UpdateTaxModal = () => {
               <label className="block pt-2 mb-2 text-[#201D1E] update-tax-modal-label">
                 Country *
               </label>
-              <div className="relative">
-                <select
-                  value={country}
-                  onChange={(e) => {
-                    setCountry(e.target.value);
-                    setState(""); // Reset state when country changes
-                    if (e.target.value === "") {
-                      e.target.classList.add("update-tax-choose-selected");
-                    } else {
-                      e.target.classList.remove("update-tax-choose-selected");
-                    }
-                  }}
-                  className={`w-full border rounded-md mt-1 px-3 py-2 appearance-none bg-transparent cursor-pointer focus:outline-none update-tax-input-style transition-colors duration-200 ${
+              <div className="relative" ref={countryDropdownRef}>
+                <button
+                  onClick={toggleCountryDropdown}
+                  className={`flex items-center justify-between px-3 py-2 border rounded-md bg-[#FBFBFB] w-full update-tax-input-style transition-colors duration-200 ${
                     fieldErrors.country
-                      ? "border-red-500 focus:ring-red-500 focus:border-red-500 update-tax-choose-selected"
-                      : country === ""
-                      ? "border-[#E9E9E9] focus:ring-gray-500 update-tax-choose-selected"
-                      : "border-[#E9E9E9] focus:ring-gray-500"
+                      ? "border-red-500"
+                      : "border-[#E9E9E9]"
                   }`}
-                  onFocus={() => setIsCountrySelectOpen(true)}
-                  onBlur={() => setIsCountrySelectOpen(false)}
                   disabled={loading || countries.length === 0}
                 >
-                  <option value="" disabled hidden>
-                    Choose
-                  </option>
-                  {countries.map((country) => (
-                    <option key={country.id} value={country.id}>
-                      {country.name || `Country ${country.id}`}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown
-                  className={`absolute right-3 top-3 w-[18px] h-[18px] md:w-[20px] md:h-[20px] transition-transform duration-300 ${
-                    isCountrySelectOpen ? "rotate-180" : "rotate-0"
+                  <span
+                    className={`${
+                      country ? "text-[#201D1E]" : "text-gray-500"
+                    }`}
+                  >
+                    {country
+                      ? countries.find((c) => c.id === parseInt(country))?.name ||
+                        "Choose"
+                      : countryFilter || "Choose"}
+                  </span>
+                  <ChevronDown
+                    size={20}
+                    className={`ml-2 transform transition-transform duration-300 ease-in-out text-[#201D1E] ${
+                      isCountryDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                <div
+                  className={`absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden transition-all duration-300 ease-in-out z-50 ${
+                    isCountryDropdownOpen
+                      ? "opacity-100 max-h-40 transform translate-y-0"
+                      : "opacity-0 max-h-0 transform -translate-y-2 pointer-events-none"
                   }`}
-                />
+                >
+                  <div className="py-1 max-h-40 overflow-y-auto">
+                    {filteredCountries.length === 0 ? (
+                      <div className="px-4 py-2 text-sm text-gray-500">
+                        No countries found
+                      </div>
+                    ) : (
+                      filteredCountries.map((country) => (
+                        <button
+                          key={country.id}
+                          onClick={() => selectCountry(country.id, country.name)}
+                          className="block w-full text-left px-4 py-2 text-sm text-[#201D1E] hover:bg-gray-100"
+                        >
+                          {country.name || `Country ${country.id}`}
+                        </button>
+                      ))
+                    )}
+                  </div>
+                </div>
               </div>
               <div className="text-sm mt-1" style={{ minHeight: "20px" }}>
                 {fieldErrors.country && (
@@ -346,42 +402,52 @@ const UpdateTaxModal = () => {
               <label className="block pt-2 mb-2 text-[#201D1E] update-tax-modal-label">
                 State
               </label>
-              <div className="relative">
-                <select
-                  value={state}
-                  onChange={(e) => {
-                    setState(e.target.value);
-                    if (e.target.value === "") {
-                      e.target.classList.add("update-tax-choose-selected");
-                    } else {
-                      e.target.classList.remove("update-tax-choose-selected");
-                    }
-                  }}
-                  className={`w-full border rounded-md mt-1 px-3 py-2 appearance-none bg-transparent cursor-pointer focus:outline-none update-tax-input-style transition-colors duration-200 ${
+              <div className="relative" ref={stateDropdownRef}>
+                <button
+                  onClick={toggleStateDropdown}
+                  className={`flex items-center justify-between px-3 py-2 border rounded-md bg-[#FBFBFB] w-full update-tax-input-style transition-colors duration-200 ${
                     fieldErrors.state
-                      ? "border-red-500 focus:ring-red-500 focus:border-red-500 update-tax-choose-selected"
-                      : state === ""
-                      ? "border-[#E9E9E9] focus:ring-gray-500 update-tax-choose-selected"
-                      : "border-[#E9E9E9] focus:ring-gray-500"
+                      ? "border-red-500"
+                      : "border-[#E9E9E9]"
                   }`}
-                  onFocus={() => setIsStateSelectOpen(true)}
-                  onBlur={() => setIsStateSelectOpen(false)}
                   disabled={loading || !country || states.length === 0}
                 >
-                  <option value="" disabled hidden>
-                    Choose
-                  </option>
-                  {states.map((state) => (
-                    <option key={state.id} value={state.id}>
-                      {state.name || `State ${state.id}`}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown
-                  className={`absolute right-3 top-3 w-[18px] h-[18px] md:w-[20px] md:h-[20px] transition-transform duration-300 ${
-                    isStateSelectOpen ? "rotate-180" : "rotate-0"
+                  <span
+                    className={`${
+                      state ? "text-[#201D1E]" : "text-gray-500"
+                    }`}
+                  >
+                    {state
+                      ? states.find((s) => s.id === parseInt(state))?.name ||
+                        "Choose"
+                      : "Choose"}
+                  </span>
+                  <ChevronDown
+                    size={20}
+                    className={`ml-2 transform transition-transform duration-300 ease-in-out text-[#201D1E] ${
+                      isStateDropdownOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                <div
+                  className={`absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden transition-all duration-300 ease-in-out z-50 ${
+                    isStateDropdownOpen
+                      ? "opacity-100 max-h-40 transform translate-y-0"
+                      : "opacity-0 max-h-0 transform -translate-y-2 pointer-events-none"
                   }`}
-                />
+                >
+                  <div className="py-1 max-h-40 overflow-y-auto">
+                    {states.map((state) => (
+                      <button
+                        key={state.id}
+                        onClick={() => selectState(state.id)}
+                        className="block w-full text-left px-4 py-2 text-sm text-[#201D1E] hover:bg-gray-100"
+                      >
+                        {state.name || `State ${state.id}`}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
               <div className="text-sm mt-1" style={{ minHeight: "20px" }}>
                 {fieldErrors.state && (
