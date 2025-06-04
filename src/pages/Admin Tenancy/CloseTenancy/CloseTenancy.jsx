@@ -126,21 +126,17 @@ const CloseTenancy = () => {
     });
   };
 
-  // Handle delete action
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(`${BASE_URL}/company/tenancies/${id}/`);
-      setTenancies(tenancies.filter((tenancy) => tenancy.tenancy_code !== id));
-      console.log("Deleted Tenancy ID:", id); // Debug log
-    } catch (error) {
-      console.error("Error deleting tenancy:", error);
-    }
-  };
-
-  // Replace the existing handleViewClick function in CloseTenancy.js with this:
+const handleDelete = async (id) => {
+  try {
+    await axios.delete(`${BASE_URL}/company/tenancies/${id}/`);
+    setTenancies(tenancies.filter((tenancy) => tenancy.id !== id));
+    console.log("Deleted Tenancy ID:", id);
+  } catch (error) {
+    console.error("Error deleting tenancy:", error);
+  }
+};
 
 const handleViewClick = (formattedTenancy) => {
-  // Find the original tenancy data from the backend
   const originalTenancy = tenancies.find(t => t.tenancy_code === formattedTenancy.tenancy_code);
   
   if (originalTenancy) {
