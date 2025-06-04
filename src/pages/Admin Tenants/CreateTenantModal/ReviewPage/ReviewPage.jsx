@@ -181,45 +181,45 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
         <div className="grid grid-cols-1 md:grid-cols-2">
           <div className="space-y-8 border-r border-[#E9E9E9] max-[480px]:border-r-0">
             <div>
-              <p className="review-page-label">Tenant Name*</p>
+              <p className="review-page-label">Tenant Name *</p>
               <p className="review-page-data">{tenant.tenant_name || "N/A"}</p>
             </div>
             <div>
-              <p className="review-page-label">Mobile Number*</p>
+              <p className="review-page-label">Mobile Number *</p>
               <p className="review-page-data">{tenant.phone || "N/A"}</p>
             </div>
             <div>
-              <p className="review-page-label">Email*</p>
+              <p className="review-page-label">Email *</p>
               <p className="review-page-data">{tenant.email || "N/A"}</p>
             </div>
             <div>
-              <p className="review-page-label">Address*</p>
+              <p className="review-page-label">Address *</p>
               <p className="review-page-data">{tenant.address || "N/A"}</p>
             </div>
             <div>
-              <p className="review-page-label">Trade License Number*</p>
+              <p className="review-page-label">Trade License Number *</p>
               <p className="review-page-data">{tenant.license_no || "N/A"}</p>
             </div>
             <div>
-              <p className="review-page-label">ID Number*</p>
+              <p className="review-page-label">ID Number *</p>
               <p className="review-page-data">{tenant.id_number || "N/A"}</p>
             </div>
             <div>
-              <p className="review-page-label">Sponsor Name*</p>
+              <p className="review-page-label">Sponsor Name *</p>
               <p className="review-page-data">{tenant.sponser_name || "N/A"}</p>
             </div>
             <div>
-              <p className="review-page-label">Sponsor ID Number*</p>
+              <p className="review-page-label">Sponsor ID Number *</p>
               <p className="review-page-data">{tenant.sponser_id_number || "N/A"}</p>
             </div>
             <div>
-              <p className="review-page-label">Status*</p>
+              <p className="review-page-label">Status *</p>
               <p className="review-page-data">{tenant.status || "N/A"}</p>
             </div>
           </div>
           <div className="space-y-8 sm:ml-5 max-[480px]:mt-8">
             <div>
-              <p className="review-page-label">Nationality*</p>
+              <p className="review-page-label">Nationality *</p>
               <p className="review-page-data">{tenant.nationality || "N/A"}</p>
             </div>
             <div>
@@ -243,11 +243,11 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
               <p className="review-page-data">{tenant.id_validity_date || "N/A"}</p>
             </div>
             <div>
-              <p className="review-page-label">Sponsor ID Type*</p>
+              <p className="review-page-label">Sponsor ID Type *</p>
               <p className="review-page-data">{getIdTypeTitle(tenant.sponser_id_type)}</p>
             </div>
             <div>
-              <p className="review-page-label">Sponsor ID Validity*</p>
+              <p className="review-page-label">Sponsor ID Validity *</p>
               <p className="review-page-data">{tenant.sponser_id_validity_date || "N/A"}</p>
             </div>
             <div>
