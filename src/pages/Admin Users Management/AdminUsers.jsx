@@ -251,7 +251,7 @@ const AdminUsers = () => {
           <div className="flex gap-[10px] user-action-buttons-container w-full md:w-auto justify-start">
             <button
               className="flex items-center justify-center gap-2 h-[38px] rounded-md user-create-btn duration-200 w-[176px]"
-              onClick={() => openModal("user-create")}
+              onClick={() => openModal("user-create", "Create User")}
             >
               Create User
               <img

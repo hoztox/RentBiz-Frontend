@@ -166,7 +166,7 @@ const AdminSidebar = () => {
                   }`}
                 onClick={() => {
                   setActiveItem("Create User");
-                  openModal("user-create");
+                  openModal("user-create", "Create User");
                 }}
               >
                 <p className="pl-10 py-[7px]">Create User</p>

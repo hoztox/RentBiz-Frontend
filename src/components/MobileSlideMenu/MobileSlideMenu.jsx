@@ -173,7 +173,7 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
                   }`}
                   onClick={() => {
                     setActiveItem("Create User");
-                    openModal("user-create");
+                    openModal("user-create", "Create user");
                     toggleMobileMenu();
                   }}
                 >
