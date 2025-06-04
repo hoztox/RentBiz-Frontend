@@ -195,22 +195,22 @@ const TenancyTermination = () => {
           <thead>
             <tr className="border-b border-[#E9E9E9] h-[57px]">
               <th className="px-4 text-left tenancy-thead whitespace-nowrap">
-                Tenancy Code
+                ID
               </th>
               <th className="px-4 text-left tenancy-thead whitespace-nowrap">
-                Tenant Name
+               NAME
               </th>
               <th className="px-4 text-left tenancy-thead whitespace-nowrap">
-                Building Name
+                BUILDING NAME
               </th>
               <th className="px-4 text-left tenancy-thead whitespace-nowrap w-[20%]">
-                Unit Name
+                UNIT NAME
               </th>
               <th className="px-4 text-left tenancy-thead whitespace-nowrap w-[12%]">
-                End Date
+                END DATE
               </th>
               <th className="px-4 pr-6 text-right tenancy-thead whitespace-nowrap">
-                Action
+                ACTION
               </th>
             </tr>
           </thead>
