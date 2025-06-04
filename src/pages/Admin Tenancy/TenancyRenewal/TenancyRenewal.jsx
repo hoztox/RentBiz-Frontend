@@ -179,16 +179,16 @@ const TenancyRenewal = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-[#E9E9E9] h-[57px]">
-              <th className="px-5 text-left tenancy-thead">Tenancy Code</th>
-              <th className="px-5 text-left tenancy-thead w-[12%]">Tenant</th>
-              <th className="pl-5 text-left tenancy-thead w-[15%]">Building Name</th>
-              <th className="pl-5 text-left tenancy-thead w-[12%]">Unit Name</th>
-              <th className="px-5 text-left tenancy-thead">Rental Months</th>
-              <th className="px-5 text-left tenancy-thead w-[12%]">End Date</th>
-              <th className="px-5 text-left tenancy-thead w-[12%]">Status</th>
-              <th className="px-5 text-center tenancy-thead w-[10%]">Renew</th>
-              <th className="pl-12 pr-5 text-center tenancy-thead w-[10%]">View</th>
-              <th className="px-5 pr-6 text-right tenancy-thead">Action</th>
+              <th className="px-5 text-left tenancy-thead">ID</th>
+              <th className="px-5 text-left tenancy-thead w-[12%]">NAME</th>
+              <th className="pl-5 text-left tenancy-thead w-[15%]">BUILDING NAME</th>
+              <th className="pl-5 text-left tenancy-thead w-[12%]">UNIT NAME</th>
+              <th className="px-5 text-left tenancy-thead">RENTAL MONTHS</th>
+              <th className="px-5 text-left tenancy-thead w-[12%]">END DATE</th>
+              <th className="px-5 text-left tenancy-thead w-[12%]">STATUS</th>
+              <th className="px-5 text-center tenancy-thead w-[10%]">RENEW</th>
+              <th className="pl-12 pr-5 text-center tenancy-thead w-[10%]">VIEW</th>
+              <th className="px-5 pr-6 text-right tenancy-thead">ACTION</th>
             </tr>
           </thead>
           <tbody>
@@ -202,7 +202,7 @@ const TenancyRenewal = () => {
                 <td className="pl-5 text-left tenancy-data">{tenancy.building?.building_name}</td>
                 <td className="pl-5 text-left tenancy-data">{tenancy.unit?.unit_name}</td>
                 <td className="px-5 tenancy-data">
-                  <div className="w-[63%] flex justify-center">{tenancy.rental_months}</div>
+                  <div className="flex justify-center">{tenancy.rental_months}</div>
                 </td>
                 <td className="pl-5 text-left tenancy-data">{tenancy.end_date}</td>
                 <td className="px-5 text-left tenancy-data">
@@ -265,8 +265,8 @@ const TenancyRenewal = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="tenancy-table-row-head">
-              <th className="px-5 w-[50%] text-left tenancy-thead trenew-id-column">Tenancy Code</th>
-              <th className="px-5 w-[50%] text-left tenancy-thead trenew-end-date-column">Tenant</th>
+              <th className="px-5 w-[50%] text-left tenancy-thead trenew-id-column">ID</th>
+              <th className="px-5 w-[50%] text-left tenancy-thead trenew-end-date-column">NAME</th>
               <th className="px-5 text-right tenancy-thead"></th>
             </tr>
           </thead>
@@ -318,7 +318,7 @@ const TenancyRenewal = () => {
                             <div className="trenew-dropdown-value">{tenancy.end_date}</div>
                           </div>
                         </div>
-                        <div className="trenew-grid">
+                        {/* <div className="trenew-grid">
                           <div className="trenew-grid-item w-[40%]">
                             <div className="trenew-dropdown-label">STATUS</div>
                             <div className="trenew-dropdown-value">{tenancy.status}</div>
@@ -327,8 +327,8 @@ const TenancyRenewal = () => {
                             <div className="trenew-dropdown-label">DEPOSIT</div>
                             <div className="trenew-dropdown-value">{tenancy.deposit || "N/A"}</div>
                           </div>
-                        </div>
-                        <div className="trenew-grid">
+                        </div> */}
+                        {/* <div className="trenew-grid">
                           <div className="trenew-grid-item w-[40%]">
                             <div className="trenew-dropdown-label">COMMISION</div>
                             <div className="trenew-dropdown-value">{tenancy.commision || "N/A"}</div>
@@ -337,8 +337,8 @@ const TenancyRenewal = () => {
                             <div className="trenew-dropdown-label">REMARKS</div>
                             <div className="trenew-dropdown-value">{tenancy.remarks || "N/A"}</div>
                           </div>
-                        </div>
-                        <div className="trenew-grid">
+                        </div> */}
+                        {/* <div className="trenew-grid">
                           <div className="trenew-grid-item w-full">
                             <div className="trenew-dropdown-label">ADDITIONAL CHARGES</div>
                             <div className="trenew-dropdown-value">
@@ -355,7 +355,7 @@ const TenancyRenewal = () => {
                               )}
                             </div>
                           </div>
-                        </div>
+                        </div> */}
                         <div className="trenew-grid">
                           <div className="trenew-grid-item w-[40%]">
                             <div className="trenew-dropdown-label">RENEW</div>
@@ -381,7 +381,7 @@ const TenancyRenewal = () => {
                             </div>
                           </div>
                           <div className="trenew-grid-item w-[20%]">
-                            <div className="trenew-dropdown-label">ACTION</div>
+                            <div className="trenew-dropdown-label flex justify-center">ACTION</div>
                             <div className="trenew-dropdown-value trenew-flex trenew-items-center mt-[10px] ml-[7px]">
                               <button onClick={() => handleEditClick(tenancy)}>
                                 <img
