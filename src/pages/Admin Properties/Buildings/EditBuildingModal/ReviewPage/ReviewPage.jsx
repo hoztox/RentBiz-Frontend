@@ -1,4 +1,4 @@
-import React, { useState, Component } from "react";
+import React, { useState, useEffect, Component } from "react";
 import axios from "axios";
 import { BASE_URL } from "../../../../../utils/config";
 import DocumentsView from "./DocumentsView";
@@ -26,6 +26,10 @@ class ErrorBoundary extends Component {
 const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [countryName, setCountryName] = useState("N/A");
+  const [stateName, setStateName] = useState("N/A");
 
   const building = formData?.building || {};
   const documents = Array.isArray(formData?.documents?.documents)
@@ -34,6 +38,48 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
 
   console.log("ReviewPage formData:", formData);
   console.log("ReviewPage documents:", documents);
+
+  // Fetch countries
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/accounts/countries/`);
+        setCountries(response.data);
+        // Find country name
+        const country = response.data.find(c => c.id === parseInt(building.country));
+        setCountryName(country ? country.name : "N/A");
+      } catch (error) {
+        console.error("Error fetching countries:", error);
+        setError("Failed to load country data.");
+      }
+    };
+    fetchCountries();
+  }, [building.country]);
+
+  // Fetch states when country ID is available
+  useEffect(() => {
+    if (building.country) {
+      const fetchStates = async () => {
+        try {
+          const response = await axios.get(
+            `${BASE_URL}/accounts/countries/${building.country}/states/`
+          );
+          setStates(response.data);
+          // Find state name
+          const state = response.data.find(s => s.id === parseInt(building.state));
+          setStateName(state ? state.name : "N/A");
+        } catch (error) {
+          console.error("Error fetching states:", error);
+          setStates([]);
+          setStateName("N/A");
+        }
+      };
+      fetchStates();
+    } else {
+      setStates([]);
+      setStateName("N/A");
+    }
+  }, [building.country, building.state]);
 
   const handleNext = async () => {
     setLoading(true);
@@ -196,7 +242,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
             </div>
             <div>
               <p className="review-page-label">Country*</p>
-              <p className="review-page-data">{building.country || "N/A"}</p>
+              <p className="review-page-data">{countryName}</p>
             </div>
             <div>
               <p className="review-page-label">Description</p>
@@ -226,7 +272,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
             </div>
             <div>
               <p className="review-page-label">State*</p>
-              <p className="review-page-data">{building.state || "N/A"}</p>
+              <p className="review-page-data">{stateName}</p>
             </div>
             <div>
               <p className="review-page-label">Remarks</p>
