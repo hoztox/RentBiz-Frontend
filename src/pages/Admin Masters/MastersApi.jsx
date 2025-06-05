@@ -1,7 +1,7 @@
 import axiosInstance from "../../axiosInstance";
 
 // Common utility functions
-const getUserCompanyId = () => {
+export const getUserCompanyId = () => {
   const role = localStorage.getItem("role")?.toLowerCase();
 
   if (role === "company") {
@@ -18,7 +18,7 @@ const getUserCompanyId = () => {
   return null;
 };
 
-const getRelevantUserId = () => {
+export const getRelevantUserId = () => {
   const role = localStorage.getItem("role")?.toLowerCase();
   if (role === "user") {
     const userId = localStorage.getItem("user_id");
@@ -238,7 +238,7 @@ export const locationApi = {
 
   fetchStates: async (countryId) => {
     if (!countryId) return [];
-    
+
     try {
       const response = await axiosInstance.get(`/accounts/countries/${countryId}/states/`);
       return Array.isArray(response.data) ? response.data : [];
@@ -334,6 +334,8 @@ export const chargesApi = {
 
     try {
       const response = await axiosInstance.get(`/company/charges/company/${companyId}/`);
+      console.log('Fetched Chargeessss', response.data);
+
       return Array.isArray(response.data) ? response.data : [];
     } catch (error) {
       handleApiError(error, "Failed to fetch charges");
@@ -349,7 +351,7 @@ export const chargesApi = {
     const payload = {
       name: chargeData.name,
       charge_code: parseInt(chargeData.chargeCodeId),
-      tax_types: chargeData.taxTypes || [],
+      taxes: chargeData.taxTypes || [], // Changed from tax_types to taxes
       company: companyId,
       ...(userId && { user: userId }),
     };
@@ -372,7 +374,7 @@ export const chargesApi = {
     const payload = {
       name: chargeData.name,
       charge_code: parseInt(chargeData.chargeCode),
-      tax_types: chargeData.taxTypes || [],
+      taxes: chargeData.taxTypes || [], // Changed from tax_types to taxes
       company: companyId,
       ...(userId && { user: userId }),
     };

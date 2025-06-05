@@ -31,60 +31,19 @@ const Taxes = () => {
     { value: "effective_date", label: "Effective on Date" },
   ];
 
-  const getUserCompanyId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-    console.log("getUserCompanyId:", { role, company_id: localStorage.getItem("company_id") });
-    if (role === "company") {
-      return localStorage.getItem("company_id");
-    } else if (role === "user" || role === "admin") {
-      try {
-        const userCompanyId = localStorage.getItem("company_id");
-        return userCompanyId ? JSON.parse(userCompanyId) : null;
-      } catch (e) {
-        console.error("Error parsing user company ID:", e);
-        return null;
-      }
-    }
-    return null;
-  };
-
   useEffect(() => {
     const loadTaxes = async () => {
       setLoading(true);
       setError(null);
-      const companyId = getUserCompanyId();
-
-      if (!companyId) {
-        setError("Company ID is missing or invalid. Please log in again.");
-        toast.error("Company ID is missing or invalid. Please log in again.");
-        setLoading(false);
-        return;
-      }
 
       try {
-        const params = {};
-        if (viewMode === "history") {
-          params.history = true;
-        } else if (viewMode === "effective_date" && effectiveDate) {
-          params.effective_date = effectiveDate;
-        } else {
-          params.active_only = true;
-        }
-
-        const response = await axios.get(`${BASE_URL}/company/taxes/${companyId}/`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-          params,
-        });
-        const taxes = Array.isArray(response.data) ? response.data : [];
+        const taxes = await taxesApi.fetch(viewMode, effectiveDate);
         console.log("Fetched taxes:", taxes);
         setData(taxes);
       } catch (err) {
         console.error("Error fetching taxes:", err);
-        const errorMessage = err.response?.data?.detail || "Failed to load taxes";
-        setError(errorMessage);
-        toast.error(errorMessage);
+        setError(err.message);
+        toast.error(err.message);
         setData([]);
       } finally {
         setLoading(false);
@@ -113,9 +72,8 @@ const Taxes = () => {
       }
     } catch (err) {
       console.error("Error deleting tax:", err);
-      const errorMessage = err.response?.data?.detail || "Failed to delete tax";
-      setError(errorMessage);
-      toast.error(error.message);
+      setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
       setIsDeleteModalOpen(false);
@@ -128,30 +86,31 @@ const Taxes = () => {
     setTaxIdToDelete(null);
   };
 
-// In Taxes.js
-const openUpdateModal = (tax) => {
-  const companyId = getUserCompanyId();
-  if (!companyId) {
-    toast.error("Company ID is missing or invalid. Please log in again.");
-    return;
-  }
-  openModal("update-tax-master", "", { 
-    tax_id: tax.id, 
-    company_id: companyId 
-  });
-};
+  const openUpdateModal = (tax) => {
+    openModal("update-tax-master", "", { 
+      tax_id: tax.id,
+      initialData: {
+        taxType: tax.tax_type,
+        taxPercentage: tax.tax_percentage,
+        country: tax.country,
+        state: tax.state,
+        applicableFrom: tax.applicable_from,
+        applicableTo: tax.applicable_to
+      }
+    });
+  };
 
   const filteredData = Array.isArray(data)
     ? data.filter(
         (tax) =>
           (tax.id?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-            tax?.country_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            tax.tax_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            tax.tax_percentage?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-            tax.applicable_from?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            tax.applicable_to?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            tax?.state_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (tax.is_active ? "active" : "inactive").toLowerCase().includes(searchTerm.toLowerCase()))
+          tax?.country_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          tax.tax_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          tax.tax_percentage?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+          tax.applicable_from?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          tax.applicable_to?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          tax?.state_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (tax.is_active ? "active" : "inactive").toLowerCase().includes(searchTerm.toLowerCase()))
       )
     : [];
 
