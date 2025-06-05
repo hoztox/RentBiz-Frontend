@@ -8,10 +8,9 @@ import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import { BASE_URL } from "../../../utils/config";
-import axios from "axios";
 import DeleteChargesModal from "./DeleteChargesModal/DeleteChargesModal";
 import buildingimg from "../../../assets/Images/Admin Masters/charges-building.png";
+import { fetchCharges, deleteCharges } from "./api";
 
 const Charges = () => {
   const [isHeaderSelectOpen, setIsHeaderSelectOpen] = useState(false);
@@ -26,49 +25,19 @@ const Charges = () => {
   const { openModal, refreshCounter } = useModal();
   const itemsPerPage = 10;
 
-  // Function to get company ID based on user role
-  const getUserCompanyId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-    if (role === "company") {
-      return localStorage.getItem("company_id");
-    } else if (role === "user" || role === "admin") {
-      try {
-        const userCompanyId = localStorage.getItem("company_id");
-        return userCompanyId ? JSON.parse(userCompanyId) : null;
-      } catch (e) {
-        console.error("Error parsing user company ID:", e);
-        return null;
-      }
-    }
-    return null;
-  };
-
   // Fetch charges data
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
-        const companyId = getUserCompanyId();
-        if (!companyId) {
-          throw new Error("Company ID is missing or invalid");
-        }
-
-        // Fetch charges
-        const chargesResponse = await axios.get(
-          `${BASE_URL}/company/charges/company/${companyId}/`,
-          { headers: { "Content-Type": "application/json" } }
-        );
-        setData(chargesResponse.data);
+        const charges = await fetchCharges();
+        setData(charges);
       } catch (err) {
-        console.error(
-          "Error fetching charges:",
-          err.response?.data || err.message
-        );
-        const errorMessage =
-          err.response?.data?.detail || err.message || "Failed to load charges";
-        setError(errorMessage);
-        toast.error(errorMessage);
+        console.error("Error fetching charges:", err);
+        setError(err.message);
+        toast.error(err.message);
+        setData([]);
       } finally {
         setLoading(false);
       }
@@ -78,11 +47,6 @@ const Charges = () => {
 
   // Handle delete initiation
   const handleDelete = (id) => {
-    if (!getUserCompanyId()) {
-      setError("Company ID not found. Please log in again.");
-      toast.error("Company ID not found. Please log in again.");
-      return;
-    }
     setChargeIdToDelete(id);
     setIsDeleteModalOpen(true);
   };
@@ -94,31 +58,16 @@ const Charges = () => {
     try {
       setLoading(true);
       setError(null);
-      const companyId = getUserCompanyId();
-      if (!companyId) {
-        throw new Error("Company ID is missing or invalid");
-      }
-      const response = await axios.delete(
-        `${BASE_URL}/company/charges/${chargeIdToDelete}/`,
-        { headers: { "Content-Type": "application/json" } }
-      );
-      if (response.status !== 200 && response.status !== 204) {
-        throw new Error("Failed to delete charge");
-      }
+      await deleteCharges(chargeIdToDelete);
       setData((prev) => prev.filter((item) => item.id !== chargeIdToDelete));
       toast.success("Charge deleted successfully");
       if (paginatedData.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
     } catch (err) {
-      console.error(
-        "Error deleting charge:",
-        err.response?.data || err.message
-      );
-      const errorMessage =
-        err.response?.data?.detail || err.message || "Failed to delete charge";
-      setError(errorMessage);
-      toast.error(errorMessage);
+      console.error("Error deleting charge:", err);
+      setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
       setIsDeleteModalOpen(false);
@@ -131,30 +80,6 @@ const Charges = () => {
     setIsDeleteModalOpen(false);
     setChargeIdToDelete(null);
   };
-
-  const filteredData = data.filter(
-    (charge) =>
-      charge.created_at?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      charge.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      charge.id.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-      charge.charge_code?.title
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase())
-  );
-
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const maxPageButtons = 5;
-  const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
-  const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
-
-  // const openUpdateModal = (charge) => {
-  //   openModal("update-charges-master", charge);
-  // };
 
   const handleEditClick = (charge) => {
     console.log("Charge Master: Selected Charge:", charge);
@@ -177,6 +102,26 @@ const Charges = () => {
       year: "numeric",
     });
   };
+
+  const filteredData = data.filter(
+    (charge) =>
+      charge.created_at?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      charge.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      charge.id.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+      charge.charge_code?.title
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const maxPageButtons = 5;
+  const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+  const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
   return (
     <div className="border border-gray-200 rounded-md charges-table">
@@ -220,7 +165,7 @@ const Charges = () => {
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-[#2892CE] hover:bg-[#2276a7]"
               }`}
-              onClick={() => openModal("create-charges-master")}
+              onClick={() => openModal("create-charges-master", "Create New Charges Master")}
               disabled={loading}
             >
               Add New Master
@@ -318,14 +263,14 @@ const Charges = () => {
                               {charge.charge_code?.title || "N/A"}
                             </td>
                             <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                              <button onClick={() => handleEditClick(charge)}>
+                              <button onClick={() => handleEditClick(charge)} disabled={loading}>
                                 <img
                                   src={editicon}
                                   alt="Edit"
                                   className="w-[18px] h-[18px] action-btn duration-200"
                                 />
                               </button>
-                              <button onClick={() => handleDelete(charge.id)}>
+                              <button onClick={() => handleDelete(charge.id)} disabled={loading}>
                                 <img
                                   src={deleteicon}
                                   alt="Delete"
@@ -434,6 +379,7 @@ const Charges = () => {
                                   <div className="dropdown-value flex items-center gap-4 p-1">
                                     <button
                                       onClick={() => handleEditClick(charge)}
+                                      disabled={loading}
                                     >
                                       <img
                                         src={editicon}
@@ -443,6 +389,7 @@ const Charges = () => {
                                     </button>
                                     <button
                                       onClick={() => handleDelete(charge.id)}
+                                      disabled={loading}
                                     >
                                       <img
                                         src={deleteicon}
