@@ -9,7 +9,7 @@ import { useModal } from "../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
 import DeleteTaxModal from "./DeleteTaxModal/DeleteTaxModal";
 import CustomDropDown from "../../../components/CustomDropDown";
-import { fetchTaxes, deleteTax } from "./api";
+import { taxesApi } from "../MastersApi";
 
 const Taxes = () => {
   const { openModal, refreshCounter } = useModal();
@@ -37,7 +37,7 @@ const Taxes = () => {
       setError(null);
 
       try {
-        const taxes = await fetchTaxes(viewMode, effectiveDate);
+        const taxes = await taxesApi.fetch(viewMode, effectiveDate);
         console.log("Fetched taxes:", taxes);
         setData(taxes);
       } catch (err) {
@@ -64,7 +64,7 @@ const Taxes = () => {
     try {
       setLoading(true);
       setError(null);
-      await deleteTax(taxIdToDelete);
+      await taxesApi.delete(taxIdToDelete);
       setData((prev) => prev.filter((item) => item.id !== taxIdToDelete));
       toast.success("Tax deleted successfully");
       if (paginatedData.length === 1 && currentPage > 1) {

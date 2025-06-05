@@ -10,7 +10,7 @@ import downArrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
 import ChargeCodeDeleteModal from "./ChargeCodeDeleteModal/ChargeCodeDeleteModal";
-import { fetchChargeCodes, deleteChargeCode } from "./api";
+import { chargeCodesApi } from "../MastersApi";
 
 const ChargeCodeType = () => {
   const { openModal, refreshCounter } = useModal();
@@ -30,7 +30,7 @@ const ChargeCodeType = () => {
     setLoading(true);
     setError(null);
     try {
-      const chargeCodes = await fetchChargeCodes();
+      const chargeCodes = await chargeCodesApi.fetch();
       setData(chargeCodes);
     } catch (err) {
       console.error("Error fetching charge codes:", err.message);
@@ -59,7 +59,7 @@ const ChargeCodeType = () => {
     try {
       setLoading(true);
       setError(null);
-      await deleteChargeCode(chargeCodeIdToDelete);
+      await chargeCodesApi.delete(chargeCodeIdToDelete);
       setData((prev) => prev.filter((item) => item.id !== chargeCodeIdToDelete));
       toast.success("Charge code deleted successfully");
       if (paginatedData.length === 1 && currentPage > 1) {

@@ -3,7 +3,7 @@ import "./CreateIdModal.css";
 import closeIcon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { toast, Toaster } from "react-hot-toast";
 import { useModal } from "../../../../context/ModalContext";
-import { createIdType } from "../api";
+import { idTypesApi } from "../../MastersApi"; // Updated import
 
 const CreateIdModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
@@ -38,7 +38,7 @@ const CreateIdModal = () => {
 
     try {
       console.log("Creating ID type with title:", title);
-      await createIdType(title);
+      await idTypesApi.create(title);
       toast.success("ID Type created successfully.");
       console.log("New ID Type Created:", { title });
       triggerRefresh();

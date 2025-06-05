@@ -10,7 +10,7 @@ import unitimg from "../../../assets/Images/Admin Masters/units-img.svg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import UnitTypeDeleteModal from "./UnitTypeDeleteModal/UnitTypeDeleteModal";
-import { fetchUnitTypes, deleteUnitType } from "./api";
+import { unitTypesApi } from "../MastersApi"; // Updated import
 
 const UnitType = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -30,7 +30,7 @@ const UnitType = () => {
     try {
       setLoading(true);
       setError(null);
-      const unitData = await fetchUnitTypes();
+      const unitData = await unitTypesApi.fetch(); // Updated API call
       setUnitTypes(unitData);
     } catch (err) {
       console.error("Error fetching unit types:", err);
@@ -52,7 +52,7 @@ const UnitType = () => {
     if (!unitTypeIdToDelete) return;
 
     try {
-      await deleteUnitType(unitTypeIdToDelete);
+      await unitTypesApi.delete(unitTypeIdToDelete); // Updated API call
       setUnitTypes((prev) => prev.filter((u) => u.id !== unitTypeIdToDelete));
       toast.success("Unit Type deleted successfully.");
     } catch (error) {
@@ -193,9 +193,8 @@ const UnitType = () => {
                 <option value="all">All</option>
               </select>
               <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
+                  }`}
               />
             </div>
           </div>
@@ -255,9 +254,8 @@ const UnitType = () => {
                     return (
                       <tr
                         key={unit.id}
-                        className={`h-[57px] hover:bg-gray-50 cursor-pointer ${
-                          shouldRemoveBorder ? "" : "border-b border-[#E9E9E9]"
-                        }`}
+                        className={`h-[57px] hover:bg-gray-50 cursor-pointer ${shouldRemoveBorder ? "" : "border-b border-[#E9E9E9]"
+                          }`}
                       >
                         <td className="px-5 text-left unit-data">
                           {(currentPage - 1) * itemsPerPage + index + 1}
@@ -376,11 +374,10 @@ const UnitType = () => {
               paginatedData.map((unit, index) => (
                 <React.Fragment key={unit.id}>
                   <tr
-                    className={`${
-                      expandedRows[unit.id]
+                    className={`${expandedRows[unit.id]
                         ? "utype-mobile-no-border"
                         : "utype-mobile-with-border"
-                    } border-b border-[#E9E9E9] h-[57px]`}
+                      } border-b border-[#E9E9E9] h-[57px]`}
                   >
                     <td className="px-5 text-left unit-data">
                       {(currentPage - 1) * itemsPerPage + index + 1}
@@ -390,17 +387,15 @@ const UnitType = () => {
                     </td>
                     <td className="py-4 flex items-center justify-end h-[57px]">
                       <div
-                        className={`unit-dropdown-field ${
-                          expandedRows[unit.id] ? "active" : ""
-                        }`}
+                        className={`unit-dropdown-field ${expandedRows[unit.id] ? "active" : ""
+                          }`}
                         onClick={() => toggleRowExpand(unit.id)}
                       >
                         <img
                           src={downarrow}
                           alt="drop-down-arrow"
-                          className={`unit-dropdown-img ${
-                            expandedRows[unit.id] ? "text-white" : ""
-                          }`}
+                          className={`unit-dropdown-img ${expandedRows[unit.id] ? "text-white" : ""
+                            }`}
                         />
                       </div>
                     </td>
@@ -481,11 +476,10 @@ const UnitType = () => {
             {[...Array(endPage - startPage + 1)].map((_, i) => (
               <button
                 key={startPage + i}
-                className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
-                  currentPage === startPage + i
+                className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${currentPage === startPage + i
                     ? "bg-[#1458A2] text-white"
                     : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-                }`}
+                  }`}
                 onClick={() => setCurrentPage(startPage + i)}
               >
                 {startPage + i}

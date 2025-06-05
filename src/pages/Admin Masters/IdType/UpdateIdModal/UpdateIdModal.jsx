@@ -3,7 +3,7 @@ import "./UpdateIdModal.css";
 import closeIcon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { useModal } from "../../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import { updateIdType } from "../api";
+import { idTypesApi } from "../../MastersApi"; // Updated import
 
 const UpdateIdModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
@@ -53,7 +53,7 @@ const UpdateIdModal = () => {
 
     try {
       console.log("Updating ID type:", { idTypeId, title });
-      const updatedData = await updateIdType(idTypeId, title);
+      const updatedData = await idTypesApi.update(idTypeId, title);
       console.log("ID Type Updated: ", updatedData);
       toast.success("ID Type updated successfully");
 

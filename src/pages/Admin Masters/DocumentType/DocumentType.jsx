@@ -10,7 +10,7 @@ import buildingimg from "../../../assets/Images/Admin Masters/building-img.svg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import DeleteDocumentTypeModal from "./DeleteDocumentTypeModal/DeleteDocumentTypeModal";
-import { fetchDocumentTypes, deleteDocumentType } from "./api";
+import { documentTypesApi } from "../MastersApi";
 
 const DocumentType = () => {
   const { openModal, refreshCounter } = useModal();
@@ -30,7 +30,7 @@ const DocumentType = () => {
     try {
       setLoading(true);
       setError(null);
-      const docData = await fetchDocumentTypes();
+      const docData = await documentTypesApi.fetch();
       setDocTypes(docData);
     } catch (err) {
       console.error("Error fetching document types:", err);
@@ -55,7 +55,7 @@ const DocumentType = () => {
     try {
       setLoading(true);
       setError(null);
-      await deleteDocumentType(docTypeIdToDelete);
+      await documentTypesApi.delete(docTypeIdToDelete);
       setDocTypes((prev) => prev.filter((item) => item.id !== docTypeIdToDelete));
       toast.success("Document Type deleted successfully");
       if (paginatedData.length === 1 && currentPage > 1) {

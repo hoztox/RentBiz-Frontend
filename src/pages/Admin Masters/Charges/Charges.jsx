@@ -10,7 +10,7 @@ import { useModal } from "../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
 import DeleteChargesModal from "./DeleteChargesModal/DeleteChargesModal";
 import buildingimg from "../../../assets/Images/Admin Masters/charges-building.png";
-import { fetchCharges, deleteCharges } from "./api";
+import { chargesApi } from "../MastersApi";
 
 const Charges = () => {
   const [isHeaderSelectOpen, setIsHeaderSelectOpen] = useState(false);
@@ -31,7 +31,7 @@ const Charges = () => {
       setLoading(true);
       setError(null);
       try {
-        const charges = await fetchCharges();
+        const charges = await chargesApi.fetch();
         setData(charges);
       } catch (err) {
         console.error("Error fetching charges:", err);
@@ -58,7 +58,7 @@ const Charges = () => {
     try {
       setLoading(true);
       setError(null);
-      await deleteCharges(chargeIdToDelete);
+      await chargesApi.delete(chargeIdToDelete);
       setData((prev) => prev.filter((item) => item.id !== chargeIdToDelete));
       toast.success("Charge deleted successfully");
       if (paginatedData.length === 1 && currentPage > 1) {
