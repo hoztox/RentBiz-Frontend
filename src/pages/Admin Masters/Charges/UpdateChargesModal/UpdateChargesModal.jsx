@@ -59,32 +59,33 @@ const UpdateChargesModal = () => {
 
   // Reset form state when modal opens or charges data changes
   useEffect(() => {
-    if (
-      modalState.isOpen &&
-      modalState.type === "update-charges-master" &&
-      modalState.data
-    ) {
-      setName(modalState.data.name || "");
-      setChargeCode(
-        typeof modalState.data.charge_code === "object"
-          ? modalState.data.charge_code.id
-          : modalState.data.charge_code || ""
-      );
-      setSelectedTaxTypes(modalState.data.tax_types || []);
-      setError(null);
-      setFieldErrors({});
-      fetchChargesCodes();
-      fetchTaxTypes();
-    } else {
-      setName("");
-      setChargeCode("");
-      setSelectedTaxTypes([]);
-      setError(null);
-      setFieldErrors({});
-      setChargeCodeOptions([]);
-      setTaxTypes([]);
-    }
-  }, [modalState.isOpen, modalState.type, modalState.data]);
+  if (
+    modalState.isOpen &&
+    modalState.type === "update-charges-master" &&
+    modalState.data
+  ) {
+    setName(modalState.data.name || "");
+    setChargeCode(
+      typeof modalState.data.charge_code === "object"
+        ? modalState.data.charge_code.id
+        : modalState.data.charge_code || ""
+    );
+    // Changed from tax_types to taxes
+    setSelectedTaxTypes(modalState.data.taxes || []);
+    setError(null);
+    setFieldErrors({});
+    fetchChargesCodes();
+    fetchTaxTypes();
+  } else {
+    setName("");
+    setChargeCode("");
+    setSelectedTaxTypes([]);
+    setError(null);
+    setFieldErrors({});
+    setChargeCodeOptions([]);
+    setTaxTypes([]);
+  }
+}, [modalState.isOpen, modalState.type, modalState.data]);
 
   // Only render for "update-charges-master" type and valid data
   if (
