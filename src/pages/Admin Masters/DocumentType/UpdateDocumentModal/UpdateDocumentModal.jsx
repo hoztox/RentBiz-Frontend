@@ -1,78 +1,50 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
 import "./UpdateDocumentModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { useModal } from "../../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import { BASE_URL } from "../../../../utils/config";
+import { updateDocumentType } from "../api";
 
 const UpdateDocumentModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
   const [title, setTitle] = useState("");
-  const [companyId, setCompanyId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [fieldError, setFieldError] = useState(null);
 
-  // Function to get company ID based on user role
-  const getUserCompanyId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-    if (role === "company") {
-      return localStorage.getItem("company_id");
-    } else if (role === "user" || role === "admin") {
-      try {
-        const userCompanyId = localStorage.getItem("company_id");
-        return userCompanyId ? JSON.parse(userCompanyId) : null;
-      } catch (e) {
-        console.error("Error parsing user company ID:", e);
-        return null;
-      }
-    }
-    return null;
-  };
-
-  // Function to get relevant user ID based on role
-  const getRelevantUserId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-
-    if (role === "user" || role === "admin") {
-      const userId = localStorage.getItem("user_id");
-      if (userId) return userId;
-    }
-
-    return null;
-  };
-
   // Reset form state when modal opens or document data changes
   useEffect(() => {
-    if (modalState.isOpen && modalState.type === "update-document-type-master" && modalState.data) {
+    if (
+      modalState.isOpen &&
+      modalState.type === "update-document-type-master" &&
+      modalState.data
+    ) {
       setTitle(modalState.data.title || "");
-      setCompanyId(getUserCompanyId());
       setError(null);
       setFieldError(null);
     }
   }, [modalState.isOpen, modalState.type, modalState.data]);
 
   // Only render for "update-document-type-master" type and valid data
-  if (!modalState.isOpen || modalState.type !== "update-document-type-master" || !modalState.data) {
+  if (
+    !modalState.isOpen ||
+    modalState.type !== "update-document-type-master" ||
+    !modalState.data
+  ) {
     return null;
   }
 
   const handleUpdate = async () => {
-    // Validation
-    if (!title) {
+    if (!title.trim()) {
       setFieldError("Please fill the Title field");
-      return;
-    }
-
-    if (!companyId) {
-      setFieldError("Company ID is missing or invalid");
+      toast.error("Please fill the Title field");
       return;
     }
 
     const documentTypeId = modalState.data.id;
     if (!documentTypeId) {
       setFieldError("Document Type ID is missing");
+      toast.error("Document Type ID is missing");
       return;
     }
 
@@ -81,45 +53,18 @@ const UpdateDocumentModal = () => {
     setFieldError(null);
 
     try {
-      const userId = getRelevantUserId();
-      console.log("Update payload:", { title, company: companyId, user: userId, id: documentTypeId });
-
-      const response = await axios.put(
-        `${BASE_URL}/company/doc_type/${documentTypeId}/`,
-        {
-          title,
-          company: companyId,
-          user: userId,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.status !== 200 && response.status !== 201) {
-        throw new Error("Failed to update document type");
-      }
-
-      console.log("Document Type Updated: ", response.data);
+      const docData = { title };
+      const response = await updateDocumentType(documentTypeId, docData);
       toast.success("Document Type updated successfully");
-
       if (modalState.onSuccess) {
-        modalState.onSuccess(response.data);
+        modalState.onSuccess(response);
       }
       triggerRefresh();
       closeModal();
     } catch (err) {
-      console.error("Error updating document type:", err.response?.data || err.message);
-      const errorMessage =
-        err.response?.data?.detail ||
-        err.response?.data?.company_id ||
-        err.response?.data?.message ||
-        err.message ||
-        "Failed to update document type";
-      setError(errorMessage);
-      toast.error(errorMessage);
+      console.error("Error updating document type:", err);
+      setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -163,9 +108,11 @@ const UpdateDocumentModal = () => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             disabled={loading}
+            maxLength={100}
           />
           <div className="text-sm mt-1" style={{ minHeight: "20px" }}>
             {fieldError && <span className="text-[#dc2626]">{fieldError}</span>}
+            {error && <span className="text-[#dc2626]">{error}</span>}
           </div>
         </div>
 
