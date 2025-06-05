@@ -3,7 +3,7 @@ import "./createchargecodemodal.css";
 import closeIcon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { toast, Toaster } from "react-hot-toast";
 import { useModal } from "../../../../context/ModalContext";
-import { createChargeCode } from "../api";
+import { chargeCodesApi } from "../../MastersApi";
 
 const CreateChargeCodeModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
@@ -37,7 +37,7 @@ const CreateChargeCodeModal = () => {
     setFieldError(null);
     try {
       console.log("Creating charge code with title:", title);
-      await createChargeCode(title);
+      await chargeCodesApi.create(title);
       toast.success("Charge Code created successfully");
       console.log("New Charge Code Created:", { title });
       triggerRefresh();

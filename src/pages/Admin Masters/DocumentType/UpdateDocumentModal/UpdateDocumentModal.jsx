@@ -3,7 +3,7 @@ import "./UpdateDocumentModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { useModal } from "../../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import { updateDocumentType } from "../api";
+import { documentTypesApi } from "../../MastersApi";
 
 const UpdateDocumentModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
@@ -54,7 +54,7 @@ const UpdateDocumentModal = () => {
 
     try {
       const docData = { title };
-      const response = await updateDocumentType(documentTypeId, docData);
+      const response = await documentTypesApi.update(documentTypeId, docData);
       toast.success("Document Type updated successfully");
       if (modalState.onSuccess) {
         modalState.onSuccess(response);

@@ -4,7 +4,7 @@ import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { ChevronDown } from "lucide-react";
 import { useModal } from "../../../../context/ModalContext";
 import { toast } from "react-hot-toast";
-import { fetchCountries, fetchStates, updateTax } from "../api";
+import { locationApi, taxesApi } from "../../MastersApi";
 
 const UpdateTaxModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
@@ -29,7 +29,7 @@ const UpdateTaxModal = () => {
   useEffect(() => {
     const loadCountries = async () => {
       try {
-        const fetchedCountries = await fetchCountries();
+        const fetchedCountries = await locationApi.fetchCountries();
         setCountries(fetchedCountries);
         setFilteredCountries(fetchedCountries);
       } catch (err) {
@@ -50,7 +50,7 @@ const UpdateTaxModal = () => {
       }
 
       try {
-        const fetchedStates = await fetchStates(country);
+        const fetchedStates = await locationApi.fetchStates(country);
         setStates(fetchedStates);
       } catch (err) {
         console.error("Error fetching states:", err);
@@ -198,7 +198,7 @@ const UpdateTaxModal = () => {
         applicableFrom,
         applicableTo,
       };
-      const response = await updateTax(taxId, taxData);
+      const response = await taxesApi.update(taxId, taxData);
       const isNewVersion = hasCriticalFieldsChanged();
       toast.success(
         isNewVersion

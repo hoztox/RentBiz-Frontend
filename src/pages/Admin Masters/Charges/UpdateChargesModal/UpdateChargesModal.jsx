@@ -4,8 +4,7 @@ import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { ChevronDown } from "lucide-react";
 import { useModal } from "../../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import { fetchChargeCodes, updateCharges } from "../api";
-import { fetchTaxes } from "../../Taxes/api";
+import { chargeCodesApi, taxesApi, chargesApi } from "../../MastersApi";
 
 const UpdateChargesModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
@@ -22,9 +21,9 @@ const UpdateChargesModal = () => {
   const taxTypeDropdownRef = useRef(null);
 
   // Fetch charge codes and tax types
-  const fetchChargeCodeOptions = async () => {
+  const fetchChargesCodes = async () => {
     try {
-      const codes = await fetchChargeCodes();
+      const codes = await chargeCodesApi.fetch();
       setChargeCodeOptions(codes);
     } catch (err) {
       console.error("Error fetching charge codes:", err);
@@ -35,7 +34,7 @@ const UpdateChargesModal = () => {
 
   const fetchTaxTypes = async () => {
     try {
-      const taxes = await fetchTaxes("active_only");
+      const taxes = await taxesApi.fetch("active_only");
       setTaxTypes(taxes);
     } catch (err) {
       console.error("Error fetching tax types:", err);
@@ -74,7 +73,7 @@ const UpdateChargesModal = () => {
       setSelectedTaxTypes(modalState.data.tax_types || []);
       setError(null);
       setFieldErrors({});
-      fetchChargeCodeOptions();
+      fetchChargesCodes();
       fetchTaxTypes();
     } else {
       setName("");
@@ -140,7 +139,7 @@ const UpdateChargesModal = () => {
         chargeCode,
         taxTypes: selectedTaxTypes,
       };
-      const response = await updateCharges(chargesId, chargeData);
+      const response = await chargesApi.update(chargesId, chargeData);
       toast.success("Charges updated successfully");
       if (modalState.onSuccess) {
         modalState.onSuccess(response);

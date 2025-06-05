@@ -3,7 +3,7 @@ import "./UpdateUnitTypeModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { useModal } from "../../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import { updateUnitType } from "../api";
+import { unitTypesApi } from "../../MastersApi"; // Updated import
 
 const UpdateUnitTypeModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
@@ -49,7 +49,7 @@ const UpdateUnitTypeModal = () => {
 
     try {
       console.log("Updating unit type:", { unitTypeId, title });
-      const updatedData = await updateUnitType(unitTypeId, title);
+      const updatedData = await unitTypesApi.update(unitTypeId, title);
       console.log("Unit Type Updated: ", updatedData);
       toast.success("Unit Type updated successfully");
 

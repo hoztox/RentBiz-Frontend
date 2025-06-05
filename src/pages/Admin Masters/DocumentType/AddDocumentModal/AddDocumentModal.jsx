@@ -3,7 +3,7 @@ import "./AddDocumentModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { useModal } from "../../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import { createDocumentType } from "../api";
+import { documentTypesApi } from "../../MastersApi";
 
 const AddDocumentModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
@@ -39,7 +39,7 @@ const AddDocumentModal = () => {
 
     try {
       const docData = { title };
-      await createDocumentType(docData);
+      await documentTypesApi.create(docData);
       toast.success("Document Type created successfully");
       triggerRefresh();
       closeModal();

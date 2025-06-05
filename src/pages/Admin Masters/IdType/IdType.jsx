@@ -10,7 +10,7 @@ import buildingImg from "../../../assets/Images/Admin Masters/building-img2.svg"
 import downArrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import IdTypeDeleteModal from "./IdTypeDeleteModal/IdTypeDeleteModal";
-import { fetchIdTypes, deleteIdType } from "./api";
+import { idTypesApi } from "../MastersApi"; // Updated import
 
 const IdType = () => {
   const { openModal, refreshCounter } = useModal();
@@ -30,7 +30,7 @@ const IdType = () => {
     try {
       setLoading(true);
       setError(null);
-      const idData = await fetchIdTypes();
+      const idData = await idTypesApi.fetch();
       setIdTypes(idData);
     } catch (err) {
       console.error("Error fetching ID types:", err);
@@ -52,7 +52,7 @@ const IdType = () => {
   const handleConfirmDelete = async () => {
     if (!idTypeIdToDelete) return;
     try {
-      await deleteIdType(idTypeIdToDelete);
+      await idTypesApi.delete(idTypeIdToDelete);
       setIdTypes((prev) => prev.filter((item) => item.id !== idTypeIdToDelete));
       toast.success("ID Type deleted successfully.");
       if (paginatedData.length === 1 && currentPage > 1) {

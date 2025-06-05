@@ -3,7 +3,7 @@ import "./CreateUnitTypeModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { toast, Toaster } from "react-hot-toast";
 import { useModal } from "../../../../context/ModalContext";
-import { createUnitType } from "../api";
+import { unitTypesApi } from "../../MastersApi"; // Updated import
 
 const CreateUnitTypeModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
@@ -37,7 +37,7 @@ const CreateUnitTypeModal = () => {
     setFieldError(null);
     try {
       console.log("Creating unit type with title:", title);
-      await createUnitType(title);
+      await unitTypesApi.create(title); // Updated API call
       console.log("New Unit Type Created:", { title });
       toast.success("Unit Type created successfully");
       triggerRefresh();

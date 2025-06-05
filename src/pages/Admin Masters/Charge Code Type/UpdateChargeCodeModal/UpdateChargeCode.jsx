@@ -3,7 +3,7 @@ import "./updatechargecode.css";
 import closeIcon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { useModal } from "../../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import { updateChargeCode } from "../api";
+import { chargeCodesApi } from "../../MastersApi";
 
 const UpdateChargeCode = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
@@ -55,7 +55,7 @@ const UpdateChargeCode = () => {
 
     try {
       console.log("Updating charge code:", { chargeCodeId, title });
-      const updatedData = await updateChargeCode(chargeCodeId, title);
+      const updatedData = await chargeCodesApi.update(chargeCodeId, title);
       console.log("Charge Code Updated: ", updatedData);
       toast.success("Charge Code updated successfully");
 
