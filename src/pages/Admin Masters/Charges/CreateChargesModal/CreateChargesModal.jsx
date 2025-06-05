@@ -10,34 +10,34 @@ const CreateChargesModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
   const [name, setName] = useState("");
   const [chargeCodeId, setChargeCodeId] = useState("");
-  const [selectedTaxTypes, setSelectedTaxTypes] = useState([]);
+  const [selectedTaxIds, setSelectedTaxIds] = useState([]);
   const [isSelectOpen, setIsSelectOpen] = useState(false);
-  const [isTaxTypeOpen, setIsTaxTypeOpen] = useState(false);
+  const [isTaxDropdownOpen, setIsTaxDropdownOpen] = useState(false);
   const [chargeCodes, setChargeCodes] = useState([]);
-  const [taxTypes, setTaxTypes] = useState([]); // State for dynamic tax types
+  const [taxes, setTaxes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
-  const taxTypeDropdownRef = useRef(null);
+  const taxDropdownRef = useRef(null);
 
   // Reset form state and fetch data when modal opens
   useEffect(() => {
     if (modalState.isOpen && modalState.type === "create-charges-master") {
       setName("");
       setChargeCodeId("");
-      setSelectedTaxTypes([]);
+      setSelectedTaxIds([]);
       setError(null);
       setFieldErrors({});
       fetchChargeCodes();
-      fetchTaxTypes(); // Fetch tax types when modal opens
+      fetchTaxes();
     }
   }, [modalState.isOpen, modalState.type]);
 
-  // Handle clicks outside tax type dropdown
+  // Handle clicks outside tax dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (taxTypeDropdownRef.current && !taxTypeDropdownRef.current.contains(event.target)) {
-        setIsTaxTypeOpen(false);
+      if (taxDropdownRef.current && !taxDropdownRef.current.contains(event.target)) {
+        setIsTaxDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -49,9 +49,8 @@ const CreateChargesModal = () => {
     return null;
   }
 
-  const getUserCompanyId = () => {
+  function getUserCompanyId() {
     const role = localStorage.getItem("role")?.toLowerCase();
-
     if (role === "company") {
       return localStorage.getItem("company_id");
     } else if (role === "user" || role === "admin") {
@@ -64,25 +63,23 @@ const CreateChargesModal = () => {
       }
     }
     return null;
-  };
+  }
 
-  const getRelevantUserId = () => {
+  function getRelevantUserId() {
     const role = localStorage.getItem("role")?.toLowerCase();
-
     if (role === "user" || role === "admin") {
       const userId = localStorage.getItem("user_id");
       if (userId) return userId;
     }
     return null;
-  };
+  }
 
-  const fetchChargeCodes = async () => {
+  async function fetchChargeCodes() {
     try {
       const companyId = getUserCompanyId();
       if (!companyId) {
         throw new Error("Company ID is missing or invalid");
       }
-
       const response = await axios.get(
         `${BASE_URL}/company/charge_code/company/${companyId}/`,
         {
@@ -96,81 +93,69 @@ const CreateChargesModal = () => {
       console.error("Error fetching charge codes:", error);
       setError("Failed to fetch charge codes");
     }
-  };
+  }
 
-  // Fetch tax types from API
-  const fetchTaxTypes = async () => {
+  async function fetchTaxes() {
     try {
       const companyId = getUserCompanyId();
       if (!companyId) {
         throw new Error("Company ID is missing or invalid");
       }
-
       const response = await axios.get(
-        `${BASE_URL}/company/taxes/${companyId}/`,
+        `${BASE_URL}/company/taxes/${companyId}/?active_only=true`,
         {
           headers: {
             "Content-Type": "application/json",
           },
         }
       );
-      setTaxTypes(response.data || []);
-      console.log('tax types:', response.data);
-      
+      setTaxes(response.data || []);
+      console.log("Active taxes:", response.data);
     } catch (error) {
-      console.error("Error fetching tax types:", error);
-      setError("Failed to fetch tax types");
+      console.error("Error fetching taxes:", error);
+      setError("Failed to fetch taxes");
     }
-  };
+  }
 
-  const handleTaxTypeToggle = (taxTypeId) => {
-    setSelectedTaxTypes((prev) =>
-      prev.includes(taxTypeId)
-        ? prev.filter((id) => id !== taxTypeId)
-        : [...prev, taxTypeId]
+  function handleTaxToggle(taxId) {
+    setSelectedTaxIds((prev) =>
+      prev.includes(taxId)
+        ? prev.filter((id) => id !== taxId)
+        : [...prev, taxId]
     );
-  };
+  }
 
-  const validateForm = () => {
+  function validateForm() {
     const errors = {};
-
     if (!name.trim()) {
       errors.name = "Please fill the Name field";
     }
     if (!chargeCodeId) {
       errors.chargeCodeId = "Please select a Charge Code Type";
     }
-    // if (selectedTaxTypes.length === 0) {
-    //   errors.taxTypes = "Please select at least one Tax Type";
-    // }
-
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
-  };
+  }
 
-  const handleSave = async () => {
+  async function handleSave() {
     if (!validateForm()) {
       return;
     }
-
     setLoading(true);
     setError(null);
     setFieldErrors({});
-
     try {
       const companyId = getUserCompanyId();
       const userId = getRelevantUserId();
-
       if (!companyId) {
         throw new Error("Company ID is missing or invalid");
       }
-
       const response = await axios.post(
         `${BASE_URL}/company/charges/create/`,
         {
           name: name,
           charge_code: parseInt(chargeCodeId),
-          tax_types: selectedTaxTypes,
+          taxes: selectedTaxIds,
           company: companyId,
           user: userId,
         },
@@ -180,15 +165,13 @@ const CreateChargesModal = () => {
           },
         }
       );
-
       if (response.status !== 200 && response.status !== 201) {
         throw new Error("Failed to create charges");
       }
-
       console.log("New Charges Created:", {
         name,
         chargeCodeId,
-        selectedTaxTypes,
+        selectedTaxIds,
         companyId,
         userId,
       });
@@ -199,16 +182,16 @@ const CreateChargesModal = () => {
       setError(
         "Failed to save charges: " +
           (err.response?.data?.detail ||
-            err.response?.data?.company_id ||
+            err.response?.data?.company ||
             err.response?.data?.name ||
             err.response?.data?.charge_code ||
-            err.response?.data?.tax_types ||
+            err.response?.data?.taxes ||
             err.message)
       );
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
@@ -304,54 +287,54 @@ const CreateChargesModal = () => {
           </div>
 
           <label className="block pt-2 !mb-[10px] text-[#201D1E] modal-label">
-            Select Tax *
+            Select Taxes
           </label>
-          <div className="relative" ref={taxTypeDropdownRef}>
+          <div className="relative" ref={taxDropdownRef}>
             <div
               className={`w-full border rounded-md mt-1 px-3 py-2 cursor-pointer focus:outline-none input-style transition-colors duration-200 flex items-center`}
-              onClick={() => setIsTaxTypeOpen(!isTaxTypeOpen)}
+              onClick={() => setIsTaxDropdownOpen(!isTaxDropdownOpen)}
             >
-              {selectedTaxTypes.length > 0
-                ? selectedTaxTypes
-                    .map((id) => taxTypes.find((t) => t.id === id)?.tax_type)
+              {selectedTaxIds.length > 0
+                ? selectedTaxIds
+                    .map((id) => taxes.find((t) => t.id === id)?.tax_type)
                     .filter(Boolean)
                     .join(", ")
-                : "Select Tax"}
+                : "Select Taxes"}
             </div>
             <ChevronDown
               className={`absolute right-3 top-3 w-[18px] h-[18px] md:w-[20px] md:h-[20px] transition-transform duration-300 ${
-                isTaxTypeOpen ? "rotate-180" : "rotate-0"
+                isTaxDropdownOpen ? "rotate-180" : "rotate-0"
               }`}
             />
-            {isTaxTypeOpen && (
+            {isTaxDropdownOpen && (
               <div className="absolute z-10 w-full mt-1 bg-white border border-[#E9E9E9] rounded-md shadow-lg max-h-60 overflow-y-auto">
-                {taxTypes.length > 0 ? (
-                  taxTypes.map((taxType) => (
+                {taxes.length > 0 ? (
+                  taxes.map((tax) => (
                     <label
-                      key={taxType.id}
+                      key={tax.id}
                       className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer tax-types"
                     >
                       <input
                         type="checkbox"
-                        checked={selectedTaxTypes.includes(taxType.id)}
-                        onChange={() => handleTaxTypeToggle(taxType.id)}
+                        checked={selectedTaxIds.includes(tax.id)}
+                        onChange={() => handleTaxToggle(tax.id)}
                         className="mr-2"
                         disabled={loading}
                       />
-                      {taxType.tax_type}
+                      {tax.tax_type} ({tax.tax_percentage}%)
                     </label>
                   ))
                 ) : (
                   <div className="px-3 py-2 text-gray-500">
-                    No tax types available
+                    No active taxes available
                   </div>
                 )}
               </div>
             )}
           </div>
           <div className="text-sm mt-1" style={{ minHeight: "20px" }}>
-            {fieldErrors.taxTypes && (
-              <span className="text-[#dc2626]">{fieldErrors.taxTypes}</span>
+            {fieldErrors.taxIds && (
+              <span className="text-[#dc2626]">{fieldErrors.taxIds}</span>
             )}
           </div>
         </div>

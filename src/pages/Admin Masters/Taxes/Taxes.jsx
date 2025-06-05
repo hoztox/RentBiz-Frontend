@@ -36,6 +36,7 @@ const Taxes = () => {
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
+    console.log("getUserCompanyId:", { role, company_id: localStorage.getItem("company_id") });
     if (role === "company") {
       return localStorage.getItem("company_id");
     } else if (role === "user" || role === "admin") {
@@ -55,7 +56,7 @@ const Taxes = () => {
       setLoading(true);
       setError(null);
       const companyId = getUserCompanyId();
-      
+
       if (!companyId) {
         setError("Company ID is missing or invalid. Please log in again.");
         toast.error("Company ID is missing or invalid. Please log in again.");
@@ -84,8 +85,7 @@ const Taxes = () => {
         setData(taxes);
       } catch (err) {
         console.error("Error fetching taxes:", err);
-        const errorMessage =
-          err.response?.data?.detail || "Failed to load taxes";
+        const errorMessage = err.response?.data?.detail || "Failed to load taxes";
         setError(errorMessage);
         toast.error(errorMessage);
         setData([]);
@@ -130,8 +130,7 @@ const Taxes = () => {
       }
     } catch (err) {
       console.error("Error deleting tax:", err);
-      const errorMessage =
-        err.response?.data?.detail || "Failed to delete tax";
+      const errorMessage = err.response?.data?.detail || "Failed to delete tax";
       setError(errorMessage);
       toast.error(error.message);
     } finally {
@@ -146,36 +145,18 @@ const Taxes = () => {
     setTaxIdToDelete(null);
   };
 
-  const handleAddTax = async (newTax) => {
-    const companyId = getUserCompanyId();
-    if (!companyId) {
-      toast.error("Company ID is missing or invalid. Please log in again.");
-      return;
-    }
-
-    try {
-      const response = await axios.post(
-        `${BASE_URL}/taxes/${companyId}/`,
-        newTax,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-      setData((prev) => [...prev, response.data]);
-      toast.success("Tax added successfully");
-    } catch (err) {
-      console.error("Error adding tax:", err);
-      const errorMessage =
-        err.response?.data?.detail || "Failed to add tax";
-      toast.error(errorMessage);
-    }
-  };
-
-  const openUpdateModal = (tax) => {
-    openModal("update-tax-master", "Update Tax Master", tax);
-  };
+// In Taxes.js
+const openUpdateModal = (tax) => {
+  const companyId = getUserCompanyId();
+  if (!companyId) {
+    toast.error("Company ID is missing or invalid. Please log in again.");
+    return;
+  }
+  openModal("update-tax-master", "", { 
+    tax_id: tax.id, 
+    company_id: companyId 
+  });
+};
 
   const filteredData = Array.isArray(data)
     ? data.filter(
@@ -183,10 +164,7 @@ const Taxes = () => {
           (tax.id?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
             tax?.country_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             tax.tax_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            tax.tax_percentage
-              ?.toString()
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase()) ||
+            tax.tax_percentage?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
             tax.applicable_from?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             tax.applicable_to?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             tax?.state_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -247,7 +225,7 @@ const Taxes = () => {
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-[#2892CE] hover:bg-[#2276a7]"
               }`}
-              onClick={() => openModal("create-tax-master", "Create New Tax Master")}
+              onClick={() => openModal("create-tax-master", null)}
               disabled={loading}
             >
               Add New Tax
