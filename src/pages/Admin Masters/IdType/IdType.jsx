@@ -121,7 +121,7 @@ const IdType = () => {
 
   const handleEditClick = (idType) => {
     console.log("ID Types: Selected IdType:", idType);
-    openModal("update-id-type-master", "Update Id Type Master", idType);
+    openModal("update-id-type-master", "Update ID Type Master", idType);
   };
 
   const toggleRowExpand = (id) => {
@@ -189,7 +189,7 @@ const IdType = () => {
           <div className="flex gap-[10px] action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md idtype-add-new-master duration-200"
-              onClick={() => openModal("create-id-type-master")}
+              onClick={() => openModal("create-id-type-master", "Create New ID Type Master")}
               disabled={loading}
             >
               Add New Master
