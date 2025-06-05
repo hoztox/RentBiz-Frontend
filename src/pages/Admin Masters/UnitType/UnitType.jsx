@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "./UnitType.css";
-import { ChevronDown } from "lucide-react";
 import { toast, Toaster } from "react-hot-toast";
 import plusicon from "../../../assets/Images/Admin Masters/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Masters/download-icon.svg";
@@ -14,7 +13,6 @@ import { unitTypesApi } from "../MastersApi"; // Updated import
 import CustomDropDown from "../../../components/CustomDropDown";
 
 const UnitType = () => {
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
