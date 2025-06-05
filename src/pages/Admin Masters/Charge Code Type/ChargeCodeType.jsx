@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
 import "./chargecodetype.css";
 import { ChevronDown } from "lucide-react";
-import plusicon from "../../../assets/Images/Admin Masters/plus-icon.svg";
-import downloadicon from "../../../assets/Images/Admin Masters/download-icon.svg";
-import editicon from "../../../assets/Images/Admin Masters/edit-icon.svg";
-import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
-import buildingimg from "../../../assets/Images/Admin Masters/building2.jpg";
-import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
+import plusIcon from "../../../assets/Images/Admin Masters/plus-icon.svg";
+import downloadIcon from "../../../assets/Images/Admin Masters/download-icon.svg";
+import editIcon from "../../../assets/Images/Admin Masters/edit-icon.svg";
+import deleteIcon from "../../../assets/Images/Admin Masters/delete-icon.svg";
+import buildingImg from "../../../assets/Images/Admin Masters/building2.jpg";
+import downArrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import { BASE_URL } from "../../../utils/config";
-import axios from "axios";
 import ChargeCodeDeleteModal from "./ChargeCodeDeleteModal/ChargeCodeDeleteModal";
+import { fetchChargeCodes, deleteChargeCode } from "./api";
 
 const ChargeCodeType = () => {
+  const { openModal, refreshCounter } = useModal();
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -21,67 +21,33 @@ const ChargeCodeType = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { openModal, refreshCounter } = useModal();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [chargeCodeIdToDelete, setChargeCodeIdToDelete] = useState(null);
   const itemsPerPage = 10;
 
-  // Function to get company ID based on user role
-  const getUserCompanyId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-    if (role === "company") {
-      return localStorage.getItem("company_id");
-    } else if (role === "user" || role === "admin") {
-      try {
-        const userCompanyId = localStorage.getItem("company_id");
-        return userCompanyId ? JSON.parse(userCompanyId) : null;
-      } catch (e) {
-        console.error("Error parsing user company ID:", e);
-        return null;
-      }
+  // Fetch charge code data
+  const fetchData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const chargeCodes = await fetchChargeCodes();
+      setData(chargeCodes);
+    } catch (err) {
+      console.error("Error fetching charge codes:", err.message);
+      const errorMessage = err.message || "Failed to load charge codes";
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
     }
-    return null;
   };
 
-  // Fetch charge code data
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const companyId = getUserCompanyId();
-        if (!companyId) {
-          throw new Error("Company ID is missing or invalid");
-        }
-        const response = await axios.get(`${BASE_URL}/company/charge_code/company/${companyId}`, {
-          headers: { "Content-Type": "application/json" },
-        });
-        setData(response.data);
-      } catch (err) {
-        console.error(
-          "Error fetching charge codes:",
-          err.response?.data || err.message
-        );
-        const errorMessage =
-          err.response?.data?.detail ||
-          err.message ||
-          "Failed to load charge codes";
-        setError(errorMessage);
-        toast.error(errorMessage);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, [refreshCounter]);
 
   // Handle delete initiation
   const handleDelete = (id) => {
-    if (!getUserCompanyId()) {
-      setError("Company ID not found. Please log in again.");
-      toast.error("Company ID not found. Please log in again.");
-      return;
-    }
     setChargeCodeIdToDelete(id);
     setIsDeleteModalOpen(true);
   };
@@ -93,33 +59,15 @@ const ChargeCodeType = () => {
     try {
       setLoading(true);
       setError(null);
-      const companyId = getUserCompanyId();
-      if (!companyId) {
-        throw new Error("Company ID is missing or invalid");
-      }
-      const response = await axios.delete(
-        `${BASE_URL}/company/charge_code/${chargeCodeIdToDelete}/`,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-      if (response.status !== 200 && response.status !== 204) {
-        throw new Error("Failed to delete charge code");
-      }
+      await deleteChargeCode(chargeCodeIdToDelete);
       setData((prev) => prev.filter((item) => item.id !== chargeCodeIdToDelete));
       toast.success("Charge code deleted successfully");
       if (paginatedData.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
     } catch (err) {
-      console.error(
-        "Error deleting charge code:",
-        err.response?.data || err.message
-      );
-      const errorMessage =
-        err.response?.data?.detail ||
-        err.message ||
-        "Failed to delete charge code";
+      console.error("Error deleting charge code:", err.message);
+      const errorMessage = err.message || "Failed to delete charge code";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -135,17 +83,26 @@ const ChargeCodeType = () => {
     setChargeCodeIdToDelete(null);
   };
 
-  const filteredData = data.filter(
-    (chargecodetype) =>
-      chargecodetype.entry_date
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      chargecodetype.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      chargecodetype.id
-        .toString()
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-  );
+  // Format date helper function
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  // Filter data based on search term
+  const filteredData = data.filter((chargeCode) => {
+    const searchLower = searchTerm.toLowerCase();
+    const createdDate = formatDate(chargeCode.created_at);
+    return (
+      createdDate.toLowerCase().includes(searchLower) ||
+      chargeCode.title?.toLowerCase().includes(searchLower) ||
+      chargeCode.id.toString().toLowerCase().includes(searchLower)
+    );
+  });
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const paginatedData = filteredData.slice(
@@ -157,30 +114,16 @@ const ChargeCodeType = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-//  const openUpdateModal = (chargecodetype) => {
-//     openModal("update-charge-code-type", chargecodetype);
-//   }; 
-
-   const handleEditClick = (chargecodetype) => {
-    console.log("Charge Code: Selected Charge Code:", chargecodetype)
-    openModal("update-charge-code-type", "Update Charge Code Master", chargecodetype)
-  }
+  const handleEditClick = (chargeCode) => {
+    console.log("Charge Code: Selected Charge Code:", chargeCode);
+    openModal("update-charge-code-type", "Update Charge Code Master", chargeCode);
+  };
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
       ...prev,
       [id]: !prev[id],
     }));
-  };
-
-  // Format date helper function
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
   };
 
   return (
@@ -230,13 +173,13 @@ const ChargeCodeType = () => {
             >
               Add New Master
               <img
-                src={plusicon}
+                src={plusIcon}
                 alt="plus icon"
                 className="relative right-[5px] md:right-0 w-[15px] h-[15px]"
               />
             </button>
             <button
-              className={`flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 idtype-download-btn ${
+              className={`flex items-center justify-center gap-2 w-full md:w-[150px] h-[38px] rounded-md duration-200 idtype-download-btn ${
                 loading
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-[#F4F4F4] hover:bg-[#e6e6e6]"
@@ -245,7 +188,7 @@ const ChargeCodeType = () => {
             >
               Download
               <img
-                src={downloadicon}
+                src={downloadIcon}
                 alt="Download Icon"
                 className="w-[15px] h-[15px] download-img"
               />
@@ -272,12 +215,8 @@ const ChargeCodeType = () => {
                       <th className="px-4 py-3 text-left idtype-thead">
                         ENTRY DATE
                       </th>
-                      <th className="px-4 py-3 text-left idtype-thead">
-                        TITLE
-                      </th>
-                      <th className="px-4 py-3 text-right idtype-thead">
-                        ACTION
-                      </th>
+                      <th className="px-4 py-3 text-left idtype-thead">TITLE</th>
+                      <th className="px-4 py-3 text-right idtype-thead">ACTION</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -291,48 +230,44 @@ const ChargeCodeType = () => {
                         </td>
                       </tr>
                     ) : (
-                      paginatedData.map((chargecodetype, index) => {
-                        const isLastItemOnPage =
-                          index === paginatedData.length - 1;
+                      paginatedData.map((chargeCode, index) => {
+                        const isLastItemOnPage = index === paginatedData.length - 1;
                         const shouldRemoveBorder =
-                          isLastItemOnPage &&
-                          paginatedData.length === itemsPerPage;
+                          isLastItemOnPage && paginatedData.length === itemsPerPage;
 
                         return (
                           <tr
-                            key={chargecodetype.id}
+                            key={chargeCode.id}
                             className={`h-[57px] hover:bg-gray-50 cursor-pointer ${
-                              shouldRemoveBorder
-                                ? ""
-                                : "border-b border-[#E9E9E9]"
+                              shouldRemoveBorder ? "" : "border-b border-[#E9E9E9]"
                             }`}
                           >
                             <td className="px-5 text-left idtype-data">
                               {(currentPage - 1) * itemsPerPage + index + 1}
                             </td>
                             <td className="px-5 text-left idtype-data">
-                              {formatDate(chargecodetype.created_at)}
+                              {formatDate(chargeCode.created_at)}
                             </td>
                             <td className="pl-5 text-left idtype-data w-[22%]">
-                              {chargecodetype.title}
+                              {chargeCode.title}
                             </td>
                             <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
                               <button
-                                onClick={() => handleEditClick(chargecodetype)}
+                                onClick={() => handleEditClick(chargeCode)}
                                 disabled={loading}
                               >
                                 <img
-                                  src={editicon}
+                                  src={editIcon}
                                   alt="Edit"
                                   className="w-[18px] h-[18px] action-btn duration-200"
                                 />
                               </button>
                               <button
-                                onClick={() => handleDelete(chargecodetype.id)}
+                                onClick={() => handleDelete(chargeCode.id)}
                                 disabled={loading}
                               >
                                 <img
-                                  src={deleteicon}
+                                  src={deleteIcon}
                                   alt="Delete"
                                   className="w-[18px] h-[18px] action-btn duration-200"
                                 />
@@ -348,7 +283,7 @@ const ChargeCodeType = () => {
               {/* Image Section */}
               <div className="w-[40%] border border-[#E9E9E9] rounded-md p-5">
                 <img
-                  src={buildingimg}
+                  src={buildingImg}
                   alt="Building exterior"
                   className="h-[587px] w-full object-cover rounded-md"
                 />
@@ -381,41 +316,37 @@ const ChargeCodeType = () => {
                     </td>
                   </tr>
                 ) : (
-                  paginatedData.map((chargecodetype, index) => (
-                    <React.Fragment key={chargecodetype.id}>
+                  paginatedData.map((chargeCode, index) => (
+                    <React.Fragment key={chargeCode.id}>
                       <tr
                         className={`${
-                          expandedRows[chargecodetype.id]
-                            ? "mobile-no-border"
-                            : "mobile-with-border"
+                          expandedRows[chargeCode.id] ? "mobile-no-border" : "mobile-with-border"
                         } border-b border-[#E9E9E9] h-[57px]`}
                       >
                         <td className="px-5 text-left idtype-data">
                           {(currentPage - 1) * itemsPerPage + index + 1}
                         </td>
                         <td className="px-3 text-left idtype-data idtype-entry-date-column">
-                          {chargecodetype.title}
+                          {chargeCode.title}
                         </td>
                         <td className="py-4 flex items-center justify-end h-[57px]">
                           <div
                             className={`idtype-dropdown-field ${
-                              expandedRows[chargecodetype.id] ? "active" : ""
+                              expandedRows[chargeCode.id] ? "active" : ""
                             }`}
-                            onClick={() => toggleRowExpand(chargecodetype.id)}
+                            onClick={() => toggleRowExpand(chargeCode.id)}
                           >
                             <img
-                              src={downarrow}
+                              src={downArrow}
                               alt="drop-down-arrow"
                               className={`idtype-dropdown-img ${
-                                expandedRows[chargecodetype.id]
-                                  ? "text-white"
-                                  : ""
+                                expandedRows[chargeCode.id] ? "text-white" : ""
                               }`}
                             />
                           </div>
                         </td>
                       </tr>
-                      {expandedRows[chargecodetype.id] && (
+                      {expandedRows[chargeCode.id] && (
                         <tr className="mobile-with-border border-b border-[#E9E9E9]">
                           <td colSpan={3} className="px-5">
                             <div className="idtype-dropdown-content">
@@ -423,32 +354,28 @@ const ChargeCodeType = () => {
                                 <div className="idtype-grid-items">
                                   <div className="dropdown-label">ENTRY DATE</div>
                                   <div className="dropdown-value">
-                                    {formatDate(chargecodetype.created_at)}
+                                    {formatDate(chargeCode.created_at)}
                                   </div>
                                 </div>
                                 <div className="idtype-grid-items">
                                   <div className="dropdown-label">ACTION</div>
                                   <div className="dropdown-value flex items-center gap-2 p-1 ml-[5px]">
                                     <button
-                                      onClick={() =>
-                                        handleEditClick(chargecodetype)
-                                      }
+                                      onClick={() => handleEditClick(chargeCode)}
                                       disabled={loading}
                                     >
                                       <img
-                                        src={editicon}
+                                        src={editIcon}
                                         alt="Edit"
                                         className="w-[18px] h-[18px] action-btn duration-200"
                                       />
                                     </button>
                                     <button
-                                      onClick={() =>
-                                        handleDelete(chargecodetype.id)
-                                      }
+                                      onClick={() => handleDelete(chargeCode.id)}
                                       disabled={loading}
                                     >
                                       <img
-                                        src={deleteicon}
+                                        src={deleteIcon}
                                         alt="Delete"
                                         className="w-[18px] h-[18px] ml-[5px] action-btn duration-200"
                                       />
@@ -472,10 +399,7 @@ const ChargeCodeType = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
               <span className="collection-list-pagination">
                 Showing{" "}
-                {Math.min(
-                  (currentPage - 1) * itemsPerPage + 1,
-                  filteredData.length
-                )}{" "}
+                {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
                 to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
                 {filteredData.length} entries
               </span>
