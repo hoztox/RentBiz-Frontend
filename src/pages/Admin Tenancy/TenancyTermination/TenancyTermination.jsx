@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./TenancyTermination.css";
-import { ChevronDown } from "lucide-react";
 import downloadicon from "../../../assets/Images/Admin Tenancy/download-icon.svg";
 import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
 import terminateicon from "../../../assets/Images/Admin Tenancy/terminate-icon.svg";
@@ -9,9 +8,9 @@ import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
 import TenancyTerminateModal from "./TenancyTerminateModal/TenancyTerminateModal";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
+import CustomDropDown from "../../../components/CustomDropDown";
 
 const TenancyTermination = () => {
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [terminateModalOpen, setTerminateModalOpen] = useState(false);
@@ -22,6 +21,15 @@ const TenancyTermination = () => {
   const [error, setError] = useState(null);
   const { openModal, refreshCounter } = useModal();
   const itemsPerPage = 10;
+
+  // Dropdown options for CustomDropDown
+  const dropdownOptions = [
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" },
+  ];
+
+  // State for selected dropdown value
+  const [selectedOption, setSelectedOption] = useState("showing");
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -163,20 +171,12 @@ const TenancyTermination = () => {
           />
           <div className="flex flex-row gap-[10px] w-full md:w-auto tterm-second-row-container">
             <div className="relative flex-1 md:flex-none w-[60%] md:w-auto">
-              <select
-                name="select"
-                id=""
-                className="appearance-none h-[38px] px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 tenancy-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+              <CustomDropDown
+                options={dropdownOptions}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                className="w-full md:w-[121px]"
+                dropdownClassName="h-[38px] px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 tenancy-selection"
               />
             </div>
             <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 tterm-download-btn">
@@ -198,7 +198,7 @@ const TenancyTermination = () => {
                 ID
               </th>
               <th className="px-4 text-left tenancy-thead whitespace-nowrap">
-               NAME
+                NAME
               </th>
               <th className="px-4 text-left tenancy-thead whitespace-nowrap">
                 BUILDING NAME
@@ -421,9 +421,7 @@ const TenancyTermination = () => {
                           <div className="tterm-grid-item">
                             <div className="tterm-dropdown-label">ACTION</div>
                             <div className="tterm-dropdown-value tterm-flex tterm-items-center mt-[10px] ml-[5px]">
-                              <button
-                                onClick={() => handleEditClick(tenancy)}
-                              >
+                              <button onClick={() => handleEditClick(tenancy)}>
                                 <img
                                   src={editicon}
                                   alt="Edit"

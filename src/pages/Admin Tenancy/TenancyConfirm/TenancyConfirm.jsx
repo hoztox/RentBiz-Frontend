@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./TenancyConfirm.css";
-import { ChevronDown } from "lucide-react";
 import plusicon from "../../../assets/Images/Admin Tenancy/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Tenancy/download-icon.svg";
 import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
@@ -11,18 +10,25 @@ import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
 import TenancyConfirmModal from "./TenancyConfirmModal/TenancyConfirmModal";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
+import CustomDropDown from "../../../components/CustomDropDown";
 
 const TenancyConfirm = () => {
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
-  const { openModal, refreshCounter, triggerRefresh } = useModal();
+  const { openModal, refreshCounter } = useModal();
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [selectedTenancy, setSelectedTenancy] = useState(null);
   const [tenancies, setTenancies] = useState([]);
   const [loading, setLoading] = useState(true);
   const itemsPerPage = 10;
+
+  const dropdownOptions = [
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" },
+  ];
+
+  const [selectedOption, setSelectedOption] = useState("showing");
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -101,9 +107,6 @@ const TenancyConfirm = () => {
         tenancyData
       );
 
-      // Trigger refresh to update the tenancies list
-      triggerRefresh();
-
       console.log("Confirmed Tenancy:", tenancyData);
       setConfirmModalOpen(false);
     } catch (error) {
@@ -160,20 +163,12 @@ const TenancyConfirm = () => {
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 tconfirm-search"
             />
             <div className="relative w-[40%] md:w-auto">
-              <select
-                name="select"
-                id=""
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 tconfirm-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+              <CustomDropDown
+                options={dropdownOptions}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                className="w-full md:w-[121px]"
+                dropdownClassName="h-[38px] px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 tenancy-selection"
               />
             </div>
           </div>

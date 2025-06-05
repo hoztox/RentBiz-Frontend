@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import "./TenancyRenewal.css";
-import { ChevronDown } from "lucide-react";
 import downloadicon from "../../../assets/Images/Admin Tenancy/download-icon.svg";
 import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Tenancy/delete-icon.svg";
@@ -10,9 +9,10 @@ import downarrow from "../../../assets/Images/Admin Tenants/downarrow.svg";
 import { BASE_URL } from "../../../utils/config";
 import { useModal } from "../../../context/ModalContext";
 import TenancyRenewalModal from "./TenancyRenewalModal/TenancyRenewalModal";
+import CustomDropDown from "../../../components/CustomDropDown";
+
 
 const TenancyRenewal = () => {
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
@@ -21,6 +21,15 @@ const TenancyRenewal = () => {
   const [error, setError] = useState(null);
   const { openModal, refreshCounter } = useModal();
   const itemsPerPage = 10;
+
+  // Dropdown options for CustomDropDown
+  const dropdownOptions = [
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" }
+  ];
+
+  // State for selected dropdown value
+  const [selectedOption, setSelectedOption] = useState("showing");
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -40,7 +49,7 @@ const TenancyRenewal = () => {
     return null;
   };
 
- const handleViewClick = (tenancy) => {
+  const handleViewClick = (tenancy) => {
     console.log("Tenancy ID: Selected Tenancy:", tenancy);
     openModal("tenancy-view", "View Tenancy", tenancy);
   };
@@ -49,10 +58,6 @@ const TenancyRenewal = () => {
     console.log("Tenancy ID: Selected Tenancy:", tenancy);
     openModal("tenancy-update", "Update Tenancy", tenancy);
   };
-
-  // const openUpdateModal = (tenancy) => {
-  //   openModal("tenancy-update", tenancy);
-  // };
 
   const handleRenewClick = (tenancy) => {
     openModal("tenancy-renew", "Renew Tenancy", {
@@ -150,18 +155,12 @@ const TenancyRenewal = () => {
           />
           <div className="flex flex-row gap-[10px] w-full md:w-auto trenew-second-row-container">
             <div className="relative flex-1 md:flex-none w-[60%] md:w-auto">
-              <select
-                name="select"
-                id=""
-                className="appearance-none h-[38px] px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 tenancy-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"}`}
+              <CustomDropDown
+                options={dropdownOptions}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                className="w-full md:w-[121px]"
+                dropdownClassName="h-[38px] px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 tenancy-selection"
               />
             </div>
             <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 trenew-download-btn">
@@ -221,7 +220,6 @@ const TenancyRenewal = () => {
                     {tenancy.status.charAt(0).toUpperCase() + tenancy.status.slice(1)}
                   </span>
                 </td>
-
                 <td className="px-5 text-center !text-[#1458a2] tenancy-data">
                   <button
                     onClick={() => handleRenewClick(tenancy)}
@@ -318,44 +316,6 @@ const TenancyRenewal = () => {
                             <div className="trenew-dropdown-value">{tenancy.end_date}</div>
                           </div>
                         </div>
-                        {/* <div className="trenew-grid">
-                          <div className="trenew-grid-item w-[40%]">
-                            <div className="trenew-dropdown-label">STATUS</div>
-                            <div className="trenew-dropdown-value">{tenancy.status}</div>
-                          </div>
-                          <div className="trenew-grid-item w-[53%]">
-                            <div className="trenew-dropdown-label">DEPOSIT</div>
-                            <div className="trenew-dropdown-value">{tenancy.deposit || "N/A"}</div>
-                          </div>
-                        </div> */}
-                        {/* <div className="trenew-grid">
-                          <div className="trenew-grid-item w-[40%]">
-                            <div className="trenew-dropdown-label">COMMISION</div>
-                            <div className="trenew-dropdown-value">{tenancy.commision || "N/A"}</div>
-                          </div>
-                          <div className="trenew-grid-item w-[53%]">
-                            <div className="trenew-dropdown-label">REMARKS</div>
-                            <div className="trenew-dropdown-value">{tenancy.remarks || "N/A"}</div>
-                          </div>
-                        </div> */}
-                        {/* <div className="trenew-grid">
-                          <div className="trenew-grid-item w-full">
-                            <div className="trenew-dropdown-label">ADDITIONAL CHARGES</div>
-                            <div className="trenew-dropdown-value">
-                              {tenancy.additional_charges?.length > 0 ? (
-                                <ul>
-                                  {tenancy.additional_charges.map((charge, index) => (
-                                    <li key={index}>
-                                      {charge.reason}: {charge.amount} (Due: {charge.due_date})
-                                    </li>
-                                  ))}
-                                </ul>
-                              ) : (
-                                "None"
-                              )}
-                            </div>
-                          </div>
-                        </div> */}
                         <div className="trenew-grid">
                           <div className="trenew-grid-item w-[40%]">
                             <div className="trenew-dropdown-label">RENEW</div>
