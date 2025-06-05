@@ -1,20 +1,28 @@
 import React, { useState } from "react";
 import "./Invoice.css";
-import { ChevronDown } from "lucide-react";
 import plusicon from "../../assets/Images/Invoice/plus-icon.svg";
 import downloadicon from "../../assets/Images/Invoice/download-icon.svg";
 import deleteicon from "../../assets/Images/Invoice/delete-icon.svg";
 import viewicon from "../../assets/Images/Invoice/view-icon.svg";
 import downarrow from "../../assets/Images/Invoice/downarrow.svg";
 import { useModal } from "../../context/ModalContext";
+import CustomDropDown from "../../components/CustomDropDown";
 
 const Invoice = () => {
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
   const { openModal } = useModal();
   const itemsPerPage = 10;
+
+  // Dropdown options for CustomDropDown
+  const dropdownOptions = [
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" }
+  ];
+
+  // State for selected dropdown value
+  const [selectedOption, setSelectedOption] = useState("showing");
 
   const demoData = [
     {
@@ -99,27 +107,19 @@ const Invoice = () => {
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 inv-search"
             />
             <div className="relative w-[40%] md:w-auto">
-              <select
-                name="select"
-                id=""
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 inv-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+              <CustomDropDown
+                options={dropdownOptions}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                className="w-full md:w-[121px]"
+                dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 inv-selection"
               />
             </div>
           </div>
           <div className="flex gap-[10px] inv-action-buttons-container w-full md:w-auto justify-start">
             <button
               className="flex items-center justify-center gap-2 h-[38px] rounded-md inv-add-invoice duration-200 w-[176px]"
-              onClick={()=>openModal("create-invoice")}
+              onClick={() => openModal("create-invoice")}
             >
               Add New Invoice
               <img src={plusicon} alt="plus icon" className="relative right-[5px] md:right-0 w-[15px] h-[15px]" />
@@ -160,7 +160,7 @@ const Invoice = () => {
                 <td className="pl-5 text-left inv-data">{invoice.tenantName}</td>
                 <td className="px-5 text-left inv-data">{invoice.amountDue}</td>
                 <td className="pl-14 text-center pr-5 pt-2">
-                  <button onClick={()=>openModal("view-invoice")}>
+                  <button onClick={() => openModal("view-invoice")}>
                     <img
                       src={invoice.view}
                       alt="View"
@@ -223,7 +223,7 @@ const Invoice = () => {
                     <td colSpan={3} className="px-5">
                       <div className="inv-dropdown-content">
                         <div className="inv-dropdown-content-grid">
-                        <div className="inv-dropdown-content-item w-[50%]">
+                          <div className="inv-dropdown-content-item w-[50%]">
                             <div className="inv-dropdown-label">TENANCY ID</div>
                             <div className="inv-dropdown-value">{invoice.tenancyId}</div>
                           </div>
@@ -240,7 +240,7 @@ const Invoice = () => {
                           <div className="inv-dropdown-content-item w-[25%]">
                             <div className="inv-dropdown-label">VIEW</div>
                             <div className="inv-dropdown-value">
-                              <button onClick={()=>openModal("view-invoice")}>
+                              <button onClick={() => openModal("view-invoice")}>
                                 <img
                                   src={invoice.view}
                                   alt="View"

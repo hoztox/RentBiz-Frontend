@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import "./Refund.css";
-import { ChevronDown } from "lucide-react";
 import plusicon from "../../assets/Images/Refund/plus-icon.svg";
 import downloadicon from "../../assets/Images/Refund/download-icon.svg";
 import editicon from "../../assets/Images/Refund/edit-icon.svg";
@@ -8,14 +7,21 @@ import printericon from "../../assets/Images/Refund/printer-icon.svg";
 import downloadactionicon from "../../assets/Images/Refund/download-action-icon.svg";
 import downarrow from "../../assets/Images/Refund/downarrow.svg";
 import { useModal } from "../../context/ModalContext";
+import CustomDropDown from "../../components/CustomDropDown";
 
 const Refund = () => {
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [expandedRows, setExpandedRows] = useState(false);
+  const [expandedRows, setExpandedRows] = useState({}); // Fixed initialization to object
   const { openModal } = useModal();
+  const [selectedOption, setSelectedOption] = useState("showing"); // State for dropdown
   const itemsPerPage = 10;
+
+  // Dropdown options
+  const dropdownOptions = [
+    { label: "Showing", value: "showing" },
+    { label: "All", value: "all" },
+  ];
 
   const demoData = [
     {
@@ -112,20 +118,12 @@ const Refund = () => {
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 refund-search"
             />
             <div className="relative w-[40%] md:w-auto">
-              <select
-                name="select"
-                id=""
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 refund-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+              <CustomDropDown
+                options={dropdownOptions}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                placeholder="Select"
+                dropdownClassName="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 refund-selection"
               />
             </div>
           </div>
