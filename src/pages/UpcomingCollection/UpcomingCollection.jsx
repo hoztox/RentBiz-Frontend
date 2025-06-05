@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import "./upcomingcollection.css";
 import { ChevronDown } from "lucide-react";
 import downarrow from "../../assets/Images/UpcomingCollection/downarrow.svg";
+import CustomDropDown from "../../components/CustomDropDown";
 
 const UpcomingCollection = () => {
   const [openSelectKey, setOpenSelectKey] = useState(null);
@@ -107,6 +108,47 @@ const UpcomingCollection = () => {
   const uniqueUnits = getUnique("unit");
   const uniqueStatuses = getUnique("status");
 
+  // Dropdown options for "Showing"/"All"
+  const showingOptions = [
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" },
+  ];
+
+  // Dropdown options for "Filter"/"All"
+  const filterOptions = [
+    { value: "filter", label: "Filter" },
+    { value: "all", label: "All" },
+  ];
+
+  // Dropdown options for filter fields
+  const idOptions = [
+    { value: "", label: "All Tenancy" },
+    ...uniqueIds.map((id) => ({ value: id, label: id })),
+  ];
+  const tenantOptions = [
+    { value: "", label: "All Tenants" },
+    ...uniqueTenants.map((tenant) => ({ value: tenant, label: tenant })),
+  ];
+  const buildingOptions = [
+    { value: "", label: "All Buildings" },
+    ...uniqueBuildings.map((building) => ({
+      value: building,
+      label: building,
+    })),
+  ];
+  const unitOptions = [
+    { value: "", label: "All Units" },
+    ...uniqueUnits.map((unit) => ({ value: unit, label: unit })),
+  ];
+  const statusOptions = [
+    { value: "", label: "All Status" },
+    ...uniqueStatuses.map((status) => ({ value: status, label: status })),
+  ];
+
+  // State for selected dropdown values
+  const [selectedShowing, setSelectedShowing] = useState("showing");
+  const [selectedFilter, setSelectedFilter] = useState("filter");
+
   const clearFilters = () => {
     const cleared = {
       id: "",
@@ -121,6 +163,8 @@ const UpcomingCollection = () => {
     setTempFilters(cleared);
     setSearchTerm("");
     setCurrentPage(1);
+    setSelectedShowing("showing");
+    setSelectedFilter("filter");
   };
 
   const filteredData = demoData.filter((report) => {
@@ -190,35 +234,23 @@ const UpcomingCollection = () => {
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 upcoming-collection-search"
             />
             <div className="relative w-[45%] md:w-auto">
-              <select
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 upcoming-collection-selection"
-                onFocus={() => setOpenSelectKey("showing")}
-                onBlur={() => setOpenSelectKey(null)}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  openSelectKey === "showing" ? "rotate-180" : "rotate-0"
-                }`}
+              <CustomDropDown
+                options={showingOptions}
+                value={selectedShowing}
+                onChange={setSelectedShowing}
+                className="w-full md:w-[121px]"
+                dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 upcoming-collection-selection"
               />
             </div>
           </div>
           <div className="flex gap-[10px] upcoming-collection-action-buttons-container">
             <div className="relative w-[55%] md:w-auto">
-              <select
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 upcoming-collection-selection"
-                onFocus={() => setOpenSelectKey("filter")}
-                onBlur={() => setOpenSelectKey(null)}
-              >
-                <option value="filter">Filter</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  openSelectKey === "filter" ? "rotate-180" : "rotate-0"
-                }`}
+              <CustomDropDown
+                options={filterOptions}
+                value={selectedFilter}
+                onChange={setSelectedFilter}
+                className="w-full md:w-[121px]"
+                dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 upcoming-collection-selection"
               />
             </div>
             <button className="flex items-center justify-center gap-2 w-[85%] md:w-[132px] rounded-md duration-200 upcoming-collection-export-btn">
@@ -232,37 +264,23 @@ const UpcomingCollection = () => {
         <div className="flex items-center justify-between">
           <div className="flex gap-[10px] flex-wrap">
             {[
-              ["id", "All Tenancy", uniqueIds],
-              ["tenant", "All Tenants", uniqueTenants],
-              ["building", "All Buildings", uniqueBuildings],
-              ["unit", "All Units", uniqueUnits],
-              ["status", "All Status", uniqueStatuses],
-            ].map(([key, label, options]) => (
+              ["id", idOptions],
+              ["tenant", tenantOptions],
+              ["building", buildingOptions],
+              ["unit", unitOptions],
+              ["status", statusOptions],
+            ].map(([key, options]) => (
               <div key={key} className="relative">
-                <select
-                  name={key}
-                  className="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer focus:border-gray-300 duration-200 upcoming-collection-selection"
+                <CustomDropDown
+                  options={options}
                   value={tempFilters[key]}
-                  onChange={(e) =>
+                  onChange={(value) =>
                     setTempFilters((prev) => ({
                       ...prev,
-                      [key]: e.target.value,
+                      [key]: value,
                     }))
                   }
-                  onFocus={() => setOpenSelectKey(key)}
-                  onBlur={() => setOpenSelectKey(null)}
-                >
-                  <option value="">{label}</option>
-                  {options.map((item, i) => (
-                    <option key={i} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown
-                  className={`absolute left-[105px] top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                    openSelectKey === key ? "rotate-180" : "rotate-0"
-                  }`}
+                  dropdownClassName="px-[7px] py-[7px] w-[130px] border-[#201D1E20] focus:border-gray-300 upcoming-collection-selection h-[38px]"
                 />
               </div>
             ))}

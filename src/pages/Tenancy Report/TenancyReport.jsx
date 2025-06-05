@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./TenancyReport.css";
 import { ChevronDown } from "lucide-react";
 import downarrow from "../../assets/Images/Tenancy Report/downarrow.svg";
+import CustomDropDown from "../../components/CustomDropDown";
 
 const TenancyReport = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -9,6 +10,13 @@ const TenancyReport = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
   const itemsPerPage = 10;
+
+  const dropdownOptions = [
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" },
+  ];
+
+  const [selectedOption, setSelectedOption] = useState("showing");
 
   const demoData = [
     {
@@ -130,20 +138,12 @@ const TenancyReport = () => {
           />
           <div className="flex gap-[10px] tenancy-report-secondary-inputs">
             <div className="relative w-[60%] md:w-auto">
-              <select
-                name="select"
-                id=""
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[121px] cursor-pointer focus:border-gray-300 duration-200 tenancy-report-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+              <CustomDropDown
+                options={dropdownOptions}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                className="w-full md:w-[121px]"
+                dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 tenancy-report-selection"
               />
             </div>
             <button className="flex items-center justify-center gap-2 w-[132px] h-[38px] rounded-md duration-200 report-export-btn">
@@ -156,18 +156,54 @@ const TenancyReport = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-[#E9E9E9] h-[57px]">
-              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">ID</th>
-              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">NAME</th>
-              <th className="pl-5 text-left tenancy-report-thead whitespace-nowrap">DESCRIPTION</th>
-              <th className="pl-5 text-left tenancy-report-thead whitespace-nowrap">BUILDING</th>
-              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">UNIT</th>
-              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">CREATED<br/>DATE</th>
-              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">HIRE START<br/>DATE</th>
-              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">HIRE END<br/>DATE</th>
-              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">RENTAL<br/>MONTHS</th>
-              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">RENT/<br/>MONTH</th>
-              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">NO.OF<br/>PAYMENTS</th>
-              <th className="px-5 pr-6 text-center tenancy-report-thead whitespace-nowrap">STATUS</th>
+              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">
+                ID
+              </th>
+              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">
+                NAME
+              </th>
+              <th className="pl-5 text-left tenancy-report-thead whitespace-nowrap">
+                DESCRIPTION
+              </th>
+              <th className="pl-5 text-left tenancy-report-thead whitespace-nowrap">
+                BUILDING
+              </th>
+              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">
+                UNIT
+              </th>
+              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">
+                CREATED
+                <br />
+                DATE
+              </th>
+              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">
+                HIRE START
+                <br />
+                DATE
+              </th>
+              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">
+                HIRE END
+                <br />
+                DATE
+              </th>
+              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">
+                RENTAL
+                <br />
+                MONTHS
+              </th>
+              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">
+                RENT/
+                <br />
+                MONTH
+              </th>
+              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">
+                NO.OF
+                <br />
+                PAYMENTS
+              </th>
+              <th className="px-5 pr-6 text-center tenancy-report-thead whitespace-nowrap">
+                STATUS
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -176,17 +212,39 @@ const TenancyReport = () => {
                 key={index}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">{report.id}</td>
-                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">{report.name}</td>
-                <td className="pl-5 text-left tenancy-report-data">{report.description}</td>
-                <td className="pl-5 text-left tenancy-report-data whitespace-nowrap">{report.building}</td>
-                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">{report.unit}</td>
-                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">{report.createdDate}</td>
-                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">{report.hireStart}</td>
-                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">{report.hireEnd}</td>
-                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">{report.rental}</td>
-                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">{report.rent}</td>
-                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">{report.payment}</td>
+                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">
+                  {report.id}
+                </td>
+                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">
+                  {report.name}
+                </td>
+                <td className="pl-5 text-left tenancy-report-data">
+                  {report.description}
+                </td>
+                <td className="pl-5 text-left tenancy-report-data whitespace-nowrap">
+                  {report.building}
+                </td>
+                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">
+                  {report.unit}
+                </td>
+                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">
+                  {report.createdDate}
+                </td>
+                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">
+                  {report.hireStart}
+                </td>
+                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">
+                  {report.hireEnd}
+                </td>
+                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">
+                  {report.rental}
+                </td>
+                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">
+                  {report.rent}
+                </td>
+                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">
+                  {report.payment}
+                </td>
                 <td className="px-5 text-center tenancy-report-data">
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] tenancy-report-status ${
@@ -207,8 +265,12 @@ const TenancyReport = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="tenancy-report-table-row-head">
-              <th className="px-5 w-[50%] text-left tenancy-report-thead tenancy-report-id-column">ID</th>
-              <th className="px-3 w-[50%] text-left tenancy-report-thead tenancy-report-name-column">NAME</th>
+              <th className="px-5 w-[50%] text-left tenancy-report-thead tenancy-report-id-column">
+                ID
+              </th>
+              <th className="px-3 w-[50%] text-left tenancy-report-thead tenancy-report-name-column">
+                NAME
+              </th>
               <th className="px-5 text-right tenancy-report-thead"></th>
             </tr>
           </thead>
@@ -222,8 +284,12 @@ const TenancyReport = () => {
                       : "tenancy-report-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left tenancy-report-data tenancy-report-id-column">{report.id}</td>
-                  <td className="px-3 text-left tenancy-report-data tenancy-report-name-column">{report.name}</td>
+                  <td className="px-5 text-left tenancy-report-data tenancy-report-id-column">
+                    {report.id}
+                  </td>
+                  <td className="px-3 text-left tenancy-report-data tenancy-report-name-column">
+                    {report.name}
+                  </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`tenancy-report-dropdown-field ${
@@ -247,51 +313,89 @@ const TenancyReport = () => {
                       <div className="tenancy-report-dropdown-content">
                         <div className="tenancy-report-grid">
                           <div className="tenancy-report-grid-item">
-                            <div className="tenancy-report-dropdown-label">DESCRIPTION</div>
-                            <div className="tenancy-report-dropdown-value">{report.description}</div>
+                            <div className="tenancy-report-dropdown-label">
+                              DESCRIPTION
+                            </div>
+                            <div className="tenancy-report-dropdown-value">
+                              {report.description}
+                            </div>
                           </div>
                           <div className="tenancy-report-grid-item">
-                            <div className="tenancy-report-dropdown-label">BUILDING</div>
-                            <div className="tenancy-report-dropdown-value">{report.building}</div>
-                          </div>
-                        </div>
-                        <div className="tenancy-report-grid">
-                          <div className="tenancy-report-grid-item">
-                            <div className="tenancy-report-dropdown-label">UNIT</div>
-                            <div className="tenancy-report-dropdown-value">{report.unit}</div>
-                          </div>
-                          <div className="tenancy-report-grid-item">
-                            <div className="tenancy-report-dropdown-label">CREATED DATE</div>
-                            <div className="tenancy-report-dropdown-value">{report.createdDate}</div>
+                            <div className="tenancy-report-dropdown-label">
+                              BUILDING
+                            </div>
+                            <div className="tenancy-report-dropdown-value">
+                              {report.building}
+                            </div>
                           </div>
                         </div>
                         <div className="tenancy-report-grid">
                           <div className="tenancy-report-grid-item">
-                            <div className="tenancy-report-dropdown-label">HIRE START DATE</div>
-                            <div className="tenancy-report-dropdown-value">{report.hireStart}</div>
+                            <div className="tenancy-report-dropdown-label">
+                              UNIT
+                            </div>
+                            <div className="tenancy-report-dropdown-value">
+                              {report.unit}
+                            </div>
                           </div>
                           <div className="tenancy-report-grid-item">
-                            <div className="tenancy-report-dropdown-label">HIRE END DATE</div>
-                            <div className="tenancy-report-dropdown-value">{report.hireEnd}</div>
-                          </div>
-                        </div>
-                        <div className="tenancy-report-grid">
-                          <div className="tenancy-report-grid-item">
-                            <div className="tenancy-report-dropdown-label">RENTAL MONTHS</div>
-                            <div className="tenancy-report-dropdown-value">{report.rental}</div>
-                          </div>
-                          <div className="tenancy-report-grid-item">
-                            <div className="tenancy-report-dropdown-label">RENT/MONTH</div>
-                            <div className="tenancy-report-dropdown-value">{report.rent}</div>
+                            <div className="tenancy-report-dropdown-label">
+                              CREATED DATE
+                            </div>
+                            <div className="tenancy-report-dropdown-value">
+                              {report.createdDate}
+                            </div>
                           </div>
                         </div>
                         <div className="tenancy-report-grid">
                           <div className="tenancy-report-grid-item">
-                            <div className="tenancy-report-dropdown-label">NO.OF PAYMENTS</div>
-                            <div className="tenancy-report-dropdown-value">{report.payment}</div>
+                            <div className="tenancy-report-dropdown-label">
+                              HIRE START DATE
+                            </div>
+                            <div className="tenancy-report-dropdown-value">
+                              {report.hireStart}
+                            </div>
                           </div>
                           <div className="tenancy-report-grid-item">
-                            <div className="tenancy-report-dropdown-label">STATUS</div>
+                            <div className="tenancy-report-dropdown-label">
+                              HIRE END DATE
+                            </div>
+                            <div className="tenancy-report-dropdown-value">
+                              {report.hireEnd}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="tenancy-report-grid">
+                          <div className="tenancy-report-grid-item">
+                            <div className="tenancy-report-dropdown-label">
+                              RENTAL MONTHS
+                            </div>
+                            <div className="tenancy-report-dropdown-value">
+                              {report.rental}
+                            </div>
+                          </div>
+                          <div className="tenancy-report-grid-item">
+                            <div className="tenancy-report-dropdown-label">
+                              RENT/MONTH
+                            </div>
+                            <div className="tenancy-report-dropdown-value">
+                              {report.rent}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="tenancy-report-grid">
+                          <div className="tenancy-report-grid-item">
+                            <div className="tenancy-report-dropdown-label">
+                              NO.OF PAYMENTS
+                            </div>
+                            <div className="tenancy-report-dropdown-value">
+                              {report.payment}
+                            </div>
+                          </div>
+                          <div className="tenancy-report-grid-item">
+                            <div className="tenancy-report-dropdown-label">
+                              STATUS
+                            </div>
                             <div className="tenancy-report-dropdown-value">
                               <span
                                 className={`px-[10px] py-[5px] h-[24px] rounded-[4px] tenancy-report-status ${
@@ -316,8 +420,10 @@ const TenancyReport = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 tenancy-report-pagination-container">
         <span className="tenancy-report-pagination collection-list-pagination">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
+          Showing{" "}
+          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+          {filteredData.length} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto tenancy-report-pagination-buttons">
           <button
@@ -349,7 +455,9 @@ const TenancyReport = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
+          {endPage < totalPages - 1 && (
+            <span className="px-2 flex items-center">...</span>
+          )}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
