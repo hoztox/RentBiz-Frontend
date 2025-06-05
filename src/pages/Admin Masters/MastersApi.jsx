@@ -252,9 +252,12 @@ export const locationApi = {
 export const taxesApi = {
   create: async (taxData) => {
     const companyId = getUserCompanyId();
+    const userId = getRelevantUserId();
     if (!companyId) throw new Error("Company ID is missing or invalid");
 
     const payload = {
+      company: companyId,
+      user: userId,
       tax_type: taxData.taxType,
       tax_percentage: parseFloat(taxData.taxPercentage),
       country: parseInt(taxData.country),
