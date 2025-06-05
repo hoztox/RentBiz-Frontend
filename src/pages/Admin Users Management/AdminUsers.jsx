@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { ChevronDown } from "lucide-react";
 import { toast, Toaster } from "react-hot-toast";
 import plusicon from "../../assets/Images/Admin Users Management/plus-icon.svg";
 import downloadicon from "../../assets/Images/Admin Users Management/download-icon.svg";
@@ -11,9 +10,11 @@ import downarrow from "../../assets/Images/Admin Users Management/downarrow.svg"
 import { useModal } from "../../context/ModalContext";
 import { BASE_URL } from "../../utils/config";
 import UserDeleteModal from "./UserDeleteModal/UserDeleteModal";
+import CustomDropDown from "../../components/CustomDropDown";
+
 
 const AdminUsers = () => {
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState("showing");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [users, setUsers] = useState([]);
@@ -21,9 +22,14 @@ const AdminUsers = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { openModal, refreshCounter } = useModal();
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State for delete modal
-  const [userIdToDelete, setUserIdToDelete] = useState(null); // State for user ID to delete
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [userIdToDelete, setUserIdToDelete] = useState(null);
   const itemsPerPage = 10;
+
+  const options = [
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" },
+  ];
 
   const getUserCompanyId = () => {
     const storedCompanyId = localStorage.getItem("company_id");
@@ -175,15 +181,10 @@ const AdminUsers = () => {
     ? users.filter(
         (user) =>
           user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          false ||
           user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          false ||
           user.id.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-          false ||
           user.user_role?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          false ||
-          user.status?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          false
+          user.status?.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : [];
 
@@ -230,23 +231,15 @@ const AdminUsers = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 user-search"
             />
-            <div className="relative w-[40%] md:w-auto">
-              <select
-                name="select"
-                id=""
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 user-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
-              />
-            </div>
+            <CustomDropDown
+              options={options}
+              value={selectedOption}
+              onChange={setSelectedOption}
+              placeholder="Showing"
+              className="w-[40%] md:w-[121px]"
+              dropdownClassName="user-selection px-[14px] py-[7px] border-[#201D1E20]"
+              enableFilter={false}
+            />
           </div>
           <div className="flex gap-[10px] user-action-buttons-container w-full md:w-auto justify-start">
             <button

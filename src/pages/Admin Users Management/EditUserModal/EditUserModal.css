@@ -26,7 +26,7 @@
     width: 100vw;
     margin: 0;
     height: 100vh;
-    background-color: #f8f9fa;
+    background-color: #ffffff;
     padding: 10px;
     z-index: 100;
   }
@@ -94,7 +94,7 @@
 @media (max-width: 480px) {
   .input-style {
     max-width: calc(100vw - 35px);
-    background-color: #F8F9FA !important;
+    background-color: #ffffff !important;
   }
 }
 

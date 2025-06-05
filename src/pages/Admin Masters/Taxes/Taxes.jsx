@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import "./Taxes.css";
-import { ChevronDown } from "lucide-react";
 import axios from "axios";
 import plusicon from "../../../assets/Images/Admin Masters/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Masters/download-icon.svg";
@@ -11,10 +10,10 @@ import { useModal } from "../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
 import { BASE_URL } from "../../../utils/config";
 import DeleteTaxModal from "./DeleteTaxModal/DeleteTaxModal";
+import CustomDropDown from "../../../components/CustomDropDown";
 
 const Taxes = () => {
   const { openModal, refreshCounter } = useModal();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
@@ -26,7 +25,6 @@ const Taxes = () => {
   const [viewMode, setViewMode] = useState("active_only");
   const [effectiveDate, setEffectiveDate] = useState("");
   const itemsPerPage = 10;
-  const dropdownRef = useRef(null);
 
   const viewModeOptions = [
     { value: "active_only", label: "Active Taxes" },
@@ -211,28 +209,12 @@ const Taxes = () => {
     }));
   };
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
-  const selectViewMode = (value) => {
+  const handleViewModeChange = (value) => {
     setViewMode(value);
     if (value !== "effective_date") {
       setEffectiveDate("");
     }
-    setIsDropdownOpen(false);
   };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   return (
     <div className="border border-[#E9E9E9] rounded-md tax-table">
@@ -284,39 +266,15 @@ const Taxes = () => {
             disabled={loading}
           />
           <div className="flex flex-col md:flex-row gap-[10px] w-full md:w-auto">
-            <div className="relative w-full md:w-[200px]" ref={dropdownRef}>
-              <button
-                onClick={toggleDropdown}
-                className="flex items-center justify-between px-3 py-[7px] border border-[#E9E9E9] rounded-md w-full h-[38px] tax-selection"
-              >
-                {viewModeOptions.find((option) => option.value === viewMode)?.label || "Active Taxes"}
-                <ChevronDown
-                  size={20}
-                  className={`ml-2 transform transition-transform duration-300 ease-in-out text-[#201D1E] ${
-                    isDropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-              <div
-                className={`absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden transition-all duration-300 ease-in-out ${
-                  isDropdownOpen
-                    ? "opacity-100 max-h-40 transform translate-y-0"
-                    : "opacity-0 max-h-0 transform -translate-y-2 pointer-events-none"
-                }`}
-              >
-                <div className="py-1">
-                  {viewModeOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => selectViewMode(option.value)}
-                      className="block w-full text-left px-4 py-2 text-sm text-[#201D1E] hover:bg-gray-100"
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <CustomDropDown
+              options={viewModeOptions}
+              value={viewMode}
+              onChange={handleViewModeChange}
+              placeholder="Active Taxes"
+              className="w-full md:w-[200px]"
+              dropdownClassName="tax-selection px-3 py-[7px] border-[#E9E9E9] h-[38px] focus:border-[#E9E9E9]"
+              enableFilter={false}
+            />
             {viewMode === "effective_date" && (
               <input
                 type="date"
