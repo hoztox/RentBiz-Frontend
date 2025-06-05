@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./TenancyConfirm.css";
-import { ChevronDown } from "lucide-react";
 import plusicon from "../../../assets/Images/Admin Tenancy/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Tenancy/download-icon.svg";
 import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
@@ -11,18 +10,25 @@ import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
 import TenancyConfirmModal from "./TenancyConfirmModal/TenancyConfirmModal";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
+import CustomDropDown from "../../../components/CustomDropDown";
 
 const TenancyConfirm = () => {
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
-  const { openModal, refreshCounter, triggerRefresh } = useModal();
+  const { openModal, refreshCounter } = useModal();
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [selectedTenancy, setSelectedTenancy] = useState(null);
   const [tenancies, setTenancies] = useState([]);
   const [loading, setLoading] = useState(true);
   const itemsPerPage = 10;
+
+  const dropdownOptions = [
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" },
+  ];
+
+  const [selectedOption, setSelectedOption] = useState("showing");
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -42,8 +48,14 @@ const TenancyConfirm = () => {
     return null;
   };
 
-  const openUpdateModal = (tenancy) => {
-    openModal("tenancy-update", tenancy);
+  const handleViewClick = (tenancy) => {
+    console.log("Tenancy ID: Selected Tenancy:", tenancy);
+    openModal("tenancy-view", "View Tenancy", tenancy);
+  };
+
+  const handleEditClick = (tenancy) => {
+    console.log("Tenancy ID: Selected Tenancy:", tenancy);
+    openModal("tenancy-update", "Update Tenancy", tenancy);
   };
 
   // Fetch tenancies from backend
@@ -52,13 +64,16 @@ const TenancyConfirm = () => {
       try {
         const companyId = getUserCompanyId();
         setLoading(true);
-        const response = await axios.get(`${BASE_URL}/company/tenancies/pending/${companyId}/`, {
-          params: { status: "pending" }
-        });
+        const response = await axios.get(
+          `${BASE_URL}/company/tenancies/pending/${companyId}/`,
+          {
+            params: { status: "pending" },
+          }
+        );
         // Sort tenancies by id in ascending order
         const sortedTenancies = response.data.sort((a, b) => a.id - b.id);
         setTenancies(sortedTenancies);
-        console.log('Fetched and sorted Pending Tenancies:', sortedTenancies);
+        console.log("Fetched and sorted Pending Tenancies:", sortedTenancies);
       } catch (error) {
         console.error("Error fetching tenancies:", error);
       } finally {
@@ -92,10 +107,7 @@ const TenancyConfirm = () => {
         tenancyData
       );
 
-      // Trigger refresh to update the tenancies list
-      triggerRefresh();
-
-      console.log('Confirmed Tenancy:', tenancyData);
+      console.log("Confirmed Tenancy:", tenancyData);
       setConfirmModalOpen(false);
     } catch (error) {
       console.error("Error confirming tenancy:", error);
@@ -115,9 +127,15 @@ const TenancyConfirm = () => {
   const filteredData = tenancies.filter(
     (tenancy) =>
       tenancy.tenancy_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenancy.tenant?.tenant_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenancy.building?.building_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenancy.unit?.unit_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tenancy.tenant?.tenant_name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      tenancy.building?.building_name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      tenancy.unit?.unit_name
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       tenancy.status?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -145,19 +163,12 @@ const TenancyConfirm = () => {
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 tconfirm-search"
             />
             <div className="relative w-[40%] md:w-auto">
-              <select
-                name="select"
-                id=""
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 tconfirm-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
-                  }`}
+              <CustomDropDown
+                options={dropdownOptions}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                className="w-full md:w-[121px]"
+                dropdownClassName="h-[38px] px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 tenancy-selection"
               />
             </div>
           </div>
@@ -202,8 +213,12 @@ const TenancyConfirm = () => {
                   <th className="pl-5 text-left tenancy-thead w-[12%]">
                     UNIT NAME
                   </th>
-                  <th className="px-5 text-left tenancy-thead">RENTAL MONTHS</th>
-                  <th className="px-5 text-left tenancy-thead w-[12%]">STATUS</th>
+                  <th className="px-5 text-left tenancy-thead">
+                    RENTAL MONTHS
+                  </th>
+                  <th className="px-5 text-left tenancy-thead w-[12%]">
+                    STATUS
+                  </th>
                   <th className="pl-12 pr-5 text-center tenancy-thead w-[8%]">
                     VIEW
                   </th>
@@ -216,7 +231,9 @@ const TenancyConfirm = () => {
                     key={tenancy.id}
                     className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
                   >
-                    <td className="px-5 text-left tenancy-data">{tenancy.tenancy_code}</td>
+                    <td className="px-5 text-left tenancy-data">
+                      {tenancy.tenancy_code}
+                    </td>
                     <td className="px-5 text-left tenancy-data">
                       {tenancy.tenant?.tenant_name || "N/A"}
                     </td>
@@ -233,20 +250,22 @@ const TenancyConfirm = () => {
                     </td>
                     <td className="px-5 text-left tenancy-data">
                       <span
-                        className={`px-[10px] py-[5px] rounded-[4px] w-[69px] tenancy-status ${tenancy.status === "active"
-                          ? "bg-[#E8EFF6] text-[#1458A2]"
-                          : tenancy.status === "pending"
+                        className={`px-[10px] py-[5px] rounded-[4px] w-[69px] tenancy-status ${
+                          tenancy.status === "active"
+                            ? "bg-[#E8EFF6] text-[#1458A2]"
+                            : tenancy.status === "pending"
                             ? "bg-[#FFF3E0] text-[#F57C00]"
                             : tenancy.status === "terminated"
-                              ? "bg-[#FFE6E6] text-[#D32F2F]"
-                              : "bg-[#E0F7E0] text-[#388E3C]"
-                          }`}
+                            ? "bg-[#FFE6E6] text-[#D32F2F]"
+                            : "bg-[#E0F7E0] text-[#388E3C]"
+                        }`}
                       >
-                        {tenancy.status.charAt(0).toUpperCase() + tenancy.status.slice(1)}
+                        {tenancy.status.charAt(0).toUpperCase() +
+                          tenancy.status.slice(1)}
                       </span>
                     </td>
                     <td className="pl-12 pr-5 pt-2 text-center">
-                      <button onClick={() => openModal("tenancy-view", tenancy)}>
+                      <button onClick={() => handleViewClick(tenancy)}>
                         <img
                           src={viewicon}
                           alt="View"
@@ -255,8 +274,7 @@ const TenancyConfirm = () => {
                       </button>
                     </td>
                     <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                      <button
-                        onClick={() => openUpdateModal(tenancy)}>
+                      <button onClick={() => handleEditClick(tenancy)}>
                         <img
                           src={editicon}
                           alt="Edit"
@@ -293,10 +311,11 @@ const TenancyConfirm = () => {
                 {paginatedData.map((tenancy) => (
                   <React.Fragment key={tenancy.id}>
                     <tr
-                      className={`${expandedRows[tenancy.id]
-                        ? "tconfirm-mobile-no-border"
-                        : "tconfirm-mobile-with-border"
-                        } border-b border-[#E9E9E9] h-[57px]`}
+                      className={`${
+                        expandedRows[tenancy.id]
+                          ? "tconfirm-mobile-no-border"
+                          : "tconfirm-mobile-with-border"
+                      } border-b border-[#E9E9E9] h-[57px]`}
                     >
                       <td className="px-5 text-left tenancy-data tconfirm-id-column">
                         {tenancy.tenancy_code}
@@ -306,15 +325,17 @@ const TenancyConfirm = () => {
                       </td>
                       <td className="py-4 flex items-center justify-end h-[57px]">
                         <div
-                          className={`tenancy-dropdown-field ${expandedRows[tenancy.id] ? "active" : ""
-                            }`}
+                          className={`tenancy-dropdown-field ${
+                            expandedRows[tenancy.id] ? "active" : ""
+                          }`}
                           onClick={() => toggleRowExpand(tenancy.id)}
                         >
                           <img
                             src={downarrow}
                             alt="drop-down-arrow"
-                            className={`tenancy-dropdown-img ${expandedRows[tenancy.id] ? "text-white" : ""
-                              }`}
+                            className={`tenancy-dropdown-img ${
+                              expandedRows[tenancy.id] ? "text-white" : ""
+                            }`}
                           />
                         </div>
                       </td>
@@ -356,23 +377,29 @@ const TenancyConfirm = () => {
                                 </div>
                                 <div className="tconfirm-dropdown-value">
                                   <span
-                                    className={`px-[10px] py-[5px] h-[24px] rounded-[4px] tenancy-status ${tenancy.status === "pending"
-                                      ? "bg-[#E8EFF6] text-[#1458A2]"
-                                      : tenancy.status === "active"
+                                    className={`px-[10px] py-[5px] h-[24px] rounded-[4px] tenancy-status ${
+                                      tenancy.status === "pending"
+                                        ? "bg-[#E8EFF6] text-[#1458A2]"
+                                        : tenancy.status === "active"
                                         ? "bg-[#E6F3E6] text-[#28A745]"
                                         : "bg-[#FFE6E6] text-[#DC3545]"
-                                      }`}
+                                    }`}
                                   >
-                                    {tenancy.status.charAt(0).toUpperCase() + tenancy.status.slice(1)}
+                                    {tenancy.status.charAt(0).toUpperCase() +
+                                      tenancy.status.slice(1)}
                                   </span>
                                 </div>
                               </div>
                             </div>
                             <div className="tconfirm-grid">
                               <div className="tconfirm-grid-item">
-                                <div className="tconfirm-dropdown-label">VIEW</div>
+                                <div className="tconfirm-dropdown-label">
+                                  VIEW
+                                </div>
                                 <div className="tconfirm-dropdown-value">
-                                  <button onClick={() => openModal("tenancy-view", tenancy)}>
+                                  <button
+                                    onClick={() => handleViewClick(tenancy)}
+                                  >
                                     <img
                                       src={viewicon}
                                       alt="View"
@@ -387,7 +414,7 @@ const TenancyConfirm = () => {
                                 </div>
                                 <div className="tconfirm-dropdown-value tconfirm-flex tconfirm-items-center p-[3px] ml-[5px]">
                                   <button
-                                    onClick={() => openModal("tenancy-update", { tenancy })}
+                                    onClick={() => handleEditClick(tenancy)}
                                   >
                                     <img
                                       src={editicon}
@@ -395,7 +422,9 @@ const TenancyConfirm = () => {
                                       className="w-[18px] h-[18px] tconfirm-action-btn duration-200"
                                     />
                                   </button>
-                                  <button onClick={() => openConfirmModal(tenancy)}>
+                                  <button
+                                    onClick={() => openConfirmModal(tenancy)}
+                                  >
                                     <img
                                       src={confirmicon}
                                       alt="Confirm"
@@ -419,7 +448,10 @@ const TenancyConfirm = () => {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 tconfirm-pagination-container">
             <span className="tconfirm-collection-list-pagination">
               Showing{" "}
-              {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+              {Math.min(
+                (currentPage - 1) * itemsPerPage + 1,
+                filteredData.length
+              )}{" "}
               to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
               {filteredData.length} entries
             </span>
@@ -439,14 +471,17 @@ const TenancyConfirm = () => {
                   1
                 </button>
               )}
-              {startPage > 2 && <span className="px-2 flex items-center">...</span>}
+              {startPage > 2 && (
+                <span className="px-2 flex items-center">...</span>
+              )}
               {[...Array(endPage - startPage + 1)].map((_, i) => (
                 <button
                   key={startPage + i}
-                  className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${currentPage === startPage + i
-                    ? "bg-[#1458A2] text-white"
-                    : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-                    }`}
+                  className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+                    currentPage === startPage + i
+                      ? "bg-[#1458A2] text-white"
+                      : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+                  }`}
                   onClick={() => setCurrentPage(startPage + i)}
                 >
                   {startPage + i}

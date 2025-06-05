@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import closeicon from "../../../../../assets/Images/Admin Buildings/close-icon.svg";
 import FormTimeline from "../FormTimeline";
@@ -7,9 +7,16 @@ import DocumentsForm from "../Upload Documents/DocumentsForm";
 import ReviewPage from "../ReviewPage/ReviewPage";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 import { BASE_URL } from "../../../../../utils/config";
+import { useModal } from "../../../../../context/ModalContext";
 
-const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated }) => {
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+const BuildingFormFlow = ({
+  onClose,
+  buildingId,
+  onPageChange,
+  initialPageIndex = 0,
+}) => {
+  const { triggerRefresh } = useModal();
+  const [currentPageIndex, setCurrentPageIndex] = useState(initialPageIndex);
   const [formData, setFormData] = useState({
     building: null,
     documents: { documents: [] },
@@ -24,8 +31,29 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const isExternalNavigation = useRef(false);
+
   const pageTitles = ["Update Building", "Upload Documents", "Review", ""];
   const currentTitle = pageTitles[currentPageIndex];
+
+  useEffect(() => {
+    if (
+      initialPageIndex !== currentPageIndex &&
+      !isExternalNavigation.current
+    ) {
+      isExternalNavigation.current = true;
+      setCurrentPageIndex(initialPageIndex);
+      setTimeout(() => {
+        isExternalNavigation.current = false;
+      }, 0);
+    }
+  }, [initialPageIndex]);
+
+  useEffect(() => {
+    if (onPageChange && !isExternalNavigation.current) {
+      onPageChange(currentPageIndex);
+    }
+  }, [currentPageIndex, onPageChange]);
 
   useEffect(() => {
     const fetchBuildingData = async () => {
@@ -40,7 +68,7 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated }) => {
           }
         );
         const buildingData = response.data;
-        console.log("BuildingFormFlow: Fetched building data:", buildingData);
+        console.log("Fetched building data:", buildingData);
         setFormData({
           building: {
             building_no: buildingData.building_no || "",
@@ -54,6 +82,8 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated }) => {
             longitude: buildingData.longitude || "",
             remarks: buildingData.remarks || "",
             land_mark: buildingData.land_mark || "",
+            country: buildingData?.country || "",
+            state: buildingData?.state || "",
           },
           documents: {
             documents: Array.isArray(buildingData.build_comp)
@@ -114,14 +144,12 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated }) => {
   }, [currentPageIndex, formData]);
 
   const handleNextPage = (pageData) => {
-    console.log("BuildingFormFlow: Received pageData:", pageData);
     setAnimating(true);
     setFormData((prevData) => {
       const newData = {
         ...prevData,
         [currentPageIndex === 0 ? "building" : "documents"]: pageData,
       };
-      console.log("BuildingFormFlow: Updated formData:", newData);
       return newData;
     });
 
@@ -139,7 +167,6 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated }) => {
           ...prevData,
           documents: { documents: pageData.documents || [] },
         };
-        console.log("BuildingFormFlow: Updated formData on back:", newData);
         return newData;
       });
     }
@@ -151,8 +178,7 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated }) => {
 
   const handleClose = () => {
     if (currentPageIndex === 3) {
-      // Trigger refresh only when closing from SubmissionConfirmation
-      onBuildingCreated();
+      triggerRefresh(); // Trigger refresh after submission
     }
     setCurrentPageIndex(0);
     setFormData({ building: null, documents: { documents: [] } });
@@ -174,21 +200,17 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated }) => {
     return <div className="text-red-500 p-4">{error}</div>;
   }
 
-  console.log(
-    "BuildingFormFlow: Passing initialData to BuildingInfoForm/ReviewPage:",
-    formData
-  );
   return (
     <div className="flex">
-      <div className="w-[350px] pr-[53px]">
+      <div className="w-[350px] pr-[53px] form-time-line">
         <FormTimeline
           key={currentPageIndex}
           currentStep={currentPageIndex + 1}
           progress={formProgress}
         />
       </div>
-      <div className="w-full h-[700px] desktop:h-[780px] px-[26px] pt-[50px] pb-[40px] overflow-y-scroll">
-        <div className="building-modal-header flex justify-between items-center mb-[35px]">
+      <div className="w-full h-[700px] desktop:h-[780px] px-[20px] sm:px-[26px] pt-[8px] sm:pt-[50px] pb-[285px] sm:pb-[40px] overflow-y-scroll">
+        <div className="building-modal-header flex justify-between items-center mb-5">
           <h3 className="building-modal-title">{currentTitle}</h3>
           <button
             onClick={handleClose}
@@ -200,7 +222,7 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated }) => {
         <div
           className={`transition-all duration-500 ease-in-out ${
             animating
-              ? "opacity-0 transform translate-x-10"
+              ? "opacity-30 transform translate-x-10"
               : "opacity-100 transform translate-x-0"
           }`}
         >
@@ -229,6 +251,7 @@ const BuildingFormFlow = ({ onClose, buildingId, onBuildingCreated }) => {
               <SubmissionConfirmation
                 key="confirm"
                 formData={formData}
+                onClose={handleClose}
               />,
             ][currentPageIndex]
           }

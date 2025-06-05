@@ -1,19 +1,16 @@
-
 import React, { useState, useEffect } from "react";
 import "./Charges.css";
 import { ChevronDown } from "lucide-react";
 import plusicon from "../../../assets/Images/Admin Masters/plus-icon.svg";
-import plusiconblue from "../../../assets/Images/Admin Masters/plus-icon-blue.svg";
 import downloadicon from "../../../assets/Images/Admin Masters/download-icon.svg";
 import editicon from "../../../assets/Images/Admin Masters/edit-icon.svg";
 import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
-import closeicon from "../../../assets/Images/Admin Masters/close-icon.svg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import { BASE_URL } from "../../../utils/config";
-import axios from "axios";
 import DeleteChargesModal from "./DeleteChargesModal/DeleteChargesModal";
+import buildingimg from "../../../assets/Images/Admin Masters/charges-building.png";
+import { fetchCharges, deleteCharges } from "./api";
 
 const Charges = () => {
   const [isHeaderSelectOpen, setIsHeaderSelectOpen] = useState(false);
@@ -28,51 +25,19 @@ const Charges = () => {
   const { openModal, refreshCounter } = useModal();
   const itemsPerPage = 10;
 
-  // Function to get company ID based on user role
-  const getUserCompanyId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-    if (role === "company") {
-      return localStorage.getItem("company_id");
-    } else if (role === "user" || role === "admin") {
-      try {
-        const userCompanyId = localStorage.getItem("company_id");
-        return userCompanyId ? JSON.parse(userCompanyId) : null;
-      } catch (e) {
-        console.error("Error parsing user company ID:", e);
-        return null;
-      }
-    }
-    return null;
-  };
-
   // Fetch charges data
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
       try {
-        const companyId = getUserCompanyId();
-        if (!companyId) {
-          throw new Error("Company ID is missing or invalid");
-        }
-
-        // Fetch charges
-        const chargesResponse = await axios.get(
-          `${BASE_URL}/company/charges/company/${companyId}/`,
-          { headers: { "Content-Type": "application/json" } }
-        );
-        setData(chargesResponse.data);
+        const charges = await fetchCharges();
+        setData(charges);
       } catch (err) {
-        console.error(
-          "Error fetching charges:",
-          err.response?.data || err.message
-        );
-        const errorMessage =
-          err.response?.data?.detail ||
-          err.message ||
-          "Failed to load charges";
-        setError(errorMessage);
-        toast.error(errorMessage);
+        console.error("Error fetching charges:", err);
+        setError(err.message);
+        toast.error(err.message);
+        setData([]);
       } finally {
         setLoading(false);
       }
@@ -82,11 +47,6 @@ const Charges = () => {
 
   // Handle delete initiation
   const handleDelete = (id) => {
-    if (!getUserCompanyId()) {
-      setError("Company ID not found. Please log in again.");
-      toast.error("Company ID not found. Please log in again.");
-      return;
-    }
     setChargeIdToDelete(id);
     setIsDeleteModalOpen(true);
   };
@@ -98,33 +58,16 @@ const Charges = () => {
     try {
       setLoading(true);
       setError(null);
-      const companyId = getUserCompanyId();
-      if (!companyId) {
-        throw new Error("Company ID is missing or invalid");
-      }
-      const response = await axios.delete(
-        `${BASE_URL}/company/charges/${chargeIdToDelete}/`,
-        { headers: { "Content-Type": "application/json" } }
-      );
-      if (response.status !== 200 && response.status !== 204) {
-        throw new Error("Failed to delete charge");
-      }
+      await deleteCharges(chargeIdToDelete);
       setData((prev) => prev.filter((item) => item.id !== chargeIdToDelete));
       toast.success("Charge deleted successfully");
       if (paginatedData.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
     } catch (err) {
-      console.error(
-        "Error deleting charge:",
-        err.response?.data || err.message
-      );
-      const errorMessage =
-        err.response?.data?.detail ||
-        err.message ||
-        "Failed to delete charge";
-      setError(errorMessage);
-      toast.error(errorMessage);
+      console.error("Error deleting charge:", err);
+      setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
       setIsDeleteModalOpen(false);
@@ -138,30 +81,9 @@ const Charges = () => {
     setChargeIdToDelete(null);
   };
 
-  const filteredData = data.filter(
-    (charge) =>
-      charge.created_at
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      charge.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      charge.id.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-      charge.charge_code?.title
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase())
-  );
-
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const maxPageButtons = 5;
-  const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
-  const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
-
-  const openUpdateModal = (charge) => {
-    openModal("update-charges-master", charge);
+  const handleEditClick = (charge) => {
+    console.log("Charge Master: Selected Charge:", charge);
+    openModal("update-charges-master", "Update Charges Master", charge);
   };
 
   const toggleRowExpand = (id) => {
@@ -180,6 +102,26 @@ const Charges = () => {
       year: "numeric",
     });
   };
+
+  const filteredData = data.filter(
+    (charge) =>
+      charge.created_at?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      charge.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      charge.id.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+      charge.charge_code?.title
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const maxPageButtons = 5;
+  const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+  const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
   return (
     <div className="border border-gray-200 rounded-md charges-table">
@@ -223,7 +165,7 @@ const Charges = () => {
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-[#2892CE] hover:bg-[#2276a7]"
               }`}
-              onClick={() => openModal("create-charges-master")}
+              onClick={() => openModal("create-charges-master", "Create New Charges Master")}
               disabled={loading}
             >
               Add New Master
@@ -267,12 +209,18 @@ const Charges = () => {
                   <thead>
                     <tr className="border-b border-[#E9E9E9] h-[57px]">
                       <th className="px-4 py-3 text-left charges-thead">ID</th>
-                      <th className="px-4 py-3 text-left charges-thead">DATE</th>
-                      <th className="px-4 py-3 text-left charges-thead">NAME</th>
                       <th className="px-4 py-3 text-left charges-thead">
-                        CHARGE TYPE
+                        DATE
                       </th>
-                      <th className="px-4 py-3 text-right charges-thead">ACTION</th>
+                      <th className="px-4 py-3 text-left charges-thead">
+                        NAME
+                      </th>
+                      <th className="px-4 py-3 text-left charges-thead">
+                        CHARGE CODE
+                      </th>
+                      <th className="px-4 py-3 text-right charges-thead">
+                        ACTION
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -287,15 +235,19 @@ const Charges = () => {
                       </tr>
                     ) : (
                       paginatedData.map((charge, index) => {
-                        const isLastItemOnPage = index === paginatedData.length - 1;
+                        const isLastItemOnPage =
+                          index === paginatedData.length - 1;
                         const shouldRemoveBorder =
-                          isLastItemOnPage && paginatedData.length === itemsPerPage;
+                          isLastItemOnPage &&
+                          paginatedData.length === itemsPerPage;
 
                         return (
                           <tr
                             key={charge.id}
                             className={`h-[57px] hover:bg-gray-50 cursor-pointer ${
-                              shouldRemoveBorder ? "" : "border-b border-[#E9E9E9]"
+                              shouldRemoveBorder
+                                ? ""
+                                : "border-b border-[#E9E9E9]"
                             }`}
                           >
                             <td className="px-5 text-left charges-data">
@@ -311,14 +263,14 @@ const Charges = () => {
                               {charge.charge_code?.title || "N/A"}
                             </td>
                             <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                              <button onClick={() => openUpdateModal(charge)}>
+                              <button onClick={() => handleEditClick(charge)} disabled={loading}>
                                 <img
                                   src={editicon}
                                   alt="Edit"
                                   className="w-[18px] h-[18px] action-btn duration-200"
                                 />
                               </button>
-                              <button onClick={() => handleDelete(charge.id)}>
+                              <button onClick={() => handleDelete(charge.id)} disabled={loading}>
                                 <img
                                   src={deleteicon}
                                   alt="Delete"
@@ -333,185 +285,13 @@ const Charges = () => {
                   </tbody>
                 </table>
               </div>
-              {/* Form Section */}
+              {/* Image Section */}
               <div className="w-[40%] border border-[#E9E9E9] rounded-md p-5">
-                {/* Taxes Form */}
-                <div className="w-full">
-                  <h2 className="mb-[20px] tax-section-head">Taxes</h2>
-
-                  {/* Tax List */}
-                  <div className="border rounded-md mb-4">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-[#E9E9E9] h-[57px]">
-                          <th className="px-4 py-3 text-left tax-section-thead">
-                            TAX
-                          </th>
-                          <th className="px-4 py-3 text-left tax-section-thead">
-                            NAME
-                          </th>
-                          <th className="px-4 py-3 text-left tax-section-thead">
-                            CHARGE TYPE
-                          </th>
-                          <th className="px-4 py-3 text-left tax-section-thead">
-                            PERCENTAGE
-                          </th>
-                          <th className="px-4 py-3 text-right tax-section-thead">
-                            ACTION
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {/* Static placeholder row */}
-                        <tr className="h-[57px] hover:bg-gray-50 cursor-pointer">
-                          <td className="px-5 text-left tax-section-tdata">
-                            Vat
-                          </td>
-                          <td className="px-5 text-left tax-section-tdata">
-                            Maintenance
-                          </td>
-                          <td className="px-5 text-left tax-section-tdata">
-                            Deposit
-                          </td>
-                          <td className="pl-5 text-left tax-section-tdata w-[18%]">
-                            20%
-                          </td>
-                          <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                            <button disabled>
-                              <img
-                                src={editicon}
-                                alt="Edit"
-                                className="w-[18px] h-[18px] action-btn duration-200"
-                              />
-                            </button>
-                            <button disabled>
-                              <img
-                                src={deleteicon}
-                                alt="Delete"
-                                className="w-[18px] h-[18px] action-btn duration-200"
-                              />
-                            </button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Add New Tax Form */}
-                  <form>
-                    <div className="border rounded-md p-4 mb-4">
-                      <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-[#201D1E] tax-form-head">
-                          Add New Tax
-                        </h3>
-                        <button
-                          type="button"
-                          className="tax-form-close-btn"
-                          disabled
-                        >
-                          <img
-                            src={closeicon}
-                            alt="close"
-                            className="w-[10px] h-[10px]"
-                          />
-                        </button>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                          <label className="block mb-[10px] text-[#201D1E] tax-form-label">
-                            Tax Type
-                          </label>
-                          <input
-                            type="text"
-                            name="tax_type"
-                            placeholder="Enter Tax Type"
-                            className="w-full px-3 py-2 border rounded-md outline-none focus:border-gray-400"
-                            disabled
-                          />
-                        </div>
-                        <div>
-                          <label className="block mb-[10px] text-[#201D1E] tax-form-label">
-                            Name
-                          </label>
-                          <div className="relative">
-                            <select
-                              name="name"
-                              className="w-full px-3 py-2 border rounded-md appearance-none outline-none focus:border-gray-400"
-                              disabled
-                            >
-                              <option value="">Choose</option>
-                            </select>
-                            <ChevronDown
-                              className="absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300"
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-[70%_20%] gap-[20px] mb-6">
-                        <div>
-                          <label className="block mb-[10px] text-[#201D1E] tax-form-label">
-                            Charge Code
-                          </label>
-                          <div className="relative">
-                            <select
-                              name="charge_code"
-                              className="w-full px-3 py-2 border rounded-md appearance-none outline-none focus:border-gray-400 charge-code-select"
-                              disabled
-                            >
-                              <option value="">Choose</option>
-                            </select>
-                            <ChevronDown
-                              className="absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300"
-                            />
-                          </div>
-                        </div>
-                        <div className="w-[110px]">
-                          <label className="block mb-[10px] text-[#201D1E] tax-form-label">
-                            Percentage (%)
-                          </label>
-                          <input
-                            type="text"
-                            name="percentage"
-                            placeholder="20%"
-                            className="w-full px-3 py-2 border rounded-md outline-none focus:border-gray-400 percentage-input"
-                            disabled
-                          />
-                        </div>
-                      </div>
-
-                      <div className="flex justify-end">
-                        <div className="flex flex-col gap-4 ml-[25px]">
-                          <div className="flex items-center">
-                            <span className="mr-3 text-[#201D1E] tax-toggle-caption">
-                              Enable to Refundable
-                            </span>
-                            <div className="tax-toggle-switch">
-                              <div className="tax-toggle-circle"></div>
-                            </div>
-                          </div>
-                          <button
-                            type="submit"
-                            className="bg-[#2892CE] py-2 hover:bg-[#076094] transition-colors tax-form-save-btn ml-[25px] mb-2 cursor-not-allowed opacity-50"
-                            disabled
-                          >
-                            Save
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </form>
-
-                  {/* Add Tax Button */}
-                  <button
-                    className="ml-auto mt-[32px] hover:bg-blue-50 transition-colors flex items-center justify-center tax-form-add-btn"
-                    disabled
-                  >
-                    Add Tax
-                    <img src={plusiconblue} alt="" />
-                  </button>
-                </div>
+                <img
+                  src={buildingimg}
+                  alt="Building exterior"
+                  className="h-[587px] w-full object-cover rounded-md"
+                />
               </div>
             </div>
           </div>
@@ -580,18 +360,16 @@ const Charges = () => {
                               <div className="charges-grid">
                                 <div className="charges-grid-items">
                                   <div className="dropdown-label">DATE</div>
-                                  <div className="dropdown-value">{formatDate(charge.created_at)}</div>
-                                </div>
-                                <div className="charges-grid-items">
-                                  <div className="dropdown-label">CHARGE TYPE</div>
                                   <div className="dropdown-value">
-                                    {charge.charge_code?.title || "N/A"}
+                                    {formatDate(charge.created_at)}
                                   </div>
                                 </div>
                                 <div className="charges-grid-items">
-                                  <div className="dropdown-label">VAT PERCENTAGE</div>
+                                  <div className="dropdown-label">
+                                    CHARGE CODE
+                                  </div>
                                   <div className="dropdown-value">
-                                    {charge.vat_percentage ? `${charge.vat_percentage}%` : "N/A"}
+                                    {charge.charge_code?.title || "N/A"}
                                   </div>
                                 </div>
                               </div>
@@ -599,14 +377,20 @@ const Charges = () => {
                                 <div className="charges-grid-items">
                                   <div className="dropdown-label">ACTION</div>
                                   <div className="dropdown-value flex items-center gap-4 p-1">
-                                    <button onClick={() => openUpdateModal(charge)}>
+                                    <button
+                                      onClick={() => handleEditClick(charge)}
+                                      disabled={loading}
+                                    >
                                       <img
                                         src={editicon}
                                         alt="Edit"
                                         className="w-[18px] h-[18px] action-btn duration-200"
                                       />
                                     </button>
-                                    <button onClick={() => handleDelete(charge.id)}>
+                                    <button
+                                      onClick={() => handleDelete(charge.id)}
+                                      disabled={loading}
+                                    >
                                       <img
                                         src={deleteicon}
                                         alt="Delete"
@@ -636,8 +420,8 @@ const Charges = () => {
                   (currentPage - 1) * itemsPerPage + 1,
                   filteredData.length
                 )}{" "}
-                to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-                {filteredData.length} entries
+                to {Math.min(currentPage * itemsPerPage, filteredData.length)}{" "}
+                of {filteredData.length} entries
               </span>
               <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
                 <button

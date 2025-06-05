@@ -1,31 +1,32 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./units.css";
-import { ChevronDown } from "lucide-react";
 import plusicon from "../../../assets/Images/Admin Units/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Units/download-icon.svg";
 import editicon from "../../../assets/Images/Admin Units/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Units/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Units/downarrow.svg";
-import AddUnitModal from "./Add Unit Modal/AddUnitModal";
-import EditUnitModal from "./Edit Unit Modal/EditUnitModal";
-import { useNavigate } from "react-router-dom";
 import { BASE_URL } from "../../../utils/config";
+import DeleteUnitModal from "./DeleteUnitModal/DeleteUnitModal";
+import { useModal } from "../../../context/ModalContext";
+import CustomDropDown from "../../../components/CustomDropDown";
 
 const Units = () => {
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [unitModalOpen, setUnitModalOpen] = useState(false);
-  const [updateUnitModalOpen, setUpdateUnitModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
   const [units, setUnits] = useState([]);
-  const [selectedUnitId, setSelectedUnitId] = useState(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [unitToDelete, setUnitToDelete] = useState(null);
+  const { openModal, refreshCounter } = useModal();
+  const [selectedOption, setSelectedOption] = useState("showing"); // State for dropdown
   const itemsPerPage = 10;
 
-  const navigate = useNavigate();
-
-  const isMobileView = () => window.innerWidth < 480;
+  // Dropdown options
+  const dropdownOptions = [
+    { label: "Showing", value: "showing" },
+    { label: "All", value: "all" },
+  ];
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -45,7 +46,7 @@ const Units = () => {
   };
 
   const companyId = getUserCompanyId();
-  
+
   const fetchUnits = async () => {
     try {
       const companyId = getUserCompanyId();
@@ -59,50 +60,36 @@ const Units = () => {
     }
   };
 
-  const refreshUnits = () => {
-    console.log("Units: Refreshing unit list");
-    fetchUnits();
-  };
-
   useEffect(() => {
     fetchUnits();
-  }, [companyId]);
-
-  const openUnitModal = () => {
-    if (isMobileView()) {
-      navigate("/unit-timeline");
-    } else {
-      setUnitModalOpen(true);
-    }
-  };
-
-  const closeUnitModal = () => {
-    setUnitModalOpen(false);
-  };
+  }, [companyId, refreshCounter]);
 
   const handleEditUnitClick = (unitId) => {
     console.log("Units: Selected unitId:", unitId);
-    setSelectedUnitId(unitId);
-    setTimeout(() => {
-      setUpdateUnitModalOpen(true);
-    });
+    openModal("edit-unit", "Select Building", { unitId });
   };
 
-  const closeUpdateUnitModal = () => {
-    setUpdateUnitModalOpen(false);
-    setSelectedUnitId(null);
+  const handleDeleteUnitClick = (unitId) => {
+    setUnitToDelete(unitId);
+    setDeleteModalOpen(true);
   };
 
-  const handleDeleteUnit = async (unitId) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this unit?");
-    if (!confirmDelete) return;
+  const handleConfirmDelete = async () => {
+    if (!unitToDelete) return;
 
     try {
-      await axios.delete(`${BASE_URL}/company/units/${unitId}/`);
-      setUnits(units.filter((unit) => unit.id !== unitId));
+      await axios.delete(`${BASE_URL}/company/units/${unitToDelete}/`);
+      setUnits(units.filter((unit) => unit.id !== unitToDelete));
+      setDeleteModalOpen(false);
+      setUnitToDelete(null);
     } catch (error) {
       console.error("Error deleting unit:", error);
     }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteModalOpen(false);
+    setUnitToDelete(null);
   };
 
   const toggleRowExpand = (id) => {
@@ -145,25 +132,19 @@ const Units = () => {
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 units-search"
             />
             <div className="relative w-[40%] md:w-auto">
-              <select
-                name="select"
-                id=""
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 unit-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"}`}
+              <CustomDropDown
+                options={dropdownOptions}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                placeholder="Select"
+                dropdownClassName="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 unit-selection"
               />
             </div>
           </div>
           <div className="flex gap-[10px] unit-action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md unit-add-new-unit duration-200"
-              onClick={openUnitModal}
+              onClick={() => openModal("create-unit", "Select Building")}
             >
               Add New Unit
               <img
@@ -233,7 +214,8 @@ const Units = () => {
                         : ""
                     }`}
                   >
-                    {unit.unit_status.charAt(0).toUpperCase() + unit.unit_status.slice(1)}
+                    {unit.unit_status.charAt(0).toUpperCase() +
+                      unit.unit_status.slice(1)}
                   </span>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
@@ -244,7 +226,7 @@ const Units = () => {
                       className="w-[18px] h-[18px] unit-action-btn duration-200"
                     />
                   </button>
-                  <button onClick={() => handleDeleteUnit(unit.id)}>
+                  <button onClick={() => handleDeleteUnitClick(unit.id)}>
                     <img
                       src={deletesicon}
                       alt="Delete"
@@ -262,7 +244,9 @@ const Units = () => {
           <thead>
             <tr className="unit-table-row-head">
               <th className="px-5 text-left unit-thead unit-id-column">ID</th>
-              <th className="px-5 text-left unit-thead unit-date-column">NAME</th>
+              <th className="px-5 text-left unit-thead unit-date-column">
+                NAME
+              </th>
               <th className="px-5 text-right unit-thead"></th>
             </tr>
           </thead>
@@ -355,21 +339,26 @@ const Units = () => {
                                     : ""
                                 }`}
                               >
-                                {unit.unit_status}
+                                {unit.unit_status.charAt(0).toUpperCase() +
+                                  unit.unit_status.slice(1)}
                               </span>
                             </div>
                           </div>
                           <div className="unit-grid-item unit-action-column">
                             <div className="unit-dropdown-label">ACTION</div>
                             <div className="unit-dropdown-value unit-flex unit-items-center unit-gap-2">
-                              <button onClick={() => handleEditUnitClick(unit.id)}>
+                              <button
+                                onClick={() => handleEditUnitClick(unit.id)}
+                              >
                                 <img
                                   src={editicon}
                                   alt="Edit"
                                   className="w-[18px] h-[18px] unit-action-btn duration-200"
                                 />
                               </button>
-                              <button onClick={() => handleDeleteUnit(unit.id)}>
+                              <button
+                                onClick={() => handleDeleteUnitClick(unit.id)}
+                              >
                                 <img
                                   src={deletesicon}
                                   alt="Delete"
@@ -445,15 +434,10 @@ const Units = () => {
           </button>
         </div>
       </div>
-      <AddUnitModal
-        open={unitModalOpen}
-        onClose={closeUnitModal}
-        onUnitCreated={refreshUnits}
-      />
-      <EditUnitModal
-        open={updateUnitModalOpen}
-        onClose={closeUpdateUnitModal}
-        unitId={selectedUnitId}
+      <DeleteUnitModal
+        isOpen={deleteModalOpen}
+        onCancel={handleCancelDelete}
+        onDelete={handleConfirmDelete}
       />
     </div>
   );

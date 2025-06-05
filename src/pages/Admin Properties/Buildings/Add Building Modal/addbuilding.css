@@ -22,6 +22,18 @@
     color: #201D1E;
 }
 
+.toggle-count {
+  font-family: 'Inter Tight';
+  font-weight: 600; 
+  font-size: 14px;
+}
+
+.mob-toggle-head {
+   font-family: 'Inter Tight';
+   font-weight: 500;
+   font-size: 16px;
+}
+
 @media screen and (min-width: 1536px) and (max-width: 1799px) {
   .building-modal-styles {
     height: 700px;
@@ -31,5 +43,17 @@
 @media screen and (min-width: 1800px) {
   .building-modal-styles {
     height: 780px;
+  }
+}
+
+@media(max-width:480px) {
+  .add-building-modal {
+    top: 90px;
+  }
+}
+
+@media (max-width: 480px) {
+  .building-modal-styles {
+    height: 100vh !important;
   }
 }

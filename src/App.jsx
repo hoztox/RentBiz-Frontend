@@ -31,38 +31,7 @@ import ReportCollection from "./pages/ReportCollection/ReportCollection";
 import IncomeExpenseReport from "./pages/IncomeExpenseReport/IncomeExpenseReport";
 import ChargeCodeType from "./pages/Admin Masters/Charge Code Type/ChargeCodeType";
 import { ModalProvider } from "./context/ModalContext";
-import HorizontalFormTimeline from "./pages/Admin Properties/Buildings/Add Building Modal/HorizontalFormTimeline";
-import ResponsiveBuildingInfoForm from "./pages/Admin Properties/Buildings/Add Building Modal/Create Building/ResponsiveBuildingInfoForm";
-import ResponsiveDocumentForm from "./pages/Admin Properties/Buildings/Add Building Modal/Upload Documents/ResponsiveDocumentForm";
-import SubmissionConfirmationResponsive from "./pages/Admin Properties/Buildings/Add Building Modal/Submit/SubmissionConfirmationResponsive";
-import BuildingsReset from "./pages/Admin Properties/Buildings/Add Building Modal/BuildingsReset";
-import UpdateHorizontalFormTimeline from "./pages/Admin Properties/Buildings/EditBuildingModal/UpdateHorizontalFormTimeline";
-import ResponsiveUpdateBuildingInfoForm from "./pages/Admin Properties/Buildings/EditBuildingModal/UpdateBuilding/ResponsiveUpdateBuildingInfoForm";
-import ResponsiveUpdateDocumentForm from "./pages/Admin Properties/Buildings/EditBuildingModal/Upload Documents/ResponsiveUpdateDocumentForm";
-import UpdateSubmissionConfirmResponsive from "./pages/Admin Properties/Buildings/EditBuildingModal/Submit/UpdateSubmissionConfirmResponsive";
-import HorizontalUnitFormTimeline from "./pages/Admin Properties/Units/Add Unit Modal/HorizontalUnitFormTimeline";
-import UnitBuildingInfoForm from "./pages/Admin Properties/Units/Add Unit Modal/Select Building/UnitBuildingInfoForm";
-import UnitInfoFormResponsive from "./pages/Admin Properties/Units/Add Unit Modal/Create Unit/UnitInfoFormResponsive";
-import UnitDocumentsFormResponsive from "./pages/Admin Properties/Units/Add Unit Modal/Upload Documents/UnitDocumentsFormResponsive";
-import UpdateBuildingsReset from "./pages/Admin Properties/Buildings/EditBuildingModal/UpdateBuildingsReset";
-import UnitSubmitPageResponsive from "./pages/Admin Properties/Units/Add Unit Modal/Submit/UnitSubmitPageResponsive";
-import UnitsResets from "./pages/Admin Properties/Units/Add Unit Modal/UnitsResets";
-import ResponsiveTenantFormTimeline from "./pages/Admin Tenants/CreateTenantModal/ResponsiveTenantFormTimeline";
-import ResponsiveTenantInfoForm from "./pages/Admin Tenants/CreateTenantModal/CreateTenant/ResponsiveTenantInfoForm";
-import TenantDocumentFormResponsive from "./pages/Admin Tenants/CreateTenantModal/UploadDocuments/TenantDocumentFormResponsive";
-import TenantSubmitConfirmResponsive from "./pages/Admin Tenants/CreateTenantModal/Submit/TenantSubmitConfirmResponsive";
-import TenantsReset from "./pages/Admin Tenants/CreateTenantModal/TenantsReset";
-import UpdateUnitBuildingInfoResponsive from "./pages/Admin Properties/Units/Edit Unit Modal/Select Building/UpdateUnitBuildingInfoResponsive";
-import UpdateUnitInfoFormResponsive from "./pages/Admin Properties/Units/Edit Unit Modal/Update Unit/UpdateUnitInfoFormResponsive";
-import UpdateUnitDocumentFormResponsive from "./pages/Admin Properties/Units/Edit Unit Modal/Upload Documents/UpdateUnitDocumentFormResponsive";
-import UpdateUnitSubmitPageResponsive from "./pages/Admin Properties/Units/Edit Unit Modal/Submit/UpdateUnitSubmitPageResponsive";
-import UpdateUnitsReset from "./pages/Admin Properties/Units/Edit Unit Modal/UpdateUnitsReset";
-import UpdateFormTimelineRes from "./pages/Admin Properties/Units/Edit Unit Modal/UpdateFormTimelineRes";
-import EditTenantFormTimelineRes from "./pages/Admin Tenants/EditTenantModal/EditTenantFormTimelineRes";
-import ResUpdateTenantInfoForm from "./pages/Admin Tenants/EditTenantModal/UpdateTenant/ResUpdateTenantInfoForm";
-import EditTenantDocFormRes from "./pages/Admin Tenants/EditTenantModal/UploadDocuments/EditTenantDocFormRes";
-import SubmissionConfirmationRes from "./pages/Admin Tenants/EditTenantModal/Submit/SubmissionConfirmationRes";
-import EditTenantsReset from "./pages/Admin Tenants/EditTenantModal/EditTenantsReset";
+import Taxes from "./pages/Admin Masters/Taxes/Taxes";
 
 const App = () => {
   return (
@@ -86,7 +55,8 @@ const App = () => {
           <Route path="tenancy-close" element={<CloseTenancy />} />
           <Route path="masters-unit-type" element={<UnitType />} />
           <Route path="masters-id-type" element={<IdType />} />
-          <Route path="masters-charge-code-type" element={<ChargeCodeType />} />
+          <Route path="masters-charge-code" element={<ChargeCodeType />} />
+          <Route path="masters-taxes" element={<Taxes />} />
           <Route path="masters-charges" element={<Charges />} />
           <Route path="masters-document-type" element={<DocumentType />} />
           <Route path="masters-translate" element={<Translate />} />
@@ -104,43 +74,6 @@ const App = () => {
             path="income-expense-report"
             element={<IncomeExpenseReport />}
           />
-          <Route path="building-timeline" element={<HorizontalFormTimeline />} />
-          <Route path="create-building" element={<ResponsiveBuildingInfoForm />} />
-          <Route path="upload-documents" element={<ResponsiveDocumentForm />} />
-          <Route path="submitted" element={<SubmissionConfirmationResponsive />} />
-          <Route path="buildings-reset" element={<BuildingsReset />} />
-
-          <Route path="update-building-timeline" element={<UpdateHorizontalFormTimeline />} />
-          <Route path="update-building" element={<ResponsiveUpdateBuildingInfoForm />} />
-          <Route path="update-building-upload-documents" element={<ResponsiveUpdateDocumentForm />} />
-          <Route path="update-building-submitted" element={<UpdateSubmissionConfirmResponsive />} />
-          <Route path="update-building-reset" element={<UpdateBuildingsReset />} />
-
-          <Route path="unit-timeline" element={<HorizontalUnitFormTimeline />} />
-          <Route path="unit-select-building-form" element={<UnitBuildingInfoForm />} />
-          <Route path="unit-create-unit-form" element={<UnitInfoFormResponsive />} />
-          <Route path="unit-upload-documents" element={<UnitDocumentsFormResponsive />} />
-          <Route path="unit-submitted" element={<UnitSubmitPageResponsive />} />
-          <Route path="unit-reset" element={<UnitsResets />} />
-
-          <Route path="update-unit-timeline" element={<UpdateFormTimelineRes />} />
-          <Route path="update-select-building-form" element={<UpdateUnitBuildingInfoResponsive />} />
-          <Route path="update-unit" element={<UpdateUnitInfoFormResponsive />} />
-          <Route path="update-unit-upload-documents" element={<UpdateUnitDocumentFormResponsive />} />
-          <Route path="update-unit-submitted" element={<UpdateUnitSubmitPageResponsive />} />
-          <Route path="update-unit-reset" element={<UpdateUnitsReset />} />
-
-          <Route path="tenant-timeline" element={<ResponsiveTenantFormTimeline />} />
-          <Route path="create-tenant" element={<ResponsiveTenantInfoForm />} />
-          <Route path="tenant-upload-documents" element={<TenantDocumentFormResponsive />} />
-          <Route path="tenant-submitted" element={<TenantSubmitConfirmResponsive />} />
-          <Route path="tenant-reset" element={<TenantsReset />} />
-
-          <Route path="edit-tenant-timeline" element={<EditTenantFormTimelineRes />} />
-          <Route path="edit-create-tenant" element={<ResUpdateTenantInfoForm />} />
-          <Route path="edit-tenant-upload-docs" element={<EditTenantDocFormRes />} />
-          <Route path="edit-tenant-submitted" element={<SubmissionConfirmationRes />} />
-          <Route path="edit-tenant-reset" element={<EditTenantsReset />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -1,32 +1,37 @@
 import React, { useState, useEffect } from "react";
 import "./buildings.css";
-import { ChevronDown } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import plusicon from "../../../assets/Images/Admin Buildings/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Buildings/download-icon.svg";
 import downarrow from "../../../assets/Images/Admin Buildings/downarrow.svg";
 import editicon from "../../../assets/Images/Admin Buildings/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Buildings/delete-icon.svg";
-import AddBuildingModal from "./Add Building Modal/AddBuildingModal";
-import EditBuildingModal from "./EditBuildingModal/EditBuildingModal";
 import { BASE_URL } from "../../../utils/config";
+import DeleteBuildingModal from "./DeleteBuildingModal/DeleteBuildingModal";
+import { useModal } from "../../../context/ModalContext";
+import CustomDropDown from "../../../components/CustomDropDown";
+
 
 const Buildings = () => {
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState('');
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [buildingModalOpen, setBuildingModalOpen] = useState(false);
-  const [editbuildingModalOpen, setEditBuildingModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
   const [buildings, setBuildings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedBuildingId, setSelectedBuildingId] = useState(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const { openModal, refreshCounter } = useModal();
+  const [buildingToDelete, setBuildingToDelete] = useState(null);
   const [error, setError] = useState(null);
+  const [selectedOption, setSelectedOption] = useState("showing"); // State for dropdown
   const itemsPerPage = 10;
-  const navigate = useNavigate();
+
+  // Dropdown options
+  const dropdownOptions = [
+    { label: "Showing", value: "showing" },
+    { label: "All", value: "all" },
+  ];
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -46,32 +51,6 @@ const Buildings = () => {
 
   const companyId = getUserCompanyId();
 
-  const isMobileView = () => window.innerWidth < 480;
-
-  const openBuildingModal = () => {
-    if (isMobileView()) {
-      navigate("/admin/building-timeline");
-    } else {
-      setBuildingModalOpen(true);
-    }
-  };
-
-  const openEditBuildingModal = () => {
-    if (isMobileView()) {
-      navigate("/admin/update-building-timeline");
-    } else {
-      setEditBuildingModalOpen(true);
-    }
-  };
-
-  const closeBuildingModal = () => {
-    setBuildingModalOpen(false);
-  };
-
-  const closeEditBuildingModal = () => {
-    setEditBuildingModalOpen(false);
-  };
-
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
       ...prev,
@@ -79,7 +58,6 @@ const Buildings = () => {
     }));
   };
 
-  // Function to fetch buildings
   const fetchBuildings = async () => {
     try {
       const companyId = getUserCompanyId();
@@ -169,11 +147,7 @@ const Buildings = () => {
 
   const handleEditClick = (buildingId) => {
     console.log("Buildings: Selected buildingId:", buildingId);
-    setSelectedBuildingId(buildingId);
-    setTimeout(() => {
-      console.log("Buildings: Opening edit modal with buildingId:", buildingId);
-      openEditBuildingModal();
-    }, 0);
+    openModal("edit-building", "Update Building", { buildingId });
   };
 
   const maxPageButtons = 5;
@@ -217,7 +191,7 @@ const Buildings = () => {
           <div className="flex gap-[10px] bldg-action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md bldg-add-new-building duration-200"
-              onClick={openBuildingModal}
+              onClick={() => openModal("create-building", "Add New Building")}
             >
               Add New Building
               <img
@@ -226,11 +200,11 @@ const Buildings = () => {
                 className="relative right-[5px] md:right-0 w-[15px] h-[15px]"
               />
             </button>
-            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 bldg-download-btn">
+            <button className="flex items-center justify-center gap-[2] w-full md:w-[122px] h-[38px] rounded-md duration-200 bldg-download-btn">
               Download
               <img
                 src={downloadicon}
-                alt="Download Icon"
+                alt="Download icon"
                 className="w-[15px] h-[15px] bldg-download-img"
               />
             </button>
@@ -273,7 +247,9 @@ const Buildings = () => {
                 <td className="px-5 text-left bldg-data">
                   {building.building_address || "N/A"}
                 </td>
-                <td className="pl-12 pr-5 text-left bldg-data">{building.unit_count}</td>
+                <td className="pl-12 pr-5 text-left bldg-data">
+                  {building.unit_count || "N/A"}
+                </td>
                 <td className="px-5 text-left bldg-data">
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${building.status === "active"
@@ -297,7 +273,12 @@ const Buildings = () => {
                       className="w-[18px] h-[18px] bldg-action-btn duration-200"
                     />
                   </button>
-                  <button onClick={() => deleteBuilding(building.id)}>
+                  <button
+                    onClick={() => {
+                      setBuildingToDelete(building.id);
+                      setDeleteModalOpen(true);
+                    }}
+                  >
                     <img
                       src={deletesicon}
                       alt="Delete"
@@ -316,9 +297,7 @@ const Buildings = () => {
           <thead>
             <tr className="bldg-table-row-head">
               <th className="px-5 text-left bldg-thead bldg-id-column">ID</th>
-              <th className="px-5 text-left bldg-thead bldg-date-column">
-                NAME
-              </th>
+              <th className="px-5 text-left bldg-thead bldg-date-column">NAME</th>
               <th className="px-5 text-right bldg-thead"></th>
             </tr>
           </thead>
@@ -382,7 +361,7 @@ const Buildings = () => {
                             <div className="bldg-dropdown-label">
                               NO. OF UNITS
                             </div>
-                            <div className="bldg-dropdown-value">N/A</div>
+                            <div className="bldg-dropdown-value">{building.unit_count || "N/A"}</div>
                           </div>
                           <div className="bldg-grid-item w-[27%]">
                             <div className="bldg-dropdown-label">STATUS</div>
@@ -415,7 +394,10 @@ const Buildings = () => {
                                 />
                               </button>
                               <button
-                                onClick={() => deleteBuilding(building.id)}
+                                onClick={() => {
+                                  setBuildingToDelete(building.id);
+                                  setDeleteModalOpen(true);
+                                }}
                               >
                                 <img
                                   src={deletesicon}
@@ -462,16 +444,13 @@ const Buildings = () => {
           </button>
         </div>
       </div>
-      <AddBuildingModal
-        open={buildingModalOpen}
-        onClose={closeBuildingModal}
-        onBuildingCreated={refreshBuildings}
-      />
-      <EditBuildingModal
-        open={editbuildingModalOpen}
-        onClose={closeEditBuildingModal}
-        buildingId={selectedBuildingId}
-        onBuildingCreated={refreshBuildings}
+      <DeleteBuildingModal
+        isOpen={deleteModalOpen}
+        onCancel={() => {
+          setDeleteModalOpen(false);
+          setBuildingToDelete(null);
+        }}
+        onDelete={deleteBuilding}
       />
     </div>
   );

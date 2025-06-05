@@ -92,9 +92,10 @@ const Collection = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const openUpdateModal = (collection) => {
-    openModal("update-collection", collection);
-  };
+  const handleEditClick = (collection) => {
+    console.log("Collection ID:", collection)
+    openModal("update-collection", "Update Collection", collection)
+  }
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -215,7 +216,7 @@ const Collection = () => {
                   </span>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={() => openUpdateModal(collection)}>
+                  <button onClick={() => handleEditClick(collection)}>
                     <img
                       src={editicon}
                       alt="Edit"

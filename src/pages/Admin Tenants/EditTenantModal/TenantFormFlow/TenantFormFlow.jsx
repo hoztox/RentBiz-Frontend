@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import closeicon from "../../../../assets/Images/Admin Tenants/close-icon.svg";
 import FormTimeline from "../FormTimeline";
@@ -7,9 +7,16 @@ import DocumentsForm from "../UploadDocuments/DocumentsForm";
 import ReviewPage from "../ReviewPage/ReviewPage";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 import { BASE_URL } from "../../../../utils/config";
+import { useModal } from "../../../../context/ModalContext";
 
-const TenantFormFlow = ({ onClose, tenantId, onTenantUpdated }) => {
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+const TenantFormFlow = ({
+  onClose,
+  tenantId,
+  onPageChange,
+  initialPageIndex = 0,
+}) => {
+  const { modalState, triggerRefresh } = useModal();
+  const [currentPageIndex, setCurrentPageIndex] = useState(initialPageIndex);
   const [formData, setFormData] = useState({
     tenant: null,
     documents: { documents: [] },
@@ -23,9 +30,31 @@ const TenantFormFlow = ({ onClose, tenantId, onTenantUpdated }) => {
   const [animating, setAnimating] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const isExternalNavigation = useRef(false);
 
   const pageTitles = ["Update Tenant", "Upload Documents", "Review", ""];
   const currentTitle = pageTitles[currentPageIndex];
+
+  // Handle external page navigation from dropdown
+  useEffect(() => {
+    if (
+      initialPageIndex !== currentPageIndex &&
+      !isExternalNavigation.current
+    ) {
+      isExternalNavigation.current = true;
+      setCurrentPageIndex(initialPageIndex);
+      setTimeout(() => {
+        isExternalNavigation.current = false;
+      }, 0);
+    }
+  }, [initialPageIndex]);
+
+  // Notify parent of page changes
+  useEffect(() => {
+    if (onPageChange && !isExternalNavigation.current) {
+      onPageChange(currentPageIndex);
+    }
+  }, [currentPageIndex, onPageChange]);
 
   useEffect(() => {
     const fetchTenantData = async () => {
@@ -43,7 +72,6 @@ const TenantFormFlow = ({ onClose, tenantId, onTenantUpdated }) => {
           }
         );
         const tenantData = response.data;
-        console.log("data", response.data)
         setFormData({
           tenant: {
             tenant_name: tenantData.tenant_name || "",
@@ -55,16 +83,17 @@ const TenantFormFlow = ({ onClose, tenantId, onTenantUpdated }) => {
             address: tenantData.address || "",
             tenant_type: tenantData.tenant_type || "",
             license_no: tenantData.license_no || "",
-            id_type: tenantData.id_type || "",
+            id_type: tenantData.id_type?.id || "",
             id_number: tenantData.id_number || "",
             id_validity_date: tenantData.id_validity_date || "",
             sponser_name: tenantData.sponser_name || "",
-            sponser_id_type: tenantData.sponser_id_type || "",
+            sponser_id_type: tenantData.sponser_id_type?.id || "",
             sponser_id_number: tenantData.sponser_id_number || "",
             sponser_id_validity_date: tenantData.sponser_id_validity_date || "",
             status: tenantData.status || "Active",
             remarks: tenantData.remarks || "",
-            company: tenantData.company || localStorage.getItem("company_id") || "",
+            company:
+              tenantData.company || localStorage.getItem("company_id") || "",
             user: tenantData.user || localStorage.getItem("user_id") || null,
           },
           documents: {
@@ -168,7 +197,7 @@ const TenantFormFlow = ({ onClose, tenantId, onTenantUpdated }) => {
 
   const handleClose = () => {
     if (currentPageIndex === 3) {
-      onTenantUpdated();
+      triggerRefresh(); // Trigger refresh for parent component
     }
     setCurrentPageIndex(0);
     setFormData({ tenant: null, documents: { documents: [] } });
@@ -192,16 +221,18 @@ const TenantFormFlow = ({ onClose, tenantId, onTenantUpdated }) => {
 
   return (
     <div className="flex">
-      <div className="w-[350px] pr-[53px]">
+      <div className="w-[350px] pr-[53px] form-time-line">
         <FormTimeline
           key={currentPageIndex}
           currentStep={currentPageIndex + 1}
           progress={formProgress}
         />
       </div>
-      <div className="w-full h-[700px] desktop:h-[780px] px-[33px] pt-[50px] pb-[40px] overflow-y-scroll">
-        <div className="tenant-modal-header flex justify-between items-center mb-[35px]">
-          <h3 className="tenant-modal-title">{currentTitle}</h3>
+      <div className="w-full h-[700px] desktop:h-[780px] px-[20px] sm:px-[26px] pt-[8px] sm:pt-[50px] pb-[285px] sm:pb-[40px] overflow-y-scroll">
+        <div className="tenant-modal-header flex justify-between items-center mb-[41px]">
+          <h3 className="tenant-modal-title">
+            {currentTitle} 
+          </h3>
           <button
             onClick={handleClose}
             className="border border-[#E9E9E9] rounded-full p-[11px]"
@@ -216,29 +247,35 @@ const TenantFormFlow = ({ onClose, tenantId, onTenantUpdated }) => {
               : "opacity-100 transform translate-x-0"
           }`}
         >
-          {[
-            <TenantInfoForm
-              key="info"
-              onNext={handleNextPage}
-              initialData={formData.tenant}
-              tenantId={tenantId}
-            />,
-            <DocumentsForm
-              key="docs"
-              onNext={handleNextPage}
-              onBack={handlePreviousPage}
-              initialData={formData.documents}
-              tenantId={tenantId}
-            />,
-            <ReviewPage
-              key="review"
-              formData={formData}
-              onNext={handleNextPage}
-              onBack={handlePreviousPage}
-              tenantId={tenantId}
-            />,
-            <SubmissionConfirmation key="confirm" formData={formData} />,
-          ][currentPageIndex]}
+          {
+            [
+              <TenantInfoForm
+                key="info"
+                onNext={handleNextPage}
+                initialData={formData.tenant}
+                tenantId={tenantId}
+              />,
+              <DocumentsForm
+                key="docs"
+                onNext={handleNextPage}
+                onBack={handlePreviousPage}
+                initialData={formData.documents}
+                tenantId={tenantId}
+              />,
+              <ReviewPage
+                key="review"
+                formData={formData}
+                onNext={handleNextPage}
+                onBack={handlePreviousPage}
+                tenantId={tenantId}
+              />,
+              <SubmissionConfirmation
+                key="confirm"
+                formData={formData}
+                onClose={handleClose}
+              />,
+            ][currentPageIndex]
+          }
         </div>
       </div>
     </div>

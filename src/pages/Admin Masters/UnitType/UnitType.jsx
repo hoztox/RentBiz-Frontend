@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import "./UnitType.css";
 import { ChevronDown } from "lucide-react";
 import { toast, Toaster } from "react-hot-toast";
@@ -10,9 +9,8 @@ import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
 import unitimg from "../../../assets/Images/Admin Masters/units-img.svg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
-import { BASE_URL } from "../../../utils/config";
 import UnitTypeDeleteModal from "./UnitTypeDeleteModal/UnitTypeDeleteModal";
-
+import { fetchUnitTypes, deleteUnitType } from "./api";
 
 const UnitType = () => {
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -27,49 +25,16 @@ const UnitType = () => {
   const [unitTypeIdToDelete, setUnitTypeIdToDelete] = useState(null);
   const itemsPerPage = 10;
 
-  const getUserCompanyId = () => {
-  const role = localStorage.getItem("role")?.toLowerCase();
-
-  if (role === "company") {
-    // When a company logs in, their own ID is stored as company_id
-    return localStorage.getItem("company_id");
-  } else if (role === "user" || role === "admin") {
-    // When a user logs in, company_id is directly stored
-    try {
-      const userCompanyId = localStorage.getItem("company_id");
-      return userCompanyId ? JSON.parse(userCompanyId) : null;
-    } catch (e) {
-      console.error("Error parsing user company ID:", e);
-      return null;
-    }
-  }
-
-  return null;
-};
-
-  const companyId = getUserCompanyId();
-
   // Fetch unit types from backend
-  const fetchUnitTypes = async () => {
-    if (!companyId) {
-      setError("Company ID not found. Please log in again.");
-      setLoading(false);
-      toast.error("Company ID not found. Please log in again.");
-      return;
-    }
+  const fetchData = async () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(
-        `${BASE_URL}/company/unit-types/company/${companyId}`
-      );
-      const unitData = Array.isArray(response.data)
-        ? response.data
-        : response.data.results || [];
+      const unitData = await fetchUnitTypes();
       setUnitTypes(unitData);
     } catch (err) {
       console.error("Error fetching unit types:", err);
-      const errorMessage = err.response?.data?.message || "Failed to fetch unit types. Please try again.";
+      const errorMessage = err.message || "Failed to fetch unit types. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -79,11 +44,6 @@ const UnitType = () => {
 
   // Handle delete confirmation
   const handleDelete = (id) => {
-    if (!companyId) {
-      setError("Company ID not found. Please log in again.");
-      toast.error("Company ID not found. Please log in again.");
-      return;
-    }
     setUnitTypeIdToDelete(id);
     setIsDeleteModalOpen(true);
   };
@@ -92,12 +52,12 @@ const UnitType = () => {
     if (!unitTypeIdToDelete) return;
 
     try {
-      await axios.delete(`${BASE_URL}/company/unit-types/${unitTypeIdToDelete}/`);
+      await deleteUnitType(unitTypeIdToDelete);
       setUnitTypes((prev) => prev.filter((u) => u.id !== unitTypeIdToDelete));
       toast.success("Unit Type deleted successfully.");
     } catch (error) {
       console.error("Error deleting unit type:", error);
-      const errorMessage = error.response?.data?.message || "Failed to delete unit type. Please try again.";
+      const errorMessage = error.message || "Failed to delete unit type. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -164,11 +124,12 @@ const UnitType = () => {
   const stats = getUnitTypeStats();
 
   useEffect(() => {
-    fetchUnitTypes();
-  }, [companyId, refreshCounter]);
+    fetchData();
+  }, [refreshCounter]);
 
-  const openUpdateModal = (unit) => {
-    openModal("update-unit-type-master", unit);
+  const handleEditClick = (unit) => {
+    console.log("ID Types: Selected IdType:", unit);
+    openModal("update-unit-type-master", "Update Unit Type Master", unit);
   };
 
   const toggleRowExpand = (id) => {
@@ -196,7 +157,7 @@ const UnitType = () => {
         <div className="flex flex-col justify-center items-center h-64 gap-4">
           <div className="text-lg text-red-600">{error}</div>
           <button
-            onClick={fetchUnitTypes}
+            onClick={fetchData}
             className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
           >
             Retry
@@ -308,7 +269,7 @@ const UnitType = () => {
                           {unit.title || "N/A"}
                         </td>
                         <td className="px-5 utype-flex-gap-23 h-[57px]">
-                          <button onClick={() => openUpdateModal(unit)}>
+                          <button onClick={() => handleEditClick(unit)}>
                             <img
                               src={editicon}
                               alt="Edit"
@@ -458,7 +419,7 @@ const UnitType = () => {
                             <div className="utype-grid-items">
                               <div className="utype-dropdown-label">ACTION</div>
                               <div className="utype-dropdown-value utype-flex-items-center-gap-2 p-1 ml-[5px]">
-                                <button onClick={() => openUpdateModal(unit)}>
+                                <button onClick={() => handleEditClick(unit)}>
                                   <img
                                     src={editicon}
                                     alt="Edit"

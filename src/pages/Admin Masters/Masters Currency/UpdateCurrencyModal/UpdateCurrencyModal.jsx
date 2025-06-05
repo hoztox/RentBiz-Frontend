@@ -162,9 +162,9 @@ const UpdateCurrencyModal = () => {
           </button>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-2">
           <label className="block pt-2 mb-2 text-[#201D1E] currency-modal-label">
-            Country*
+            Country *
           </label>
           <div className="relative">
             <select
@@ -204,7 +204,7 @@ const UpdateCurrencyModal = () => {
           </div>
 
           <label className="block pt-2 mb-2 text-[#201D1E] currency-modal-label">
-            Currency*
+            Currency *
           </label>
           <input
             type="text"
@@ -220,7 +220,7 @@ const UpdateCurrencyModal = () => {
           />
 
           <label className="block pt-2 mb-2 text-[#201D1E] currency-modal-label">
-            Currency Code*
+            Currency Code *
           </label>
           <input
             type="text"
@@ -236,7 +236,7 @@ const UpdateCurrencyModal = () => {
           />
 
           <label className="block pt-2 mb-2 text-[#201D1E] currency-modal-label">
-            Minor Unit*
+            Minor Unit *
           </label>
           <input
             type="text"

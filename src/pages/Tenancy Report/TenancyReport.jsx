@@ -152,22 +152,22 @@ const TenancyReport = () => {
           </div>
         </div>
       </div>
-      <div className="tenancy-report-desktop-only">
+      <div className="tenancy-report-desktop-only overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-[#E9E9E9] h-[57px]">
-              <th className="px-5 text-left tenancy-report-thead w-[58px]">ID</th>
-              <th className="px-5 text-left tenancy-report-thead w-[86px]">NAME</th>
-              <th className="pl-5 text-left tenancy-report-thead w-[87px]">DESCRIPTION</th>
-              <th className="pl-5 text-left tenancy-report-thead w-[102px]">BUILDING</th>
-              <th className="px-5 text-left tenancy-report-thead w-[54px]">UNIT</th>
-              <th className="px-5 text-left tenancy-report-thead w-[84px]">CREATED DATE</th>
-              <th className="px-5 text-left tenancy-report-thead w-[94px]">HIRE START DATE</th>
-              <th className="px-5 text-left tenancy-report-thead w-[94px]">HIRE END DATE</th>
-              <th className="px-5 text-left tenancy-report-thead w-[60px]">RENTAL MONTHS</th>
-              <th className="px-5 text-left tenancy-report-thead w-[53px]">RENT/MONTH</th>
-              <th className="px-5 text-left tenancy-report-thead w-[74px]">NO.OF PAYMENTS</th>
-              <th className="px-5 pr-6 text-center tenancy-report-thead w-[69px]">STATUS</th>
+              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">ID</th>
+              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">NAME</th>
+              <th className="pl-5 text-left tenancy-report-thead whitespace-nowrap">DESCRIPTION</th>
+              <th className="pl-5 text-left tenancy-report-thead whitespace-nowrap">BUILDING</th>
+              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">UNIT</th>
+              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">CREATED<br/>DATE</th>
+              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">HIRE START<br/>DATE</th>
+              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">HIRE END<br/>DATE</th>
+              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">RENTAL<br/>MONTHS</th>
+              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">RENT/<br/>MONTH</th>
+              <th className="px-5 text-left tenancy-report-thead whitespace-nowrap">NO.OF<br/>PAYMENTS</th>
+              <th className="px-5 pr-6 text-center tenancy-report-thead whitespace-nowrap">STATUS</th>
             </tr>
           </thead>
           <tbody>
@@ -176,17 +176,17 @@ const TenancyReport = () => {
                 key={index}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-5 text-left tenancy-report-data w-[58px]">{report.id}</td>
-                <td className="px-5 text-left tenancy-report-data w-[86px]">{report.name}</td>
-                <td className="pl-5 text-left tenancy-report-data w-[67px]">{report.description}</td>
-                <td className="pl-5 text-left tenancy-report-data w-[102px]">{report.building}</td>
-                <td className="px-5 text-left tenancy-report-data w-[54px]">{report.unit}</td>
-                <td className="px-5 text-left tenancy-report-data w-[84px]">{report.createdDate}</td>
-                <td className="px-5 text-left tenancy-report-data w-[95px]">{report.hireStart}</td>
-                <td className="px-5 text-left tenancy-report-data w-[95px]">{report.hireEnd}</td>
-                <td className="px-5 text-left tenancy-report-data w-[60px]">{report.rental}</td>
-                <td className="px-5 text-left tenancy-report-data w-[40px]">{report.rent}</td>
-                <td className="px-5 text-left tenancy-report-data w-[74px]">{report.payment}</td>
+                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">{report.id}</td>
+                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">{report.name}</td>
+                <td className="pl-5 text-left tenancy-report-data">{report.description}</td>
+                <td className="pl-5 text-left tenancy-report-data whitespace-nowrap">{report.building}</td>
+                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">{report.unit}</td>
+                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">{report.createdDate}</td>
+                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">{report.hireStart}</td>
+                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">{report.hireEnd}</td>
+                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">{report.rental}</td>
+                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">{report.rent}</td>
+                <td className="px-5 text-left tenancy-report-data whitespace-nowrap">{report.payment}</td>
                 <td className="px-5 text-center tenancy-report-data">
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] tenancy-report-status ${

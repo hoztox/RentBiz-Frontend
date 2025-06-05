@@ -40,69 +40,104 @@ const AdminLogin = () => {
   };
 
 const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  if (!username || !password) {
-    toast.error("Username and Password are required");
-    return;
-  }
-
-  try {
-    setLoading(true);
-
-    const response = await axios.post(`${BASE_URL}/company/company-login/`, {
-      username,
-      password,
-    });
-
-    console.log("Login Success:", response.data);
-
-    if (response.status === 200) {
-      const {
-        access,
-        refresh,
-        role,
-        id,
-        company_id,
-        ...restData
-      } = response.data;
-
-      console.log("Access Token:", access);
-      console.log("Refresh Token:", refresh);
-      console.log("Role:", role);
-
-      localStorage.setItem("accessToken", access);
-      localStorage.setItem("refreshToken", refresh);
-      localStorage.setItem("role", role);
-
-      const normalizedRole = role.toLowerCase();
-
-      if (normalizedRole === "company") {
-        localStorage.setItem("company_id", id); // id is company_id for company login
-        Object.entries(restData).forEach(([key, value]) => {
-          localStorage.setItem(`company_${key}`, JSON.stringify(value));
-        });
-        localStorage.removeItem("user_id");
-        navigate("/admin/dashboard");
-      } else if (normalizedRole === "user" || normalizedRole === "admin") {
-        localStorage.setItem("user_id", id); // id is user_id for user login
-        if (company_id) localStorage.setItem("company_id", company_id);
-        Object.entries(restData).forEach(([key, value]) => {
-          localStorage.setItem(`user_${key}`, JSON.stringify(value));
-        });
-        localStorage.removeItem("company_name");
-        navigate("/admin/dashboard");
-      } else {
-        toast.error("Unknown role, login failed");
-      }
+    e.preventDefault();
+    console.log("=== FRONTEND LOGIN DEBUG ===");
+    console.log("Username:", username);
+    console.log("Password:", password ? "***provided***" : "empty");
+    if (!username || !password) {
+      toast.error("Username and Password are required");
+      return;
     }
-  } catch (error) {
-    console.error("Login Error:", error.response?.data || error);
-    toast.error("Login failed. Please check your credentials.");
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      setLoading(true);
+      const loginData = {
+        username: username.trim(), // Remove any whitespace
+        password: password,
+      };
+      console.log("Sending login request with data:", {
+        username: loginData.username,
+        password: "***hidden***"
+      });
+      const response = await axios.post(`${BASE_URL}/company/company-login/`, loginData);
+      console.log("Login Response Status:", response.status);
+      console.log("Login Response Data:", response.data);
+      if (response.status === 200) {
+        const {
+          access,
+          refresh,
+          role,
+          id,
+          company_id,
+          ...restData
+        } = response.data;
+        console.log("Extracted data:");
+        console.log("- Access Token:", access ? "present" : "missing");
+        console.log("- Refresh Token:", refresh ? "present" : "missing");
+        console.log("- Role:", role);
+        console.log("- ID:", id);
+        console.log("- Company ID:", company_id);
+        console.log("- Rest Data:", restData);
+        // Store tokens
+        localStorage.setItem("accessToken", access);
+        localStorage.setItem("refreshToken", refresh);
+        localStorage.setItem("role", role);
+        const normalizedRole = role.toLowerCase();
+        console.log("Normalized Role:", normalizedRole);
+        if (normalizedRole === "company") {
+          console.log("Processing company login...");
+          // For company login, use the company's ID (not user_id)
+          localStorage.setItem("company_id", id);
+          // Store all company data with company_ prefix
+          Object.entries(restData).forEach(([key, value]) => {
+            const storageKey = `company_${key}`;
+            const storageValue = JSON.stringify(value);
+            localStorage.setItem(storageKey, storageValue);
+            console.log(`Stored ${storageKey}:`, storageValue);
+          });
+          // Clean up user-specific data
+          localStorage.removeItem("user_id");
+          console.log("Company login successful, navigating to dashboard");
+          toast.success("Company login successful!");
+          navigate("/admin/dashboard");
+        } else if (normalizedRole === "user") {
+          console.log("Processing user login...");
+          localStorage.setItem("user_id", id);
+          if (company_id) {
+            localStorage.setItem("company_id", company_id);
+          }
+          // Store all user data with user_ prefix
+          Object.entries(restData).forEach(([key, value]) => {
+            const storageKey = `user_${key}`;
+            const storageValue = JSON.stringify(value);
+            localStorage.setItem(storageKey, storageValue);
+            console.log(`Stored ${storageKey}:`, storageValue);
+          });
+          // Clean up company-specific data
+          localStorage.removeItem("company_name");
+          console.log("User login successful, navigating to dashboard");
+          toast.success("User login successful!");
+          navigate("/admin/dashboard");
+        } else {
+          console.error("Unknown role received:", role);
+          toast.error("Unknown role, login failed");
+        }
+      }
+    } catch (error) {
+      console.error("=== LOGIN ERROR ===");
+      console.error("Error object:", error);
+      console.error("Error response:", error.response);
+      console.error("Error response data:", error.response?.data);
+      console.error("Error message:", error.message);
+      const errorMessage = error.response?.data?.error ||
+                          error.response?.data?.message ||
+                          "Login failed. Please check your credentials.";
+      console.error("Showing error message:", errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+      console.log("=== LOGIN PROCESS COMPLETE ===");
+    }
+  };
 
 
   return (

@@ -78,10 +78,10 @@ const AdminSidebar = () => {
   // Create Tenant Modal
   const [isCreateTenantModalOpen, setIsCreateTenantModalOpen] = useState(false);
 
-  const openCreateTenantModal = () => {
-    setIsCreateTenantModalOpen(true);
-    setActiveItem("Tenants Master");
-  };
+  // const openCreateTenantModal = () => {
+  //   setIsCreateTenantModalOpen(true);
+  //   setActiveItem("Tenants Master");
+  // };
 
   const closeCreateTenantModal = () => {
     setIsCreateTenantModalOpen(false);
@@ -166,7 +166,7 @@ const AdminSidebar = () => {
                   }`}
                 onClick={() => {
                   setActiveItem("Create User");
-                  openModal("user-create");
+                  openModal("user-create", "Create User");
                 }}
               >
                 <p className="pl-10 py-[7px]">Create User</p>
@@ -295,8 +295,9 @@ const AdminSidebar = () => {
                     }`}
                   onClick={() => {
                     setActiveItem("Create Tenant");
-                    openCreateTenantModal();
+                    // openCreateTenantModal();
                     navigate("/admin/tenants");
+                    openModal("create-tenant", "Create New Tenant");
                   }}
                 >
                   <p className="pl-10 py-[7px]">Create Tenant</p>
@@ -471,14 +472,25 @@ const AdminSidebar = () => {
                 </div>
 
                 <div
-                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Charge Code Type" ? "submenu-active" : ""
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Charge Code" ? "submenu-active" : ""
                     }`}
                   onClick={() => {
-                    setActiveItem("Charge Code Type");
-                    navigate("/admin/masters-charge-code-type");
+                    setActiveItem("Charge Code");
+                    navigate("/admin/masters-charge-code");
                   }}
                 >
-                  <p className="pl-10 py-[7px]">Charge Code Type</p>
+                  <p className="pl-10 py-[7px]">Charge Code</p>
+                </div>
+
+                <div
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Taxes" ? "submenu-active" : ""
+                    }`}
+                  onClick={() => {
+                    setActiveItem("Taxes");
+                    navigate("/admin/masters-taxes");
+                  }}
+                >
+                  <p className="pl-10 py-[7px]">Taxes</p>
                 </div>
 
                 <div
@@ -714,8 +726,8 @@ const AdminSidebar = () => {
         <div className="mx-5">
           <div
             className={`flex items-center py-[7px] px-3 mb-5 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Logout"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
+              ? "menu-active"
+              : "text-gray-700 hover:bg-gray-200"
               }`}
             onClick={handleLogout}
             role="button"

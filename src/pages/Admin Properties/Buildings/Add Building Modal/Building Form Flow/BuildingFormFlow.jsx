@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import closeicon from "../../../../../assets/Images/Admin Buildings/close-icon.svg";
 import FormTimeline from "../FormTimeline";
 import BuildingInfoForm from "../Create Building/BuildingInfoForm";
 import DocumentsForm from "../Upload Documents/DocumentsForm";
 import ReviewPage from "../ReviewPage/ReviewPage";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
+import "./buildingformflow.css";
+import { useModal } from "../../../../../context/ModalContext";
 
-const BuildingFormFlow = ({ onClose, onBuildingCreated }) => {
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+const BuildingFormFlow = ({ onClose, onPageChange, initialPageIndex = 0 }) => {
+  const { triggerRefresh } = useModal();
+  const [currentPageIndex, setCurrentPageIndex] = useState(initialPageIndex);
   const [formData, setFormData] = useState({
     building: null,
     documents: null,
@@ -19,20 +22,38 @@ const BuildingFormFlow = ({ onClose, onBuildingCreated }) => {
     submitted: 0,
   });
   const [animating, setAnimating] = useState(false);
+  const isExternalNavigation = useRef(false);
 
-  // Dynamic page titles based on current page
-  const pageTitles = [
-    "Create New Building",
-    "Upload Documents",
-    "Review",
-    "",
-  ];
+  const pageTitles = ["Create New Building", "Upload Documents", "Review", ""];
 
-  // Get current title based on page index
   const currentTitle = pageTitles[currentPageIndex];
 
   useEffect(() => {
-    const newProgress = { createBuilding: 0, uploadDocuments: 0, review: 0, submitted: 0 };
+    if (
+      initialPageIndex !== currentPageIndex &&
+      !isExternalNavigation.current
+    ) {
+      isExternalNavigation.current = true;
+      setCurrentPageIndex(initialPageIndex);
+      setTimeout(() => {
+        isExternalNavigation.current = false;
+      }, 0);
+    }
+  }, [initialPageIndex]);
+
+  useEffect(() => {
+    if (onPageChange && !isExternalNavigation.current) {
+      onPageChange(currentPageIndex);
+    }
+  }, [currentPageIndex, onPageChange]);
+
+  useEffect(() => {
+    const newProgress = {
+      createBuilding: 0,
+      uploadDocuments: 0,
+      review: 0,
+      submitted: 0,
+    };
 
     if (currentPageIndex >= 1) newProgress.createBuilding = 100;
     if (currentPageIndex >= 2) newProgress.uploadDocuments = 100;
@@ -69,7 +90,7 @@ const BuildingFormFlow = ({ onClose, onBuildingCreated }) => {
     }));
 
     setTimeout(() => {
-      setCurrentPageIndex((prev) => prev + 1); // Progress to next page, including SubmissionConfirmation
+      setCurrentPageIndex((prev) => prev + 1);
       setAnimating(false);
     }, 500);
   };
@@ -91,12 +112,16 @@ const BuildingFormFlow = ({ onClose, onBuildingCreated }) => {
 
   const handleClose = () => {
     if (currentPageIndex === 3) {
-      // Only trigger refresh if closing from SubmissionConfirmation
-      onBuildingCreated();
+      triggerRefresh(); // Trigger refresh after submission
     }
     setCurrentPageIndex(0);
     setFormData({ building: null, documents: null });
-    setFormProgress({ createBuilding: 0, uploadDocuments: 0, review: 0, submitted: 0 });
+    setFormProgress({
+      createBuilding: 0,
+      uploadDocuments: 0,
+      review: 0,
+      submitted: 0,
+    });
     onClose();
   };
 
@@ -121,23 +146,20 @@ const BuildingFormFlow = ({ onClose, onBuildingCreated }) => {
     <SubmissionConfirmation
       key="confirm"
       formData={formData}
+      onClose={handleClose}
     />,
   ];
 
   return (
     <div className="flex">
-      {/* Left Side - Timeline */}
-      <div className="w-[350px] pr-[53px]">
+      <div className="w-[350px] pr-[53px] form-time-line">
         <FormTimeline
           key={currentPageIndex}
           currentStep={currentPageIndex + 1}
           progress={formProgress}
         />
       </div>
-
-      {/* Right Side - Form Steps & Modal Header */}
-      <div className="w-full h-[700px] desktop:h-[780px] px-[26px] pt-[50px] pb-[40px] overflow-y-scroll">
-        {/* Modal Header with Dynamic Title */}
+      <div className="w-full h-[700px] desktop:h-[780px] px-[20px] sm:px-[26px] pt-[8px] sm:pt-[50px] pb-[285px] sm:pb-[40px] overflow-y-scroll">
         <div className="building-modal-header flex justify-between items-center mb-[35px]">
           <h3 className="building-modal-title">{currentTitle}</h3>
           <button
@@ -147,11 +169,11 @@ const BuildingFormFlow = ({ onClose, onBuildingCreated }) => {
             <img src={closeicon} alt="Close" className="w-[15px] h-[15px]" />
           </button>
         </div>
-
-        {/* Current Form Page with Animation */}
         <div
           className={`transition-all duration-500 ease-in-out ${
-            animating ? "opacity-0 transform translate-x-10" : "opacity-100 transform translate-x-0"
+            animating
+              ? "opacity-0 transform translate-x-10"
+              : "opacity-100 transform translate-x-0"
           }`}
         >
           {pageComponents[currentPageIndex]}

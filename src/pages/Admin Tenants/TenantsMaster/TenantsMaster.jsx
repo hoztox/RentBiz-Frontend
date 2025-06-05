@@ -1,32 +1,35 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./TenantsMaster.css";
-import { ChevronDown } from "lucide-react";
 import plusicon from "../../../assets/Images/Admin Tenants/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Tenants/download-icon.svg";
 import editicon from "../../../assets/Images/Admin Tenants/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Tenants/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenants/downarrow.svg";
-import CreateTenantModal from "../CreateTenantModal/CreateTenantModal";
-import EditTenantModal from "../EditTenantModal/EditTenantModal";
-import { useNavigate } from "react-router-dom";
+import DeleteTenantModal from "../DeleteTenantModal/DeleteTenantModal";
 import { BASE_URL } from "../../../utils/config";
+import { useModal } from "../../../context/ModalContext";
+import CustomDropDown from "../../../components/CustomDropDown";
+
 
 const TenantsMaster = () => {
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [createTenantModalOpen, setCreateTenantModalOpen] = useState(false);
-  const [updateTenantModalOpen, setUpdateTenantModalOpen] = useState(false);
   const [expandedRows, setExpandedRows] = useState({});
   const [tenants, setTenants] = useState([]);
-  const [selectedTenantId, setSelectedTenantId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [tenantToDelete, setTenantToDelete] = useState(null);
+  const { openModal, refreshCounter } = useModal();
+  const [selectedOption, setSelectedOption] = useState("showing"); // State for dropdown
   const itemsPerPage = 10;
-  const navigate = useNavigate();
 
-  const isMobileView = () => window.innerWidth < 480;
+  // Dropdown options
+  const dropdownOptions = [
+    { label: "Showing", value: "showing" },
+    { label: "All", value: "all" },
+  ];
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -73,11 +76,6 @@ const TenantsMaster = () => {
     }
   };
 
-  const refreshTenants = () => {
-    console.log("Tenants: Refreshing tenant list");
-    fetchTenants();
-  };
-
   useEffect(() => {
     if (companyId) {
       fetchTenants();
@@ -85,60 +83,34 @@ const TenantsMaster = () => {
       setError("Company ID not found.");
       setLoading(false);
     }
-  }, [companyId]);
+  }, [companyId, refreshCounter]);
 
-  const openCreateTenantModal = () => {
-    if (isMobileView()) {
-      navigate("/admin/tenant-timeline");
-    } else {
-      setCreateTenantModalOpen(true);
-    }
-  };
+  const handleDeleteTenant = async () => {
+    if (!tenantToDelete) return;
 
-  const closeCreateTenantModal = () => {
-    setCreateTenantModalOpen(false);
-  };
-
-  const openUpdateTenantModal = (tenantId) => {
-    console.log("Tenants: Selected tenantId:", tenantId);
-    setSelectedTenantId(tenantId);
-    if (isMobileView()) {
-      navigate("/admin/edit-tenant-timeline");
-    } else {
-      setTimeout(() => {
-        console.log("Tenants: Opening edit modal with tenantId:", tenantId);
-        setUpdateTenantModalOpen(true);
-      }, 0);
-    }
-  };
-
-  const closeUpdateTenantModal = () => {
-    setUpdateTenantModalOpen(false);
-    setSelectedTenantId(null);
-  };
-
-  const handleDeleteTenant = async (tenantId) => {
-    if (window.confirm("Are you sure you want to delete this tenant?")) {
-      try {
-        const response = await axios.delete(
-          `${BASE_URL}/company/tenant/${tenantId}/`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        if (response.status === 204) {
-          setTenants(tenants.filter((tenant) => tenant.id !== tenantId));
-          console.log("Tenants: Successfully deleted tenant", tenantId);
+    try {
+      const response = await axios.delete(
+        `${BASE_URL}/company/tenant/${tenantToDelete}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
-      } catch (error) {
-        console.error("Error deleting tenant:", error);
-        setError(
-          "Failed to delete tenant: " +
-            (error.response?.data?.message || error.message)
-        );
+      );
+      if (response.status === 204) {
+        setTenants(tenants.filter((tenant) => tenant.id !== tenantToDelete));
+        console.log("Tenants: Successfully deleted tenant", tenantToDelete);
       }
+      setDeleteModalOpen(false);
+      setTenantToDelete(null);
+    } catch (error) {
+      console.error("Error deleting tenant:", error);
+      setError(
+        "Failed to delete tenant: " +
+          (error.response?.data?.message || error.message)
+      );
+      setDeleteModalOpen(false);
+      setTenantToDelete(null);
     }
   };
 
@@ -154,7 +126,9 @@ const TenantsMaster = () => {
       (tenant.tenant_name?.toLowerCase() || "").includes(
         searchTerm.toLowerCase()
       ) ||
-      (tenant.address?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (tenant.address?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase()
+      ) ||
       (tenant.code?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
       (tenant.tenant_type?.toLowerCase() || "").includes(
         searchTerm.toLowerCase()
@@ -194,26 +168,19 @@ const TenantsMaster = () => {
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 tenant-search"
             />
             <div className="relative w-[40%] md:w-auto">
-              <select
-                name="select"
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 tenant-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+              <CustomDropDown
+                options={dropdownOptions}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                placeholder="Select"
+                dropdownClassName="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 tenant-selection"
               />
             </div>
           </div>
           <div className="flex gap-[10px] action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md add-new-tenant duration-200"
-              onClick={openCreateTenantModal}
+              onClick={() => openModal("create-tenant", "Create New Tenant")}
             >
               Add New Tenant
               <img
@@ -285,14 +252,19 @@ const TenantsMaster = () => {
                   {tenant.id_type?.title || "N/A"}
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={() => openUpdateTenantModal(tenant.id)}>
+                  <button onClick={() => openModal("edit-tenant", "Update Tenant", { tenantId: tenant.id })}>
                     <img
                       src={editicon}
                       alt="Edit"
                       className="w-[18px] h-[18px] action-btn duration-200"
                     />
                   </button>
-                  <button onClick={() => handleDeleteTenant(tenant.id)}>
+                  <button
+                    onClick={() => {
+                      setTenantToDelete(tenant.id);
+                      setDeleteModalOpen(true);
+                    }}
+                  >
                     <img
                       src={deletesicon}
                       alt="Delete"
@@ -403,7 +375,7 @@ const TenantsMaster = () => {
                             <div className="dropdown-label">ACTION</div>
                             <div className="dropdown-value flex items-center gap-2 mt-[10px]">
                               <button
-                                onClick={() => openUpdateTenantModal(tenant.id)}
+                                onClick={() => openModal("edit-tenant", "Update Tenant", { tenantId: tenant.id })}
                               >
                                 <img
                                   src={editicon}
@@ -412,7 +384,10 @@ const TenantsMaster = () => {
                                 />
                               </button>
                               <button
-                                onClick={() => handleDeleteTenant(tenant.id)}
+                                onClick={() => {
+                                  setTenantToDelete(tenant.id);
+                                  setDeleteModalOpen(true);
+                                }}
                               >
                                 <img
                                   src={deletesicon}
@@ -489,16 +464,13 @@ const TenantsMaster = () => {
           </button>
         </div>
       </div>
-      <CreateTenantModal
-        open={createTenantModalOpen}
-        onClose={closeCreateTenantModal}
-        onTenantCreated={refreshTenants}
-      />
-      <EditTenantModal
-        open={updateTenantModalOpen}
-        onClose={closeUpdateTenantModal}
-        tenantId={selectedTenantId}
-        onTenantUpdated={refreshTenants}
+      <DeleteTenantModal
+        isOpen={deleteModalOpen}
+        onCancel={() => {
+          setDeleteModalOpen(false);
+          setTenantToDelete(null);
+        }}
+        onDelete={handleDeleteTenant}
       />
     </div>
   );

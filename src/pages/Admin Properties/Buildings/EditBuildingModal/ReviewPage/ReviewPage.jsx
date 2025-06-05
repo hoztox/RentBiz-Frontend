@@ -1,4 +1,4 @@
-import React, { useState, Component } from "react";
+import React, { useState, useEffect, Component } from "react";
 import axios from "axios";
 import { BASE_URL } from "../../../../../utils/config";
 import DocumentsView from "./DocumentsView";
@@ -26,6 +26,10 @@ class ErrorBoundary extends Component {
 const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [countryName, setCountryName] = useState("N/A");
+  const [stateName, setStateName] = useState("N/A");
 
   const building = formData?.building || {};
   const documents = Array.isArray(formData?.documents?.documents)
@@ -34,6 +38,48 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
 
   console.log("ReviewPage formData:", formData);
   console.log("ReviewPage documents:", documents);
+
+  // Fetch countries
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/accounts/countries/`);
+        setCountries(response.data);
+        // Find country name
+        const country = response.data.find(c => c.id === parseInt(building.country));
+        setCountryName(country ? country.name : "N/A");
+      } catch (error) {
+        console.error("Error fetching countries:", error);
+        setError("Failed to load country data.");
+      }
+    };
+    fetchCountries();
+  }, [building.country]);
+
+  // Fetch states when country ID is available
+  useEffect(() => {
+    if (building.country) {
+      const fetchStates = async () => {
+        try {
+          const response = await axios.get(
+            `${BASE_URL}/accounts/countries/${building.country}/states/`
+          );
+          setStates(response.data);
+          // Find state name
+          const state = response.data.find(s => s.id === parseInt(building.state));
+          setStateName(state ? state.name : "N/A");
+        } catch (error) {
+          console.error("Error fetching states:", error);
+          setStates([]);
+          setStateName("N/A");
+        }
+      };
+      fetchStates();
+    } else {
+      setStates([]);
+      setStateName("N/A");
+    }
+  }, [building.country, building.state]);
 
   const handleNext = async () => {
     setLoading(true);
@@ -185,7 +231,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
       <div className="border rounded-md border-[#E9E9E9] p-5 mb-5">
         <h2 className="review-page-head">Building</h2>
         <div className="grid grid-cols-1 md:grid-cols-2">
-          <div className="space-y-8 border-r border-[#E9E9E9]">
+          <div className="space-y-8 border-r border-[#E9E9E9] max-[480px]:border-r-0">
             <div>
               <p className="review-page-label">Building No*</p>
               <p className="review-page-data">{building.building_no || "N/A"}</p>
@@ -193,6 +239,10 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
             <div>
               <p className="review-page-label">Building Name*</p>
               <p className="review-page-data">{building.building_name || "N/A"}</p>
+            </div>
+            <div>
+              <p className="review-page-label">Country*</p>
+              <p className="review-page-data">{countryName}</p>
             </div>
             <div>
               <p className="review-page-label">Description</p>
@@ -211,7 +261,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
               </p>
             </div>
           </div>
-          <div className="space-y-8 ml-5">
+          <div className="space-y-8 sm:ml-5 max-[480px]:mt-8">
             <div>
               <p className="review-page-label">Plot No*</p>
               <p className="review-page-data">{building.plot_no || "N/A"}</p>
@@ -219,6 +269,10 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
             <div>
               <p className="review-page-label">Address*</p>
               <p className="review-page-data">{building.building_address || "N/A"}</p>
+            </div>
+            <div>
+              <p className="review-page-label">State*</p>
+              <p className="review-page-data">{stateName}</p>
             </div>
             <div>
               <p className="review-page-label">Remarks</p>
@@ -235,7 +289,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
           </div>
         </div>
       </div>
-      <div className="border rounded-md border-[#E9E9E9] p-5">
+      <div className="py-5">
         <h2 className="review-page-head">Documents</h2>
         <ErrorBoundary>
           <DocumentsView documents={documents} />

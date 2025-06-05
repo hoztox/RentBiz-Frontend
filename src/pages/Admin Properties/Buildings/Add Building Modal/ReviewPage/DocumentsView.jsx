@@ -43,11 +43,11 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
   const getDocumentIcon = (type) => {
     switch (type) {
       case "pdf":
-        return <FileText className="text-blue-500" size={24} />;
+        return <FileText className="text-blue-500" size={16} />;
       case "image":
-        return <Image className="text-blue-500" size={24} />;
+        return <Image className="text-blue-500" size={16} />;
       default:
-        return <File className="text-blue-500" size={24} />;
+        return <File className="text-blue-500" size={16} />;
     }
   };
 
@@ -65,13 +65,12 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
   };
 
   return (
-    <div className="flex flex-col w-full">
-      <h1 className="documents-head pb-5">Documents</h1>
+    <div className="flex flex-col w-full max-w-full overflow-x-hidden">
       {safeDocuments.length === 0 ? (
         <p className="text-gray-500">No documents uploaded.</p>
       ) : (
         <>
-          <div className="md:grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
+          <div className="grid grid-cols-2 min-[480px]:!grid-cols-5 gap-0.5 min-[480px]:gap-4">
             {visibleDocuments.map((doc, index) => {
               // Use the first file in upload_file for display
               const file = Array.isArray(doc.upload_file)
@@ -85,25 +84,25 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
                   };
 
               return (
-                <div key={index} className="flex flex-col">
-                  <div className="bg-gray-100 rounded-md overflow-hidden cursor-pointer">
+                <div key={index} className="flex flex-col w-full max-w-[150px] min-[480px]:max-w-none mx-auto min-[480px]:mx-0">
+                  <div className="bg-gray-100 rounded-md overflow-hidden cursor-pointer box-border">
                     <div className="relative bg-white">
                       {type === "image" && file ? (
                         <img
                           src={URL.createObjectURL(file)}
                           alt={name}
-                          className="object-cover h-[220px] w-full"
+                          className="object-cover h-[162px] w-full"
                           onLoad={(e) => URL.revokeObjectURL(e.target.src)} // Clean up URL
                         />
                       ) : (
-                        <div className="w-full h-[220px] flex items-center justify-center bg-[#1458A2]">
+                        <div className="w-full h-auto max-h-[120px] min-[480px]:h-[220px] min-[480px]:max-h-[220px] aspect-[4/3] flex items-center justify-center bg-[#1458A2]">
                           {getDocumentIcon(type)}
                         </div>
                       )}
                     </div>
-                    <div className="p-2 px-3 bg-[#1458A2] text-start">
-                      <p className="document-name text-white truncate">
-                        {getDocTypeName(doc.doc_type)}: {name}
+                    <div className="p-2 min-[480px]:p-2 min-[480px]:px-3 bg-[#1458A2] text-start">
+                      <p className="document-name text-white text-xs min-[480px]:text-base truncate">
+                        {getDocTypeName} {name}
                       </p>
                     </div>
                   </div>

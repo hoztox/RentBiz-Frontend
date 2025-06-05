@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import "./buildinginfoform.css";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import PropTypes from "prop-types";
+import axios from "axios";
+import { BASE_URL } from "../../../../../utils/config"; // Adjust path as needed
 
 const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
   const [formState, setFormState] = useState({
@@ -17,11 +19,71 @@ const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
     land_mark: "",
     company: localStorage.getItem("company_id") || "",
     user: localStorage.getItem("user_id") || null,
+    country: "", // Added country field
+    state: "",   // Added state field
   });
-  const [isSelectFocused, setIsSelectFocused] = useState(false);
+  const [isSelectFocused, setIsSelectFocused] = useState({
+    status: false,
+    country: false,
+    state: false,
+  });
+  const [countries, setCountries] = useState([]);
+  const [states, setStates] = useState([]);
+  const [loading, setLoading] = useState({ countries: false, states: false });
   const [error, setError] = useState(null);
 
-  // Initialize formState with initialData when provided
+  // Fetch countries on mount
+  useEffect(() => {
+    const fetchCountries = async () => {
+      setLoading((prev) => ({ ...prev, countries: true }));
+      try {
+        const response = await axios.get(`${BASE_URL}/accounts/countries/`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+        setCountries(response.data);
+      } catch (err) {
+        console.error("Error fetching countries:", err);
+        setError("Failed to load countries");
+      } finally {
+        setLoading((prev) => ({ ...prev, countries: false }));
+      }
+    };
+    fetchCountries();
+  }, []);
+
+  // Fetch states when country changes
+  useEffect(() => {
+    if (formState.country) {
+      const fetchStates = async () => {
+        setLoading((prev) => ({ ...prev, states: true }));
+        try {
+          const response = await axios.get(
+            `${BASE_URL}/accounts/countries/${formState.country}/states/`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          setStates(response.data);
+        } catch (err) {
+          console.error("Error fetching states:", err);
+          setStates([]);
+          setError("Failed to load states");
+        } finally {
+          setLoading((prev) => ({ ...prev, states: false }));
+        }
+      };
+      fetchStates();
+    } else {
+      setStates([]);
+      setFormState((prev) => ({ ...prev, state: "" }));
+    }
+  }, [formState.country]);
+
+  // Initialize formState with initialData
   useEffect(() => {
     if (initialData) {
       console.log("BuildingInfoForm received initialData:", initialData);
@@ -38,23 +100,28 @@ const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
         land_mark: initialData.land_mark || "",
         company: initialData.company || localStorage.getItem("company_id") || "",
         user: initialData.user || localStorage.getItem("user_id") || null,
+        country: initialData.country || "", // Initialize country
+        state: initialData.state || "",     // Initialize state
       });
     }
   }, [initialData]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormState({
-      ...formState,
+    setFormState((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
+    if (name === "status" || name === "country" || name === "state") {
+      setIsSelectFocused((prev) => ({ ...prev, [name]: false }));
+    }
   };
 
   const handleNumberStep = (name, step) => {
     const currentValue = parseFloat(formState[name]) || 0;
     setFormState({
       ...formState,
-      [name]: (currentValue + step).toString(),
+      [name]: (currentValue + step).toFixed(4),
     });
   };
 
@@ -67,6 +134,7 @@ const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
       "building_name",
       "building_address",
       "status",
+      "country", // Make country required
     ];
     requiredFields.forEach((field) => {
       if (!formState[field]) {
@@ -94,6 +162,8 @@ const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
       land_mark: formState.land_mark || null,
       company: formState.company || localStorage.getItem("company_id"),
       user: formState.user || localStorage.getItem("user_id") || null,
+      country: formState.country || null,
+      state: formState.state || null,
     };
     console.log("BuildingInfoForm submitted:", tempData);
     onNext(tempData);
@@ -105,7 +175,7 @@ const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
 
   return (
     <form onSubmit={handleSubmit} className="flex-1">
-      <div className="grid grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div className="col-span-1">
           <label className="block building-info-form-label">Building No*</label>
           <input
@@ -148,6 +218,62 @@ const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
             className="w-full building-info-form-inputs resize-none focus:border-gray-300 duration-200"
             required
           />
+        </div>
+        <div className="col-span-1">
+          <label className="block building-info-form-label">Country*</label>
+          <div className="relative">
+            <select
+              name="country"
+              value={formState.country}
+              onChange={handleInputChange}
+              onFocus={() => setIsSelectFocused((prev) => ({ ...prev, country: true }))}
+              onBlur={() => setIsSelectFocused((prev) => ({ ...prev, country: false }))}
+              className="w-full appearance-none building-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer"
+              required
+            >
+              <option value="">Select Country</option>
+              {countries.map((country) => (
+                <option key={country.id} value={country.id}>
+                  {country.name}
+                </option>
+              ))}
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <ChevronDown
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
+                  isSelectFocused.country ? "rotate-180" : ""
+                }`}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="col-span-1">
+          <label className="block building-info-form-label">State</label>
+          <div className="relative">
+            <select
+              name="state"
+              value={formState.state}
+              onChange={handleInputChange}
+              onFocus={() => setIsSelectFocused((prev) => ({ ...prev, state: true }))}
+              onBlur={() => setIsSelectFocused((prev) => ({ ...prev, state: false }))}
+              className="w-full appearance-none building-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer"
+              disabled={!formState.country || loading.states}
+            >
+              <option value="">Select State</option>
+              {states.map((state) => (
+                <option key={state.id} value={state.id}>
+                  {state.name}
+                </option>
+              ))}
+            </select>
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <ChevronDown
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
+                  isSelectFocused.state ? "rotate-180" : ""
+                }`}
+              />
+            </div>
+          </div>
         </div>
         <div className="col-span-1">
           <label className="block building-info-form-label">Description</label>
@@ -236,19 +362,18 @@ const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
               name="status"
               value={formState.status}
               onChange={handleInputChange}
-              onFocus={() => setIsSelectFocused(true)}
-              onBlur={() => setIsSelectFocused(false)}
+              onFocus={() => setIsSelectFocused((prev) => ({ ...prev, status: true }))}
+              onBlur={() => setIsSelectFocused((prev) => ({ ...prev, status: false }))}
               className="w-full appearance-none building-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer"
               required
             >
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
-              <option value="pending">Pending</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
                 className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
-                  isSelectFocused ? "rotate-180" : ""
+                  isSelectFocused.status ? "rotate-180" : ""
                 }`}
               />
             </div>

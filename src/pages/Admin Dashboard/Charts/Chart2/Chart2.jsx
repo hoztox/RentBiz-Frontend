@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from 'recharts';
 import { ChevronDown } from 'lucide-react';
-import { motion } from 'framer-motion';
+import {motion} from 'framer-motion'
 import moneyin from "../../../../assets/Images/Dashboard/money-in.svg"
 import moneyout from '../../../../assets/Images/Dashboard/money-out.svg';
 import "./chart2.css"
@@ -47,33 +47,33 @@ const Chart2 = ({ initialData = sampleData }) => {
     const maxEarning = Math.max(...currentData.map(item => item.earning));
     const maxExpense = Math.max(...currentData.map(item => Math.abs(item.expense)));
     const overallMax = Math.max(maxEarning, maxExpense);
-  
+
     // Round up to the nearest 100
     const roundedMax = Math.ceil(overallMax / 100) * 100;
-  
+
     // Ensure domain is symmetrical and extends beyond the max values
     const domainMax = Math.max(300, roundedMax * 1.2);
     const adjustedDomainMax = Math.ceil(domainMax / 100) * 100;
     const newDomain = [-adjustedDomainMax, adjustedDomainMax];
-  
+
     // Adjust the Y-axis intervals based on screen size
     let interval = 100; // Default interval
     if (windowWidth < 480) {
       interval = 50; // Smaller screens get a finer scale
     }
-  
+
     // Generate Y-axis ticks based on the selected interval
     const newTicks = [];
     for (let i = -adjustedDomainMax; i <= adjustedDomainMax; i += interval) {
       newTicks.push(i);
     }
-  
+
     return { domain: newDomain, ticks: newTicks };
   };
-  
-  
-  
-  
+
+
+
+
 
   // Effect to filter/adjust data when period changes
   useEffect(() => {
@@ -200,7 +200,7 @@ const Chart2 = ({ initialData = sampleData }) => {
 
       <div className='flex justify-between'>
 
-        <div className="w-full line-chart">
+        <div className="w-full line-chart max-[480px]:h-[30vh]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={data}
@@ -213,13 +213,13 @@ const Chart2 = ({ initialData = sampleData }) => {
                 tickLine={false}
                 tick={{ fill: '#9CA3AF' }}
               />
-<YAxis
-  axisLine={false}
-  tickLine={false}
-  tick={{ fill: '#9CA3AF' }}
-  domain={yAxisDomain}
-  ticks={yAxisTicks} // Now set to 100-unit intervals
-/>
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: '#9CA3AF' }}
+                domain={yAxisDomain}
+                ticks={yAxisTicks} // Now set to 100-unit intervals
+              />
 
 
               <Tooltip

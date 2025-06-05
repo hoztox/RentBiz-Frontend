@@ -59,6 +59,24 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
     return null;
   };
 
+  // Helper function to display file names
+  const getFileDisplayText = (files) => {
+    if (!files || files.length === 0) {
+      return "Attach Files";
+    }
+    
+    if (files.length === 1) {
+      return files[0].name;
+    }
+    
+    if (files.length === 2) {
+      return `${files[0].name}, ${files[1].name}`;
+    }
+    
+    // For more than 2 files, show first file name and count
+    return `${files[0].name} and ${files.length - 1} more`;
+  };
+
   useEffect(() => {
     const fetchDocTypes = async () => {
       setLoading(true);
@@ -151,11 +169,11 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <div className="flex-1 overflow-y-auto">
-          {loading && <p>Loading document types...</p>}
+          {loading && <p></p>}
           <div>
             {documents.map((doc) => (
               <div key={doc.id} className="border-b first:pt-0 py-5">
-                <div className="flex gap-[10px] justify-between">
+                <div className="sm:flex sm:gap-[10px] sm:justify-between max-[480px]:grid max-[480px]:grid-cols-2 max-[480px]:gap-4">
                   {/* Document Type */}
                   <div>
                     <label className="block documents-label">Doc.Type</label>
@@ -237,11 +255,10 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
                         <label
                           htmlFor={`fileInput-${doc.id}`}
                           className="flex items-center justify-between documents-inputs cursor-pointer w-[161px] !py-2"
+                          title={doc.upload_file.length > 0 ? doc.upload_file.map(file => file.name).join(', ') : ''}
                         >
                           <span className="text-[#4B465C60] text-sm truncate">
-                            {doc.upload_file.length > 0
-                              ? `${doc.upload_file.length} file(s)`
-                              : "Attach Files"}
+                            {getFileDisplayText(doc.upload_file)}
                           </span>
                           <img
                             src={documentIcon}
@@ -279,7 +296,7 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
           </div>
         </div>
 
-        <div className="flex justify-end gap-4 pt-[35px] border-t mt-auto">
+        <div className="flex justify-end gap-4 pt-[35px] border-t mt-auto max-[480px]:border-t-0">
           <button
             type="button"
             className="text-[#201D1E] bg-white hover:bg-[#201D1E] hover:text-white back-button duration-200"

@@ -29,9 +29,9 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
   const navigate = useNavigate();
   const { openModal } = useModal();
 
-  const openCreateTenant = () => {
-    navigate("/admin/tenant-timeline");
-  };
+  // const openCreateTenant = () => {
+  //   navigate("/admin/tenant-timeline");
+  // };
 
   const [expandedMenus, setExpandedMenus] = useState({
     Users: false,
@@ -173,7 +173,7 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
                   }`}
                   onClick={() => {
                     setActiveItem("Create User");
-                    openModal("user-create");
+                    openModal("user-create", "Create user");
                     toggleMobileMenu();
                   }}
                 >
@@ -309,7 +309,7 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
                   }`}
                   onClick={() => {
                     setActiveItem("Create Tenant");
-                    openCreateTenant();
+                    openModal("create-tenant", "Create New Tenant");
                     toggleMobileMenu();
                   }}
                 >
@@ -505,15 +505,27 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
                 </div>
                 <div
                   className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
-                    activeItem === "Charge Code Type" ? "submenu-active" : ""
+                    activeItem === "Charge Code" ? "submenu-active" : ""
                   }`}
                   onClick={() => {
-                    setActiveItem("Charge Code Type");
-                    navigate("/admin/masters-charge-code-type");
+                    setActiveItem("Charge Code");
+                    navigate("/admin/masters-charge-code");
                     toggleMobileMenu();
                   }}
                 >
-                  <p className="pl-10 py-[7px]">Charge Code Type</p>
+                  <p className="pl-10 py-[7px]">Charge Code</p>
+                </div>
+                <div
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                    activeItem === "Taxes" ? "submenu-active" : ""
+                  }`}
+                  onClick={() => {
+                    setActiveItem("Taxes");
+                    navigate("/admin/masters-taxes");
+                    toggleMobileMenu();
+                  }}
+                >
+                  <p className="pl-10 py-[7px]">Taxes</p>
                 </div>
                 <div
                   className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${

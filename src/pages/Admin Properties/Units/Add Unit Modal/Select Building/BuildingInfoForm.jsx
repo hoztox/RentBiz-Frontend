@@ -11,7 +11,7 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
       buildingId: "",
       building_name: "",
       description: "",
-      address: "",
+      building_address: "",
       building_no: "",
       plot_no: "",
     }
@@ -141,7 +141,7 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
       buildingId: formState.buildingId,
       building_name: formState.building_name,
       description: formState.description,
-      building_address: formState.address,
+      building_address: formState.building_address,
       building_no: formState.building_no,
       plot_no: formState.plot_no,
     };
@@ -152,7 +152,7 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
   return (
     <form onSubmit={handleSubmit} className="flex-1">
       {error && <p className="text-red-500 mb-4">{error}</p>}
-      <div className="grid grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         {/* Building Name */}
         <div className="col-span-1">
           <label className="block building-info-form-label">Building Name*</label>

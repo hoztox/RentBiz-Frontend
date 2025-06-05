@@ -17,41 +17,52 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
   const [documents, setDocuments] = useState(
     safeInitialDocuments.length > 0
       ? safeInitialDocuments.map((doc, index) => ({
-        id: index + 1,
-        doc_type: doc.doc_type || "",
-        number: doc.number || "",
-        issued_date: doc.issued_date || "",
-        expiry_date: doc.expiry_date || "",
-        upload_file: doc.upload_file || [],
-      }))
+          id: index + 1,
+          doc_type: doc.doc_type || "",
+          number: doc.number || "",
+          issued_date: doc.issued_date || "",
+          expiry_date: doc.expiry_date || "",
+          upload_file: doc.upload_file || [],
+        }))
       : [
-        {
-          id: 1,
-          doc_type: "",
-          number: "",
-          issued_date: "",
-          expiry_date: "",
-          upload_file: [],
-        },
-      ]
+          {
+            id: 1,
+            doc_type: "",
+            number: "",
+            issued_date: "",
+            expiry_date: "",
+            upload_file: [],
+          },
+        ]
   );
   const [docTypes, setDocTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Helper function to display file names
+  const getFileDisplayText = (files) => {
+    if (!files || files.length === 0) {
+      return "Attach Files";
+    }
+    
+    if (files.length === 1) {
+      return files[0].name;
+    }
+    
+    if (files.length === 2) {
+      return `${files[0].name}, ${files[1].name}`;
+    }
+    
+    // For more than 2 files, show first file name and count
+    return `${files[0].name} and ${files.length - 1} more`;
+  };
+
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
     const storedCompanyId = localStorage.getItem("company_id");
-
-    console.log("Role:", role);
-    console.log("Raw company_id from localStorage:", storedCompanyId);
-
-    if (role === "company") {
-      return storedCompanyId;
-    } else if (role === "user" || role === "admin") {
+    if (role === "company" || role === "user" || role === "admin") {
       return storedCompanyId;
     }
-
     return null;
   };
 
@@ -91,8 +102,9 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
     }
 
     const tempData = {
+      ...initialData, // Include all TenantInfoForm data
       tenant_comp: validDocuments.map((doc) => ({
-        doc_type: parseInt(doc.doc_type) || null,
+        doc_type: doc.doc_type || null, // Keep as string
         number: doc.number || null,
         issued_date: doc.issued_date || null,
         expiry_date: doc.expiry_date || null,
@@ -105,8 +117,9 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
 
   const handleBack = () => {
     const tempData = {
+      ...initialData, // Include all TenantInfoForm data
       tenant_comp: documents.map((doc) => ({
-        doc_type: parseInt(doc.doc_type) || null,
+        doc_type: doc.doc_type || null,
         number: doc.number || null,
         issued_date: doc.issued_date || null,
         expiry_date: doc.expiry_date || null,
@@ -150,7 +163,7 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
           <div>
             {documents.map((doc) => (
               <div key={doc.id} className="border-b first:pt-0 py-5">
-                <div className="flex gap-[10px] justify-between">
+                <div className="sm:flex sm:gap-[10px] sm:justify-between max-[480px]:grid max-[480px]:grid-cols-2 max-[480px]:gap-4">
                   <div>
                     <label className="block documents-label">Doc.Type</label>
                     <div className="relative">
@@ -230,11 +243,10 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
                         <label
                           htmlFor={`fileInput-${doc.id}`}
                           className="flex items-center justify-between documents-inputs cursor-pointer w-[161px] !py-2"
+                          title={doc.upload_file.length > 0 ? doc.upload_file.map(file => file.name).join(', ') : ''}
                         >
                           <span className="text-[#4B465C60] text-sm truncate">
-                            {doc.upload_file.length > 0
-                              ? `${doc.upload_file.length} file(s)`
-                              : "Attach Files"}
+                            {getFileDisplayText(doc.upload_file)}
                           </span>
                           <img
                             src={documentIcon}
@@ -272,7 +284,7 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
           </div>
         </div>
 
-        <div className="flex justify-end gap-4 pt-[35px] border-t mt-auto">
+        <div className="flex justify-end gap-4 pt-[35px] border-t mt-auto max-[480px]:border-t-0">
           <button
             type="button"
             className="text-[#201D1E] bg-white hover:bg-[#201D1E] hover:text-white back-button duration-200"

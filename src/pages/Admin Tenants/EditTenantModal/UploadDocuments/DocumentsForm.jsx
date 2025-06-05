@@ -7,7 +7,7 @@ import plusIcon from "../../../../assets/Images/Admin Tenants/plus-icon-black.sv
 import axios from "axios";
 import { BASE_URL } from "../../../../utils/config";
 
-const DocumentsForm = ({ onNext, onBack, initialData, tenantId }) => {
+const DocumentsForm = ({ onNext, onBack, initialData }) => {
   const safeInitialDocuments = Array.isArray(initialData?.documents)
     ? initialData.documents.map((doc, index) => ({
         id: doc.id || index + 1,
@@ -30,6 +30,39 @@ const DocumentsForm = ({ onNext, onBack, initialData, tenantId }) => {
   const [docTypes, setDocTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Helper function to display file names
+  const getFileDisplayText = (files) => {
+    if (!files || files.length === 0) {
+      return "Attach Files";
+    }
+    
+    const getFileName = (file) => {
+      if (file && file.name) {
+        return file.name;
+      } else if (typeof file === 'string') {
+        const parts = file.split('/');
+        return parts[parts.length - 1] || file;
+      } else if (file && file.upload_file) {
+        const fileName = file.upload_file;
+        if (typeof fileName === 'string') {
+          const parts = fileName.split('/');
+          return parts[parts.length - 1] || fileName;
+        }
+      }
+      return 'Unknown file';
+    };
+    
+    if (files.length === 1) {
+      return getFileName(files[0]);
+    }
+    
+    if (files.length === 2) {
+      return `${getFileName(files[0])}, ${getFileName(files[1])}`;
+    }
+    
+    return `${getFileName(files[0])} and ${files.length - 1} more`;
+  };
 
   useEffect(() => {
     const fetchDocTypes = async () => {
@@ -76,27 +109,31 @@ const DocumentsForm = ({ onNext, onBack, initialData, tenantId }) => {
     }
 
     const tempData = {
+      ...initialData,
       documents: validDocuments.map((doc) => ({
-        doc_type: parseInt(doc.doc_type) || null,
+        doc_type: doc.doc_type || null,
         number: doc.number || null,
         issued_date: doc.issued_date || null,
         expiry_date: doc.expiry_date || null,
         upload_file: doc.upload_file || [],
       })),
     };
+    console.log("Temporarily saved documents data:", tempData);
     onNext(tempData);
   };
 
   const handleBack = () => {
     const tempData = {
+      ...initialData,
       documents: documents.map((doc) => ({
-        doc_type: parseInt(doc.doc_type) || null,
+        doc_type: doc.doc_type || null,
         number: doc.number || null,
         issued_date: doc.issued_date || null,
         expiry_date: doc.expiry_date || null,
         upload_file: doc.upload_file || [],
       })),
     };
+    console.log("Passing documents data back:", tempData);
     onBack(tempData);
   };
 
@@ -133,7 +170,7 @@ const DocumentsForm = ({ onNext, onBack, initialData, tenantId }) => {
           <div>
             {documents.map((doc) => (
               <div key={doc.id} className="border-b first:pt-0 py-5">
-                <div className="flex gap-[10px] justify-between">
+                <div className="sm:flex sm:gap-[10px] sm:justify-between max-[480px]:grid max-[480px]:grid-cols-2 max-[480px]:gap-4">
                   <div>
                     <label className="block documents-label">Doc.Type</label>
                     <div className="relative">
@@ -207,11 +244,10 @@ const DocumentsForm = ({ onNext, onBack, initialData, tenantId }) => {
                         <label
                           htmlFor={`fileInput-${doc.id}`}
                           className="flex items-center justify-between documents-inputs cursor-pointer w-[161px] !py-2"
+                          title={getFileDisplayText(doc.upload_file)}
                         >
                           <span className="text-[#4B465C60] text-sm truncate">
-                            {doc.upload_file.length > 0
-                              ? `${doc.upload_file.length} file(s)`
-                              : "Attach Files"}
+                            {getFileDisplayText(doc.upload_file)}
                           </span>
                           <img
                             src={documentIcon}
@@ -246,7 +282,7 @@ const DocumentsForm = ({ onNext, onBack, initialData, tenantId }) => {
             </button>
           </div>
         </div>
-        <div className="flex justify-end gap-4 pt-[35px] border-t mt-auto">
+        <div className="flex justify-end gap-4 pt-[35px] border-t mt-auto max-[480px]:border-t-0">
           <button
             type="button"
             className="text-[#201D1E] bg-white hover:bg-[#201D1E] hover:text-white back-button duration-200"

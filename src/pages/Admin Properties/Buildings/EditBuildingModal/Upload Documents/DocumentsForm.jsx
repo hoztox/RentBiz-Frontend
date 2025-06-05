@@ -7,7 +7,7 @@ import { BASE_URL } from "../../../../../utils/config";
 import "./documentform.css";
 import axios from "axios";
 
-const DocumentsForm = ({ onNext, onBack, initialData, buildingId }) => {
+const DocumentsForm = ({ onNext, onBack, initialData }) => {
   const safeInitialDocuments = Array.isArray(initialData?.documents)
     ? initialData.documents.map((doc, index) => ({
         id: doc.id || index + 1, // Ensure id
@@ -39,6 +39,44 @@ const DocumentsForm = ({ onNext, onBack, initialData, buildingId }) => {
 
   console.log("DocumentsForm initialData:", initialData);
   console.log("DocumentsForm documents state:", documents);
+
+  // Helper function to display file names
+  const getFileDisplayText = (files) => {
+    if (!files || files.length === 0) {
+      return "Attach Files";
+    }
+    
+    // Helper function to get file name from file object or URL/path
+    const getFileName = (file) => {
+      if (file && file.name) {
+        // New uploaded file
+        return file.name;
+      } else if (typeof file === 'string') {
+        // Existing file as URL or path - extract filename
+        const parts = file.split('/');
+        return parts[parts.length - 1] || file;
+      } else if (file && file.upload_file) {
+        // Nested structure - extract filename
+        const fileName = file.upload_file;
+        if (typeof fileName === 'string') {
+          const parts = fileName.split('/');
+          return parts[parts.length - 1] || fileName;
+        }
+      }
+      return 'Unknown file';
+    };
+    
+    if (files.length === 1) {
+      return getFileName(files[0]);
+    }
+    
+    if (files.length === 2) {
+      return `${getFileName(files[0])}, ${getFileName(files[1])}`;
+    }
+    
+    // For more than 2 files, show first file name and count
+    return `${getFileName(files[0])} and ${files.length - 1} more`;
+  };
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -150,11 +188,11 @@ const DocumentsForm = ({ onNext, onBack, initialData, buildingId }) => {
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <div className="flex-1 overflow-y-auto">
-          {loading && <p>Loading document types...</p>}
+          {loading && <p></p>}
           <div>
             {documents.map((doc) => (
               <div key={doc.id} className="border-b first:pt-0 py-5">
-                <div className="flex gap-[10px] justify-between">
+                <div className="sm:flex sm:gap-[10px] sm:justify-between max-[480px]:grid max-[480px]:grid-cols-2 max-[480px]:gap-4">
                   <div>
                     <label className="block documents-label">Doc.Type</label>
                     <div className="relative">
@@ -230,11 +268,24 @@ const DocumentsForm = ({ onNext, onBack, initialData, buildingId }) => {
                         <label
                           htmlFor={`fileInput-${doc.id}`}
                           className="flex items-center justify-between documents-inputs cursor-pointer w-[161px] !py-2"
+                          title={doc.upload_file.length > 0 ? doc.upload_file.map(file => {
+                            if (file && file.name) return file.name;
+                            if (typeof file === 'string') {
+                              const parts = file.split('/');
+                              return parts[parts.length - 1] || file;
+                            }
+                            if (file && file.upload_file) {
+                              const fileName = file.upload_file;
+                              if (typeof fileName === 'string') {
+                                const parts = fileName.split('/');
+                                return parts[parts.length - 1] || fileName;
+                              }
+                            }
+                            return 'Unknown file';
+                          }).join(', ') : ''}
                         >
                           <span className="text-[#4B465C60] text-sm truncate">
-                            {doc.upload_file.length > 0
-                              ? `${doc.upload_file.length} file(s)`
-                              : "Attach Files"}
+                            {getFileDisplayText(doc.upload_file)}
                           </span>
                           <img
                             src={documentIcon}
@@ -269,7 +320,7 @@ const DocumentsForm = ({ onNext, onBack, initialData, buildingId }) => {
             </button>
           </div>
         </div>
-        <div className="flex justify-end gap-4 pt-[35px] border-t mt-auto">
+        <div className="flex justify-end gap-4 pt-[35px] border-t mt-auto max-[480px]:border-t-0">
           <button
             type="button"
             className="text-[#201D1E] bg-white hover:bg-[#201D1E] hover:text-white back-button duration-200"
