@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import "./DocumentType.css";
 import { ChevronDown } from "lucide-react";
 import { toast, Toaster } from "react-hot-toast";
@@ -10,8 +9,8 @@ import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
 import buildingimg from "../../../assets/Images/Admin Masters/building-img.svg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
-import { BASE_URL } from "../../../utils/config";
 import DeleteDocumentTypeModal from "./DeleteDocumentTypeModal/DeleteDocumentTypeModal";
+import { fetchDocumentTypes, deleteDocumentType } from "./api";
 
 const DocumentType = () => {
   const { openModal, refreshCounter } = useModal();
@@ -26,99 +25,54 @@ const DocumentType = () => {
   const [docTypeIdToDelete, setDocTypeIdToDelete] = useState(null);
   const itemsPerPage = 10;
 
-  const getUserCompanyId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-    if (role === "company") {
-      return localStorage.getItem("company_id");
-    } else if (role === "user" || role === "admin") {
-      try {
-        const userCompanyId = localStorage.getItem("company_id");
-        return userCompanyId ? JSON.parse(userCompanyId) : null;
-      } catch (e) {
-        console.error("Error parsing user company ID:", e);
-        return null;
-      }
-    }
-    return null;
-  };
-
-  const companyId = getUserCompanyId();
-
-  // Fetch document types from backend
+  // Fetch document types
   const fetchDocTypes = async () => {
-    if (!companyId) {
-      setError("Company ID not found. Please log in again.");
-      setLoading(false);
-      toast.error("Company ID not found. Please log in again.");
-      return;
-    }
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(
-        `${BASE_URL}/company/doc_type/company/${companyId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      const docData = Array.isArray(response.data)
-        ? response.data
-        : response.data.results || [];
+      const docData = await fetchDocumentTypes();
       setDocTypes(docData);
     } catch (err) {
       console.error("Error fetching document types:", err);
-      const errorMessage =
-        err.response?.data?.message ||
-        "Failed to fetch document types. Please try again.";
-      setError(errorMessage);
-      toast.error(errorMessage);
+      setError(err.message);
+      toast.error(err.message);
       setDocTypes([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle delete confirmation
+  // Handle delete initiation
   const handleDelete = (id) => {
-    if (!companyId) {
-      setError("Company ID not found. Please log in again.");
-      toast.error("Company ID not found. Please log in again.");
-      return;
-    }
     setDocTypeIdToDelete(id);
     setIsDeleteModalOpen(true);
   };
 
+  // Handle delete confirmation
   const handleConfirmDelete = async () => {
     if (!docTypeIdToDelete) return;
+
     try {
-      await axios.delete(`${BASE_URL}/company/doc_type/${docTypeIdToDelete}/`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      setDocTypes((prev) =>
-        prev.filter((item) => item.id !== docTypeIdToDelete)
-      );
-      toast.success("Document Type deleted successfully.");
+      setLoading(true);
+      setError(null);
+      await deleteDocumentType(docTypeIdToDelete);
+      setDocTypes((prev) => prev.filter((item) => item.id !== docTypeIdToDelete));
+      toast.success("Document Type deleted successfully");
       if (paginatedData.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
-    } catch (error) {
-      console.error("Error deleting document type:", error);
-      const errorMessage =
-        error.response?.data?.message ||
-        "Failed to delete document type. Please try again.";
-      setError(errorMessage);
-      toast.error(errorMessage);
+    } catch (err) {
+      console.error("Error deleting document type:", err);
+      setError(err.message);
+      toast.error(err.message);
     } finally {
+      setLoading(false);
       setIsDeleteModalOpen(false);
       setDocTypeIdToDelete(null);
     }
   };
 
+  // Handle cancel delete
   const handleCancelDelete = () => {
     setIsDeleteModalOpen(false);
     setDocTypeIdToDelete(null);
@@ -159,11 +113,7 @@ const DocumentType = () => {
     if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(totalPages);
     }
-  }, [companyId, currentPage, searchTerm, refreshCounter]);
-
-  // const openUpdateModal = (docType) => {
-  //   openModal("update-document-type-master", docType);
-  // };
+  }, [refreshCounter]);
 
   const handleEditClick = (docType) => {
     console.log("Document Types: Selected Document:", docType);
