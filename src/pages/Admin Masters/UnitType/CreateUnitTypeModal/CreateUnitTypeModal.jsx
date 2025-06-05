@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "./CreateUnitTypeModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
+import { toast, Toaster } from "react-hot-toast";
 import { useModal } from "../../../../context/ModalContext";
-import { BASE_URL } from "../../../../utils/config";
-import axios from "axios";
+import { createUnitType } from "../api";
 
 const CreateUnitTypeModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
@@ -26,37 +26,6 @@ const CreateUnitTypeModal = () => {
     return null;
   }
 
-  const getUserCompanyId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-
-    if (role === "company") {
-      // When a company logs in, their own ID is stored as company_id
-      return localStorage.getItem("company_id");
-    } else if (role === "user" || role === "admin") {
-      // When a user logs in, company_id is directly stored
-      try {
-        const userCompanyId = localStorage.getItem("company_id");
-        return userCompanyId ? JSON.parse(userCompanyId) : null;
-      } catch (e) {
-        console.error("Error parsing user company ID:", e);
-        return null;
-      }
-    }
-
-    return null;
-  };
-
-  const getRelevantUserId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-
-    if (role === "user" || role === "admin") {
-      const userId = localStorage.getItem("user_id");
-      if (userId) return userId;
-    }
-
-    return null;
-  };
-
   const handleSave = async () => {
     if (!title) {
       setFieldError("Please fill the Title field");
@@ -67,43 +36,15 @@ const CreateUnitTypeModal = () => {
     setError(null);
     setFieldError(null);
     try {
-      const companyId = getUserCompanyId();
-      const userId = getRelevantUserId();
-      console.log("Request payload:", { title, companyId, userId });
-
-      if (!companyId) {
-        throw new Error("Company ID is missing or invalid");
-      }
-
-      const response = await axios.post(
-        `${BASE_URL}/company/unit-types/create/`,
-        {
-          title,
-          company: companyId,
-          user: userId,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.status !== 200 && response.status !== 201) {
-        throw new Error("Failed to create unit type");
-      }
-
-      console.log("New Unit Type Created: ", { title, companyId, userId });
+      console.log("Creating unit type with title:", title);
+      await createUnitType(title);
+      console.log("New Unit Type Created:", { title });
+      toast.success("Unit Type created successfully");
       triggerRefresh();
       closeModal();
     } catch (err) {
-      console.error("Error:", err.response?.data || err.message);
-      setError(
-        "Failed to save unit type: " +
-          (err.response?.data?.detail ||
-            err.response?.data?.company_id ||
-            err.message)
-      );
+      console.error("Error:", err.message || error);
+      setError("Failed to save unit type: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -111,6 +52,7 @@ const CreateUnitTypeModal = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
+      <Toaster />
       <div
         onClick={(e) => e.stopPropagation()}
         className="create-unit-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[262px] p-6"
@@ -125,8 +67,6 @@ const CreateUnitTypeModal = () => {
             <img src={closeicon} alt="close" className="w-4 h-4" />
           </button>
         </div>
-
-        {/* {error && <div className="text-red-500 mb-4">{error}</div>} */}
 
         <div className="mb-6">
           <label className="block pt-2 tenancy-modal-label">Title *</label>
