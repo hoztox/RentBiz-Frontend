@@ -93,7 +93,7 @@ const CustomDropDown = ({
         onClick={toggleDropdown}
         className={`flex items-center justify-between px-3 py-2 border border-gray-300 rounded-md w-full cursor-pointer duration-200 bg-transparent ${dropdownClassName}`}
       >
-        <span className={`${value || filterText ? "text-[#201D1E]" : "text-gray-500"}`}>
+        <span className={`${value || filterText ? "text-[#201D1E]" : "text-[#201D1E]"}`}>
           {displayText}
         </span>
         <ChevronDown
