@@ -1,14 +1,20 @@
 import React, { useState } from "react";
 import "./Translate.css";
-import { ChevronDown } from "lucide-react";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
+import CustomDropDown from "../../../components/CustomDropDown";
 
 const Translate = () => {
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
   const itemsPerPage = 10;
+
+  const dropdownOption = [
+    {value: "showing", label: "Showing"},
+    {value: "all", label:"All"}
+  ];
+
+  const [selectedOption, setSelectedOption] = useState("showing")
 
   const demoData = [
     {
@@ -90,21 +96,13 @@ const Translate = () => {
           />
           <div className="flex flex-row gap-[10px] w-full md:w-auto second-row-container">
             <div className="relative flex-1 md:flex-none w-[45%] md:w-auto">
-              <select
-                name="select"
-                id=""
-                className="appearance-none h-[38px] px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 translate-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
-              />
+             <CustomDropDown
+              options={dropdownOption}
+              value={selectedOption}
+              onChange={setSelectedOption}
+              className="w-full md:w-[121px]"
+              dropdownClassName="px-[14px] py-[7px] h-[38px] border-[#201D1E20] focus:border-gray-300 translate-selection"
+             />
             </div>
             <button className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md update-btn duration-200">
               Update

@@ -173,7 +173,7 @@ const AddCurrencyModal = () => {
                 <option value="Qatar">Qatar</option>
               </select>
               <ChevronDown
-                className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
+                className={`absolute right-[11px] top-[13px] text-gray-400 pointer-events-none transition-transform duration-300 ${
                   isSelectOpen ? "rotate-180" : "rotate-0"
                 }`}
                 width={22}
