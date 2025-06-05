@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "./buildings.css";
-import { ChevronDown } from "lucide-react";
 import axios from "axios";
 import plusicon from "../../../assets/Images/Admin Buildings/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Buildings/download-icon.svg";
@@ -10,9 +9,10 @@ import deletesicon from "../../../assets/Images/Admin Buildings/delete-icon.svg"
 import { BASE_URL } from "../../../utils/config";
 import DeleteBuildingModal from "./DeleteBuildingModal/DeleteBuildingModal";
 import { useModal } from "../../../context/ModalContext";
+import CustomDropDown from "../../../components/CustomDropDown";
+
 
 const Buildings = () => {
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
@@ -22,7 +22,14 @@ const Buildings = () => {
   const { openModal, refreshCounter } = useModal();
   const [buildingToDelete, setBuildingToDelete] = useState(null);
   const [error, setError] = useState(null);
+  const [selectedOption, setSelectedOption] = useState("showing"); // State for dropdown
   const itemsPerPage = 10;
+
+  // Dropdown options
+  const dropdownOptions = [
+    { label: "Showing", value: "showing" },
+    { label: "All", value: "all" },
+  ];
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -126,7 +133,7 @@ const Buildings = () => {
 
   const handleEditClick = (buildingId) => {
     console.log("Buildings: Selected buildingId:", buildingId);
-    openModal("edit-building", "Update Building", { buildingId }); // Fixed to pass title and data
+    openModal("edit-building", "Update Building", { buildingId });
   };
 
   const maxPageButtons = 5;
@@ -149,26 +156,19 @@ const Buildings = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[10px] outline-none border rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 bldg-search"
             />
-         <div className="relative w-[40%] md:w-auto">
-              <select
-                name="select"
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 bldg-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+            <div className="relative w-[40%] md:w-auto">
+              <CustomDropDown
+                options={dropdownOptions}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                placeholder="Select"
+                dropdownClassName="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 bldg-selection"
               />
             </div>
           </div>
           <div className="flex gap-[10px] bldg-action-buttons-container">
             <button
-              className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[40px] rounded-md bldg-add-new-building duration-200"
+              className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md bldg-add-new-building duration-200"
               onClick={() => openModal("create-building", "Add New Building")}
             >
               Add New Building
@@ -178,7 +178,7 @@ const Buildings = () => {
                 className="relative right-[5px] md:right-0 w-[15px] h-[15px]"
               />
             </button>
-            <button className="flex items-center justify-center gap-[2] w-full md:w-[122px] h-[40px] rounded-md duration-200 bldg-download-btn">
+            <button className="flex items-center justify-center gap-[2] w-full md:w-[122px] h-[38px] rounded-md duration-200 bldg-download-btn">
               Download
               <img
                 src={downloadicon}
@@ -190,87 +190,86 @@ const Buildings = () => {
         </div>
       </div>
       <div className="bldg-desktop-only">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="border-b border-[#E9E9E9] h-[57px]">
-                <th className="px-5 text-left bldg-thead">ID</th>
-                <th className="px-5 text-left bldg-thead w-[12%]">DATE</th>
-                <th className="pl-5 text-left bldg-thead w-[15%]">NAME</th>
-                <th className="px-5 text-left bldg-thead">ADDRESS</th>
-                <th className="pl-12 pr-5 text-left bldg-thead w-[18%]">
-                  NO. OF UNITS
-                </th>
-                <th className="px-5 text-left bldg-thead w-[12%]">STATUS</th>
-                <th className="px-5 pr-6 text-right bldg-thead">ACTION</th>
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="border-b border-[#E9E9E9] h-[57px]">
+              <th className="px-5 text-left bldg-thead">ID</th>
+              <th className="px-5 text-left bldg-thead w-[12%]">DATE</th>
+              <th className="pl-5 text-left bldg-thead w-[15%]">NAME</th>
+              <th className="px-5 text-left bldg-thead">ADDRESS</th>
+              <th className="pl-12 pr-5 text-left bldg-thead w-[18%]">
+                NO. OF UNITS
+              </th>
+              <th className="px-5 text-left bldg-thead w-[12%]">STATUS</th>
+              <th className="px-5 pr-6 text-right bldg-thead">ACTION</th>
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedData.map((building, index) => (
+              <tr
+                key={building.id || index}
+                className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
+              >
+                <td className="px-5 text-left bldg-data">
+                  {building.code || "N/A"}
+                </td>
+                <td className="px-5 text-left bldg-data">
+                  {new Date(building.created_at).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </td>
+                <td className="pl-5 text-left bldg-data">
+                  {building.building_name || "N/A"}
+                </td>
+                <td className="px-5 text-left bldg-data">
+                  {building.building_address || "N/A"}
+                </td>
+                <td className="pl-12 pr-5 text-left bldg-data">
+                  {building.unit_count || "N/A"}
+                </td>
+                <td className="px-5 text-left bldg-data">
+                  <span
+                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
+                      building.status === "active"
+                        ? "bg-[#e1ffea] text-[#28c76f]"
+                        : building.status === "inactive"
+                        ? "bg-[#FFE1E1] text-[#c72828]"
+                        : "bg-[#FFF4E1] text-[#FFA500]"
+                    }`}
+                  >
+                    {building.status
+                      ? building.status.charAt(0).toUpperCase() +
+                        building.status.slice(1)
+                      : "N/A"}
+                  </span>
+                </td>
+                <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
+                  <button onClick={() => handleEditClick(building.id)}>
+                    <img
+                      src={editicon}
+                      alt="Edit"
+                      className="w-[18px] h-[18px] bldg-action-btn duration-200"
+                    />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setBuildingToDelete(building.id);
+                      setDeleteModalOpen(true);
+                    }}
+                  >
+                    <img
+                      src={deletesicon}
+                      alt="Delete"
+                      className="w-[18px] h-[18px] bldg-action-btn duration-200"
+                    />
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {paginatedData.map((building, index) => (
-                <tr
-                  key={building.id || index}
-                  className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
-                >
-                  <td className="px-5 text-left bldg-data">
-                    {building.code || "N/A"}
-                  </td>
-                  <td className="px-5 text-left bldg-data">
-                    {new Date(building.created_at).toLocaleDateString("en-GB", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </td>
-                  <td className="pl-5 text-left bldg-data">
-                    {building.building_name || "N/A"}
-                  </td>
-                  <td className="px-5 text-left bldg-data">
-                    {building.building_address || "N/A"}
-                  </td>
-                  <td className="pl-12 pr-5 text-left bldg-data">
-                    {building.unit_count || "N/A"}
-                  </td>
-                  <td className="px-5 text-left bldg-data">
-                    <span
-                      className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
-                        building.status === "active"
-                          ? "bg-[#e1ffea] text-[#28c76f]"
-                          : building.status === "inactive"
-                            ? "bg-[#FFE1E1] text-[#c72828]"
-                            : "bg-[#FFF4E1] text-[#FFA500]"
-                      }`}
-                    >
-                      {building.status
-                        ? building.status.charAt(0).toUpperCase() +
-                          building.status.slice(1)
-                        : "N/A"}
-                    </span>
-                  </td>
-                  <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                    <button onClick={() => handleEditClick(building.id)}>
-                      <img
-                        src={editicon}
-                        alt="Edit"
-                        className="w-[18px] h-[18px] bldg-action-btn duration-200"
-                      />
-                    </button>
-                    <button
-                      onClick={() => {
-                        setBuildingToDelete(building.id);
-                        setDeleteModalOpen(true);
-                      }}
-                    >
-                      <img
-                        src={deletesicon}
-                        alt="Delete"
-                        className="w-[18px] h-[18px] bldg-action-btn duration-200"
-                      />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-       
+            ))}
+          </tbody>
+        </table>
       </div>
       <div className="block md:hidden">
         <table className="w-full border-collapse">
@@ -354,8 +353,8 @@ const Buildings = () => {
                                   building.status === "active"
                                     ? "bg-[#e1ffea] text-[#28c76f]"
                                     : building.status === "inactive"
-                                      ? "bg-[#FFE1E1] text-[#c72828]"
-                                      : "bg-[#FFF4E1] text-[#FFA500]"
+                                    ? "bg-[#FFE1E1] text-[#c72828]"
+                                    : "bg-[#FFF4E1] text-[#FFA500]"
                                 } `}
                               >
                                 {building.status
