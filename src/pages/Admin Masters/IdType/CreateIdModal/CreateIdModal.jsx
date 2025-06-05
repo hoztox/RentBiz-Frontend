@@ -70,7 +70,7 @@ const CreateIdModal = () => {
         </div>
 
         <div className="mb-6">
-          <label className="block pt-2 tenancy-modal-label">Title*</label>
+          <label className="block pt-2 tenancy-modal-label">Title *</label>
           <input
             type="text"
             className={`input-style border transition-colors duration-200 ${fieldError
