@@ -4,8 +4,7 @@ import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { ChevronDown } from "lucide-react";
 import { useModal } from "../../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import axios from "axios";
-import { BASE_URL } from "../../../../utils/config";
+import { chargeCodesApi, taxesApi, chargesApi } from "../../MastersApi";
 
 const UpdateChargesModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
@@ -21,86 +20,36 @@ const UpdateChargesModal = () => {
   const [fieldErrors, setFieldErrors] = useState({});
   const taxTypeDropdownRef = useRef(null);
 
-  // Function to get company ID based on user role
-  const getUserCompanyId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-    if (role === "company") {
-      return localStorage.getItem("company_id");
-    } else if (role === "user" || role === "admin") {
-      try {
-        const userCompanyId = localStorage.getItem("company_id");
-        return userCompanyId ? JSON.parse(userCompanyId) : null;
-      } catch (e) {
-        console.error("Error parsing user company ID:", e);
-        return null;
-      }
-    }
-    return null;
-  };
-
-  // Function to get relevant user ID based on role
-  const getRelevantUserId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-    if (role === "user" || role === "admin") {
-      const userId = localStorage.getItem("user_id");
-      if (userId) return userId;
-    }
-    return null;
-  };
-
-  // Fetch charge codes for dropdown
-  const fetchChargeCodeOptions = async () => {
+  // Fetch charge codes and tax types
+  const fetchChargesCodes = async () => {
     try {
-      const companyId = getUserCompanyId();
-      if (!companyId) return;
-
-      const response = await axios.get(
-        `${BASE_URL}/company/charge_code/company/${companyId}/`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.status === 200 && response.data) {
-        const options = Array.isArray(response.data)
-          ? response.data
-          : response.data.results || [];
-        setChargeCodeOptions(options);
-      }
+      const codes = await chargeCodesApi.fetch();
+      setChargeCodeOptions(codes);
     } catch (err) {
       console.error("Error fetching charge codes:", err);
+      setError(err.message);
+      toast.error(err.message);
     }
   };
 
-  // Fetch tax types from API
   const fetchTaxTypes = async () => {
     try {
-      const companyId = getUserCompanyId();
-      if (!companyId) {
-        throw new Error("Company ID is missing or invalid");
-      }
-
-      const response = await axios.get(
-        `${BASE_URL}/company/taxes/${companyId}/`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      setTaxTypes(response.data || []);
-    } catch (error) {
-      console.error("Error fetching tax types:", error);
-      setError("Failed to fetch tax types");
+      const taxes = await taxesApi.fetch("active_only");
+      setTaxTypes(taxes);
+    } catch (err) {
+      console.error("Error fetching tax types:", err);
+      setError(err.message);
+      toast.error(err.message);
     }
   };
 
   // Handle clicks outside tax type dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (taxTypeDropdownRef.current && !taxTypeDropdownRef.current.contains(event.target)) {
+      if (
+        taxTypeDropdownRef.current &&
+        !taxTypeDropdownRef.current.contains(event.target)
+      ) {
         setIsTaxTypeOpen(false);
       }
     };
@@ -124,7 +73,7 @@ const UpdateChargesModal = () => {
       setSelectedTaxTypes(modalState.data.tax_types || []);
       setError(null);
       setFieldErrors({});
-      fetchChargeCodeOptions();
+      fetchChargesCodes();
       fetchTaxTypes();
     } else {
       setName("");
@@ -179,66 +128,28 @@ const UpdateChargesModal = () => {
     }
 
     const chargesId = modalState.data.id;
-    const companyId = getUserCompanyId();
-
-    if (!companyId) {
-      setError("Company ID is missing or invalid");
-      toast.error("Company ID is missing or invalid");
-      return;
-    }
-
-    if (!chargesId) {
-      setError("Charges ID is missing");
-      toast.error("Charges ID is missing");
-      return;
-    }
 
     setLoading(true);
     setError(null);
     setFieldErrors({});
 
     try {
-      const userId = getRelevantUserId();
-      const response = await axios.put(
-        `${BASE_URL}/company/charges/${chargesId}/`,
-        {
-          name: name,
-          charge_code: chargeCode,
-          tax_types: selectedTaxTypes,
-          company: companyId,
-          user: userId,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.status !== 200 && response.status !== 201) {
-        throw new Error("Failed to update charges");
+      const chargeData = {
+        name,
+        chargeCode,
+        taxTypes: selectedTaxTypes,
+      };
+      const response = await chargesApi.update(chargesId, chargeData);
+      toast.success("Charges updated successfully");
+      if (modalState.onSuccess) {
+        modalState.onSuccess(response);
       }
       triggerRefresh();
-      toast.success("Charges updated successfully");
-
-      if (modalState.onSuccess) {
-        modalState.onSuccess(response.data);
-      }
-
       closeModal();
     } catch (err) {
-      console.error("Error updating charges:", err.response?.data || err.message);
-      const errorMessage =
-        err.response?.data?.detail ||
-        err.response?.data?.name ||
-        err.response?.data?.charge_code ||
-        err.response?.data?.tax_types ||
-        err.response?.data?.company ||
-        err.response?.data?.message ||
-        err.message ||
-        "Failed to update charges";
-      setError(errorMessage);
-      toast.error(errorMessage);
+      console.error("Error updating charges:", err || error);
+      setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -255,7 +166,7 @@ const UpdateChargesModal = () => {
       <Toaster />
       <div
         onClick={(e) => e.stopPropagation()}
-        className="update-masters-charges-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[460px] p-6"
+        className="update-masters-charges-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto p-6"
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="modal-head">Update Charges Master</h2>
@@ -313,14 +224,14 @@ const UpdateChargesModal = () => {
               } ${chargeCode === "" ? "choose-selected" : ""}`}
               onFocus={() => setIsSelectOpen(true)}
               onBlur={() => setIsSelectOpen(false)}
-              disabled={loading}
+              disabled={loading || chargeCodeOptions.length === 0}
             >
               <option value="" disabled hidden>
                 Choose Charge Code
               </option>
               {chargeCodeOptions.map((option) => (
                 <option key={option.id} value={option.id}>
-                  {option.title}
+                  {option.title || option.name || `Code ${option.id}`}
                 </option>
               ))}
             </select>
@@ -337,19 +248,27 @@ const UpdateChargesModal = () => {
           </div>
 
           <label className="block pt-2 !mb-[10px] text-[#201D1E] modal-label">
-            Select Tax *
+            Select Tax
           </label>
           <div className="relative" ref={taxTypeDropdownRef}>
             <div
-              className={`w-full border rounded-md mt-1 px-3 py-2 cursor-pointer focus:outline-none input-style transition-colors duration-200 flex items-center`}
+              className={`w-full border rounded-md mt-1 px-3 py-2 cursor-pointer focus:outline-none input-style transition-colors duration-200 flex items-center ${
+                fieldErrors.taxTypes ? "border-red-500" : "border-[#E9E9E9]"
+              }`}
               onClick={() => setIsTaxTypeOpen(!isTaxTypeOpen)}
             >
-              {selectedTaxTypes.length > 0
-                ? selectedTaxTypes
-                    .map((id) => taxTypes.find((t) => t.id === id)?.tax_type)
-                    .filter(Boolean)
-                    .join(", ")
-                : "Select Tax"}
+              <span
+                className={`${
+                  selectedTaxTypes.length > 0 ? "text-[#201D1E]" : "text-gray-500"
+                }`}
+              >
+                {selectedTaxTypes.length > 0
+                  ? selectedTaxTypes
+                      .map((id) => taxTypes.find((t) => t.id === id)?.tax_type)
+                      .filter(Boolean)
+                      .join(", ")
+                  : "Select Tax"}
+              </span>
             </div>
             <ChevronDown
               className={`absolute right-3 top-3 w-[18px] h-[18px] md:w-[20px] md:h-[20px] transition-transform duration-300 ${

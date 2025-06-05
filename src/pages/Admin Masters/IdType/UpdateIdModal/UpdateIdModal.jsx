@@ -1,47 +1,16 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import "./UpdateIdModal.css";
-import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
+import closeIcon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { useModal } from "../../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import { BASE_URL } from "../../../../utils/config";
+import { idTypesApi } from "../../MastersApi"; // Updated import
 
 const UpdateIdModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
   const [title, setTitle] = useState("");
-  const [companyId, setCompanyId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [fieldError, setFieldError] = useState(null);
-
-  // Function to get company ID based on user role
-  const getUserCompanyId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-    if (role === "company") {
-      return localStorage.getItem("company_id");
-    } else if (role === "user" || role === "admin") {
-      try {
-        const userCompanyId = localStorage.getItem("company_id");
-        return userCompanyId ? JSON.parse(userCompanyId) : null;
-      } catch (e) {
-        console.error("Error parsing user company ID:", e);
-        return null;
-      }
-    }
-    return null;
-  };
-
-  // Function to get relevant user ID based on role
-  const getRelevantUserId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-
-    if (role === "user" || role === "admin") {
-      const userId = localStorage.getItem("user_id");
-      if (userId) return userId;
-    }
-
-    return null;
-  };
 
   // Reset form state when modal opens or ID type data changes
   useEffect(() => {
@@ -51,7 +20,6 @@ const UpdateIdModal = () => {
       modalState.data
     ) {
       setTitle(modalState.data.title || "");
-      setCompanyId(getUserCompanyId());
       setError(null);
       setFieldError(null);
     }
@@ -73,11 +41,6 @@ const UpdateIdModal = () => {
       return;
     }
 
-    if (!companyId) {
-      setFieldError("Company ID is missing or invalid");
-      return;
-    }
-
     const idTypeId = modalState.data.id;
     if (!idTypeId) {
       setFieldError("ID Type ID is missing");
@@ -89,51 +52,19 @@ const UpdateIdModal = () => {
     setFieldError(null);
 
     try {
-      const userId = getRelevantUserId();
-      console.log("Update payload:", {
-        title,
-        company: companyId,
-        user: userId,
-        id: idTypeId,
-      });
-
-      const response = await axios.put(
-        `${BASE_URL}/company/id_type/${idTypeId}/`,
-        {
-          title,
-          company: companyId,
-          user: userId,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.status !== 200 && response.status !== 201) {
-        throw new Error("Failed to update ID type");
-      }
-
-      console.log("ID Type Updated: ", response.data);
+      console.log("Updating ID type:", { idTypeId, title });
+      const updatedData = await idTypesApi.update(idTypeId, title);
+      console.log("ID Type Updated: ", updatedData);
       toast.success("ID Type updated successfully");
 
       if (modalState.onSuccess) {
-        modalState.onSuccess(response.data);
+        modalState.onSuccess(updatedData);
       }
       triggerRefresh();
       closeModal();
     } catch (err) {
-      console.error(
-        "Error updating ID type:",
-        err.response?.data || err.message
-      );
-      const errorMessage =
-        err.response?.data?.detail ||
-        err.response?.data?.company_id ||
-        err.response?.data?.message ||
-        err.message ||
-        "Failed to update ID type";
+      console.error("Error updating ID type:", err.message);
+      const errorMessage = err.message || error || "Failed to update ID type";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -162,7 +93,7 @@ const UpdateIdModal = () => {
             aria-label="Close modal"
             disabled={loading}
           >
-            <img src={closeicon} alt="close" className="w-4 h-4" />
+            <img src={closeIcon} alt="Close" className="w-4 h-4" />
           </button>
         </div>
 
@@ -171,16 +102,14 @@ const UpdateIdModal = () => {
           <input
             type="text"
             className={`input-style border transition-colors duration-200 ${
-              fieldError
-                ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-                : "border-gray-300 focus:ring-gray-700 focus:border-gray-700"
+              fieldError ? 'border-red-500 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-gray-700 focus:border-gray-700'
             }`}
             placeholder="Enter Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             disabled={loading}
           />
-          <div className="text-sm mt-1" style={{ minHeight: "20px" }}>
+         <div className="text-sm mt-1" style={{ minHeight: "20px" }}>
             {fieldError && <span className="text-[#dc2626]">{fieldError}</span>}
           </div>
         </div>
@@ -194,12 +123,10 @@ const UpdateIdModal = () => {
         <div className="flex justify-end mt-[-15px]">
           <button
             onClick={handleUpdate}
-            disabled={loading}
             className={`text-white rounded w-[150px] h-[38px] update-modal-save-btn duration-200 ${
-              loading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-[#2892CE] hover:bg-[#2276a7]"
-            }`}
+              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#2892CE] hover:bg-[#2276a7]'
+            } transition-colors`}
+            disabled={loading}
             aria-label="Save ID type"
           >
             {loading ? "Saving..." : "Save"}

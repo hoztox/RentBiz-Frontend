@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import "./CreateIdModal.css";
-import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
+import closeIcon from "../../../../assets/Images/Admin Masters/close-icon.svg";
+import { toast, Toaster } from "react-hot-toast";
 import { useModal } from "../../../../context/ModalContext";
-import { BASE_URL } from "../../../../utils/config";
+import { idTypesApi } from "../../MastersApi"; // Updated import
 
 const CreateIdModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
@@ -26,37 +26,6 @@ const CreateIdModal = () => {
     return null;
   }
 
-  const getUserCompanyId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-
-    if (role === "company") {
-      // When a company logs in, their own ID is stored as company_id
-      return localStorage.getItem("company_id");
-    } else if (role === "user" || role === "admin") {
-      // When a user logs in, company_id is directly stored
-      try {
-        const userCompanyId = localStorage.getItem("company_id");
-        return userCompanyId ? JSON.parse(userCompanyId) : null;
-      } catch (e) {
-        console.error("Error parsing user company ID:", e);
-        return null;
-      }
-    }
-
-    return null;
-  };
-
-  const getRelevantUserId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-
-    if (role === "user" || role === "admin") {
-      const userId = localStorage.getItem("user_id");
-      if (userId) return userId;
-    }
-
-    return null;
-  };
-
   const handleSave = async () => {
     if (!title) {
       setFieldError("Please fill the Title field");
@@ -68,43 +37,15 @@ const CreateIdModal = () => {
     setFieldError(null);
 
     try {
-      const companyId = getUserCompanyId();
-      const userId = getRelevantUserId();
-      console.log("Request payload:", { title, companyId, userId });
-
-      if (!companyId) {
-        throw new Error("Company ID is missing or invalid");
-      }
-
-      const response = await axios.post(
-        `${BASE_URL}/company/id_type/create/`,
-        {
-          title,
-          company: companyId,
-          user: userId,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.status !== 200 && response.status !== 201) {
-        throw new Error("Failed to create ID type");
-      }
-
-      console.log("New ID Type Created: ", response.data);
+      console.log("Creating ID type with title:", title);
+      await idTypesApi.create(title);
+      toast.success("ID Type created successfully.");
+      console.log("New ID Type Created:", { title });
       triggerRefresh();
       closeModal();
     } catch (err) {
-      console.error("Error:", err.response?.data || err.message);
-      setError(
-        "Failed to save ID type: " +
-          (err.response?.data?.detail ||
-            err.response?.data?.company_id ||
-            err.message)
-      );
+      console.error("Error:", err.message || error);
+      setError("Failed to save ID type: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -112,6 +53,7 @@ const CreateIdModal = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
+      <Toaster />
       <div
         onClick={(e) => e.stopPropagation()}
         className="create-id-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[262px] p-6"
@@ -123,7 +65,7 @@ const CreateIdModal = () => {
             className="close-btn hover:bg-gray-100 duration-200"
             aria-label="Close modal"
           >
-            <img src={closeicon} alt="close" className="w-4 h-4" />
+            <img src={closeIcon} alt="close" className="w-4 h-4" />
           </button>
         </div>
 
@@ -131,11 +73,10 @@ const CreateIdModal = () => {
           <label className="block pt-2 tenancy-modal-label">Title*</label>
           <input
             type="text"
-            className={`input-style border transition-colors duration-200 ${
-              fieldError
+            className={`input-style border transition-colors duration-200 ${fieldError
                 ? "border-red-500 focus:ring-red-500 focus:border-red-500"
                 : "border-gray-300 focus:ring-gray-700 focus:border-gray-700"
-            }`}
+              }`}
             placeholder="Enter Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}

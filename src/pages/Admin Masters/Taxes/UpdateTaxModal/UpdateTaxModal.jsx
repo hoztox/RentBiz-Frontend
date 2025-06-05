@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import "./UpdateTaxModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { ChevronDown } from "lucide-react";
 import { useModal } from "../../../../context/ModalContext";
-import axios from "axios";
-import { BASE_URL } from "../../../../utils/config";
 import { toast } from "react-hot-toast";
 
 const UpdateTaxModal = () => {
@@ -15,9 +13,11 @@ const UpdateTaxModal = () => {
   const [taxPercentage, setTaxPercentage] = useState("");
   const [applicableFrom, setApplicableFrom] = useState("");
   const [applicableTo, setApplicableTo] = useState("");
-  const [isCountrySelectOpen, setIsCountrySelectOpen] = useState(false);
-  const [isStateSelectOpen, setIsStateSelectOpen] = useState(false);
+  const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
+  const [isStateDropdownOpen, setIsStateDropdownOpen] = useState(false);
   const [countries, setCountries] = useState([]);
+  const [filteredCountries, setFilteredCountries] = useState([]);
+  const [countryFilter, setCountryFilter] = useState("");
   const [states, setStates] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(false);
@@ -41,25 +41,22 @@ const UpdateTaxModal = () => {
   };
 
   useEffect(() => {
-    const fetchCountries = async () => {
+    const loadCountries = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/accounts/countries/`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        });
-        setCountries(Array.isArray(response.data) ? response.data : []);
+        const fetchedCountries = await locationApi.fetchCountries();
+        setCountries(fetchedCountries);
+        setFilteredCountries(fetchedCountries);
       } catch (err) {
         console.error("Error fetching countries:", err);
-        toast.error("Failed to load countries");
+        toast.error(err.message);
       }
     };
 
-    fetchCountries();
+    loadCountries();
   }, []);
 
   useEffect(() => {
-    const fetchStates = async () => {
+    const loadStates = async () => {
       if (!country) {
         setStates([]);
         setState("");
@@ -67,23 +64,16 @@ const UpdateTaxModal = () => {
       }
 
       try {
-        const response = await axios.get(
-          `${BASE_URL}/accounts/countries/${country}/states/`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            },
-          }
-        );
-        setStates(Array.isArray(response.data) ? response.data : []);
+        const fetchedStates = await locationApi.fetchStates(country);
+        setStates(fetchedStates);
       } catch (err) {
         console.error("Error fetching states:", err);
-        toast.error("Failed to load states");
+        toast.error(err.message);
         setStates([]);
       }
     };
 
-    fetchStates();
+    loadStates();
   }, [country]);
 
   useEffect(() => {
@@ -249,7 +239,7 @@ const UpdateTaxModal = () => {
       closeModal();
     } catch (err) {
       console.error("Error updating tax:", err);
-      let errorMessage = "Failed to update tax";
+      let errorMessage = err.message;
       if (err.response?.data) {
         if (err.response.data.detail) {
           errorMessage = err.response.data.detail;
@@ -269,6 +259,31 @@ const UpdateTaxModal = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleCountryDropdown = () => {
+    setIsCountryDropdownOpen(!isCountryDropdownOpen);
+    if (!isCountryDropdownOpen) {
+      setCountryFilter("");
+      setFilteredCountries(countries);
+    }
+  };
+
+  const toggleStateDropdown = () => {
+    setIsStateDropdownOpen(!isStateDropdownOpen);
+  };
+
+  const selectCountry = (countryId) => {
+    setCountry(countryId);
+    setState("");
+    setIsCountryDropdownOpen(false);
+    setCountryFilter("");
+    setFilteredCountries(countries);
+  };
+
+  const selectState = (stateId) => {
+    setState(stateId);
+    setIsStateDropdownOpen(false);
   };
 
   return (

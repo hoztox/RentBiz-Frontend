@@ -1,23 +1,30 @@
 import React, { useState, useEffect } from "react";
 import "./CloseTenancy.css";
-import { ChevronDown } from "lucide-react";
 import axios from "axios";
 import downloadicon from "../../../assets/Images/Admin Tenancy/download-icon.svg";
-// import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
 import deleteicon from "../../../assets/Images/Admin Tenancy/delete-icon.svg";
 import viewicon from "../../../assets/Images/Admin Tenancy/view-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
+import CustomDropDown from "../../../components/CustomDropDown";
 
 const CloseTenancy = () => {
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
   const [tenancies, setTenancies] = useState([]);
   const { openModal } = useModal();
   const itemsPerPage = 10;
+
+  // Dropdown options for CustomDropDown
+  const dropdownOptions = [
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" },
+  ];
+
+  // State for selected dropdown value
+  const [selectedOption, setSelectedOption] = useState("showing");
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -126,32 +133,33 @@ const CloseTenancy = () => {
     });
   };
 
-const handleDelete = async (id) => {
-  try {
-    await axios.delete(`${BASE_URL}/company/tenancies/${id}/`);
-    setTenancies(tenancies.filter((tenancy) => tenancy.id !== id));
-    console.log("Deleted Tenancy ID:", id);
-  } catch (error) {
-    console.error("Error deleting tenancy:", error);
-  }
-};
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${BASE_URL}/company/tenancies/${id}/`);
+      setTenancies(tenancies.filter((tenancy) => tenancy.id !== id));
+      console.log("Deleted Tenancy ID:", id);
+    } catch (error) {
+      console.error("Error deleting tenancy:", error);
+    }
+  };
 
-const handleViewClick = (formattedTenancy) => {
-  const originalTenancy = tenancies.find(t => t.tenancy_code === formattedTenancy.tenancy_code);
-  
-  if (originalTenancy) {
-    console.log("View Original Tenancy Data:", originalTenancy);
-    openModal("tenancy-view", "View Tenancy", originalTenancy);
-  } else {
-    console.error("Original tenancy data not found for:", formattedTenancy.tenancy_code);
-    // Fallback: pass the formatted data anyway
-    openModal("tenancy-view", "View Tenancy", formattedTenancy);
-  }
-};
-  // const handleEditClick = (tenancy) => {
-  //   console.log("Edit Tenancy Data:", tenancy);
-  //   openModal("tenancy-update", "Update Tenancy", tenancy);
-  // };
+  const handleViewClick = (formattedTenancy) => {
+    const originalTenancy = tenancies.find(
+      (t) => t.tenancy_code === formattedTenancy.tenancy_code
+    );
+
+    if (originalTenancy) {
+      console.log("View Original Tenancy Data:", originalTenancy);
+      openModal("tenancy-view", "View Tenancy", originalTenancy);
+    } else {
+      console.error(
+        "Original tenancy data not found for:",
+        formattedTenancy.tenancy_code
+      );
+      // Fallback: pass the formatted data anyway
+      openModal("tenancy-view", "View Tenancy", formattedTenancy);
+    }
+  };
 
   // Handle close tenancy action
   const handleCloseTenancy = async (id) => {
@@ -190,20 +198,12 @@ const handleViewClick = (formattedTenancy) => {
           />
           <div className="flex flex-row gap-[10px] w-full md:w-auto tclose-second-row-container">
             <div className="relative flex-1 md:flex-none w-[60%] md:w-auto">
-              <select
-                name="select"
-                id=""
-                className="appearance-none h-[38px] px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 tenancy-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+              <CustomDropDown
+                options={dropdownOptions}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                className="w-full md:w-[121px]"
+                dropdownClassName="h-[38px] px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 tenancy-selection"
               />
             </div>
             <button className="flex items-center justify-center gap-2 md:w-[122px] h-[38px] rounded-md duration-200 tclose-download-btn">
@@ -251,7 +251,9 @@ const handleViewClick = (formattedTenancy) => {
                   key={index}
                   className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
                 >
-                  <td className="px-5 text-left tenancy-data">{tenancy.tenancy_code}</td>
+                  <td className="px-5 text-left tenancy-data">
+                    {tenancy.tenancy_code}
+                  </td>
                   <td className="px-5 text-left tenancy-data">
                     {tenancy.tenant}
                   </td>
@@ -292,13 +294,6 @@ const handleViewClick = (formattedTenancy) => {
                     </button>
                   </td>
                   <td className="px-5 tclose-flex-gap-23 h-[57px] flex !justify-center">
-                    {/* <button onClick={() => handleEditClick(tenancy)}>
-                      <img
-                        src={editicon}
-                        alt="Edit"
-                        className="w-[18px] h-[18px] tclose-action-btn duration-200"
-                      />
-                    </button> */}
                     <button onClick={() => handleDelete(tenancy.id)}>
                       <img
                         src={deleteicon}
@@ -411,9 +406,7 @@ const handleViewClick = (formattedTenancy) => {
                               <div className="tclose-dropdown-label">VIEW</div>
                               <div className="tclose-dropdown-value">
                                 <button
-                                  onClick={() =>
-                                    handleViewClick(tenancy)
-                                  }
+                                  onClick={() => handleViewClick(tenancy)}
                                 >
                                   <img
                                     src={tenancy.view}
@@ -448,15 +441,6 @@ const handleViewClick = (formattedTenancy) => {
                                 ACTION
                               </div>
                               <div className="tclose-dropdown-value tclose-flex-items-center-gap-2 mt-[10px] ml-[5px]">
-                                {/* <button
-                                  onClick={() => handleEditClick(tenancy)}
-                                >
-                                  <img
-                                    src={editicon}
-                                    alt="Edit"
-                                    className="w-[18px] h-[18px] tclose-action-btn duration-200"
-                                  />
-                                </button> */}
                                 <button
                                   onClick={() => handleDelete(tenancy.id)}
                                 >

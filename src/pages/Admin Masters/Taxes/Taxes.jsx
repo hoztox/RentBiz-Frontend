@@ -1,7 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import "./Taxes.css";
-import { ChevronDown } from "lucide-react";
-import axios from "axios";
 import plusicon from "../../../assets/Images/Admin Masters/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Masters/download-icon.svg";
 import editicon from "../../../assets/Images/Admin Masters/edit-icon.svg";
@@ -9,12 +7,12 @@ import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import { BASE_URL } from "../../../utils/config";
 import DeleteTaxModal from "./DeleteTaxModal/DeleteTaxModal";
+import CustomDropDown from "../../../components/CustomDropDown";
+import { taxesApi } from "../MastersApi";
 
 const Taxes = () => {
   const { openModal, refreshCounter } = useModal();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
@@ -26,7 +24,6 @@ const Taxes = () => {
   const [viewMode, setViewMode] = useState("active_only");
   const [effectiveDate, setEffectiveDate] = useState("");
   const itemsPerPage = 10;
-  const dropdownRef = useRef(null);
 
   const viewModeOptions = [
     { value: "active_only", label: "Active Taxes" },
@@ -52,7 +49,7 @@ const Taxes = () => {
   };
 
   useEffect(() => {
-    const fetchTaxes = async () => {
+    const loadTaxes = async () => {
       setLoading(true);
       setError(null);
       const companyId = getUserCompanyId();
@@ -94,16 +91,10 @@ const Taxes = () => {
       }
     };
 
-    fetchTaxes();
+    loadTaxes();
   }, [refreshCounter, viewMode, effectiveDate]);
 
   const handleDelete = (id) => {
-    const companyId = getUserCompanyId();
-    if (!companyId) {
-      setError("Company ID not found. Please log in again.");
-      toast.error("Company ID not found. Please log in again.");
-      return;
-    }
     setTaxIdToDelete(id);
     setIsDeleteModalOpen(true);
   };
@@ -114,15 +105,7 @@ const Taxes = () => {
     try {
       setLoading(true);
       setError(null);
-      const companyId = getUserCompanyId();
-      if (!companyId) {
-        throw new Error("Company ID is missing or invalid");
-      }
-      await axios.delete(`${BASE_URL}/company/taxes/${taxIdToDelete}/`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
+      await taxesApi.delete(taxIdToDelete);
       setData((prev) => prev.filter((item) => item.id !== taxIdToDelete));
       toast.success("Tax deleted successfully");
       if (paginatedData.length === 1 && currentPage > 1) {
@@ -189,28 +172,12 @@ const openUpdateModal = (tax) => {
     }));
   };
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
-  const selectViewMode = (value) => {
+  const handleViewModeChange = (value) => {
     setViewMode(value);
     if (value !== "effective_date") {
       setEffectiveDate("");
     }
-    setIsDropdownOpen(false);
   };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   return (
     <div className="border border-[#E9E9E9] rounded-md tax-table">
@@ -262,39 +229,15 @@ const openUpdateModal = (tax) => {
             disabled={loading}
           />
           <div className="flex flex-col md:flex-row gap-[10px] w-full md:w-auto">
-            <div className="relative w-full md:w-[200px]" ref={dropdownRef}>
-              <button
-                onClick={toggleDropdown}
-                className="flex items-center justify-between px-3 py-[7px] border border-[#E9E9E9] rounded-md w-full h-[38px] tax-selection"
-              >
-                {viewModeOptions.find((option) => option.value === viewMode)?.label || "Active Taxes"}
-                <ChevronDown
-                  size={20}
-                  className={`ml-2 transform transition-transform duration-300 ease-in-out text-[#201D1E] ${
-                    isDropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-              <div
-                className={`absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden transition-all duration-300 ease-in-out ${
-                  isDropdownOpen
-                    ? "opacity-100 max-h-40 transform translate-y-0"
-                    : "opacity-0 max-h-0 transform -translate-y-2 pointer-events-none"
-                }`}
-              >
-                <div className="py-1">
-                  {viewModeOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => selectViewMode(option.value)}
-                      className="block w-full text-left px-4 py-2 text-sm text-[#201D1E] hover:bg-gray-100"
-                    >
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <CustomDropDown
+              options={viewModeOptions}
+              value={viewMode}
+              onChange={handleViewModeChange}
+              placeholder="Active Taxes"
+              className="w-full md:w-[200px]"
+              dropdownClassName="tax-selection px-3 py-[7px] border-[#E9E9E9] h-[38px] focus:border-[#E9E9E9]"
+              enableFilter={false}
+            />
             {viewMode === "effective_date" && (
               <input
                 type="date"
@@ -363,14 +306,14 @@ const openUpdateModal = (tax) => {
                         {tax.is_active ? "Active" : "Inactive"}
                       </td>
                       <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                        <button onClick={() => openUpdateModal(tax)}>
+                        <button onClick={() => openUpdateModal(tax)} disabled={loading}>
                           <img
                             src={editicon}
                             alt="Edit"
                             className="w-[18px] h-[18px] tax-action-btn duration-200"
                           />
                         </button>
-                        <button onClick={() => handleDelete(tax.id)}>
+                        <button onClick={() => handleDelete(tax.id)} disabled={loading}>
                           <img
                             src={deleteicon}
                             alt="Delete"
@@ -504,6 +447,7 @@ const openUpdateModal = (tax) => {
                                   <div className="tax-dropdown-value flex items-center gap-4">
                                     <button
                                       onClick={() => openUpdateModal(tax)}
+                                      disabled={loading}
                                     >
                                       <img
                                         src={editicon}
@@ -513,6 +457,7 @@ const openUpdateModal = (tax) => {
                                     </button>
                                     <button
                                       onClick={() => handleDelete(tax.id)}
+                                      disabled={loading}
                                     >
                                       <img
                                         src={deleteicon}

@@ -3,8 +3,8 @@ import "./CreateChargesModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { ChevronDown } from "lucide-react";
 import { useModal } from "../../../../context/ModalContext";
-import axios from "axios";
-import { BASE_URL } from "../../../../utils/config";
+import { toast } from "react-hot-toast";
+import { chargeCodesApi, taxesApi, chargesApi } from "../../MastersApi";
 
 const CreateChargesModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
@@ -197,7 +197,7 @@ const CreateChargesModal = () => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
       <div
         onClick={(e) => e.stopPropagation()}
-        className="create-charges-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[460px] p-6"
+        className="create-charges-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto p-6"
       >
         <div className="flex justify-between items-center md:mb-6">
           <h2 className="modal-head">Create New Charges Master</h2>
@@ -263,7 +263,7 @@ const CreateChargesModal = () => {
               }`}
               onFocus={() => setIsSelectOpen(true)}
               onBlur={() => setIsSelectOpen(false)}
-              disabled={loading}
+              disabled={loading || chargeCodes.length === 0}
             >
               <option value="" disabled hidden>
                 Choose

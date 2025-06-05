@@ -10,16 +10,24 @@ import viewicon from "../../../assets/Images/Admin Tenancy/view-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
+import CustomDropDown from "../../../components/CustomDropDown";
 
 const TenancyMaster = () => {
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  // State for selected dropdown value
+  const [selectedOption, setSelectedOption] = useState("showing");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
   const [tenancies, setTenancies] = useState([]);
   const [loading, setLoading] = useState(true);
   const itemsPerPage = 10;
   const { openModal, refreshCounter } = useModal();
+
+  // Dropdown options for CustomDropDown
+  const dropdownOptions = [
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" },
+  ];
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -136,20 +144,12 @@ const TenancyMaster = () => {
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 tenancy-search"
             />
             <div className="relative w-[40%] md:w-auto">
-              <select
-                name="select"
-                id=""
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 tenancy-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+              <CustomDropDown
+                options={dropdownOptions}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                className="w-full md:w-[121px]"
+                dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 tenancy-selection"
               />
             </div>
           </div>
@@ -372,11 +372,7 @@ const TenancyMaster = () => {
                           <div className="tenancy-grid-item">
                             <div className="tenancy-dropdown-label">VIEW</div>
                             <div className="tenancy-dropdown-value">
-                              <button
-                                onClick={() =>
-                                  handleViewClick(tenancy)
-                                }
-                              >
+                              <button onClick={() => handleViewClick(tenancy)}>
                                 <img
                                   src={viewicon}
                                   alt="View"
@@ -388,11 +384,7 @@ const TenancyMaster = () => {
                           <div className="tenancy-grid-item tenancy-action-column">
                             <div className="tenancy-dropdown-label">ACTION</div>
                             <div className="tenancy-dropdown-value tenancy-flex tenancy-items-center tenancy-gap-2">
-                              <button
-                                onClick={() =>
-                                  handleEditClick( tenancy)
-                                }
-                              >
+                              <button onClick={() => handleEditClick(tenancy)}>
                                 <img
                                   src={editicon}
                                   alt="Edit"

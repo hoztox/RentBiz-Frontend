@@ -1,57 +1,25 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import "./UpdateUnitTypeModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { useModal } from "../../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import { BASE_URL } from "../../../../utils/config";
+import { unitTypesApi } from "../../MastersApi"; // Updated import
 
 const UpdateUnitTypeModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
   const [title, setTitle] = useState("");
-  const [companyId, setCompanyId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [fieldError, setFieldError] = useState(null);
 
-  // Function to get company ID based on user role
-  const getUserCompanyId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-    if (role === "company") {
-      return localStorage.getItem("company_id");
-    } else if (role === "user" || role === "admin") {
-      try {
-        const userCompanyId = localStorage.getItem("company_id");
-        return userCompanyId ? JSON.parse(userCompanyId) : null;
-      } catch (e) {
-        console.error("Error parsing user company ID:", e);
-        return null;
-      }
-    }
-    return null;
-  };
-
-  // Function to get relevant user ID based on role
-  const getRelevantUserId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-
-    if (role === "user" || role === "admin") {
-      const userId = localStorage.getItem("user_id");
-      if (userId) return userId;
-    }
-
-    return null;
-  };
-
   // Reset form state when modal opens or unit data changes
   useEffect(() => {
-      if (
+    if (
       modalState.isOpen &&
       modalState.type === "update-unit-type-master" &&
       modalState.data
     ) {
       setTitle(modalState.data.title || "");
-      setCompanyId(getUserCompanyId());
       setError(null);
       setFieldError(null);
     }
@@ -69,11 +37,6 @@ const UpdateUnitTypeModal = () => {
       return;
     }
 
-    if (!companyId) {
-      setFieldError("Company ID is missing or invalid");
-      return;
-    }
-
     const unitTypeId = modalState.data.id;
     if (!unitTypeId) {
       setFieldError("Unit Type ID is missing");
@@ -85,43 +48,19 @@ const UpdateUnitTypeModal = () => {
     setFieldError(null);
 
     try {
-      const userId = getRelevantUserId();
-      console.log("Update payload:", { title, companyId, userId, unitTypeId });
-
-      const response = await axios.put(
-        `${BASE_URL}/company/unit-types/${unitTypeId}/`,
-        {
-          title,
-          company: companyId,
-          user: userId,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.status !== 200 && response.status !== 201) {
-        throw new Error("Failed to update unit type");
-      }
-
-      console.log("Unit Type Updated: ", response.data);
+      console.log("Updating unit type:", { unitTypeId, title });
+      const updatedData = await unitTypesApi.update(unitTypeId, title);
+      console.log("Unit Type Updated: ", updatedData);
       toast.success("Unit Type updated successfully");
 
       if (modalState.onSuccess) {
-        modalState.onSuccess(response.data);
+        modalState.onSuccess(updatedData);
       }
       triggerRefresh();
       closeModal();
     } catch (err) {
-      console.error("Error updating unit type:", err.response?.data || err.message);
-      const errorMessage =
-        err.response?.data?.detail ||
-        err.response?.data?.company_id ||
-        err.response?.data?.message ||
-        err.message ||
-        "Failed to update unit type";
+      console.error("Error updating unit type:", err.message);
+      const errorMessage = err.message || error || "Failed to update unit type";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -172,12 +111,6 @@ const UpdateUnitTypeModal = () => {
             {fieldError && <span className="text-[#dc2626]">{fieldError}</span>}
           </div>
         </div>
-
-        {/* {error && (
-          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-            {error}
-          </div>
-        )} */}
 
         <div className="flex justify-end">
           <button
