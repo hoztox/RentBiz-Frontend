@@ -31,19 +31,60 @@ const Taxes = () => {
     { value: "effective_date", label: "Effective on Date" },
   ];
 
+  const getUserCompanyId = () => {
+    const role = localStorage.getItem("role")?.toLowerCase();
+    console.log("getUserCompanyId:", { role, company_id: localStorage.getItem("company_id") });
+    if (role === "company") {
+      return localStorage.getItem("company_id");
+    } else if (role === "user" || role === "admin") {
+      try {
+        const userCompanyId = localStorage.getItem("company_id");
+        return userCompanyId ? JSON.parse(userCompanyId) : null;
+      } catch (e) {
+        console.error("Error parsing user company ID:", e);
+        return null;
+      }
+    }
+    return null;
+  };
+
   useEffect(() => {
     const loadTaxes = async () => {
       setLoading(true);
       setError(null);
+      const companyId = getUserCompanyId();
+
+      if (!companyId) {
+        setError("Company ID is missing or invalid. Please log in again.");
+        toast.error("Company ID is missing or invalid. Please log in again.");
+        setLoading(false);
+        return;
+      }
 
       try {
-        const taxes = await taxesApi.fetch(viewMode, effectiveDate);
+        const params = {};
+        if (viewMode === "history") {
+          params.history = true;
+        } else if (viewMode === "effective_date" && effectiveDate) {
+          params.effective_date = effectiveDate;
+        } else {
+          params.active_only = true;
+        }
+
+        const response = await axios.get(`${BASE_URL}/company/taxes/${companyId}/`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+          params,
+        });
+        const taxes = Array.isArray(response.data) ? response.data : [];
         console.log("Fetched taxes:", taxes);
         setData(taxes);
       } catch (err) {
         console.error("Error fetching taxes:", err);
-        setError(err.message);
-        toast.error(err.message);
+        const errorMessage = err.response?.data?.detail || "Failed to load taxes";
+        setError(errorMessage);
+        toast.error(errorMessage);
         setData([]);
       } finally {
         setLoading(false);
@@ -72,8 +113,9 @@ const Taxes = () => {
       }
     } catch (err) {
       console.error("Error deleting tax:", err);
-      setError(err.message);
-      toast.error(err.message);
+      const errorMessage = err.response?.data?.detail || "Failed to delete tax";
+      setError(errorMessage);
+      toast.error(error.message);
     } finally {
       setLoading(false);
       setIsDeleteModalOpen(false);
@@ -86,9 +128,18 @@ const Taxes = () => {
     setTaxIdToDelete(null);
   };
 
-  const openUpdateModal = (tax) => {
-    openModal("update-tax-master", "Update Tax Master", tax);
-  };
+// In Taxes.js
+const openUpdateModal = (tax) => {
+  const companyId = getUserCompanyId();
+  if (!companyId) {
+    toast.error("Company ID is missing or invalid. Please log in again.");
+    return;
+  }
+  openModal("update-tax-master", "", { 
+    tax_id: tax.id, 
+    company_id: companyId 
+  });
+};
 
   const filteredData = Array.isArray(data)
     ? data.filter(
@@ -96,10 +147,7 @@ const Taxes = () => {
           (tax.id?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
             tax?.country_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             tax.tax_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            tax.tax_percentage
-              ?.toString()
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase()) ||
+            tax.tax_percentage?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
             tax.applicable_from?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             tax.applicable_to?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             tax?.state_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -144,7 +192,7 @@ const Taxes = () => {
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-[#2892CE] hover:bg-[#2276a7]"
               }`}
-              onClick={() => openModal("create-tax-master", "Create New Tax Master")}
+              onClick={() => openModal("create-tax-master", null)}
               disabled={loading}
             >
               Add New Tax
