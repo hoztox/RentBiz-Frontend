@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import "./Expense.css";
-import { ChevronDown } from "lucide-react";
 import plusicon from "../../assets/Images/Expense/plus-icon.svg";
 import downloadicon from "../../assets/Images/Expense/download-icon.svg";
 import editicon from "../../assets/Images/Expense/edit-icon.svg";
@@ -8,14 +7,21 @@ import printericon from "../../assets/Images/Expense/printer-icon.svg";
 import downloadactionicon from "../../assets/Images/Expense/download-action-icon.svg";
 import downarrow from "../../assets/Images/Expense/downarrow.svg";
 import { useModal } from "../../context/ModalContext";
+import CustomDropDown from "../../components/CustomDropDown";
 
 const Expense = () => {
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
   const { openModal } = useModal();
   const itemsPerPage = 10;
+
+  const dropdownOptions = [
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" },
+  ];
+
+  const [selectedOption, setSelectedOption] = useState("showing");
 
   const demoData = [
     {
@@ -87,9 +93,9 @@ const Expense = () => {
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
   const handleEditClick = (expense) => {
-    console.log("ExpenseId: ", expense)
-    openModal("update-expense", "Update Expense", expense)
-  }
+    console.log("ExpenseId: ", expense);
+    openModal("update-expense", "Update Expense", expense);
+  };
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -112,21 +118,13 @@ const Expense = () => {
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 expense-search"
             />
             <div className="relative w-[40%] md:w-auto">
-              <select
-                name="select"
-                id=""
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 expense-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
-              />
+             <CustomDropDown
+             options={dropdownOptions}
+             value={selectedOption}
+             onChange={setSelectedOption}
+             className="w-full md:w-[121px]"
+             dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 expense-selection"
+             />
             </div>
           </div>
           <div className="flex gap-[10px] expense-action-buttons w-full md:w-auto justify-start">
