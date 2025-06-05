@@ -3,9 +3,8 @@ import "./UpdateTaxModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { ChevronDown } from "lucide-react";
 import { useModal } from "../../../../context/ModalContext";
-import axios from "axios";
-import { BASE_URL } from "../../../../utils/config";
 import { toast } from "react-hot-toast";
+import { fetchCountries, fetchStates, updateTax } from "../api";
 
 const UpdateTaxModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
@@ -27,44 +26,23 @@ const UpdateTaxModal = () => {
   const countryDropdownRef = useRef(null);
   const stateDropdownRef = useRef(null);
 
-  const getUserCompanyId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-    if (role === "company") {
-      return localStorage.getItem("company_id");
-    } else if (role === "user" || role === "admin") {
-      try {
-        const userCompanyId = localStorage.getItem("company_id");
-        return userCompanyId ? JSON.parse(userCompanyId) : null;
-      } catch (e) {
-        console.error("Error parsing user company ID:", e);
-        return null;
-      }
-    }
-    return null;
-  };
-
   useEffect(() => {
-    const fetchCountries = async () => {
+    const loadCountries = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/accounts/countries/`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        });
-        const fetchedCountries = Array.isArray(response.data) ? response.data : [];
+        const fetchedCountries = await fetchCountries();
         setCountries(fetchedCountries);
         setFilteredCountries(fetchedCountries);
       } catch (err) {
         console.error("Error fetching countries:", err);
-        toast.error("Failed to load countries");
+        toast.error(err.message);
       }
     };
 
-    fetchCountries();
+    loadCountries();
   }, []);
 
   useEffect(() => {
-    const fetchStates = async () => {
+    const loadStates = async () => {
       if (!country) {
         setStates([]);
         setState("");
@@ -72,23 +50,16 @@ const UpdateTaxModal = () => {
       }
 
       try {
-        const response = await axios.get(
-          `${BASE_URL}/accounts/countries/${country}/states/`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            },
-          }
-        );
-        setStates(Array.isArray(response.data) ? response.data : []);
+        const fetchedStates = await fetchStates(country);
+        setStates(fetchedStates);
       } catch (err) {
         console.error("Error fetching states:", err);
-        toast.error("Failed to load states");
+        toast.error(err.message);
         setStates([]);
       }
     };
 
-    fetchStates();
+    loadStates();
   }, [country]);
 
   useEffect(() => {
@@ -210,16 +181,7 @@ const UpdateTaxModal = () => {
     setError(null);
     setFieldErrors({});
 
-    const companyId = getUserCompanyId();
     const taxId = modalState.data?.id;
-
-    if (!companyId) {
-      setError("Company ID is missing or invalid. Please log in again.");
-      toast.error("Company ID is missing or invalid. Please log in again.");
-      setLoading(false);
-      return;
-    }
-
     if (!taxId) {
       setError("Tax ID is missing or invalid.");
       toast.error("Tax ID is missing or invalid.");
@@ -228,31 +190,19 @@ const UpdateTaxModal = () => {
     }
 
     try {
-      const payload = {
-        tax_type: taxType,
-        tax_percentage: parseFloat(taxPercentage),
-        country: parseInt(country),
-        state: state ? parseInt(state) : null,
-        applicable_from: applicableFrom,
+      const taxData = {
+        taxType,
+        taxPercentage,
+        country,
+        state,
+        applicableFrom,
+        applicableTo,
       };
-      if (applicableTo) {
-        payload.applicable_to = applicableTo;
-      }
-
-      const response = await axios.put(
-        `${BASE_URL}/company/taxes/${companyId}/${taxId}/`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-
+      const response = await updateTax(taxId, taxData);
       const isNewVersion = hasCriticalFieldsChanged();
       toast.success(
         isNewVersion
-          ? response.data.applicable_to
+          ? response.applicable_to
             ? "New tax version created successfully"
             : "New tax version created and set as active. Previous version was closed."
           : "Tax record updated successfully"
@@ -261,7 +211,7 @@ const UpdateTaxModal = () => {
       closeModal();
     } catch (err) {
       console.error("Error updating tax:", err);
-      let errorMessage = "Failed to update tax";
+      let errorMessage = err.message;
       if (err.response?.data) {
         if (err.response.data.detail) {
           errorMessage = err.response.data.detail;
@@ -295,7 +245,7 @@ const UpdateTaxModal = () => {
     setIsStateDropdownOpen(!isStateDropdownOpen);
   };
 
-  const selectCountry = (countryId, countryName) => {
+  const selectCountry = (countryId) => {
     setCountry(countryId);
     setState("");
     setIsCountryDropdownOpen(false);

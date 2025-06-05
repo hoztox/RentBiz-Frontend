@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "./Taxes.css";
-import axios from "axios";
 import plusicon from "../../../assets/Images/Admin Masters/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Masters/download-icon.svg";
 import editicon from "../../../assets/Images/Admin Masters/edit-icon.svg";
@@ -8,9 +7,9 @@ import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import { BASE_URL } from "../../../utils/config";
 import DeleteTaxModal from "./DeleteTaxModal/DeleteTaxModal";
 import CustomDropDown from "../../../components/CustomDropDown";
+import { fetchTaxes, deleteTax } from "./api";
 
 const Taxes = () => {
   const { openModal, refreshCounter } = useModal();
@@ -32,76 +31,29 @@ const Taxes = () => {
     { value: "effective_date", label: "Effective on Date" },
   ];
 
-  const getUserCompanyId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-    if (role === "company") {
-      return localStorage.getItem("company_id");
-    } else if (role === "user" || role === "admin") {
-      try {
-        const userCompanyId = localStorage.getItem("company_id");
-        return userCompanyId ? JSON.parse(userCompanyId) : null;
-      } catch (e) {
-        console.error("Error parsing user company ID:", e);
-        return null;
-      }
-    }
-    return null;
-  };
-
   useEffect(() => {
-    const fetchTaxes = async () => {
+    const loadTaxes = async () => {
       setLoading(true);
       setError(null);
-      const companyId = getUserCompanyId();
-      
-      if (!companyId) {
-        setError("Company ID is missing or invalid. Please log in again.");
-        toast.error("Company ID is missing or invalid. Please log in again.");
-        setLoading(false);
-        return;
-      }
 
       try {
-        const params = {};
-        if (viewMode === "history") {
-          params.history = true;
-        } else if (viewMode === "effective_date" && effectiveDate) {
-          params.effective_date = effectiveDate;
-        } else {
-          params.active_only = true;
-        }
-
-        const response = await axios.get(`${BASE_URL}/company/taxes/${companyId}/`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-          params,
-        });
-        const taxes = Array.isArray(response.data) ? response.data : [];
+        const taxes = await fetchTaxes(viewMode, effectiveDate);
         console.log("Fetched taxes:", taxes);
         setData(taxes);
       } catch (err) {
         console.error("Error fetching taxes:", err);
-        const errorMessage =
-          err.response?.data?.detail || "Failed to load taxes";
-        setError(errorMessage);
-        toast.error(errorMessage);
+        setError(err.message);
+        toast.error(err.message);
         setData([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTaxes();
+    loadTaxes();
   }, [refreshCounter, viewMode, effectiveDate]);
 
   const handleDelete = (id) => {
-    const companyId = getUserCompanyId();
-    if (!companyId) {
-      setError("Company ID not found. Please log in again.");
-      toast.error("Company ID not found. Please log in again.");
-      return;
-    }
     setTaxIdToDelete(id);
     setIsDeleteModalOpen(true);
   };
@@ -112,15 +64,7 @@ const Taxes = () => {
     try {
       setLoading(true);
       setError(null);
-      const companyId = getUserCompanyId();
-      if (!companyId) {
-        throw new Error("Company ID is missing or invalid");
-      }
-      await axios.delete(`${BASE_URL}/company/taxes/${taxIdToDelete}/`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-      });
+      await deleteTax(taxIdToDelete);
       setData((prev) => prev.filter((item) => item.id !== taxIdToDelete));
       toast.success("Tax deleted successfully");
       if (paginatedData.length === 1 && currentPage > 1) {
@@ -128,10 +72,8 @@ const Taxes = () => {
       }
     } catch (err) {
       console.error("Error deleting tax:", err);
-      const errorMessage =
-        err.response?.data?.detail || "Failed to delete tax";
-      setError(errorMessage);
-      toast.error(error.message);
+      setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
       setIsDeleteModalOpen(false);
@@ -142,33 +84,6 @@ const Taxes = () => {
   const handleCancelDelete = () => {
     setIsDeleteModalOpen(false);
     setTaxIdToDelete(null);
-  };
-
-  const handleAddTax = async (newTax) => {
-    const companyId = getUserCompanyId();
-    if (!companyId) {
-      toast.error("Company ID is missing or invalid. Please log in again.");
-      return;
-    }
-
-    try {
-      const response = await axios.post(
-        `${BASE_URL}/taxes/${companyId}/`,
-        newTax,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-      setData((prev) => [...prev, response.data]);
-      toast.success("Tax added successfully");
-    } catch (err) {
-      console.error("Error adding tax:", err);
-      const errorMessage =
-        err.response?.data?.detail || "Failed to add tax";
-      toast.error(errorMessage);
-    }
   };
 
   const openUpdateModal = (tax) => {
@@ -343,14 +258,14 @@ const Taxes = () => {
                         {tax.is_active ? "Active" : "Inactive"}
                       </td>
                       <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                        <button onClick={() => openUpdateModal(tax)}>
+                        <button onClick={() => openUpdateModal(tax)} disabled={loading}>
                           <img
                             src={editicon}
                             alt="Edit"
                             className="w-[18px] h-[18px] tax-action-btn duration-200"
                           />
                         </button>
-                        <button onClick={() => handleDelete(tax.id)}>
+                        <button onClick={() => handleDelete(tax.id)} disabled={loading}>
                           <img
                             src={deleteicon}
                             alt="Delete"
@@ -484,6 +399,7 @@ const Taxes = () => {
                                   <div className="tax-dropdown-value flex items-center gap-4">
                                     <button
                                       onClick={() => openUpdateModal(tax)}
+                                      disabled={loading}
                                     >
                                       <img
                                         src={editicon}
@@ -493,6 +409,7 @@ const Taxes = () => {
                                     </button>
                                     <button
                                       onClick={() => handleDelete(tax.id)}
+                                      disabled={loading}
                                     >
                                       <img
                                         src={deleteicon}
