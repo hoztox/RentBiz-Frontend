@@ -18,7 +18,7 @@ const Buildings = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
   const [buildings, setBuildings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const { openModal, refreshCounter } = useModal();
   const [buildingToDelete, setBuildingToDelete] = useState(null);
@@ -59,27 +59,27 @@ const Buildings = () => {
     }));
   };
 
-  const fetchBuildings = async () => {
-    try {
-      const companyId = getUserCompanyId();
-      setLoading(true);
-      const response = await axios.get(
-        `${BASE_URL}/company/buildings/company/${companyId}/`
-      );
-      const data = Array.isArray(response.data)
-        ? response.data
-        : response.data.results || [];
-      console.log("Buildings: Fetched buildings:", data);
-      setBuildings(data);
-      setLoading(false);
-    } catch (err) {
-      setError(
-        "Failed to fetch buildings data: " +
-        (err.response?.data?.message || err.message)
-      );
-      setLoading(false);
-    }
-  };
+  // const fetchBuildings = async () => {
+  //   try {
+  //     const companyId = getUserCompanyId();
+  //     setLoading(true);
+  //     const response = await axios.get(
+  //       `${BASE_URL}/company/buildings/company/${companyId}/`
+  //     );
+  //     const data = Array.isArray(response.data)
+  //       ? response.data
+  //       : response.data.results || [];
+  //     console.log("Buildings: Fetched buildings:", data);
+  //     setBuildings(data);
+  //     setLoading(false);
+  //   } catch (err) {
+  //     setError(
+  //       "Failed to fetch buildings data: " +
+  //       (err.response?.data?.message || err.message)
+  //     );
+  //     setLoading(false);
+  //   }
+  // };
 
   useEffect(() => {
     setCurrentPage(1);
@@ -106,17 +106,17 @@ const Buildings = () => {
   const totalPages = Math.ceil(totalCount / itemsPerPage);
   const paginatedData = buildings;
 
-  const deleteBuilding = async (buildingId) => {
-    if (window.confirm("Are you sure you want to delete this building?")) {
+  const deleteBuilding = async () => {
       try {
         const response = await axios.delete(
-          `${BASE_URL}/company/buildings/${buildingId}/`
+          `${BASE_URL}/company/buildings/${buildingToDelete}/`
         );
         if (response.status === 204) {
           setBuildings(
-            buildings.filter((building) => building.id !== buildingId)
+            buildings.filter((building) => building.id !== buildingToDelete)
           );
-          console.log("Buildings: Successfully deleted building", buildingId);
+          setDeleteModalOpen(false);
+          console.log("Buildings: Successfully deleted building", buildingToDelete);
         }
       } catch (err) {
         console.error("Failed to delete building", err);
@@ -125,7 +125,6 @@ const Buildings = () => {
           (err.response?.data?.message || err.message)
         );
       }
-    }
   };
 
   const handleEditClick = (buildingId) => {

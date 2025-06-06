@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./TenancyViewModal.css";
 import closeicon from "../../../assets/Images/Admin Tenancy/close-icon.svg";
-import printicon from "../../../assets/Images/Admin Tenancy/print-icon.svg";
+import printicon from "../../../assets/Images/Admin Tenancy/download-icon-blue.svg";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 

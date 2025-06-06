@@ -160,21 +160,19 @@ const BuildingFormFlow = ({
   };
 
   const handlePreviousPage = (pageData) => {
-    setAnimating(true);
-    if (pageData) {
-      setFormData((prevData) => {
-        const newData = {
-          ...prevData,
-          documents: { documents: pageData.documents || [] },
-        };
-        return newData;
-      });
-    }
-    setTimeout(() => {
-      setCurrentPageIndex((prev) => Math.max(prev - 1, 0));
-      setAnimating(false);
-    }, 500);
-  };
+  setAnimating(true);
+  setFormData((prevData) => {
+    // Merge the previous data with the new data from the review page
+    return {
+      ...prevData,
+      documents: pageData || prevData.documents
+    };
+  });
+  setTimeout(() => {
+    setCurrentPageIndex((prev) => Math.max(prev - 1, 0));
+    setAnimating(false);
+  }, 500);
+};
 
   const handleClose = () => {
     if (currentPageIndex === 3) {
