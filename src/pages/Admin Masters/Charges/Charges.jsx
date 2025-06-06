@@ -11,6 +11,7 @@ import { toast, Toaster } from "react-hot-toast";
 import DeleteChargesModal from "./DeleteChargesModal/DeleteChargesModal";
 import buildingimg from "../../../assets/Images/Admin Masters/charges-building.png";
 import { chargesApi } from "../MastersApi";
+import CustomDropDown from "../../../components/CustomDropDown";
 
 const Charges = () => {
   const [isHeaderSelectOpen, setIsHeaderSelectOpen] = useState(false);
@@ -24,6 +25,13 @@ const Charges = () => {
   const [chargeIdToDelete, setChargeIdToDelete] = useState(null);
   const { openModal, refreshCounter } = useModal();
   const itemsPerPage = 10;
+
+  const dropdownOptions = [
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" },
+  ];
+
+  const [selectedOption, setSelectedOption] = useState("showing")
 
   // Fetch charges data
   useEffect(() => {
@@ -140,21 +148,12 @@ const Charges = () => {
               disabled={loading}
             />
             <div className="relative w-[40%] md:w-auto">
-              <select
-                name="select"
-                id=""
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 charges-selection"
-                onFocus={() => setIsHeaderSelectOpen(true)}
-                onBlur={() => setIsHeaderSelectOpen(false)}
-                disabled={loading}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isHeaderSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+              <CustomDropDown
+                options={dropdownOptions}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                className="w-full md:w-[121px]"
+                dropdownClassName="px-[14px] py-[7px] h-[38px] border-[#201D1E20] focus:border-gray-300 charges-selection"
               />
             </div>
           </div>
@@ -165,7 +164,9 @@ const Charges = () => {
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-[#2892CE] hover:bg-[#2276a7]"
               }`}
-              onClick={() => openModal("create-charges-master", "Create New Charges Master")}
+              onClick={() =>
+                openModal("create-charges-master", "Create New Charges Master")
+              }
               disabled={loading}
             >
               Add New Master
@@ -263,14 +264,20 @@ const Charges = () => {
                               {charge.charge_code?.title || "N/A"}
                             </td>
                             <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                              <button onClick={() => handleEditClick(charge)} disabled={loading}>
+                              <button
+                                onClick={() => handleEditClick(charge)}
+                                disabled={loading}
+                              >
                                 <img
                                   src={editicon}
                                   alt="Edit"
                                   className="w-[18px] h-[18px] action-btn duration-200"
                                 />
                               </button>
-                              <button onClick={() => handleDelete(charge.id)} disabled={loading}>
+                              <button
+                                onClick={() => handleDelete(charge.id)}
+                                disabled={loading}
+                              >
                                 <img
                                   src={deleteicon}
                                   alt="Delete"
