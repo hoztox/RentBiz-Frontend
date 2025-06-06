@@ -4,6 +4,7 @@ import "./TenancyConfirm.css";
 import plusicon from "../../../assets/Images/Admin Tenancy/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Tenancy/download-icon.svg";
 import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
+import cancelicon from "../../../assets/Images/Admin Tenancy/terminate-icon.svg";
 import viewicon from "../../../assets/Images/Admin Tenancy/view-icon.svg";
 import confirmicon from "../../../assets/Images/Admin Tenancy/confirm-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
@@ -11,6 +12,7 @@ import TenancyConfirmModal from "./TenancyConfirmModal/TenancyConfirmModal";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 import CustomDropDown from "../../../components/CustomDropDown";
+import TenancyCancelModal from "./TenancyCancelModal/TenancyCancelModal";
 
 const TenancyConfirm = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -18,6 +20,7 @@ const TenancyConfirm = () => {
   const [expandedRows, setExpandedRows] = useState({});
   const { openModal, refreshCounter } = useModal();
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [openCancelModal, setOpenCancelModal] = useState(false);
   const [selectedTenancy, setSelectedTenancy] = useState(null);
   const [tenancies, setTenancies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -87,6 +90,11 @@ const TenancyConfirm = () => {
     setSelectedTenancy(tenancy);
     setConfirmModalOpen(true);
   };
+
+  const cancelModalOpen = (tenancy) => {
+    setSelectedTenancy(tenancy);
+    setOpenCancelModal(true);
+  }
 
   const handleConfirmAction = async () => {
     try {
@@ -222,7 +230,7 @@ const TenancyConfirm = () => {
                   <th className="pl-12 pr-5 text-center tenancy-thead w-[8%]">
                     VIEW
                   </th>
-                  <th className="px-5 pr-6 text-right tenancy-thead">ACTION</th>
+                  <th className="px-5 pr-11 text-right tenancy-thead">ACTION</th>
                 </tr>
               </thead>
               <tbody>
@@ -273,7 +281,7 @@ const TenancyConfirm = () => {
                         />
                       </button>
                     </td>
-                    <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
+                    <td className="px-5 flex gap-[15px] items-center justify-end h-[57px]">
                       <button onClick={() => handleEditClick(tenancy)}>
                         <img
                           src={editicon}
@@ -285,8 +293,11 @@ const TenancyConfirm = () => {
                         <img
                           src={confirmicon}
                           alt="Confirm"
-                          className="w-[24px] h-[20px] tconfirm-confirm-btn duration-200"
+                          className="w-[26px] h-[26px] tconfirm-confirm-btn duration-200"
                         />
+                      </button>
+                      <button onClick={()=>cancelModalOpen(tenancy)}>
+                        <img src={cancelicon} alt="Cancel" className="w-[26px] h-[26px] tconfirm-cancel-btn duration-200" />
                       </button>
                     </td>
                   </tr>
@@ -412,7 +423,7 @@ const TenancyConfirm = () => {
                                 <div className="tconfirm-dropdown-label">
                                   ACTION
                                 </div>
-                                <div className="tconfirm-dropdown-value tconfirm-flex tconfirm-items-center p-[3px] ml-[5px]">
+                                <div className="tconfirm-dropdown-value tconfirm-flex tconfirm-items-center p-[5px]">
                                   <button
                                     onClick={() => handleEditClick(tenancy)}
                                   >
@@ -430,6 +441,9 @@ const TenancyConfirm = () => {
                                       alt="Confirm"
                                       className="w-[24px] h-[20px] tconfirm-confirm-btn duration-200 ml-2"
                                     />
+                                  </button>
+                                  <button onClick={()=>cancelModalOpen(tenancy)}>
+                                    <img src={cancelicon} alt="Cancel" className="w-[24px] h-[20px] tconfirm-cancel-btn duration-200 ml-2" />
                                   </button>
                                 </div>
                               </div>
@@ -511,6 +525,11 @@ const TenancyConfirm = () => {
             isOpen={confirmModalOpen}
             onCancel={() => setConfirmModalOpen(false)}
             onConfirm={handleConfirmAction}
+            tenancy={selectedTenancy}
+          />
+          <TenancyCancelModal 
+            isOpen={openCancelModal}
+            onCancel={()=> setOpenCancelModal(false)}
             tenancy={selectedTenancy}
           />
         </>

@@ -104,6 +104,10 @@
     hue-rotate(86deg) brightness(94%) contrast(90%);
 }
 
+.tconfirm-cancel-btn:hover {
+  filter: brightness(120%);
+}
+
 .tconfirm-collection-list-pagination {
   font-family: "Inter Tight";
   font-size: 13px;
