@@ -62,6 +62,29 @@ const TenancyViewModal = () => {
     }));
   };
 
+  const handlePrint = async () => {
+    try {
+      const tenancyId =  modalState.data.id || modalState.data.tenancy_code ;
+      const response = await axios.get(`${BASE_URL}/company/tenancy/${tenancyId}/download-pdf/`, {
+        responseType: 'blob', // Important for handling binary data (PDF)
+      });
+
+      // Create a blob URL and trigger download
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `tenancy_${tenancyId}.pdf`; // Customize the filename
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url); // Clean up
+    } catch (err) {
+      console.error("Error downloading PDF:", err);
+      alert("Failed to download PDF. Please try again.");
+    }
+  };
+
   // Only render for "tenancy-view" type
   if (!modalState.isOpen || modalState.type !== "tenancy-view") return null;
 
@@ -105,9 +128,10 @@ const TenancyViewModal = () => {
           <h2 className="tenancy-view-modal-head">Tenancy View</h2>
           <div className="flex items-center gap-[19px]">
             <button
+              onClick={handlePrint}
               className="tenancy-view-modal-close-btn hover:bg-gray-100 duration-200"
             >
-              <img src={printicon} alt="Close" className="w-[20px] h-[20px]" />
+              <img src={printicon} alt="Print" className="w-[20px] h-[20px]" />
             </button>
             <button
               onClick={closeModal}
