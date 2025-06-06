@@ -9,6 +9,7 @@ import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 import CustomDropDown from "../../../components/CustomDropDown";
 import TenancyCloseModal from "./TenancyCloseModal/TenancyCloseModal";
+import DeleteTenancyModal from "../DeleteTenancyModal/DeleteTenancyModal";
 
 const CloseTenancy = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,6 +17,7 @@ const CloseTenancy = () => {
   const [expandedRows, setExpandedRows] = useState({});
   const [tenancies, setTenancies] = useState([]);
   const [showCloseModal, setShowCloseModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedTenancyId, setSelectedTenancyId] = useState(null);
   const { openModal } = useModal();
   const itemsPerPage = 10;
@@ -141,6 +143,8 @@ const CloseTenancy = () => {
       await axios.delete(`${BASE_URL}/company/tenancies/${id}/`);
       setTenancies(tenancies.filter((tenancy) => tenancy.id !== id));
       console.log("Deleted Tenancy ID:", id);
+      setShowDeleteModal(false); // Close modal after deletion
+      setSelectedTenancyId(null); // Clear selected tenancy ID
     } catch (error) {
       console.error("Error deleting tenancy:", error);
     }
@@ -159,7 +163,6 @@ const CloseTenancy = () => {
         "Original tenancy data not found for:",
         formattedTenancy.tenancy_code
       );
-      // Fallback: pass the formatted data anyway
       openModal("tenancy-view", "View Tenancy", formattedTenancy);
     }
   };
@@ -189,8 +192,20 @@ const CloseTenancy = () => {
     setShowCloseModal(true);
   };
 
-  const cancelClose = (id) => {
+  const cancelClose = () => {
     setShowCloseModal(false);
+    setSelectedTenancyId(null);
+  };
+
+  // Function to open DeleteModal
+  const openDeleteModal = (id) => {
+    setSelectedTenancyId(id);
+    setShowDeleteModal(true);
+  };
+
+  // Function to cancel DeleteModal
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
     setSelectedTenancyId(null);
   };
 
@@ -307,7 +322,7 @@ const CloseTenancy = () => {
                     </button>
                   </td>
                   <td className="px-5 tclose-flex-gap-23 h-[57px] ml-[23px] flex !justify-center">
-                    <button onClick={() => handleDelete(tenancy.id)}>
+                    <button onClick={() => openDeleteModal(tenancy.id)}>
                       <img
                         src={deleteicon}
                         alt="Delete"
@@ -381,7 +396,7 @@ const CloseTenancy = () => {
                           <div className="tclose-grid">
                             <div className="tclose-grid-item">
                               <div className="tclose-dropdown-label">
-                                BULDING NAME
+                                BUILDING NAME
                               </div>
                               <div className="tclose-dropdown-value">
                                 {tenancy.building}
@@ -455,7 +470,7 @@ const CloseTenancy = () => {
                               </div>
                               <div className="tclose-dropdown-value tclose-flex-items-center-gap-2 mt-[10px] ml-[5px]">
                                 <button
-                                  onClick={() => handleDelete(tenancy.id)}
+                                  onClick={() => openDeleteModal(tenancy.id)}
                                 >
                                   <img
                                     src={deleteicon}
@@ -537,6 +552,15 @@ const CloseTenancy = () => {
         isOpen={showCloseModal}
         onCancel={cancelClose}
         onConfirm={() => handleCloseTenancy(selectedTenancyId)}
+      />
+      <DeleteTenancyModal
+        isOpen={showDeleteModal}
+        onCancel={cancelDelete}
+        onDelete={() => handleDelete(selectedTenancyId)}
+        title="Are You Sure?"
+        message="Are you sure you want to delete this tenancy?"
+        deleteButtonText="Delete"
+        cancelButtonText="Cancel"
       />
     </div>
   );
