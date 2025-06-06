@@ -74,13 +74,45 @@ input::placeholder {
   box-sizing: border-box;
 }
 
+
+.form-checkbox {
+  appearance: none;
+  width: 19px;
+  height: 19px;
+  border: 2px solid #E9E9E9;
+  border-radius: 5px;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+}
+
+.form-checkbox:checked {
+  background-color: transparent;
+  border-color: #2892CE; /* Optional: Change border color to blue when checked */
+}
+
+.form-checkbox:checked::after {
+  content: url('../../../../assets/Images/Admin Masters/tickmark.svg');
+  color: #2892CE; 
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  filter: brightness(0) saturate(100%) invert(46%) sepia(54%) saturate(906%) hue-rotate(161deg) brightness(96%) contrast(80%);
+}
+
+
+
 @media (min-width: 768px) {
   .add-document-modal-container {
     width: 522px;
     max-width: 522px;
-    height: 262px;
+    height: 306px;
     border-radius: 6px;
     background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 }
 

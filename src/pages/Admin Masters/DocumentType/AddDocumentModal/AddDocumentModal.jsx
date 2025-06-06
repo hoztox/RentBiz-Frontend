@@ -3,28 +3,53 @@ import "./AddDocumentModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { useModal } from "../../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import { documentTypesApi } from "../../MastersApi";
+import { documentTypesApi, getUserCompanyId } from "../../MastersApi";
+
+const checkboxOptions = [
+  { name: "number", label: "Number" },
+  { name: "issue_date", label: "Issue Date" },
+  { name: "expiry_date", label: "Expiry Date" },
+  { name: "upload_file", label: "Upload Files" },
+];
 
 const AddDocumentModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
   const [title, setTitle] = useState("");
+  const [checkboxes, setCheckboxes] = useState(
+    checkboxOptions.reduce((acc, option) => {
+      acc[option.name] = false;
+      return acc;
+    }, {})
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [fieldError, setFieldError] = useState(null);
+  const companyId = getUserCompanyId();
 
   // Reset form state when modal opens
   useEffect(() => {
     if (modalState.isOpen && modalState.type === "create-document-type-master") {
       setTitle("");
+      setCheckboxes(
+        checkboxOptions.reduce((acc, option) => {
+          acc[option.name] = false;
+          return acc;
+        }, {})
+      );
       setError(null);
       setFieldError(null);
     }
   }, [modalState.isOpen, modalState.type]);
 
-  // Only render for "create-document-type-master" type
-  if (!modalState.isOpen || modalState.type !== "create-document-type-master") {
-    return null;
-  }
+  const handleCheckboxChange = (e) => {
+    const { name, checked } = e.target;
+    console.log(`Checkbox ${name} changed to: ${checked}`);
+    setCheckboxes((prev) => {
+      const newState = { ...prev, [name]: checked };
+      console.log("Updated checkboxes state:", newState);
+      return newState;
+    });
+  };
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -33,31 +58,47 @@ const AddDocumentModal = () => {
       return;
     }
 
+    if (!companyId) {
+      setFieldError("Company ID is missing");
+      toast.error("Company ID is missing");
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setFieldError(null);
 
     try {
-      const docData = { title };
-      await documentTypesApi.create(docData);
+      const docData = {
+        title,
+        ...checkboxes,
+        company: companyId,
+      };
+      console.log("Sending docData to API:", JSON.stringify(docData, null, 2));
+      const response = await documentTypesApi.create(docData);
+      console.log("API Response:", JSON.stringify(response, null, 2));
       toast.success("Document Type created successfully");
       triggerRefresh();
       closeModal();
     } catch (err) {
       console.error("Error creating document type:", err);
-      setError(err.message);
-      toast.error(err.message);
+      setError(err.message || "Failed to create document type");
+      toast.error(err.message || error ||"Failed to create document type");
     } finally {
       setLoading(false);
     }
   };
 
+  if (!modalState.isOpen || modalState.type !== "create-document-type-master") {
+    return null;
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
-       <Toaster />
+      <Toaster />
       <div
         onClick={(e) => e.stopPropagation()}
-        className="add-document-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[262px] p-6"
+        className="add-document-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[300px] p-6"
       >
         <div className="flex justify-between items-center md:mb-6">
           <h2 className="modal-head">Create New Document Type Master</h2>
@@ -88,13 +129,26 @@ const AddDocumentModal = () => {
             disabled={loading}
             maxLength={100}
           />
-          <div className="text-sm mt-1" style={{ minHeight: "20px" }}>
-            {fieldError && <span className="text-[#dc2626]">{fieldError}</span>}
-            {error && <span className="text-[#dc2626]">{error}</span>}
+          {fieldError && <span className="text-[#dc2626]">{fieldError}</span>}
+
+          <div className="flex flex-wrap gap-4 mt-5 justify-between items-center">
+            {checkboxOptions.map((option) => (
+              <label key={option.name} className="flex items-center gap-1">
+                <input
+                  type="checkbox"
+                  name={option.name}
+                  checked={checkboxes[option.name] || false}
+                  onChange={handleCheckboxChange}
+                  disabled={loading}
+                  className="form-checkbox"
+                />
+                <span className="tenancy-modal-label !m-0 cursor-pointer">{option.label}</span>
+              </label>
+            ))}
           </div>
         </div>
 
-        <div className="flex justify-end mt-[-15px]">
+        <div className="flex justify-end">
           <button
             onClick={handleSave}
             className={`bg-[#2892CE] hover:bg-[#2276a7] text-white rounded w-[150px] h-[38px] modal-save-btn duration-200 ${
