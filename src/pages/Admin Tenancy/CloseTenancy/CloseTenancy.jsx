@@ -8,12 +8,15 @@ import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 import CustomDropDown from "../../../components/CustomDropDown";
+import TenancyCloseModal from "./TenancyCloseModal/TenancyCloseModal";
 
 const CloseTenancy = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
   const [tenancies, setTenancies] = useState([]);
+  const [showCloseModal, setShowCloseModal] = useState(false);
+  const [selectedTenancyId, setSelectedTenancyId] = useState(null);
   const { openModal } = useModal();
   const itemsPerPage = 10;
 
@@ -175,10 +178,20 @@ const CloseTenancy = () => {
             : tenancy
         )
       );
-      console.log("Closed Tenancy ID:", id); // Debug log
+      setShowCloseModal(false);
     } catch (error) {
       console.error("Error closing tenancy:", error);
     }
+  };
+
+  const openCloseModal = (id) => {
+    setSelectedTenancyId(id);
+    setShowCloseModal(true);
+  };
+
+  const cancelClose = (id) => {
+    setShowCloseModal(false);
+    setSelectedTenancyId(null);
   };
 
   return (
@@ -282,7 +295,7 @@ const CloseTenancy = () => {
                   </td>
                   <td className="px-5 text-center">
                     <button
-                      onClick={() => handleCloseTenancy(tenancy.id)}
+                      onClick={() => openCloseModal(tenancy.id)}
                       disabled={tenancy.isClose}
                       className={`px-4 py-2 rounded-md tenancy-data ${
                         tenancy.isClose
@@ -293,7 +306,7 @@ const CloseTenancy = () => {
                       {tenancy.isClose ? "Closed" : "Click to Close"}
                     </button>
                   </td>
-                  <td className="px-5 tclose-flex-gap-23 h-[57px] flex !justify-center">
+                  <td className="px-5 tclose-flex-gap-23 h-[57px] ml-[23px] flex !justify-center">
                     <button onClick={() => handleDelete(tenancy.id)}>
                       <img
                         src={deleteicon}
@@ -420,9 +433,9 @@ const CloseTenancy = () => {
                               <div className="tclose-dropdown-label">CLOSE</div>
                               <div className="tclose-dropdown-value">
                                 <button
-                                  onClick={() => handleCloseTenancy(tenancy.id)}
+                                  onClick={() => openCloseModal(tenancy.id)}
                                   disabled={tenancy.isClose}
-                                  className={` py-2 rounded-md font-medium ${
+                                  className={`py-2 rounded-md font-medium ${
                                     tenancy.isClose
                                       ? "text-gray-400 cursor-not-allowed"
                                       : "text-blue-600 hover:text-blue-800"
@@ -520,6 +533,11 @@ const CloseTenancy = () => {
           </button>
         </div>
       </div>
+      <TenancyCloseModal
+        isOpen={showCloseModal}
+        onCancel={cancelClose}
+        onConfirm={() => handleCloseTenancy(selectedTenancyId)}
+      />
     </div>
   );
 };

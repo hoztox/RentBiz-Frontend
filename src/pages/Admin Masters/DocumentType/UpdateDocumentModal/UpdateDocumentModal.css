@@ -78,9 +78,12 @@ input::placeholder {
   .update-document-modal-container {
     width: 522px;
     max-width: 522px;
-    height: 262px;
+    height: 306px;
     border-radius: 6px;
     background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 }
 

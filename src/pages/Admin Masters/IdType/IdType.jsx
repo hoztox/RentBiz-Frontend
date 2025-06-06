@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "./IdType.css";
-import { ChevronDown } from "lucide-react";
 import { toast, Toaster } from "react-hot-toast";
 import plusIcon from "../../../assets/Images/Admin Masters/plus-icon.svg";
 import downloadIcon from "../../../assets/Images/Admin Masters/download-icon.svg";
@@ -11,10 +10,10 @@ import downArrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import IdTypeDeleteModal from "./IdTypeDeleteModal/IdTypeDeleteModal";
 import { idTypesApi } from "../MastersApi"; // Updated import
+import CustomDropDown from "../../../components/CustomDropDown";
 
 const IdType = () => {
   const { openModal, refreshCounter } = useModal();
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
@@ -25,6 +24,13 @@ const IdType = () => {
   const [idTypeIdToDelete, setIdTypeIdToDelete] = useState(null);
   const itemsPerPage = 10;
 
+  const dropdownOptions = [
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" },
+  ];
+
+  const [selectedOption, setSelectedOption] = useState("showing")
+
   // Fetch ID types from backend
   const fetchData = async () => {
     try {
@@ -34,7 +40,8 @@ const IdType = () => {
       setIdTypes(idData);
     } catch (err) {
       console.error("Error fetching ID types:", err);
-      const errorMessage = err.message || "Failed to fetch ID types. Please try again.";
+      const errorMessage =
+        err.message || "Failed to fetch ID types. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
       setIdTypes([]);
@@ -60,7 +67,8 @@ const IdType = () => {
       }
     } catch (error) {
       console.error("Error deleting ID type:", error);
-      const errorMessage = error.message || "Failed to delete ID type. Please try again.";
+      const errorMessage =
+        error.message || "Failed to delete ID type. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -113,7 +121,7 @@ const IdType = () => {
 
   const handleEditClick = (idType) => {
     console.log("ID Types: Selected IdType:", idType);
-    openModal("update-id-type-master", "Update Id Type Master", idType);
+    openModal("update-id-type-master", "Update ID Type Master", idType);
   };
 
   const toggleRowExpand = (id) => {
@@ -169,28 +177,19 @@ const IdType = () => {
               disabled={loading}
             />
             <div className="relative w-[40%] md:w-auto">
-              <select
-                name="select"
-                id=""
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 idtype-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-                disabled={loading}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+              <CustomDropDown 
+                options={dropdownOptions}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                className="w-full md:w-[121px]"
+                dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 idtype-selection"
               />
-            </div>
+          </div>
           </div>
           <div className="flex gap-[10px] action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md idtype-add-new-master duration-200"
-              onClick={() => openModal("create-id-type-master")}
+              onClick={() => openModal("create-id-type-master", "Create New ID Type Master")}
               disabled={loading}
             >
               Add New Master

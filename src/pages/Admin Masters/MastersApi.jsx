@@ -1,7 +1,7 @@
 import axiosInstance from "../../axiosInstance";
 
 // Common utility functions
-const getUserCompanyId = () => {
+export const getUserCompanyId = () => {
   const role = localStorage.getItem("role")?.toLowerCase();
 
   if (role === "company") {
@@ -18,7 +18,7 @@ const getUserCompanyId = () => {
   return null;
 };
 
-const getRelevantUserId = () => {
+export const getRelevantUserId = () => {
   const role = localStorage.getItem("role")?.toLowerCase();
   if (role === "user") {
     const userId = localStorage.getItem("user_id");
@@ -238,7 +238,7 @@ export const locationApi = {
 
   fetchStates: async (countryId) => {
     if (!countryId) return [];
-    
+
     try {
       const response = await axiosInstance.get(`/accounts/countries/${countryId}/states/`);
       return Array.isArray(response.data) ? response.data : [];
@@ -252,9 +252,12 @@ export const locationApi = {
 export const taxesApi = {
   create: async (taxData) => {
     const companyId = getUserCompanyId();
+    const userId = getRelevantUserId();
     if (!companyId) throw new Error("Company ID is missing or invalid");
 
     const payload = {
+      company: companyId,
+      user: userId,
       tax_type: taxData.taxType,
       tax_percentage: parseFloat(taxData.taxPercentage),
       country: parseInt(taxData.country),
@@ -334,6 +337,8 @@ export const chargesApi = {
 
     try {
       const response = await axiosInstance.get(`/company/charges/company/${companyId}/`);
+      console.log('Fetched Chargeessss', response.data);
+
       return Array.isArray(response.data) ? response.data : [];
     } catch (error) {
       handleApiError(error, "Failed to fetch charges");
@@ -349,13 +354,17 @@ export const chargesApi = {
     const payload = {
       name: chargeData.name,
       charge_code: parseInt(chargeData.chargeCodeId),
-      tax_types: chargeData.taxTypes || [],
+      taxes: chargeData.taxTypes || [], // Changed from tax_types to taxes
       company: companyId,
       ...(userId && { user: userId }),
     };
 
+    console.log('FormData');
+
+
     try {
       const response = await axiosInstance.post(`/company/charges/create/`, payload);
+      console.log("Document Type Created:", response.data);
       return response.data;
     } catch (error) {
       handleApiError(error, "Failed to create charges");
@@ -372,7 +381,7 @@ export const chargesApi = {
     const payload = {
       name: chargeData.name,
       charge_code: parseInt(chargeData.chargeCode),
-      tax_types: chargeData.taxTypes || [],
+      taxes: chargeData.taxTypes || [], // Changed from tax_types to taxes
       company: companyId,
       ...(userId && { user: userId }),
     };
@@ -405,6 +414,8 @@ export const documentTypesApi = {
 
     try {
       const response = await axiosInstance.get(`/company/doc_type/company/${companyId}`);
+      console.log('Documentsssss', response.data);
+
       return Array.isArray(response.data) ? response.data : response.data.results || [];
     } catch (error) {
       handleApiError(error, "Failed to fetch document types");
@@ -419,6 +430,10 @@ export const documentTypesApi = {
 
     const payload = {
       title: docData.title,
+      number: docData.number || false, // Include number field
+      issue_date: docData.issue_date || false, // Include issue_date field
+      expiry_date: docData.expiry_date || false, // Include expiry_date field
+      upload_file: docData.upload_file || false, // Include upload_file field
       company: companyId,
       ...(userId && { user: userId }),
     };
@@ -440,6 +455,10 @@ export const documentTypesApi = {
 
     const payload = {
       title: docData.title,
+      number: docData.number || false,  
+      issue_date: docData.issue_date || false,  
+      expiry_date: docData.expiry_date || false,  
+      upload_file: docData.upload_file || false,
       company: companyId,
       ...(userId && { user: userId }),
     };

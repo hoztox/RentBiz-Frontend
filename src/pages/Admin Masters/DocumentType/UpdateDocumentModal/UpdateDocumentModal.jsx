@@ -5,9 +5,22 @@ import { useModal } from "../../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
 import { documentTypesApi } from "../../MastersApi";
 
+const checkboxOptions = [
+  { name: "number", label: "Number" },
+  { name: "issue_date", label: "Issue Date" },
+  { name: "expiry_date", label: "Expiry Date" },
+  { name: "upload_file", label: "Upload Files" },
+];
+
 const UpdateDocumentModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
   const [title, setTitle] = useState("");
+  const [checkboxes, setCheckboxes] = useState(
+    checkboxOptions.reduce((acc, option) => {
+      acc[option.name] = false;
+      return acc;
+    }, {})
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [fieldError, setFieldError] = useState(null);
@@ -20,19 +33,24 @@ const UpdateDocumentModal = () => {
       modalState.data
     ) {
       setTitle(modalState.data.title || "");
+      setCheckboxes({
+        number: modalState.data.number || false,
+        issue_date: modalState.data.issue_date || false,
+        expiry_date: modalState.data.expiry_date || false,
+        upload_file: modalState.data.upload_file || false,
+      });
       setError(null);
       setFieldError(null);
     }
   }, [modalState.isOpen, modalState.type, modalState.data]);
 
-  // Only render for "update-document-type-master" type and valid data
-  if (
-    !modalState.isOpen ||
-    modalState.type !== "update-document-type-master" ||
-    !modalState.data
-  ) {
-    return null;
-  }
+  const handleCheckboxChange = (e) => {
+    const { name, checked } = e.target;
+    setCheckboxes((prev) => ({
+      ...prev,
+      [name]: checked,
+    }));
+  };
 
   const handleUpdate = async () => {
     if (!title.trim()) {
@@ -53,7 +71,13 @@ const UpdateDocumentModal = () => {
     setFieldError(null);
 
     try {
-      const docData = { title };
+      const docData = {
+        title,
+        number: checkboxes.number,
+        issue_date: checkboxes.issue_date,
+        expiry_date: checkboxes.expiry_date,
+        upload_file: checkboxes.upload_file,
+      };
       const response = await documentTypesApi.update(documentTypeId, docData);
       toast.success("Document Type updated successfully");
       if (modalState.onSuccess) {
@@ -63,8 +87,8 @@ const UpdateDocumentModal = () => {
       closeModal();
     } catch (err) {
       console.error("Error updating document type:", err);
-      setError(err.message);
-      toast.error(err.message);
+      setError(err.message || "Failed to update document type");
+      toast.error(err.message || "Failed to update document type");
     } finally {
       setLoading(false);
     }
@@ -76,12 +100,21 @@ const UpdateDocumentModal = () => {
     }
   };
 
+  // Only render for "update-document-type-master" type and valid data
+  if (
+    !modalState.isOpen ||
+    modalState.type !== "update-document-type-master" ||
+    !modalState.data
+  ) {
+    return null;
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
       <Toaster />
       <div
         onClick={(e) => e.stopPropagation()}
-        className="update-document-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[262px] p-6"
+        className="update-document-modal-container relative bg-white rounded-md w-full max-w-[522px] h-auto md:h-[300px] p-6"
       >
         <div className="flex justify-between items-center md:mb-6">
           <h2 className="update-modal-head">Update Document Type Master</h2>
@@ -110,6 +143,21 @@ const UpdateDocumentModal = () => {
             disabled={loading}
             maxLength={100}
           />
+          <div className="flex flex-wrap gap-4 mt-5 justify-between items-center">
+            {checkboxOptions.map((option) => (
+              <label key={option.name} className="flex items-center gap-1">
+                <input
+                  type="checkbox"
+                  name={option.name}
+                  checked={checkboxes[option.name] || false}
+                  onChange={handleCheckboxChange}
+                  disabled={loading}
+                  className="form-checkbox"
+                />
+                <span className="update-modal-label !m-0 cursor-pointer">{option.label}</span>
+              </label>
+            ))}
+          </div>
           <div className="text-sm mt-1" style={{ minHeight: "20px" }}>
             {fieldError && <span className="text-[#dc2626]">{fieldError}</span>}
             {error && <span className="text-[#dc2626]">{error}</span>}

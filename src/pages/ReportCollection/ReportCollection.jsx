@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./reportcollection.css";
-import { ChevronDown } from "lucide-react";
 import downarrow from "../../assets/Images/CollectionReport/downarrow.svg";
+import CustomDropDown from "../../components/CustomDropDown";
+import { ChevronDown } from "lucide-react";
 
 const ReportCollection = () => {
-  const [openSelectKey, setOpenSelectKey] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState({
@@ -26,19 +26,21 @@ const ReportCollection = () => {
     end_date: "",
   });
   const [expandedRows, setExpandedRows] = useState({});
+  const [selectedShowing, setSelectedShowing] = useState("showing"); // State for Showing/All dropdown
+  const [selectedFilter, setSelectedFilter] = useState("filter"); // State for Filter/All dropdown
+  const [isDateRangeOpen, setIsDateRangeOpen] = useState(false); // State for date range dropdown
 
   // Reference to the date range dropdown
   const dateRangeRef = useRef(null);
 
-  // Close dropdowns when clicking outside
+  // Close date range dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (
-        openSelectKey === "date_range" &&
         dateRangeRef.current &&
         !dateRangeRef.current.contains(event.target)
       ) {
-        setOpenSelectKey(null);
+        setIsDateRangeOpen(false);
       }
     }
 
@@ -46,7 +48,7 @@ const ReportCollection = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [openSelectKey]);
+  }, []);
 
   const itemsPerPage = 10;
 
@@ -54,7 +56,7 @@ const ReportCollection = () => {
     {
       id: "B24090001",
       tenancy: "TC0013-1",
-      date: "09 sept 2024  ",
+      date: "09 sept 2024",
       tenant: "Coffee",
       building: "Emaar Square Area",
       unit: "SHOP10",
@@ -65,7 +67,7 @@ const ReportCollection = () => {
     {
       id: "B24090002",
       tenancy: "TC0013-1",
-      date: "09 sept 2024  ",
+      date: "09 sept 2024",
       tenant: "Shoes shop",
       building: "Al Reem",
       unit: "SHOP11",
@@ -76,7 +78,7 @@ const ReportCollection = () => {
     {
       id: "B24090003",
       tenancy: "TC0013-1",
-      date: "09 sept 2024  ",
+      date: "09 sept 2024",
       tenant: "Coffee",
       building: "Down Town",
       unit: "SHOP10",
@@ -87,7 +89,7 @@ const ReportCollection = () => {
     {
       id: "B24090004",
       tenancy: "TC0013-1",
-      date: "09 sept 2024  ",
+      date: "09 sept 2024",
       tenant: "Shoes shop",
       building: "Al Reem",
       unit: "SHOP11",
@@ -104,6 +106,41 @@ const ReportCollection = () => {
   const uniqueBuildings = getUnique("building");
   const uniqueUnits = getUnique("unit");
   const uniquePayments = getUnique("payment");
+
+  // Dropdown options
+  const showingOptions = [
+    { label: "Showing", value: "showing" },
+    { label: "All", value: "all" },
+  ];
+
+  const filterOptions = [
+    { label: "Filter", value: "filter" },
+    { label: "All", value: "all" },
+  ];
+
+  const idOptions = [
+    { label: "All Tenancy", value: "" },
+    ...uniqueIds.map((id) => ({ label: id, value: id })),
+  ];
+  const tenantOptions = [
+    { label: "All Tenants", value: "" },
+    ...uniqueTenants.map((tenant) => ({ label: tenant, value: tenant })),
+  ];
+  const buildingOptions = [
+    { label: "All Buildings", value: "" },
+    ...uniqueBuildings.map((building) => ({
+      label: building,
+      value: building,
+    })),
+  ];
+  const unitOptions = [
+    { label: "All Units", value: "" },
+    ...uniqueUnits.map((unit) => ({ label: unit, value: unit })),
+  ];
+  const paymentOptions = [
+    { label: "All Payments", value: "" },
+    ...uniquePayments.map((payment) => ({ label: payment, value: payment })),
+  ];
 
   const clearFilters = () => {
     const cleared = {
@@ -152,7 +189,7 @@ const ReportCollection = () => {
 
   // Toggle date range dropdown
   const toggleDateRange = () => {
-    setOpenSelectKey(openSelectKey === "date_range" ? null : "date_range");
+    setIsDateRangeOpen((prev) => !prev);
   };
 
   const toggleRowExpand = (id) => {
@@ -176,35 +213,23 @@ const ReportCollection = () => {
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 report-collection-search"
             />
             <div className="relative w-[45%] md:w-auto">
-              <select
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 report-collection-selection"
-                onFocus={() => setOpenSelectKey("showing")}
-                onBlur={() => setOpenSelectKey(null)}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  openSelectKey === "showing" ? "rotate-180" : "rotate-0"
-                }`}
+              <CustomDropDown
+                options={showingOptions}
+                value={selectedShowing}
+                onChange={setSelectedShowing}
+                placeholder="Select"
+                dropdownClassName="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 report-collection-selection"
               />
             </div>
           </div>
           <div className="flex gap-[10px] report-collection-action-buttons-container">
             <div className="relative w-[55%] md:w-auto">
-              <select
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 report-collection-selection"
-                onFocus={() => setOpenSelectKey("filter")}
-                onBlur={() => setOpenSelectKey(null)}
-              >
-                <option value="filter">Filter</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  openSelectKey === "filter" ? "rotate-180" : "rotate-0"
-                }`}
+              <CustomDropDown
+                options={filterOptions}
+                value={selectedFilter}
+                onChange={setSelectedFilter}
+                placeholder="Select"
+                dropdownClassName="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 report-collection-selection"
               />
             </div>
             <button className="flex items-center justify-center gap-2 w-[89%] md:w-[132px] rounded-md duration-200 report-collection-export-btn">
@@ -218,37 +243,24 @@ const ReportCollection = () => {
         <div className="flex items-center justify-between">
           <div className="flex gap-[10px] flexBars-wrap">
             {[
-              ["id", "All Tenancy", uniqueIds],
-              ["tenant", "All Tenants", uniqueTenants],
-              ["building", "All Buildings", uniqueBuildings],
-              ["unit", "All Units", uniqueUnits],
-              ["payment", "All Payments", uniquePayments],
-            ].map(([key, label, options]) => (
+              ["id", idOptions],
+              ["tenant", tenantOptions],
+              ["building", buildingOptions],
+              ["unit", unitOptions],
+              ["payment", paymentOptions],
+            ].map(([key, options]) => (
               <div key={key} className="relative">
-                <select
-                  name={key}
-                  className="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer focus:border-gray-300 duration-200 report-collection-selection"
+                <CustomDropDown
+                  options={options}
                   value={tempFilters[key]}
-                  onChange={(e) =>
+                  onChange={(value) =>
                     setTempFilters((prev) => ({
                       ...prev,
-                      [key]: e.target.value,
+                      [key]: value,
                     }))
                   }
-                  onFocus={() => setOpenSelectKey(key)}
-                  onBlur={() => setOpenSelectKey(null)}
-                >
-                  <option value="">{label}</option>
-                  {options.map((item, i) => (
-                    <option key={i} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown
-                  className={`absolute left-[105px] top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                    openSelectKey === key ? "rotate-180" : "rotate-0"
-                  }`}
+                  placeholder="Select"
+                  dropdownClassName="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer focus:border-gray-300 duration-200 report-collection-selection"
                 />
               </div>
             ))}
@@ -260,11 +272,11 @@ const ReportCollection = () => {
                 Date Range
                 <ChevronDown
                   className={`ml-2 transition-transform duration-300 ${
-                    openSelectKey === "date_range" ? "rotate-180" : "rotate-0"
+                    isDateRangeOpen ? "rotate-180" : "rotate-0"
                   }`}
                 />
               </div>
-              {openSelectKey === "date_range" && (
+              {isDateRangeOpen && (
                 <div className="absolute z-10 bg-white p-4 mt-1 border border-gray-300 rounded-md shadow-md w-[250px]">
                   <label className="block text-sm mb-1 filter-btn">
                     Start Date
@@ -437,7 +449,7 @@ const ReportCollection = () => {
                         <div className="report-collection-grid">
                           <div className="report-collection-grid-item">
                             <div className="report-collection-dropdown-label">
-                              TENANT 
+                              TENANT
                             </div>
                             <div className="report-collection-dropdown-value">
                               {report.tenant}

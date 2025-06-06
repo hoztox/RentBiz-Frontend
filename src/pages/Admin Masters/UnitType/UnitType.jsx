@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "./UnitType.css";
-import { ChevronDown } from "lucide-react";
 import { toast, Toaster } from "react-hot-toast";
 import plusicon from "../../../assets/Images/Admin Masters/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Masters/download-icon.svg";
@@ -11,9 +10,9 @@ import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import UnitTypeDeleteModal from "./UnitTypeDeleteModal/UnitTypeDeleteModal";
 import { unitTypesApi } from "../MastersApi"; // Updated import
+import CustomDropDown from "../../../components/CustomDropDown";
 
 const UnitType = () => {
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
@@ -25,6 +24,13 @@ const UnitType = () => {
   const [unitTypeIdToDelete, setUnitTypeIdToDelete] = useState(null);
   const itemsPerPage = 10;
 
+  const dropdownOptions = [
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" },
+  ];
+
+  const [selectedOption, setSelectedOption] = useState("showing")
+
   // Fetch unit types from backend
   const fetchData = async () => {
     try {
@@ -34,7 +40,8 @@ const UnitType = () => {
       setUnitTypes(unitData);
     } catch (err) {
       console.error("Error fetching unit types:", err);
-      const errorMessage = err.message || "Failed to fetch unit types. Please try again.";
+      const errorMessage =
+        err.message || "Failed to fetch unit types. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -57,7 +64,8 @@ const UnitType = () => {
       toast.success("Unit Type deleted successfully.");
     } catch (error) {
       console.error("Error deleting unit type:", error);
-      const errorMessage = error.message || "Failed to delete unit type. Please try again.";
+      const errorMessage =
+        error.message || "Failed to delete unit type. Please try again.";
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -183,19 +191,13 @@ const UnitType = () => {
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 unit-search"
             />
             <div className="relative w-[40%] md:w-auto">
-              <select
-                name="select"
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 unit-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${isSelectOpen ? "rotate-180" : "rotate-0"
-                  }`}
-              />
+            <CustomDropDown
+              options={dropdownOptions}
+              value={selectedOption}
+              onChange={setSelectedOption}
+              className="w-full md:w-[121px]"
+              dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 unit-selection"
+            />
             </div>
           </div>
           <div className="flex gap-[10px] utype-action-buttons-container">
@@ -254,8 +256,9 @@ const UnitType = () => {
                     return (
                       <tr
                         key={unit.id}
-                        className={`h-[57px] hover:bg-gray-50 cursor-pointer ${shouldRemoveBorder ? "" : "border-b border-[#E9E9E9]"
-                          }`}
+                        className={`h-[57px] hover:bg-gray-50 cursor-pointer ${
+                          shouldRemoveBorder ? "" : "border-b border-[#E9E9E9]"
+                        }`}
                       >
                         <td className="px-5 text-left unit-data">
                           {(currentPage - 1) * itemsPerPage + index + 1}
@@ -374,10 +377,11 @@ const UnitType = () => {
               paginatedData.map((unit, index) => (
                 <React.Fragment key={unit.id}>
                   <tr
-                    className={`${expandedRows[unit.id]
+                    className={`${
+                      expandedRows[unit.id]
                         ? "utype-mobile-no-border"
                         : "utype-mobile-with-border"
-                      } border-b border-[#E9E9E9] h-[57px]`}
+                    } border-b border-[#E9E9E9] h-[57px]`}
                   >
                     <td className="px-5 text-left unit-data">
                       {(currentPage - 1) * itemsPerPage + index + 1}
@@ -387,15 +391,17 @@ const UnitType = () => {
                     </td>
                     <td className="py-4 flex items-center justify-end h-[57px]">
                       <div
-                        className={`unit-dropdown-field ${expandedRows[unit.id] ? "active" : ""
-                          }`}
+                        className={`unit-dropdown-field ${
+                          expandedRows[unit.id] ? "active" : ""
+                        }`}
                         onClick={() => toggleRowExpand(unit.id)}
                       >
                         <img
                           src={downarrow}
                           alt="drop-down-arrow"
-                          className={`unit-dropdown-img ${expandedRows[unit.id] ? "text-white" : ""
-                            }`}
+                          className={`unit-dropdown-img ${
+                            expandedRows[unit.id] ? "text-white" : ""
+                          }`}
                         />
                       </div>
                     </td>
@@ -406,7 +412,9 @@ const UnitType = () => {
                         <div className="unit-dropdown-content">
                           <div className="utype-grid">
                             <div className="utype-grid-items">
-                              <div className="utype-dropdown-label">ENTRY DATE</div>
+                              <div className="utype-dropdown-label">
+                                ENTRY DATE
+                              </div>
                               <div className="utype-dropdown-value">
                                 {formatDate(unit.created_at)}
                               </div>
@@ -476,10 +484,11 @@ const UnitType = () => {
             {[...Array(endPage - startPage + 1)].map((_, i) => (
               <button
                 key={startPage + i}
-                className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${currentPage === startPage + i
+                className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+                  currentPage === startPage + i
                     ? "bg-[#1458A2] text-white"
                     : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-                  }`}
+                }`}
                 onClick={() => setCurrentPage(startPage + i)}
               >
                 {startPage + i}
@@ -506,7 +515,6 @@ const UnitType = () => {
           </div>
         </div>
       )}
-
       <UnitTypeDeleteModal
         isOpen={isDeleteModalOpen}
         onCancel={handleCancelDelete}

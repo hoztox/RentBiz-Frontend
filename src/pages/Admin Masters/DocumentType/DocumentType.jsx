@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "./DocumentType.css";
-import { ChevronDown } from "lucide-react";
 import { toast, Toaster } from "react-hot-toast";
 import plusicon from "../../../assets/Images/Admin Masters/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Masters/download-icon.svg";
@@ -11,10 +10,10 @@ import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import DeleteDocumentTypeModal from "./DeleteDocumentTypeModal/DeleteDocumentTypeModal";
 import { documentTypesApi } from "../MastersApi";
+import CustomDropDown from "../../../components/CustomDropDown";
 
 const DocumentType = () => {
   const { openModal, refreshCounter } = useModal();
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
@@ -24,6 +23,13 @@ const DocumentType = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [docTypeIdToDelete, setDocTypeIdToDelete] = useState(null);
   const itemsPerPage = 10;
+
+  const dropdownOption = [
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" },
+  ];
+
+  const [selectedOption, setSelectedOption] = useState("showing");
 
   // Fetch document types
   const fetchDocTypes = async () => {
@@ -86,10 +92,14 @@ const DocumentType = () => {
       month: "short",
       year: "numeric",
     });
-  };
+  }
 
-  // Filter data based on search term
-  const filteredData = docTypes.filter((docType) => {
+  // Sort and filter data
+  const sortedData = [...docTypes].sort((a, b) => {
+      return a.id - b.id;
+  });
+
+  const filteredData = sortedData.filter((docType) => {
     const searchLower = searchTerm.toLowerCase();
     const createdDate = formatDate(docType.created_at);
     return (
@@ -158,7 +168,6 @@ const DocumentType = () => {
   return (
     <div className="border border-gray-200 rounded-md doctype-table">
       <Toaster />
-
       {/* Header Section */}
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] doctype-table-header">
         <h1 className="doctype-head">Document Type Masters</h1>
@@ -173,21 +182,12 @@ const DocumentType = () => {
               disabled={loading}
             />
             <div className="relative w-[40%] md:w-auto">
-              <select
-                name="select"
-                id=""
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 doctype-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-                disabled={loading}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+              <CustomDropDown
+                options={dropdownOption}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                className="w-full md:w-[121px]"
+                dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 doctype-selection"
               />
             </div>
           </div>
@@ -227,7 +227,11 @@ const DocumentType = () => {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-[#E9E9E9] h-[57px]">
-                  <th className="px-4 py-3 text-left doctype-thead">ID</th>
+                  <th
+                    className="px-4 py-3 text-left doctype-thead cursor-pointer"
+                  >
+                    ID
+                  </th>
                   <th className="px-4 py-3 text-left doctype-thead">
                     ENTRY DATE
                   </th>
@@ -311,7 +315,9 @@ const DocumentType = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="doctype-table-row-head">
-              <th className="px-5 w-[52%] text-left doctype-thead doctype-id-column">
+              <th
+                className="px-5 w-[52%] text-left doctype-thead doctype-id-column cursor-pointer"
+              >
                 ID
               </th>
               <th className="px-5 w-[47%] text-left doctype-thead doctype-entry-date-column">
@@ -328,7 +334,7 @@ const DocumentType = () => {
                 </td>
               </tr>
             ) : (
-              paginatedData.map((docType, index) => (
+              paginatedData.map((docType) => (
                 <React.Fragment key={docType.id}>
                   <tr
                     className={`${
@@ -338,7 +344,7 @@ const DocumentType = () => {
                     } border-b border-[#E9E9E9] h-[57px]`}
                   >
                     <td className="px-5 text-left doctype-data">
-                      {(currentPage - 1) * itemsPerPage + index + 1}
+                      {docType.id}
                     </td>
                     <td className="px-3 text-left doctype-data doctype-entry-date-column">
                       {docType.title || "N/A"}

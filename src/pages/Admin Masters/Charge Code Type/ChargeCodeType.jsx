@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "./chargecodetype.css";
-import { ChevronDown } from "lucide-react";
 import plusIcon from "../../../assets/Images/Admin Masters/plus-icon.svg";
 import downloadIcon from "../../../assets/Images/Admin Masters/download-icon.svg";
 import editIcon from "../../../assets/Images/Admin Masters/edit-icon.svg";
@@ -11,10 +10,10 @@ import { useModal } from "../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
 import ChargeCodeDeleteModal from "./ChargeCodeDeleteModal/ChargeCodeDeleteModal";
 import { chargeCodesApi } from "../MastersApi";
+import CustomDropDown from "../../../components/CustomDropDown";
 
 const ChargeCodeType = () => {
   const { openModal, refreshCounter } = useModal();
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
@@ -24,6 +23,13 @@ const ChargeCodeType = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [chargeCodeIdToDelete, setChargeCodeIdToDelete] = useState(null);
   const itemsPerPage = 10;
+
+  const dropdownOptions = [
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" },
+  ];
+
+  const [selectedOption, setSelectedOption] = useState("showing");
 
   // Fetch charge code data
   const fetchData = async () => {
@@ -60,7 +66,9 @@ const ChargeCodeType = () => {
       setLoading(true);
       setError(null);
       await chargeCodesApi.delete(chargeCodeIdToDelete);
-      setData((prev) => prev.filter((item) => item.id !== chargeCodeIdToDelete));
+      setData((prev) =>
+        prev.filter((item) => item.id !== chargeCodeIdToDelete)
+      );
       toast.success("Charge code deleted successfully");
       if (paginatedData.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
@@ -116,7 +124,11 @@ const ChargeCodeType = () => {
 
   const handleEditClick = (chargeCode) => {
     console.log("Charge Code: Selected Charge Code:", chargeCode);
-    openModal("update-charge-code-type", "Update Charge Code Master", chargeCode);
+    openModal(
+      "update-charge-code-type",
+      "Update Charge Code Master",
+      chargeCode
+    );
   };
 
   const toggleRowExpand = (id) => {
@@ -143,21 +155,12 @@ const ChargeCodeType = () => {
               disabled={loading}
             />
             <div className="relative w-[40%] md:w-auto">
-              <select
-                name="select"
-                id=""
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 idtype-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-                disabled={loading}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+              <CustomDropDown
+                options={dropdownOptions}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                className="w-full md:w-[121px]"
+                dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 idtype-selection"
               />
             </div>
           </div>
@@ -215,8 +218,12 @@ const ChargeCodeType = () => {
                       <th className="px-4 py-3 text-left idtype-thead">
                         ENTRY DATE
                       </th>
-                      <th className="px-4 py-3 text-left idtype-thead">TITLE</th>
-                      <th className="px-4 py-3 text-right idtype-thead">ACTION</th>
+                      <th className="px-4 py-3 text-left idtype-thead">
+                        TITLE
+                      </th>
+                      <th className="px-4 py-3 text-right idtype-thead">
+                        ACTION
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -231,15 +238,19 @@ const ChargeCodeType = () => {
                       </tr>
                     ) : (
                       paginatedData.map((chargeCode, index) => {
-                        const isLastItemOnPage = index === paginatedData.length - 1;
+                        const isLastItemOnPage =
+                          index === paginatedData.length - 1;
                         const shouldRemoveBorder =
-                          isLastItemOnPage && paginatedData.length === itemsPerPage;
+                          isLastItemOnPage &&
+                          paginatedData.length === itemsPerPage;
 
                         return (
                           <tr
                             key={chargeCode.id}
                             className={`h-[57px] hover:bg-gray-50 cursor-pointer ${
-                              shouldRemoveBorder ? "" : "border-b border-[#E9E9E9]"
+                              shouldRemoveBorder
+                                ? ""
+                                : "border-b border-[#E9E9E9]"
                             }`}
                           >
                             <td className="px-5 text-left idtype-data">
@@ -320,7 +331,9 @@ const ChargeCodeType = () => {
                     <React.Fragment key={chargeCode.id}>
                       <tr
                         className={`${
-                          expandedRows[chargeCode.id] ? "mobile-no-border" : "mobile-with-border"
+                          expandedRows[chargeCode.id]
+                            ? "mobile-no-border"
+                            : "mobile-with-border"
                         } border-b border-[#E9E9E9] h-[57px]`}
                       >
                         <td className="px-5 text-left idtype-data">
@@ -352,7 +365,9 @@ const ChargeCodeType = () => {
                             <div className="idtype-dropdown-content">
                               <div className="idtype-grid">
                                 <div className="idtype-grid-items">
-                                  <div className="dropdown-label">ENTRY DATE</div>
+                                  <div className="dropdown-label">
+                                    ENTRY DATE
+                                  </div>
                                   <div className="dropdown-value">
                                     {formatDate(chargeCode.created_at)}
                                   </div>
@@ -361,7 +376,9 @@ const ChargeCodeType = () => {
                                   <div className="dropdown-label">ACTION</div>
                                   <div className="dropdown-value flex items-center gap-2 p-1 ml-[5px]">
                                     <button
-                                      onClick={() => handleEditClick(chargeCode)}
+                                      onClick={() =>
+                                        handleEditClick(chargeCode)
+                                      }
                                       disabled={loading}
                                     >
                                       <img
@@ -371,7 +388,9 @@ const ChargeCodeType = () => {
                                       />
                                     </button>
                                     <button
-                                      onClick={() => handleDelete(chargeCode.id)}
+                                      onClick={() =>
+                                        handleDelete(chargeCode.id)
+                                      }
                                       disabled={loading}
                                     >
                                       <img
@@ -399,9 +418,12 @@ const ChargeCodeType = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
               <span className="collection-list-pagination">
                 Showing{" "}
-                {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-                to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-                {filteredData.length} entries
+                {Math.min(
+                  (currentPage - 1) * itemsPerPage + 1,
+                  filteredData.length
+                )}{" "}
+                to {Math.min(currentPage * itemsPerPage, filteredData.length)}{" "}
+                of {filteredData.length} entries
               </span>
               <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
                 <button

@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./IncomeExpenseReport.css";
 import { ChevronDown } from "lucide-react";
-import downarrow from "../../assets/Images/IncomeExpenseReport/downarrow.svg"
+import downarrow from "../../assets/Images/IncomeExpenseReport/downarrow.svg";
+import CustomDropDown from "../../components/CustomDropDown";
 
 const IncomeExpenseReport = () => {
   const [openSelectKey, setOpenSelectKey] = useState(null);
@@ -102,6 +103,39 @@ const IncomeExpenseReport = () => {
   const uniqueBuildings = getUnique("building");
   const uniqueUnits = getUnique("unit");
 
+  // Dropdown options for "Showing"/"All"
+  const showingOptions = [
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" },
+  ];
+
+  // Dropdown options for "Filter"/"All"
+  const filterOptions = [
+    { value: "filter", label: "Filter" },
+    { value: "all", label: "All" },
+  ];
+
+  // Dropdown options for filter fields
+  const tenantOptions = [
+    { value: "", label: "All Tenancy" },
+    ...uniqueTenants.map((tenant) => ({ value: tenant, label: tenant })),
+  ];
+  const buildingOptions = [
+    { value: "", label: "All Buildings" },
+    ...uniqueBuildings.map((building) => ({
+      value: building,
+      label: building,
+    })),
+  ];
+  const unitOptions = [
+    { value: "", label: "All Units" },
+    ...uniqueUnits.map((unit) => ({ value: unit, label: unit })),
+  ];
+
+  // State for selected dropdown values
+  const [selectedShowing, setSelectedShowing] = useState("showing");
+  const [selectedFilter, setSelectedFilter] = useState("filter");
+
   const clearFilters = () => {
     const cleared = {
       id: "",
@@ -116,6 +150,8 @@ const IncomeExpenseReport = () => {
     setTempFilters(cleared);
     setSearchTerm("");
     setCurrentPage(1);
+    setSelectedShowing("showing");
+    setSelectedFilter("filter");
   };
 
   const filteredData = demoData.filter((report) => {
@@ -170,35 +206,23 @@ const IncomeExpenseReport = () => {
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 income-expense-search"
             />
             <div className="relative w-[45%] md:w-auto">
-              <select
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 income-expense-selection"
-                onFocus={() => setOpenSelectKey("showing")}
-                onBlur={() => setOpenSelectKey(null)}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  openSelectKey === "showing" ? "rotate-180" : "rotate-0"
-                }`}
+              <CustomDropDown
+                options={showingOptions}
+                value={selectedShowing}
+                onChange={setSelectedShowing}
+                className="w-full md:w-[121px]"
+                dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 income-expense-selection"
               />
             </div>
           </div>
           <div className="flex gap-[10px] income-expense-action-buttons-container">
             <div className="relative w-[55%] md:w-auto">
-              <select
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 income-expense-selection"
-                onFocus={() => setOpenSelectKey("filter")}
-                onBlur={() => setOpenSelectKey(null)}
-              >
-                <option value="filter">Filter</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  openSelectKey === "filter" ? "rotate-180" : "rotate-0"
-                }`}
+              <CustomDropDown
+                options={filterOptions}
+                value={selectedFilter}
+                onChange={setSelectedFilter}
+                className="w-full md:w-[121px]"
+                dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 income-expense-selection"
               />
             </div>
             <button className="flex items-center justify-center gap-2 w-[89%] md:w-[132px] rounded-md duration-200 income-expense-export-btn">
@@ -212,86 +236,46 @@ const IncomeExpenseReport = () => {
         <div className="flex items-center justify-between">
           <div className="flex gap-[10px] flex-wrap">
             <div className="relative">
-              <select
-                name="tenant"
-                className="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer focus:border-gray-300 duration-200 income-expense-selection"
+              <CustomDropDown
+                options={tenantOptions}
                 value={tempFilters.tenant}
-                onChange={(e) =>
+                onChange={(value) =>
                   setTempFilters((prev) => ({
                     ...prev,
-                    tenant: e.target.value,
+                    tenant: value,
                   }))
                 }
-                onFocus={() => setOpenSelectKey("tenant")}
-                onBlur={() => setOpenSelectKey(null)}
-              >
-                <option value="">All Tenancy</option>
-                {uniqueTenants.map((item, i) => (
-                  <option key={i} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  openSelectKey === "tenant" ? "rotate-180" : "rotate-0"
-                }`}
+                className="w-[130px]"
+                dropdownClassName="px-[7px] py-[7px] border-[#201D1E20] focus:border-gray-300 income-expense-selection h-[38px]"
               />
             </div>
 
             <div className="relative">
-              <select
-                name="building"
-                className="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer focus:border-gray-300 duration-200 income-expense-selection"
+              <CustomDropDown
+                options={buildingOptions}
                 value={tempFilters.building}
-                onChange={(e) =>
+                onChange={(value) =>
                   setTempFilters((prev) => ({
                     ...prev,
-                    building: e.target.value,
+                    building: value,
                   }))
                 }
-                onFocus={() => setOpenSelectKey("building")}
-                onBlur={() => setOpenSelectKey(null)}
-              >
-                <option value="">All Buildings</option>
-                {uniqueBuildings.map((item, i) => (
-                  <option key={i} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  openSelectKey === "building" ? "rotate-180" : "rotate-0"
-                }`}
+                dropdownClassName="px-[7px] py-[7px] w-[130px] border-[#201D1E20] focus:border-gray-300 income-expense-selection h-[38px]"
               />
             </div>
 
             <div className="relative">
-              <select
-                name="unit"
-                className="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer focus:border-gray-300 duration-200 income-expense-selection"
+              <CustomDropDown
+                options={unitOptions}
                 value={tempFilters.unit}
-                onChange={(e) =>
+                onChange={(value) =>
                   setTempFilters((prev) => ({
                     ...prev,
-                    unit: e.target.value,
+                    unit: value,
                   }))
                 }
-                onFocus={() => setOpenSelectKey("unit")}
-                onBlur={() => setOpenSelectKey(null)}
-              >
-                <option value="">All Units</option>
-                {uniqueUnits.map((item, i) => (
-                  <option key={i} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  openSelectKey === "unit" ? "rotate-180" : "rotate-0"
-                }`}
+                className="w-[130px]"
+                dropdownClassName="px-[7px] py-[7px] border-[#201D1E20] focus:border-gray-300 income-expense-selection h-[38px]"
               />
             </div>
 
@@ -423,7 +407,9 @@ const IncomeExpenseReport = () => {
                 <td className="px-5 income-expense-data">{income.unit}</td>
                 <td className="px-5 income-expense-data">{income.tenant}</td>
                 <td className="px-5 income-expense-data">{income.charge}</td>
-                <td className="px-5 income-expense-data">{income.invoice_no}</td>
+                <td className="px-5 income-expense-data">
+                  {income.invoice_no}
+                </td>
                 <td className="px-5 text-center income-expense-data bg-[#F2FCF7] !text-[#28C76F]">
                   {income.income_amount}
                 </td>
@@ -452,8 +438,12 @@ const IncomeExpenseReport = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="income-expense-table-row-head">
-              <th className="px-5 pl-[1rem] w-[50%] text-left income-expense-thead income-expense-date-column">DATE</th>
-              <th className="px-3 w-[33.33%] text-left income-expense-thead income-expense-tenant-column">BUILDING</th>
+              <th className="px-5 pl-[1rem] w-[50%] text-left income-expense-thead income-expense-date-column">
+                DATE
+              </th>
+              <th className="px-3 w-[33.33%] text-left income-expense-thead income-expense-tenant-column">
+                BUILDING
+              </th>
               <th className=" text-right income-expense-thead"></th>
             </tr>
           </thead>
@@ -467,8 +457,12 @@ const IncomeExpenseReport = () => {
                       : "income-expense-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left income-expense-data income-expense-date-column w-[35%] pl-[16px]">{report.date}</td>
-                  <td className="px-3 text-left income-expense-data income-expense-tenant-column w-[30%]">{report.building}</td>
+                  <td className="px-5 text-left income-expense-data income-expense-date-column w-[35%] pl-[16px]">
+                    {report.date}
+                  </td>
+                  <td className="px-3 text-left income-expense-data income-expense-tenant-column w-[30%]">
+                    {report.building}
+                  </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`income-expense-dropdown-field ${
@@ -492,22 +486,38 @@ const IncomeExpenseReport = () => {
                       <div className="income-expense-grid-container">
                         <div className="income-expense-grid">
                           <div className="income-expense-grid-item">
-                            <div className="income-expense-dropdown-label w-[50%]">UNIT</div>
-                            <div className="income-expense-dropdown-value">{report.unit}</div>
+                            <div className="income-expense-dropdown-label w-[50%]">
+                              UNIT
+                            </div>
+                            <div className="income-expense-dropdown-value">
+                              {report.unit}
+                            </div>
                           </div>
                           <div className="income-expense-grid-item w-[50%]">
-                            <div className="income-expense-dropdown-label">TENANT</div>
-                            <div className="income-expense-dropdown-value">{report.tenant}</div>
+                            <div className="income-expense-dropdown-label">
+                              TENANT
+                            </div>
+                            <div className="income-expense-dropdown-value">
+                              {report.tenant}
+                            </div>
                           </div>
                         </div>
                         <div className="income-expense-grid">
                           <div className="income-expense-grid-item w-[50%]">
-                            <div className="income-expense-dropdown-label">CHARGE</div>
-                            <div className="income-expense-dropdown-value">{report.charge}</div>
+                            <div className="income-expense-dropdown-label">
+                              CHARGE
+                            </div>
+                            <div className="income-expense-dropdown-value">
+                              {report.charge}
+                            </div>
                           </div>
                           <div className="income-expense-grid-item w-[50%]">
-                            <div className="income-expense-dropdown-label">INVOICE NO/EXPENSE NO</div>
-                            <div className="income-expense-dropdown-value">{report.invoice_no}</div>
+                            <div className="income-expense-dropdown-label">
+                              INVOICE NO/EXPENSE NO
+                            </div>
+                            <div className="income-expense-dropdown-value">
+                              {report.invoice_no}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -515,30 +525,60 @@ const IncomeExpenseReport = () => {
                         <table className="income-expense-dropdown-table">
                           <thead>
                             <tr className="income-expense-dropdown-table-header">
-                              <th colSpan="3" className="income-expense-income-header">
+                              <th
+                                colSpan="3"
+                                className="income-expense-income-header"
+                              >
                                 INCOME
                               </th>
-                              <th colSpan="3" className="income-expense-expense-header">
+                              <th
+                                colSpan="3"
+                                className="income-expense-expense-header"
+                              >
                                 EXPENSE
                               </th>
                             </tr>
                             <tr className="income-expense-dropdown-table-subheader">
-                              <th className="income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">AMOUNT</th>
-                              <th className="income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">VAT</th>
-                              <th className="income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">TOTAL</th>
-                              <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">AMOUNT</th>
-                              <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">VAT</th>
-                              <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">TOTAL</th>
+                              <th className="income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">
+                                AMOUNT
+                              </th>
+                              <th className="income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">
+                                VAT
+                              </th>
+                              <th className="income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">
+                                TOTAL
+                              </th>
+                              <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
+                                AMOUNT
+                              </th>
+                              <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
+                                VAT
+                              </th>
+                              <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
+                                TOTAL
+                              </th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr className="income-expense-dropdown-table-row">
-                              <td className="income-expense-data bg-[#F2FCF7] !text-[#28C76F]">{report.income_amount}</td>
-                              <td className="income-expense-data bg-[#F2FCF7] !text-[#28C76F]">{report.income_vat}</td>
-                              <td className="income-expense-data bg-[#F2FCF7] !text-[#28C76F]">{report.income_total}</td>
-                              <td className="income-expense-data bg-[#FFF7F6] !text-[#FE7062]">{report.expense_amount}</td>
-                              <td className="income-expense-data bg-[#FFF7F6] !text-[#FE7062]">{report.expense_vat}</td>
-                              <td className="income-expense-data bg-[#FFF7F6] !text-[#FE7062]">{report.expense_total}</td>
+                              <td className="income-expense-data bg-[#F2FCF7] !text-[#28C76F]">
+                                {report.income_amount}
+                              </td>
+                              <td className="income-expense-data bg-[#F2FCF7] !text-[#28C76F]">
+                                {report.income_vat}
+                              </td>
+                              <td className="income-expense-data bg-[#F2FCF7] !text-[#28C76F]">
+                                {report.income_total}
+                              </td>
+                              <td className="income-expense-data bg-[#FFF7F6] !text-[#FE7062]">
+                                {report.expense_amount}
+                              </td>
+                              <td className="income-expense-data bg-[#FFF7F6] !text-[#FE7062]">
+                                {report.expense_vat}
+                              </td>
+                              <td className="income-expense-data bg-[#FFF7F6] !text-[#FE7062]">
+                                {report.expense_total}
+                              </td>
                             </tr>
                           </tbody>
                         </table>
@@ -554,8 +594,10 @@ const IncomeExpenseReport = () => {
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 income-expense-pagination-container">
         <span className="income-expense-pagination collection-list-pagination">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
-          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
+          Showing{" "}
+          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+          {filteredData.length} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto income-expense-pagination-buttons">
           <button
@@ -587,7 +629,9 @@ const IncomeExpenseReport = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
+          {endPage < totalPages - 1 && (
+            <span className="px-2 flex items-center">...</span>
+          )}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./TenancyViewModal.css";
 import closeicon from "../../../assets/Images/Admin Tenancy/close-icon.svg";
+import printicon from "../../../assets/Images/Admin Tenancy/download-icon-blue.svg";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 
@@ -15,17 +16,17 @@ const TenancyViewModal = () => {
   useEffect(() => {
     if (modalState.isOpen && modalState.type === "tenancy-view" && modalState.data) {
       console.log("Modal opened with data:", modalState.data); // Debug log
-      
+
       const fetchTenancyData = async () => {
         try {
           setLoading(true);
           setError(null);
-          
+
           // Use the tenancy_code or id from the passed data
           const tenancyId = modalState.data.tenancy_code || modalState.data.id;
           console.log("Fetching tenancy with ID:", tenancyId); // Debug log
-          
-          const response = await axios.get(`${BASE_URL}/company/tenancies/${tenancyId}/`); 
+
+          const response = await axios.get(`${BASE_URL}/company/tenancies/${tenancyId}/`);
           const data = response.data;
           console.log("Fetched tenancy data:", data); // Debug log
 
@@ -34,7 +35,7 @@ const TenancyViewModal = () => {
             ...acc,
             [charge.id]: false,
           }), {}) || {};
-          
+
           setExpandedStates(initialExpandedStates);
           setTenancyData(data);
           setLoading(false);
@@ -42,7 +43,7 @@ const TenancyViewModal = () => {
           console.error("Error fetching tenancy data:", err);
           setError("Failed to fetch tenancy data");
           setLoading(false);
-          
+
           // Fallback: use the data that was passed directly
           console.log("Using fallback data:", modalState.data);
           setTenancyData(modalState.data);
@@ -61,6 +62,29 @@ const TenancyViewModal = () => {
     }));
   };
 
+  const handlePrint = async () => {
+    try {
+      const tenancyId =  modalState.data.id || modalState.data.tenancy_code ;
+      const response = await axios.get(`${BASE_URL}/company/tenancy/${tenancyId}/download-pdf/`, {
+        responseType: 'blob', // Important for handling binary data (PDF)
+      });
+
+      // Create a blob URL and trigger download
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `tenancy_${tenancyId}.pdf`; // Customize the filename
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url); // Clean up
+    } catch (err) {
+      console.error("Error downloading PDF:", err);
+      alert("Failed to download PDF. Please try again.");
+    }
+  };
+
   // Only render for "tenancy-view" type
   if (!modalState.isOpen || modalState.type !== "tenancy-view") return null;
 
@@ -71,7 +95,7 @@ const TenancyViewModal = () => {
       </div>
     </div>
   );
-  
+
   if (error && !tenancyData) return (
     <div className="view-modal-overlay fixed inset-0 flex items-center justify-center transition-colors z-50">
       <div className="view-modal-container bg-white rounded-md p-6 transition-all">
@@ -88,7 +112,7 @@ const TenancyViewModal = () => {
       </div>
     </div>
   );
-  
+
   if (!tenancyData) return null;
 
   return (
@@ -102,12 +126,20 @@ const TenancyViewModal = () => {
       >
         <div className="flex justify-between items-center mt-[5px] mb-[30px]">
           <h2 className="tenancy-view-modal-head">Tenancy View</h2>
-          <button
-            onClick={closeModal}
-            className="tenancy-view-modal-close-btn hover:bg-gray-100 duration-200"
-          >
-            <img src={closeicon} alt="Close" className="w-[15px] h-[15px]" />
-          </button>
+          <div className="flex items-center gap-[19px]">
+            <button
+              onClick={handlePrint}
+              className="tenancy-view-modal-close-btn hover:bg-gray-100 duration-200"
+            >
+              <img src={printicon} alt="Print" className="w-[20px] h-[20px]" />
+            </button>
+            <button
+              onClick={closeModal}
+              className="tenancy-view-modal-close-btn hover:bg-gray-100 duration-200"
+            >
+              <img src={closeicon} alt="Close" className="w-[15px] h-[15px]" />
+            </button>
+          </div>
         </div>
 
         {/* Tenancy Details */}
@@ -183,7 +215,7 @@ const TenancyViewModal = () => {
                         key={charge.id || index}
                         className="h-[57px] border-b border-[#E9E9E9] last:border-b-0 hover:bg-gray-100"
                       >
-                        <td className="px-[10px] py-[5px] w-[20px] view-tenancy-charges-tdata">{ index + 1}</td>
+                        <td className="px-[10px] py-[5px] w-[20px] view-tenancy-charges-tdata">{index + 1}</td>
                         <td className="px-[10px] py-[5px] w-[110px] view-tenancy-charges-tdata">{charge.charge_type?.name || "N/A"}</td>
                         <td className="px-[10px] py-[5px] w-[110px] view-tenancy-charges-tdata">{charge.reason || "N/A"}</td>
                         <td className="px-[10px] py-[5px] w-[120px] view-tenancy-charges-tdata">{charge.due_date || "N/A"}</td>

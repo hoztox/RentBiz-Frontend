@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./Currency.css";
-import { ChevronDown } from "lucide-react";
 import { toast, Toaster } from "react-hot-toast";
 import plusicon from "../../../assets/Images/Admin Masters/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Masters/download-icon.svg";
@@ -11,10 +10,10 @@ import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 import CurrencyDeleteModal from "./CurrencyDeleteModal/CurrencyDeleteModal";
+import CustomDropDown from "../../../components/CustomDropDown";
 
 const Currency = () => {
   const { openModal, refreshCounter } = useModal();
-  const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
@@ -24,6 +23,13 @@ const Currency = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currencyIdToDelete, setCurrencyIdToDelete] = useState(null);
   const itemsPerPage = 10;
+
+  const dropdownOption = [
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" },
+  ];
+
+  const [selectedOption, setSelectedOption] = useState("showing");
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -167,9 +173,9 @@ const Currency = () => {
   }, [companyId, currentPage, searchTerm, refreshCounter]);
 
   const handelEditClick = (currency) => {
-    console.log("Currency Id:", currency)
-    openModal("update-currency-master", "Update Currency", currency)
-  }
+    console.log("Currency Id:", currency);
+    openModal("update-currency-master", "Update Currency", currency);
+  };
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -223,21 +229,12 @@ const Currency = () => {
               disabled={loading}
             />
             <div className="relative w-[40%] md:w-auto">
-              <select
-                name="select"
-                id=""
-                className="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 currency-selection"
-                onFocus={() => setIsSelectOpen(true)}
-                onBlur={() => setIsSelectOpen(false)}
-                disabled={loading}
-              >
-                <option value="showing">Showing</option>
-                <option value="all">All</option>
-              </select>
-              <ChevronDown
-                className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                  isSelectOpen ? "rotate-180" : "rotate-0"
-                }`}
+              <CustomDropDown
+                options={dropdownOption}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                className="w-full md:w-[121px]"
+                dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 currency-selection"
               />
             </div>
           </div>

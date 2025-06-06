@@ -11,6 +11,7 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
   const [states, setStates] = useState([]);
   const [countryName, setCountryName] = useState("N/A");
   const [stateName, setStateName] = useState("N/A");
+  const [docTypes, setDocTypes] = useState([]);
 
   // Extract building and documents data from formData
   const building = formData?.building || {};
@@ -21,6 +22,21 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
   // Debug formData structure
   console.log("ReviewPage formData:", formData);
   console.log("Documents:", documents);
+
+  // Fetch document types
+  useEffect(() => {
+    const fetchDocTypes = async () => {
+      try {
+        const companyId = localStorage.getItem("company_id");
+        const response = await axios.get(`${BASE_URL}/company/doc_type/company/${companyId}`);
+        setDocTypes(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error("Error fetching document types:", error);
+        setError("Failed to load document types.");
+      }
+    };
+    fetchDocTypes();
+  }, []);
 
   // Fetch countries
   useEffect(() => {
@@ -67,7 +83,8 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
   const handleNext = async () => {
     setLoading(true);
     setError(null);
-    // Validate required fields
+
+    // Validate building required fields
     const requiredFields = [
       "building_no",
       "plot_no",
@@ -82,27 +99,34 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
       setLoading(false);
       return;
     }
-    // Validate documents
-    if (documents.length > 0) {
-      const invalidDocs = documents.filter(
-        (doc) =>
-          !doc.doc_type ||
-          !doc.number ||
-          !doc.issued_date ||
-          !doc.expiry_date ||
-          !doc.upload_file?.length
+
+    // Validate documents based on doc_type properties
+    const invalidDocs = documents.filter((doc) => {
+      if (!doc.doc_type) return true; // Document must have a doc_type
+      const docType = docTypes.find((type) => type.id === parseInt(doc.doc_type));
+      if (!docType) return true; // Invalid doc_type
+
+      // Check only the fields required by the doc_type
+      return (
+        (docType.number && !doc.number) ||
+        (docType.issue_date && !doc.issued_date) ||
+        (docType.expiry_date && !doc.expiry_date) ||
+        (docType.upload_file && !doc.upload_file?.length)
       );
-      if (invalidDocs.length > 0) {
-        setError("All documents must have doc_type, number, dates, and at least one file.");
-        setLoading(false);
-        return;
-      }
+    });
+
+    if (documents.length > 0 && invalidDocs.length > 0) {
+      setError("Some documents are missing required fields based on their document type.");
+      setLoading(false);
+      return;
     }
+
     try {
       // Helper function to handle empty values
       const getValueOrEmpty = (value) => {
         return value === null || value === undefined ? '' : value;
       };
+
       // Create FormData for multipart/form-data
       const formDataWithFiles = new FormData();
       // Add building fields with proper null handling
@@ -119,21 +143,33 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
       formDataWithFiles.append('building_address', building.building_address);
       formDataWithFiles.append('country', getValueOrEmpty(building.country));
       formDataWithFiles.append('state', getValueOrEmpty(building.state));
-      // Add documents data
+
+      // Add documents data, including only required fields
       documents.forEach((doc, index) => {
-        formDataWithFiles.append(`build_comp[${index}][doc_type]`, doc.doc_type);
-        formDataWithFiles.append(`build_comp[${index}][number]`, doc.number);
-        formDataWithFiles.append(`build_comp[${index}][issued_date]`, doc.issued_date);
-        formDataWithFiles.append(`build_comp[${index}][expiry_date]`, doc.expiry_date);
-        if (doc.upload_file && doc.upload_file[0]) {
-          formDataWithFiles.append(`build_comp[${index}][upload_file]`, doc.upload_file[0]);
+        const docType = docTypes.find((type) => type.id === parseInt(doc.doc_type));
+        if (docType) {
+          formDataWithFiles.append(`build_comp[${index}][doc_type]`, doc.doc_type);
+          if (docType.number) {
+            formDataWithFiles.append(`build_comp[${index}][number]`, getValueOrEmpty(doc.number));
+          }
+          if (docType.issue_date) {
+            formDataWithFiles.append(`build_comp[${index}][issued_date]`, getValueOrEmpty(doc.issued_date));
+          }
+          if (docType.expiry_date) {
+            formDataWithFiles.append(`build_comp[${index}][expiry_date]`, getValueOrEmpty(doc.expiry_date));
+          }
+          if (docType.upload_file && doc.upload_file && doc.upload_file[0]) {
+            formDataWithFiles.append(`build_comp[${index}][upload_file]`, doc.upload_file[0]);
+          }
         }
       });
+
       // Log FormData contents for debugging
       console.log("FormData contents:");
       for (const [key, value] of formDataWithFiles.entries()) {
         console.log(`${key}:`, value instanceof File ? `File: ${value.name}` : value);
       }
+
       // Send POST request
       const response = await axios.post(
         `${BASE_URL}/company/buildings/create/`,
