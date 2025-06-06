@@ -103,11 +103,6 @@ input::placeholder {
 
 
 
-
-
-
-
-
 @media (min-width: 768px) {
   .add-document-modal-container {
     width: 522px;
@@ -115,6 +110,9 @@ input::placeholder {
     height: 306px;
     border-radius: 6px;
     background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 }
 

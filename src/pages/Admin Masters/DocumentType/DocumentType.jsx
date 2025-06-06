@@ -25,11 +25,11 @@ const DocumentType = () => {
   const itemsPerPage = 10;
 
   const dropdownOption = [
-    {value: "showing", label: "Showing"},
-    {value: "all", label:"All"}
-  ]
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" },
+  ];
 
-  const [selectedOption, setSelectedOption] = useState("showing")
+  const [selectedOption, setSelectedOption] = useState("showing");
 
   // Fetch document types
   const fetchDocTypes = async () => {
@@ -92,10 +92,14 @@ const DocumentType = () => {
       month: "short",
       year: "numeric",
     });
-  };
+  }
 
-  // Filter data based on search term
-  const filteredData = docTypes.filter((docType) => {
+  // Sort and filter data
+  const sortedData = [...docTypes].sort((a, b) => {
+      return a.id - b.id;
+  });
+
+  const filteredData = sortedData.filter((docType) => {
     const searchLower = searchTerm.toLowerCase();
     const createdDate = formatDate(docType.created_at);
     return (
@@ -178,13 +182,13 @@ const DocumentType = () => {
               disabled={loading}
             />
             <div className="relative w-[40%] md:w-auto">
-                <CustomDropDown
-                  options={dropdownOption}
-                  value={selectedOption}
-                  onChange={setSelectedOption}
-                  className="w-full md:w-[121px]"
-                  dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 doctype-selection"
-                />
+              <CustomDropDown
+                options={dropdownOption}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                className="w-full md:w-[121px]"
+                dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 doctype-selection"
+              />
             </div>
           </div>
           <div className="flex gap-[10px] action-buttons-container">
@@ -223,7 +227,11 @@ const DocumentType = () => {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-[#E9E9E9] h-[57px]">
-                  <th className="px-4 py-3 text-left doctype-thead">ID</th>
+                  <th
+                    className="px-4 py-3 text-left doctype-thead cursor-pointer"
+                  >
+                    ID
+                  </th>
                   <th className="px-4 py-3 text-left doctype-thead">
                     ENTRY DATE
                   </th>
@@ -307,7 +315,9 @@ const DocumentType = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="doctype-table-row-head">
-              <th className="px-5 w-[52%] text-left doctype-thead doctype-id-column">
+              <th
+                className="px-5 w-[52%] text-left doctype-thead doctype-id-column cursor-pointer"
+              >
                 ID
               </th>
               <th className="px-5 w-[47%] text-left doctype-thead doctype-entry-date-column">
@@ -324,7 +334,7 @@ const DocumentType = () => {
                 </td>
               </tr>
             ) : (
-              paginatedData.map((docType, index) => (
+              paginatedData.map((docType) => (
                 <React.Fragment key={docType.id}>
                   <tr
                     className={`${
@@ -334,7 +344,7 @@ const DocumentType = () => {
                     } border-b border-[#E9E9E9] h-[57px]`}
                   >
                     <td className="px-5 text-left doctype-data">
-                      {(currentPage - 1) * itemsPerPage + index + 1}
+                      {docType.id}
                     </td>
                     <td className="px-3 text-left doctype-data doctype-entry-date-column">
                       {docType.title || "N/A"}

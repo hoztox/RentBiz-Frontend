@@ -359,8 +359,12 @@ export const chargesApi = {
       ...(userId && { user: userId }),
     };
 
+    console.log('FormData');
+
+
     try {
       const response = await axiosInstance.post(`/company/charges/create/`, payload);
+      console.log("Document Type Created:", response.data);
       return response.data;
     } catch (error) {
       handleApiError(error, "Failed to create charges");
@@ -410,6 +414,8 @@ export const documentTypesApi = {
 
     try {
       const response = await axiosInstance.get(`/company/doc_type/company/${companyId}`);
+      console.log('Documentsssss', response.data);
+
       return Array.isArray(response.data) ? response.data : response.data.results || [];
     } catch (error) {
       handleApiError(error, "Failed to fetch document types");
@@ -424,6 +430,10 @@ export const documentTypesApi = {
 
     const payload = {
       title: docData.title,
+      number: docData.number || false, // Include number field
+      issue_date: docData.issue_date || false, // Include issue_date field
+      expiry_date: docData.expiry_date || false, // Include expiry_date field
+      upload_file: docData.upload_file || false, // Include upload_file field
       company: companyId,
       ...(userId && { user: userId }),
     };
@@ -445,6 +455,10 @@ export const documentTypesApi = {
 
     const payload = {
       title: docData.title,
+      number: docData.number || false,  
+      issue_date: docData.issue_date || false,  
+      expiry_date: docData.expiry_date || false,  
+      upload_file: docData.upload_file || false,
       company: companyId,
       ...(userId && { user: userId }),
     };

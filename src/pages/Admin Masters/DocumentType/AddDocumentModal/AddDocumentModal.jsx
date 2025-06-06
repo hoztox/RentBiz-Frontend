@@ -3,13 +3,13 @@ import "./AddDocumentModal.css";
 import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { useModal } from "../../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import { documentTypesApi } from "../../MastersApi";
+import { documentTypesApi, getUserCompanyId } from "../../MastersApi";
 
 const checkboxOptions = [
   { name: "number", label: "Number" },
-  { name: "issueDate", label: "Issue Date" },
-  { name: "expiryDate", label: "Expiry Date" },
-  { name: "uploadFiles", label: "Upload Files" }
+  { name: "issue_date", label: "Issue Date" },
+  { name: "expiry_date", label: "Expiry Date" },
+  { name: "upload_file", label: "Upload Files" },
 ];
 
 const AddDocumentModal = () => {
@@ -24,6 +24,7 @@ const AddDocumentModal = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [fieldError, setFieldError] = useState(null);
+  const companyId = getUserCompanyId();
 
   // Reset form state when modal opens
   useEffect(() => {
@@ -42,7 +43,12 @@ const AddDocumentModal = () => {
 
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
-    setCheckboxes((prev) => ({ ...prev, [name]: checked }));
+    console.log(`Checkbox ${name} changed to: ${checked}`);
+    setCheckboxes((prev) => {
+      const newState = { ...prev, [name]: checked };
+      console.log("Updated checkboxes state:", newState);
+      return newState;
+    });
   };
 
   const handleSave = async () => {
@@ -52,32 +58,37 @@ const AddDocumentModal = () => {
       return;
     }
 
+    if (!companyId) {
+      setFieldError("Company ID is missing");
+      toast.error("Company ID is missing");
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setFieldError(null);
 
     try {
-      const docData = { 
+      const docData = {
         title,
-        ...Object.fromEntries(
-          Object.entries(checkboxes).map(([key, value]) => [
-            `has${key.charAt(0).toUpperCase() + key.slice(1)}`,
-            value
-          ])
-      )};
-      await documentTypesApi.create(docData);
+        ...checkboxes,
+        company: companyId,
+      };
+      console.log("Sending docData to API:", JSON.stringify(docData, null, 2));
+      const response = await documentTypesApi.create(docData);
+      console.log("API Response:", JSON.stringify(response, null, 2));
       toast.success("Document Type created successfully");
       triggerRefresh();
       closeModal();
     } catch (err) {
       console.error("Error creating document type:", err);
-      setError(err.message);
-      toast.error(err.message || error);
+      setError(err.message || "Failed to create document type");
+      toast.error(err.message || error ||"Failed to create document type");
     } finally {
       setLoading(false);
     }
   };
-  
+
   if (!modalState.isOpen || modalState.type !== "create-document-type-master") {
     return null;
   }
@@ -109,8 +120,8 @@ const AddDocumentModal = () => {
             type="text"
             className={`input-style border transition-colors duration-200 ${
               fieldError
-              ? "border-red-500 focus:ring-red-500 focus:border-red-500"
-              : "border-gray-300 focus:ring-gray-700 focus:border-gray-700"
+                ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                : "border-gray-300 focus:ring-gray-700 focus:border-gray-700"
             }`}
             placeholder="Enter Document Type Title"
             value={title}
@@ -119,14 +130,14 @@ const AddDocumentModal = () => {
             maxLength={100}
           />
           {fieldError && <span className="text-[#dc2626]">{fieldError}</span>}
-          
+
           <div className="flex flex-wrap gap-4 mt-5 justify-between items-center">
             {checkboxOptions.map((option) => (
               <label key={option.name} className="flex items-center gap-1">
                 <input
                   type="checkbox"
                   name={option.name}
-                  checked={checkboxes[option.name]}
+                  checked={checkboxes[option.name] || false}
                   onChange={handleCheckboxChange}
                   disabled={loading}
                   className="form-checkbox"
