@@ -30,6 +30,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
   const [states, setStates] = useState([]);
   const [countryName, setCountryName] = useState("N/A");
   const [stateName, setStateName] = useState("N/A");
+  const [docTypes, setDocTypes] = useState([]);
 
   const building = formData?.building || {};
   const documents = Array.isArray(formData?.documents?.documents)
@@ -81,10 +82,32 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
     }
   }, [building.country, building.state]);
 
+  useEffect(() => {
+    const fetchDocTypes = async () => {
+      try {
+        const companyId = localStorage.getItem("company_id");
+        const response = await axios.get(
+          `${BASE_URL}/company/doc_type/company/${companyId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setDocTypes(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error("Error fetching document types:", error);
+        setError("Failed to load document types.");
+      }
+    };
+    fetchDocTypes();
+  }, []);
+
   const handleNext = async () => {
     setLoading(true);
     setError(null);
 
+    // Validate building required fields
     const requiredFields = [
       "building_no",
       "plot_no",
@@ -100,28 +123,28 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
       return;
     }
 
-    if (documents.length > 0) {
-      const invalidDocs = documents.filter(
-        (doc) =>
-          !doc.doc_type ||
-          !doc.number ||
-          !doc.issued_date ||
-          !doc.expiry_date ||
-          !doc.upload_file
+    // Validate documents based on docType properties
+    const invalidDocs = documents.filter((doc) => {
+      if (!doc.doc_type) return true; // Document must have a doc_type
+      const docType = docTypes.find((type) => type.id === parseInt(doc.doc_type));
+      if (!docType) return true; // Invalid doc_type
+
+      // Check only the fields required by the doc_type
+      return (
+        (docType.number && !doc.number) ||
+        (docType.issue_date && !doc.issued_date) ||
+        (docType.expiry_date && !doc.expiry_date) ||
+        (docType.upload_file && !doc.upload_file?.length)
       );
-      if (invalidDocs.length > 0) {
-        setError("All documents must have doc_type, number, dates, and at least one file.");
-        setLoading(false);
-        return;
-      }
+    });
+
+    if (documents.length > 0 && invalidDocs.length > 0) {
+      setError("Some documents are missing required fields based on their document type.");
+      setLoading(false);
+      return;
     }
 
     try {
-      console.log("Documents array:", documents);
-      documents.forEach((doc, index) => {
-        console.log(`Document ${index} upload_file:`, doc.upload_file, typeof doc.upload_file);
-      });
-
       const convertToBlob = async (fileData) => {
         if (!fileData) {
           console.warn("No file data provided");
@@ -147,41 +170,37 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
         return null;
       };
 
-      const payload = {
-        ...building,
-        build_comp: documents.map((doc) => ({
-          doc_type: doc.doc_type,
-          number: doc.number,
-          issued_date: doc.issued_date,
-          expiry_date: doc.expiry_date,
-          upload_file: doc.upload_file || null,
-        })),
-      };
-
       const formDataWithFiles = new FormData();
-      Object.entries(payload).forEach(([key, value]) => {
-        if (key !== "build_comp") {
-          formDataWithFiles.append(key, value ?? "");
-        }
+      // Add building fields
+      Object.entries(building).forEach(([key, value]) => {
+        formDataWithFiles.append(key, value ?? "");
       });
 
+      // Add documents data, including only required fields
       await Promise.all(
-        payload.build_comp.map(async (doc, index) => {
-          formDataWithFiles.append(`build_comp[${index}][doc_type]`, doc.doc_type || "");
-          formDataWithFiles.append(`build_comp[${index}][number]`, doc.number || "");
-          formDataWithFiles.append(`build_comp[${index}][issued_date]`, doc.issued_date || "");
-          formDataWithFiles.append(`build_comp[${index}][expiry_date]`, doc.expiry_date || "");
-          if (doc.upload_file) {
-            const file = Array.isArray(doc.upload_file) ? doc.upload_file[0] : doc.upload_file;
-            const fileBlob = await convertToBlob(file);
-            if (fileBlob) {
-              formDataWithFiles.append(
-                `build_comp[${index}][upload_file]`,
-                fileBlob,
-                fileBlob.name || `file-${index}`
-              );
-            } else {
-              console.warn(`Skipping invalid file for document ${index}`);
+        documents.map(async (doc, index) => {
+          const docType = docTypes.find((type) => type.id === parseInt(doc.doc_type));
+          if (docType) {
+            formDataWithFiles.append(`build_comp[${index}][doc_type]`, doc.doc_type || "");
+            if (docType.number) {
+              formDataWithFiles.append(`build_comp[${index}][number]`, doc.number || "");
+            }
+            if (docType.issue_date) {
+              formDataWithFiles.append(`build_comp[${index}][issued_date]`, doc.issued_date || "");
+            }
+            if (docType.expiry_date) {
+              formDataWithFiles.append(`build_comp[${index}][expiry_date]`, doc.expiry_date || "");
+            }
+            if (docType.upload_file && doc.upload_file && doc.upload_file.length > 0) {
+              const file = Array.isArray(doc.upload_file) ? doc.upload_file[0] : doc.upload_file;
+              const fileBlob = await convertToBlob(file);
+              if (fileBlob) {
+                formDataWithFiles.append(
+                  `build_comp[${index}][upload_file]`,
+                  fileBlob,
+                  fileBlob.name || `file-${index}`
+                );
+              }
             }
           }
         })
@@ -198,6 +217,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -215,14 +235,12 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
   };
 
   const handleBack = () => {
-    const backData = {
-      ...formData,
-      documents: documents,
-    };
-    console.log("ReviewPage passing back:", backData);
-    onBack(backData);
+  const backData = {
+    documents: documents // Make sure this matches the structure DocumentsForm expects
   };
-
+  console.log("ReviewPage passing back:", backData);
+  onBack(backData);
+};
   return (
     <div className="flex flex-col h-full">
       {error && (

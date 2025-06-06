@@ -20,13 +20,13 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
   };
 
   const getDocumentInfo = (file) => {
-    if (!file || typeof file === "string" && file.includes("The submitted data was not a file")) {
+    if (!file || (typeof file === "string" && file.includes("The submitted data was not a file"))) {
       return { type: "unknown", name: "Invalid File" };
     }
 
     let extension, name;
     if (typeof file === "string") {
-      const fileName = file.split("/").pop();
+      const fileName = file.split("/").pop() || "Unknown File";
       extension = fileName.split(".").pop()?.toLowerCase() || "";
       name = fileName;
     } else if (file instanceof File) {
@@ -65,7 +65,7 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
   };
 
   const getFileSource = (file) => {
-    if (!file || typeof file === "string" && file.includes("The submitted data was not a file")) {
+    if (!file || (typeof file === "string" && file.includes("The submitted data was not a file"))) {
       return null;
     }
     if (file instanceof File) {
@@ -99,9 +99,7 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
         <>
           <div className="grid grid-cols-2 min-[480px]:!grid-cols-5 gap-0.5 min-[480px]:gap-4">
             {visibleDocuments.map((doc, index) => {
-              const file = Array.isArray(doc.upload_file)
-                ? doc.upload_file[0]
-                : null;
+              const file = Array.isArray(doc.upload_file) ? doc.upload_file[0] : doc.upload_file;
               const { type, name } = file
                 ? getDocumentInfo(file)
                 : {
@@ -111,8 +109,11 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
               const fileSrc = getFileSource(file);
 
               return (
-                <div key={index} className="flex flex-col w-full max-w-[150px] min-[480px]:max-w-none mx-auto min-[480px]:mx-0">
-                  <div className="bg-gray-100 rounded-md overflow-hidden cursor-pointer box-border">
+                <div
+                  key={index}
+                  className="flex flex-col w-full max-w-[150px] min-[480px]:max-w-none mx-auto min-[480px]:mx-0"
+                >
+                  <div className="bg-gray-100 rounded-md overflow-hidden cursor-pointer box-border relative">
                     <div className="relative bg-white">
                       {type === "image" && fileSrc ? (
                         <img
@@ -142,7 +143,7 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
                     </div>
                     <div className="p-2 min-[480px]:p-2 min-[480px]:px-3 bg-[#1458A2] text-start">
                       <p className="document-name text-white text-xs min-[480px]:text-base truncate">
-                        {getDocTypeName} {name}
+                        {getDocTypeName(doc.doc_type)} {name}
                       </p>
                     </div>
                   </div>
