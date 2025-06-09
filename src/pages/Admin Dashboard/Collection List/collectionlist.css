@@ -98,16 +98,16 @@
 }
 
 .collection-list-pagination {
-    font-family: 'Inter Tight';
+    font-family: "Inter Tight";
     font-size: 13px;
     font-style: normal;
     font-weight: 400;
     line-height: 20px;
-    color: #4B465C80;
+    color: #4b465c80;
 }
 
 .pagination-btn {
-    font-family: 'Inter Tight';
+    font-family: "Inter Tight";
     font-size: 15px;
     font-style: normal;
     font-weight: 500;
@@ -117,7 +117,7 @@
 }
 
 .page-no-btns {
-    font-family: 'Inter Tight';
+    font-family: "Inter Tight";
     font-size: 15px;
     font-style: normal;
     font-weight: 500;
@@ -133,7 +133,6 @@
     line-height: 14px;
 }
 
-
 @media(min-width:481px) {
     .collection-drop-down-fields, .collection-drop-down-field {
         display: none;
@@ -147,7 +146,6 @@
     .collection-list-tabs {
         flex-direction: column-reverse;
         border-bottom: none;
-
     }
     .search-input, .table-drop-down-btn {
         width: 100%;
@@ -155,7 +153,7 @@
     .inputs-drop {
         margin-bottom: 16px;
     }
-    .tabs{
+    .tabs {
         display: flex;
         justify-content: space-between;
     }
@@ -163,11 +161,23 @@
         display: none;
     }
 
-    .collection-list-pagination-div {
+    .pagination-container {
         flex-direction: column;
         height: 97.53px;
         justify-content: center;
         gap: 16px;
+        align-items: center;
+    }
+
+    .collection-list-pagination {
+        text-align: center;
+    }
+
+    .pagination-buttons {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        overflow-y: hidden;
     }
 
     .collection-drop-down-field {
@@ -181,47 +191,46 @@
         align-items: center;
         justify-content: center;
         transition: background-color 0.3s ease;
-      }
-      .collection-drop-down-field.active {
+    }
+    .collection-drop-down-field.active {
         background-color: #254396;
-      }
-      .collection-dropdown-img {
+    }
+    .collection-dropdown-img {
         transition: transform 0.3s ease;
         width: 10px;
-      }
+    }
     
-      .collection-dropdown-img.rotated {
+    .collection-dropdown-img.rotated {
         transform: rotate(180deg);
-      }
-      .tabs button {
+    }
+    .tabs button {
         padding: 5px 10px;
-      }
-      .collection-list-theads {
+    }
+    .collection-list-theads {
         height: auto;
         background-color: #F7F7F7;
         border-bottom: none;
-      }
+    }
 
-      .collection-list-thead {
+    .collection-list-thead {
         padding-right: 0px;
-        /* font-size: 10px; */
         padding-top: 10px;
         padding-bottom: 10px;
-      }
-      .collection-list-tenet {
+    }
+    .collection-list-tenet {
         padding-left: 5px;
-      }
+    }
 
-      .collection-list-building, .collection-list-data-building {
+    .collection-list-building, .collection-list-data-building {
         padding-left: 14px;
-      }
-      .collection-list-data-building {
+    }
+    .collection-list-data-building {
         padding-right: 0px;
-      }
-      .collection-list-id {
+    }
+    .collection-list-id {
         padding-right: 10px;
-      }
-      .drop-down-head {
+    }
+    .drop-down-head {
         font-family: 'Inter Tight';
         font-size: 12px;
         font-style: normal;
@@ -229,38 +238,38 @@
         line-height: normal;
         letter-spacing: 1px;
         color: #677487;
-      }
-      .drop-down-data {
+    }
+    .drop-down-data {
         font-family: 'Inter Tight';
         font-size: 13px;
         font-style: normal;
         font-weight: 400;
         line-height: 22px;
-      }
+    }
 
-      .collection-list-status {
-       padding: 5px 9px; 
-       border-radius: 3px;
-       margin-top: 5px;
-      }
+    .collection-list-status {
+        padding: 5px 9px; 
+        border-radius: 3px;
+        margin-top: 5px;
+    }
 
-      .mobile-no-border {
+    .mobile-no-border {
         border-bottom: none !important;
-      }
-      
-      .mobile-with-border {
+    }
+    
+    .mobile-with-border {
         border-bottom: 1px solid #E9E9E9;
-      }
-      .pagination-btn {
+    }
+    .pagination-btn {
         font-size: 13px;
         padding: 0px 10px;
         height: 28px;
-      }
-      .page-no-btns {
+    }
+    .page-no-btns {
         font-size: 13px;
         padding: 0px 10px;
         height: 28px;
-      }
+    }
 }
 
 @media(max-width:414px){
@@ -268,6 +277,7 @@
         font-size: 11px;
     }
 }
+
 @media(max-width:394px){
     .collection-list-thead {
         font-size: 10px;
