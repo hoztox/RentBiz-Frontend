@@ -25,7 +25,6 @@ import CreateTenantModal from "../../pages/Admin Tenants/CreateTenantModal/Creat
 import { useModal } from "../../context/ModalContext";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from 'react-hot-toast';
-import axios from "axios";
 
 const AdminSidebar = () => {
   const [activeItem, setActiveItem] = useState("Dashboard");
@@ -81,11 +80,6 @@ const AdminSidebar = () => {
 
   // Create Tenant Modal
   const [isCreateTenantModalOpen, setIsCreateTenantModalOpen] = useState(false);
-
-  // const openCreateTenantModal = () => {
-  //   setIsCreateTenantModalOpen(true);
-  //   setActiveItem("Tenants Master");
-  // };
 
   const closeCreateTenantModal = () => {
     setIsCreateTenantModalOpen(false);
