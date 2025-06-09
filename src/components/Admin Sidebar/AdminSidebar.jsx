@@ -20,14 +20,18 @@ import tenancyReport from "../../assets/Images/Admin Sidebar/tenancy report.svg"
 import upcomingCollection from "../../assets/Images/Admin Sidebar/upcoming collection.svg";
 import reportCollection from "../../assets/Images/Admin Sidebar/report collection.svg";
 import incomeExpense from "../../assets/Images/Admin Sidebar/income-expense.svg";
-import logout from "../../assets/Images/Admin Sidebar/logout-icon.svg"
+import logoutIcon from "../../assets/Images/Admin Sidebar/logout-icon.svg";
 import CreateTenantModal from "../../pages/Admin Tenants/CreateTenantModal/CreateTenantModal";
 import { useModal } from "../../context/ModalContext";
+import { useAuth } from "../../context/AuthContext";
+import { toast } from 'react-hot-toast';
+import axios from "axios";
 
 const AdminSidebar = () => {
   const [activeItem, setActiveItem] = useState("Dashboard");
   const navigate = useNavigate();
-  const { openModal } = useModal();
+  const { openModal, closeModal } = useModal();
+  const { logout } = useAuth();
 
   const handleNonDropdownClick = (item, path) => {
     setActiveItem(item);
@@ -88,14 +92,17 @@ const AdminSidebar = () => {
     setActiveItem("Tenants Master");
   };
 
-  const handleLogout = () => {
-    // Clear all localStorage data
-    localStorage.clear();
+  const handleLogout = async () => {
+    closeModal();
+    setIsCreateTenantModalOpen(false); // Close CreateTenantModal
 
-    // Navigate to login page
-    navigate("/");
+    // Call AuthContext logout
+    logout();
 
-    // Update active item to reflect logout
+    // Show toast
+    toast.success("Logged out successfully!");
+
+    // Update active item
     setActiveItem("Logout");
   };
 
@@ -115,10 +122,11 @@ const AdminSidebar = () => {
       <div className="flex flex-col overflow-y-auto">
         <div className="mx-5 mb-8">
           <div
-            className={`flex items-center px-[12px] py-[7px] gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Dashboard"
-              ? "menu-active"
-              : "text-gray-700 hover:bg-gray-200"
-              }`}
+            className={`flex items-center px-[12px] py-[7px] gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
+              activeItem === "Dashboard"
+                ? "menu-active"
+                : "text-gray-700 hover:bg-gray-200"
+            }`}
             onClick={() =>
               handleNonDropdownClick("Dashboard", "/admin/dashboard")
             }
@@ -136,10 +144,11 @@ const AdminSidebar = () => {
         <div className="mx-5">
           <h3 className="pb-3 category-head">USER MANAGEMENT</h3>
           <div
-            className={`flex items-center justify-between px-3 py-[7px] rounded-[4px] mb-3 cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Users"
-              ? "menu-active"
-              : "text-gray-700 hover:bg-gray-200"
-              }`}
+            className={`flex items-center justify-between px-3 py-[7px] rounded-[4px] mb-3 cursor-pointer transition-all duration-300 ease-in-out ${
+              activeItem === "Users"
+                ? "menu-active"
+                : "text-gray-700 hover:bg-gray-200"
+            }`}
             onClick={() => {
               toggleMenu("Users");
               setActiveItem("Users");
@@ -150,20 +159,23 @@ const AdminSidebar = () => {
               <p className="pb-[2px] menu-text">Users</p>
             </div>
             <ChevronDown
-              className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${expandedMenus.Users ? "rotate-180" : ""
-                }`}
+              className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${
+                expandedMenus.Users ? "rotate-180" : ""
+              }`}
             />
           </div>
           <div
-            className={`overflow-hidden transition-all duration-500 ease-in-out ${expandedMenus.Users
-              ? "max-h-24 opacity-100 mb-3"
-              : "max-h-0 opacity-0"
-              }`}
+            className={`overflow-hidden transition-all duration-500 ease-in-out ${
+              expandedMenus.Users
+                ? "max-h-24 opacity-100 mb-3"
+                : "max-h-0 opacity-0"
+            }`}
           >
             <div>
               <div
-                className={`cursor-pointer mb-2 transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Create User" ? "submenu-active" : ""
-                  }`}
+                className={`cursor-pointer mb-2 transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                  activeItem === "Create User" ? "submenu-active" : ""
+                }`}
                 onClick={() => {
                   setActiveItem("Create User");
                   openModal("user-create", "Create User");
@@ -173,8 +185,9 @@ const AdminSidebar = () => {
               </div>
 
               <div
-                className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Manage Users" ? "submenu-active" : ""
-                  }`}
+                className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                  activeItem === "Manage Users" ? "submenu-active" : ""
+                }`}
                 onClick={() => {
                   setActiveItem("Manage Users");
                   navigate("/admin/users-manage");
@@ -193,10 +206,11 @@ const AdminSidebar = () => {
           {/* Properties with dropdown */}
           <div>
             <div
-              className={`flex items-center justify-between px-3 py-[7px] rounded-[4px] mb-3 cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Properties"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
-                }`}
+              className={`flex items-center justify-between px-3 py-[7px] rounded-[4px] mb-3 cursor-pointer transition-all duration-300 ease-in-out ${
+                activeItem === "Properties"
+                  ? "menu-active"
+                  : "text-gray-700 hover:bg-gray-200"
+              }`}
               onClick={() => {
                 toggleMenu("Properties");
                 setActiveItem("Properties");
@@ -211,20 +225,23 @@ const AdminSidebar = () => {
                 <p className="pb-[2px] menu-text">Properties</p>
               </div>
               <ChevronDown
-                className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${expandedMenus.Properties ? "rotate-180" : ""
-                  }`}
+                className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${
+                  expandedMenus.Properties ? "rotate-180" : ""
+                }`}
               />
             </div>
             <div
-              className={`overflow-hidden transition-all duration-500 ease-in-out ${expandedMenus.Properties
-                ? "max-h-24 opacity-100 mb-3"
-                : "max-h-0 opacity-0"
-                }`}
+              className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                expandedMenus.Properties
+                  ? "max-h-24 opacity-100 mb-3"
+                  : "max-h-0 opacity-0"
+              }`}
             >
               <div>
                 <div
-                  className={`cursor-pointer mb-2 transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Buildings" ? "submenu-active" : ""
-                    }`}
+                  className={`cursor-pointer mb-2 transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                    activeItem === "Buildings" ? "submenu-active" : ""
+                  }`}
                   onClick={() => {
                     setActiveItem("Buildings");
                     navigate("/admin/buildings");
@@ -234,8 +251,9 @@ const AdminSidebar = () => {
                 </div>
 
                 <div
-                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Units" ? "submenu-active" : ""
-                    }`}
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                    activeItem === "Units" ? "submenu-active" : ""
+                  }`}
                   onClick={() => {
                     setActiveItem("Units");
                     navigate("/admin/units");
@@ -250,10 +268,11 @@ const AdminSidebar = () => {
           {/* Tenants with dropdown */}
           <div>
             <div
-              className={`flex items-center justify-between px-3 py-[7px] rounded-[4px] mb-3 cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Tenants"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
-                }`}
+              className={`flex items-center justify-between px-3 py-[7px] rounded-[4px] mb-3 cursor-pointer transition-all duration-300 ease-in-out ${
+                activeItem === "Tenants"
+                  ? "menu-active"
+                  : "text-gray-700 hover:bg-gray-200"
+              }`}
               onClick={() => {
                 toggleMenu("Tenants");
                 setActiveItem("Tenants");
@@ -268,20 +287,23 @@ const AdminSidebar = () => {
                 <p className="pb-[2px] menu-text">Tenants</p>
               </div>
               <ChevronDown
-                className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${expandedMenus.Tenants ? "rotate-180" : ""
-                  }`}
+                className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${
+                  expandedMenus.Tenants ? "rotate-180" : ""
+                }`}
               />
             </div>
             <div
-              className={`overflow-hidden transition-all duration-500 ease-in-out ${expandedMenus.Tenants
-                ? "max-h-24 opacity-100 mb-3"
-                : "max-h-0 opacity-0"
-                }`}
+              className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                expandedMenus.Tenants
+                  ? "max-h-24 opacity-100 mb-3"
+                  : "max-h-0 opacity-0"
+              }`}
             >
               <div>
                 <div
-                  className={`cursor-pointer mb-2 transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Tenants Master" ? "submenu-active" : ""
-                    }`}
+                  className={`cursor-pointer mb-2 transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                    activeItem === "Tenants Master" ? "submenu-active" : ""
+                  }`}
                   onClick={() => {
                     setActiveItem("Tenants Master");
                     navigate("/admin/tenants");
@@ -291,8 +313,9 @@ const AdminSidebar = () => {
                 </div>
 
                 <div
-                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Create Tenant" ? "submenu-active" : ""
-                    }`}
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                    activeItem === "Create Tenant" ? "submenu-active" : ""
+                  }`}
                   onClick={() => {
                     setActiveItem("Create Tenant");
                     // openCreateTenantModal();
@@ -309,8 +332,9 @@ const AdminSidebar = () => {
           {/* Tenancy with dropdown */}
           <div className="mb-6">
             <div
-              className={`flex items-center mb-2 justify-between px-3 py-[7px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Tenancy" ? "menu-active" : "hover:bg-gray-200"
-                }`}
+              className={`flex items-center mb-2 justify-between px-3 py-[7px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
+                activeItem === "Tenancy" ? "menu-active" : "hover:bg-gray-200"
+              }`}
               onClick={() => {
                 toggleMenu("Tenancy");
                 setActiveItem("Tenancy");
@@ -335,22 +359,25 @@ const AdminSidebar = () => {
                 <p className="pb-[2px] menu-text">Tenancy</p>
               </div>
               <ChevronDown
-                className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${expandedMenus.Tenancy ? "rotate-180" : ""
-                  }`}
+                className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${
+                  expandedMenus.Tenancy ? "rotate-180" : ""
+                }`}
                 aria-hidden="true"
               />
             </div>
             <div
               id="tenancy-submenu"
-              className={`overflow-hidden transition-all duration-500 ease-in-out ${expandedMenus.Tenancy
-                ? "max-h-96 opacity-100"
-                : "max-h-0 opacity-0"
-                }`}
+              className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                expandedMenus.Tenancy
+                  ? "max-h-96 opacity-100"
+                  : "max-h-0 opacity-0"
+              }`}
             >
               <div className="flex flex-col py-2">
                 <div
-                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Create Tenancy" ? "submenu-active" : ""
-                    }`}
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                    activeItem === "Create Tenancy" ? "submenu-active" : ""
+                  }`}
                   onClick={() => {
                     setActiveItem("Create Tenancy");
                     openModal("tenancy-create");
@@ -360,8 +387,9 @@ const AdminSidebar = () => {
                   <p className="pl-10 py-[7px]">Create Tenancy</p>
                 </div>
                 <div
-                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Tenancy Master" ? "submenu-active" : ""
-                    }`}
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                    activeItem === "Tenancy Master" ? "submenu-active" : ""
+                  }`}
                   onClick={() => {
                     setActiveItem("Tenancy Master");
                     navigate("/admin/tenancy-master");
@@ -370,8 +398,9 @@ const AdminSidebar = () => {
                   <p className="pl-10 py-[7px]">Tenancy Master</p>
                 </div>
                 <div
-                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Tenancy Confirm" ? "submenu-active" : ""
-                    }`}
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                    activeItem === "Tenancy Confirm" ? "submenu-active" : ""
+                  }`}
                   onClick={() => {
                     setActiveItem("Tenancy Confirm");
                     navigate("/admin/tenancy-confirm");
@@ -380,8 +409,9 @@ const AdminSidebar = () => {
                   <p className="pl-10 py-[7px]">Tenancy Confirm</p>
                 </div>
                 <div
-                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Tenancy Renewal" ? "submenu-active" : ""
-                    }`}
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                    activeItem === "Tenancy Renewal" ? "submenu-active" : ""
+                  }`}
                   onClick={() => {
                     setActiveItem("Tenancy Renewal");
                     navigate("/admin/tenancy-renewal");
@@ -390,8 +420,9 @@ const AdminSidebar = () => {
                   <p className="pl-10 py-[7px]">Tenancy Renewal</p>
                 </div>
                 <div
-                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Tenancy Termination" ? "submenu-active" : ""
-                    }`}
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                    activeItem === "Tenancy Termination" ? "submenu-active" : ""
+                  }`}
                   onClick={() => {
                     setActiveItem("Tenancy Termination");
                     navigate("/admin/tenancy-termination");
@@ -400,8 +431,9 @@ const AdminSidebar = () => {
                   <p className="pl-10 py-[7px]">Tenancy Termination</p>
                 </div>
                 <div
-                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Close Tenancy" ? "submenu-active" : ""
-                    }`}
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                    activeItem === "Close Tenancy" ? "submenu-active" : ""
+                  }`}
                   onClick={() => {
                     setActiveItem("Close Tenancy");
                     navigate("/admin/tenancy-close");
@@ -420,10 +452,11 @@ const AdminSidebar = () => {
           {/* Masters with dropdown */}
           <div>
             <div
-              className={`flex items-center justify-between px-3 py-[7px] rounded-[4px] mb-3 cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Masters"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
-                }`}
+              className={`flex items-center justify-between px-3 py-[7px] rounded-[4px] mb-3 cursor-pointer transition-all duration-300 ease-in-out ${
+                activeItem === "Masters"
+                  ? "menu-active"
+                  : "text-gray-700 hover:bg-gray-200"
+              }`}
               onClick={() => {
                 toggleMenu("Masters");
                 setActiveItem("Masters");
@@ -438,20 +471,23 @@ const AdminSidebar = () => {
                 <p className="pb-[2px] menu-text">Masters</p>
               </div>
               <ChevronDown
-                className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${expandedMenus.Masters ? "rotate-180" : ""
-                  }`}
+                className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${
+                  expandedMenus.Masters ? "rotate-180" : ""
+                }`}
               />
             </div>
             <div
-              className={`overflow-hidden transition-all duration-500 ease-in-out ${expandedMenus.Masters
-                ? "max-h-96 opacity-100 mb-3"
-                : "max-h-0 opacity-0"
-                }`}
+              className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                expandedMenus.Masters
+                  ? "max-h-96 opacity-100 mb-3"
+                  : "max-h-0 opacity-0"
+              }`}
             >
               <div>
                 <div
-                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Unit Type" ? "submenu-active" : ""
-                    }`}
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                    activeItem === "Unit Type" ? "submenu-active" : ""
+                  }`}
                   onClick={() => {
                     setActiveItem("Unit Type");
                     navigate("/admin/masters-unit-type");
@@ -461,8 +497,9 @@ const AdminSidebar = () => {
                 </div>
 
                 <div
-                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "ID Type" ? "submenu-active" : ""
-                    }`}
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                    activeItem === "ID Type" ? "submenu-active" : ""
+                  }`}
                   onClick={() => {
                     setActiveItem("ID Type");
                     navigate("/admin/masters-id-type");
@@ -472,8 +509,9 @@ const AdminSidebar = () => {
                 </div>
 
                 <div
-                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Charge Code" ? "submenu-active" : ""
-                    }`}
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                    activeItem === "Charge Code" ? "submenu-active" : ""
+                  }`}
                   onClick={() => {
                     setActiveItem("Charge Code");
                     navigate("/admin/masters-charge-code");
@@ -483,8 +521,9 @@ const AdminSidebar = () => {
                 </div>
 
                 <div
-                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Taxes" ? "submenu-active" : ""
-                    }`}
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                    activeItem === "Taxes" ? "submenu-active" : ""
+                  }`}
                   onClick={() => {
                     setActiveItem("Taxes");
                     navigate("/admin/masters-taxes");
@@ -494,8 +533,9 @@ const AdminSidebar = () => {
                 </div>
 
                 <div
-                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Charges" ? "submenu-active" : ""
-                    }`}
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                    activeItem === "Charges" ? "submenu-active" : ""
+                  }`}
                   onClick={() => {
                     setActiveItem("Charges");
                     navigate("/admin/masters-charges");
@@ -505,8 +545,9 @@ const AdminSidebar = () => {
                 </div>
 
                 <div
-                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Document Type" ? "submenu-active" : ""
-                    }`}
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                    activeItem === "Document Type" ? "submenu-active" : ""
+                  }`}
                   onClick={() => {
                     setActiveItem("Document Type");
                     navigate("/admin/masters-document-type");
@@ -516,8 +557,9 @@ const AdminSidebar = () => {
                 </div>
 
                 <div
-                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${activeItem === "Translate" ? "submenu-active" : ""
-                    }`}
+                  className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
+                    activeItem === "Translate" ? "submenu-active" : ""
+                  }`}
                   onClick={() => {
                     setActiveItem("Translate");
                     navigate("/admin/masters-translate");
@@ -532,10 +574,11 @@ const AdminSidebar = () => {
           {/* Currency as normal tab */}
           <div className="mb-6">
             <div
-              className={`flex items-center py-[7px] px-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Currency"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
-                }`}
+              className={`flex items-center py-[7px] px-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
+                activeItem === "Currency"
+                  ? "menu-active"
+                  : "text-gray-700 hover:bg-gray-200"
+              }`}
               onClick={() =>
                 handleNonDropdownClick("Currency", "/admin/masters-currency")
               }
@@ -554,10 +597,11 @@ const AdminSidebar = () => {
         <div className="mx-5">
           <h3 className="pb-3 category-head">FINANCIAL</h3>
           <div
-            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "AdditionalCharges"
-              ? "menu-active"
-              : "text-gray-700 hover:bg-gray-200"
-              }`}
+            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
+              activeItem === "AdditionalCharges"
+                ? "menu-active"
+                : "text-gray-700 hover:bg-gray-200"
+            }`}
             onClick={() =>
               handleNonDropdownClick(
                 "AdditionalCharges",
@@ -573,10 +617,11 @@ const AdminSidebar = () => {
             <p className="pb-[2px] menu-text">Additional Charges</p>
           </div>
           <div
-            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Invoice"
-              ? "menu-active"
-              : "text-gray-700 hover:bg-gray-200"
-              }`}
+            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
+              activeItem === "Invoice"
+                ? "menu-active"
+                : "text-gray-700 hover:bg-gray-200"
+            }`}
             onClick={() => handleNonDropdownClick("Invoice", "/admin/invoice")}
           >
             <img
@@ -587,10 +632,11 @@ const AdminSidebar = () => {
             <p className="pb-[2px] menu-text">Invoice</p>
           </div>
           <div
-            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "MonthlyInvoice"
-              ? "menu-active"
-              : "text-gray-700 hover:bg-gray-200"
-              }`}
+            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
+              activeItem === "MonthlyInvoice"
+                ? "menu-active"
+                : "text-gray-700 hover:bg-gray-200"
+            }`}
             onClick={() =>
               handleNonDropdownClick("MonthlyInvoice", "/admin/monthly-invoice")
             }
@@ -603,10 +649,11 @@ const AdminSidebar = () => {
             <p className="pb-[2px] menu-text">Monthly Invoice</p>
           </div>
           <div
-            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Collection"
-              ? "menu-active"
-              : "text-gray-700 hover:bg-gray-200"
-              }`}
+            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
+              activeItem === "Collection"
+                ? "menu-active"
+                : "text-gray-700 hover:bg-gray-200"
+            }`}
             onClick={() =>
               handleNonDropdownClick("Collection", "/admin/collection")
             }
@@ -619,10 +666,11 @@ const AdminSidebar = () => {
             <p className="pb-[2px] menu-text">Collection</p>
           </div>
           <div
-            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Expense"
-              ? "menu-active"
-              : "text-gray-700 hover:bg-gray-200"
-              }`}
+            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
+              activeItem === "Expense"
+                ? "menu-active"
+                : "text-gray-700 hover:bg-gray-200"
+            }`}
             onClick={() => handleNonDropdownClick("Expense", "/admin/expense")}
           >
             <img
@@ -633,10 +681,11 @@ const AdminSidebar = () => {
             <p className="pb-[2px] menu-text">Expense</p>
           </div>
           <div
-            className={`flex items-center py-[7px] px-3 mb-6 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Refund"
-              ? "menu-active"
-              : "text-gray-700 hover:bg-gray-200"
-              }`}
+            className={`flex items-center py-[7px] px-3 mb-6 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
+              activeItem === "Refund"
+                ? "menu-active"
+                : "text-gray-700 hover:bg-gray-200"
+            }`}
             onClick={() => handleNonDropdownClick("Refund", "/admin/refund")}
           >
             <img src={refund} alt="Refund" className="w-[18px] sidebar-icon" />
@@ -648,10 +697,11 @@ const AdminSidebar = () => {
         <div className="mx-5">
           <h3 className="pb-3 category-head">REPORTS</h3>
           <div
-            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "TenancyReport"
-              ? "menu-active"
-              : "text-gray-700 hover:bg-gray-200"
-              }`}
+            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
+              activeItem === "TenancyReport"
+                ? "menu-active"
+                : "text-gray-700 hover:bg-gray-200"
+            }`}
             onClick={() =>
               handleNonDropdownClick("TenancyReport", "/admin/tenancy-report")
             }
@@ -664,10 +714,11 @@ const AdminSidebar = () => {
             <p className="pb-[2px] menu-text">Tenancy Report</p>
           </div>
           <div
-            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "UpcomingCollection"
-              ? "menu-active"
-              : "text-gray-700 hover:bg-gray-200"
-              }`}
+            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
+              activeItem === "UpcomingCollection"
+                ? "menu-active"
+                : "text-gray-700 hover:bg-gray-200"
+            }`}
             onClick={() =>
               handleNonDropdownClick(
                 "UpcomingCollection",
@@ -683,10 +734,11 @@ const AdminSidebar = () => {
             <p className="pb-[2px] menu-text">Upcoming Collection</p>
           </div>
           <div
-            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "ReportCollection"
-              ? "menu-active"
-              : "text-gray-700 hover:bg-gray-200"
-              }`}
+            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
+              activeItem === "ReportCollection"
+                ? "menu-active"
+                : "text-gray-700 hover:bg-gray-200"
+            }`}
             onClick={() =>
               handleNonDropdownClick(
                 "ReportCollection",
@@ -702,10 +754,11 @@ const AdminSidebar = () => {
             <p className="pb-[2px] menu-text">Collection</p>
           </div>
           <div
-            className={`flex items-center py-[7px] px-3 mb-6 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "IncomeExpense"
-              ? "menu-active"
-              : "text-gray-700 hover:bg-gray-200"
-              }`}
+            className={`flex items-center py-[7px] px-3 mb-6 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
+              activeItem === "IncomeExpense"
+                ? "menu-active"
+                : "text-gray-700 hover:bg-gray-200"
+            }`}
             onClick={() =>
               handleNonDropdownClick(
                 "IncomeExpense",
@@ -725,39 +778,28 @@ const AdminSidebar = () => {
 
         <div className="mx-5">
           <div
-            className={`flex items-center py-[7px] px-3 mb-5 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${activeItem === "Logout"
-              ? "menu-active"
-              : "text-gray-700 hover:bg-gray-200"
-              }`}
+            className={`flex items-center py-[7px] px-3 mb-5 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
+              activeItem === 'Logout' ? 'menu-active' : 'text-gray-700 hover:bg-gray-200'
+            }`}
             onClick={handleLogout}
             role="button"
             aria-label="Logout"
             tabIndex={0}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
+              if (e.key === 'Enter' || e.key === ' ') {
                 handleLogout();
               }
             }}
           >
-            <img
-              src={logout}
-              alt="Logout"
-              className="w-[18px] sidebar-icon"
-            />
+            <img src={logoutIcon} alt="Logout" className="w-[18px] sidebar-icon" />
             <p className="pb-[2px] menu-text">Logout</p>
           </div>
         </div>
       </div>
 
+      <CreateTenantModal open={isCreateTenantModalOpen} onClose={closeCreateTenantModal} />
 
-      {/* Create Tenant Modal */}
-      <CreateTenantModal
-        open={isCreateTenantModalOpen}
-        onClose={closeCreateTenantModal}
-      />
-
-      {/* Footer */}
-      <div className="mx-5 border-t border-[#E8E8E8] text-start py-6 side-footer-text ">
+      <div className="mx-5 border-t border-[#E8E8E8] text-start py-6 side-footer-text">
         Powered By RentBiz - 2025
       </div>
     </div>
