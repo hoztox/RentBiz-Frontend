@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./CreateTenancyModal.css";
-import closeicon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/close-icon.svg";
-import deleteicon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/delete-icon.svg";
-import plusicon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/plus-icon.svg";
-import { ChevronDown } from "lucide-react";
+import { X, Trash2, Plus, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
@@ -13,8 +10,12 @@ const CreateTenancyModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
   const navigate = useNavigate();
   const [selectOpenStates, setSelectOpenStates] = useState({});
-  const [showPaymentSchedule, setShowPaymentSchedule] = useState(true);
-  const [taxModalData, setTaxModalData] = useState({ isOpen: false, chargeId: null, taxDetails: null });
+  const [showPaymentSchedule, setShowPaymentSchedule] = useState(false);
+  const [taxModalData, setTaxModalData] = useState({
+    isOpen: false,
+    chargeId: null,
+    taxDetails: [],
+  });
 
   // API data states
   const [tenants, setTenants] = useState([]);
@@ -48,7 +49,7 @@ const CreateTenancyModal = () => {
       amount: "",
       tax: "",
       total: "",
-      tax_percentage: null,
+      tax_details: [],
     },
   ]);
 
@@ -139,11 +140,26 @@ const CreateTenancyModal = () => {
     }
   }, [formData.start_date, formData.rental_months]);
 
-  // Fetch payment schedule preview
+  // Reset payment schedule when relevant form fields change
+  useEffect(() => {
+    setShowPaymentSchedule(false);
+    setPaymentSchedule([]);
+  }, [
+    formData.rental_months,
+    formData.no_payments,
+    formData.first_rent_due_on,
+    formData.rent_per_frequency,
+    formData.deposit,
+    formData.commission,
+    formData.start_date,
+  ]);
+
+  // Fetch payment schedule preview when showPaymentSchedule is true
   useEffect(() => {
     const fetchPaymentSchedulePreview = async () => {
       const companyId = getUserCompanyId();
       if (
+        showPaymentSchedule &&
         companyId &&
         formData.rental_months &&
         formData.no_payments &&
@@ -172,59 +188,11 @@ const CreateTenancyModal = () => {
           console.error("Error fetching payment schedule preview:", error);
           setPaymentSchedule([]);
         }
-      } else {
-        setPaymentSchedule([]);
       }
     };
 
     fetchPaymentSchedulePreview();
-  }, [
-    formData.rental_months,
-    formData.no_payments,
-    formData.first_rent_due_on,
-    formData.rent_per_frequency,
-    formData.deposit,
-    formData.commission,
-    formData.start_date,
-  ]);
-
-  const fetchTaxDetails = async (chargeTypeId, dueDate, chargeId, isAdditionalCharge = true) => {
-    try {
-      const companyId = getUserCompanyId();
-      const chargeType = chargeTypes.find(type => type.id === parseInt(chargeTypeId));
-      if (!chargeType) return;
-
-      const response = await axios.get(
-        `${BASE_URL}/company/taxes/active/${companyId}/${chargeType.name}/${dueDate}/`
-      );
-      const taxDetails = response.data || { tax_percentageme_to_many: [], tax_percentage: 0 };
-
-      if (isAdditionalCharge) {
-        setAdditionalCharges(prev =>
-          prev.map(charge =>
-            charge.id === chargeId
-              ? { ...charge, tax_percentage: taxDetails.tax_percentage }
-              : charge
-          )
-        );
-      }
-
-      setTaxModalData({
-        isOpen: true,
-        chargeId,
-        taxDetails: {
-          tax_type: chargeType.name,
-          tax_percentage: taxDetails.tax_percentage,
-          tax_amount: isAdditionalCharge
-            ? (parseFloat(additionalCharges.find(c => c.id === chargeId)?.amount || 0) * (taxDetails.tax_percentage / 100)).toFixed(2)
-            : (parseFloat(paymentSchedule.find(p => p.id === chargeId)?.amount || 0) * (taxDetails.tax_percentage / 100)).toFixed(2),
-        },
-      });
-    } catch (error) {
-      console.error("Error fetching tax details:", error);
-      setTaxModalData({ isOpen: true, chargeId, taxDetails: null });
-    }
-  };
+  }, [showPaymentSchedule]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -235,26 +203,32 @@ const CreateTenancyModal = () => {
     }));
   };
 
-  const handleAdditionalChargeChange = async (id, field, value) => {
+  const handleAdditionalChargeChange = (id, field, value) => {
     setAdditionalCharges((prev) =>
       prev.map((charge) => {
         if (charge.id === id) {
           const updatedCharge = { ...charge, [field]: value };
-          if (field === "charge_type" || field === "amount" || field === "due_date") {
+          if (
+            field === "charge_type" ||
+            field === "amount" ||
+            field === "due_date"
+          ) {
             const selectedChargeType = chargeTypes.find(
               (type) => type.id === parseInt(updatedCharge.charge_type)
             );
-            if (selectedChargeType && updatedCharge.amount && updatedCharge.due_date) {
-              fetchTaxDetails(updatedCharge.charge_type, updatedCharge.due_date, id).then(() => {
-                const amount = parseFloat(updatedCharge.amount || 0);
-                const taxPercentage = parseFloat(updatedCharge.tax_percentage || 0);
-                updatedCharge.tax = (amount * (taxPercentage / 100)).toFixed(2);
-                updatedCharge.total = (amount + parseFloat(updatedCharge.tax || 0)).toFixed(2);
-                setAdditionalCharges([...prev]);
-              });
+            if (
+              selectedChargeType &&
+              updatedCharge.amount &&
+              updatedCharge.due_date
+            ) {
+              const amount = parseFloat(updatedCharge.amount || 0);
+              updatedCharge.tax = "0.00";
+              updatedCharge.total = amount.toFixed(2);
+              updatedCharge.tax_details = [];
             } else {
               updatedCharge.tax = "0.00";
               updatedCharge.total = updatedCharge.amount || "0.00";
+              updatedCharge.tax_details = [];
             }
           }
           return updatedCharge;
@@ -262,6 +236,24 @@ const CreateTenancyModal = () => {
         return charge;
       })
     );
+  };
+
+  const showTaxDetails = (chargeId, isAdditionalCharge = true) => {
+    const charges = isAdditionalCharge ? additionalCharges : paymentSchedule;
+    const charge = charges.find((c) => c.id === chargeId);
+    if (charge && charge.tax_details) {
+      setTaxModalData({
+        isOpen: true,
+        chargeId,
+        taxDetails: charge.tax_details,
+      });
+    } else {
+      setTaxModalData({
+        isOpen: true,
+        chargeId,
+        taxDetails: [],
+      });
+    }
   };
 
   const addRow = () => {
@@ -276,7 +268,7 @@ const CreateTenancyModal = () => {
         amount: "",
         tax: "",
         total: "",
-        tax_percentage: null,
+        tax_details: [],
       },
     ]);
   };
@@ -285,6 +277,13 @@ const CreateTenancyModal = () => {
     setAdditionalCharges(
       additionalCharges.filter((charge) => charge.id !== id)
     );
+  };
+
+  const toggleSelectOpen = (field) => {
+    setSelectOpenStates((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
   };
 
   const togglePaymentSchedule = () => {
@@ -314,8 +313,7 @@ const CreateTenancyModal = () => {
         !charge.charge_type ||
         !charge.reason ||
         !charge.due_date ||
-        !charge.amount ||
-        charge.tax === ""
+        !charge.amount
       ) {
         alert("Please fill all fields in Additional Charges");
         return;
@@ -324,6 +322,55 @@ const CreateTenancyModal = () => {
 
     const companyId = getUserCompanyId();
     const userId = getRelevantUserId();
+
+    let updatedAdditionalCharges = [...additionalCharges];
+    try {
+      for (let i = 0; i < additionalCharges.length; i++) {
+        const charge = additionalCharges[i];
+        const previewPayload = {
+          company: companyId,
+          rental_months: 1,
+          no_payments: 0,
+          first_rent_due_on: charge.due_date,
+          rent_per_frequency: 0,
+          deposit: 0,
+          commission: 0,
+          start_date: charge.due_date,
+          [chargeTypes
+            .find((type) => type.id === parseInt(charge.charge_type))
+            ?.name.toLowerCase()]: parseFloat(charge.amount),
+        };
+
+        const response = await axios.post(
+          `${BASE_URL}/company/tenancies/preview-payment-schedule/`,
+          previewPayload
+        );
+        const schedule = response.data.payment_schedules.find(
+          (s) =>
+            s.charge_type_name.toLowerCase() ===
+            chargeTypes
+              .find((type) => type.id === parseInt(charge.charge_type))
+              ?.name.toLowerCase()
+        );
+        if (schedule) {
+          updatedAdditionalCharges[i] = {
+            ...charge,
+            tax: schedule.tax.toFixed(2),
+            total: schedule.total.toFixed(2),
+            tax_details: schedule.tax_details,
+          };
+        }
+      }
+    } catch (error) {
+      console.error(
+        "Error fetching tax details for additional charges:",
+        error
+      );
+      alert(
+        "Failed to calculate taxes for additional charges. Please try again."
+      );
+      return;
+    }
 
     const payload = {
       company: companyId,
@@ -336,17 +383,20 @@ const CreateTenancyModal = () => {
       end_date: formData.end_date,
       no_payments: parseInt(formData.no_payments),
       first_rent_due_on: formData.first_rent_due_on,
-      rent_per_frequency: parseFloat(formData.rent_per_frequency || 0).toFixed(2),
+      rent_per_frequency: parseFloat(formData.rent_per_frequency || 0).toFixed(
+        2
+      ),
       deposit: parseFloat(formData.deposit || 0).toFixed(2),
       commission: parseFloat(formData.commission || 0).toFixed(2),
       remarks: formData.remarks,
-      additional_charges: additionalCharges.map((charge) => ({
+      additional_charges: updatedAdditionalCharges.map((charge) => ({
         charge_type: parseInt(charge.charge_type),
         reason: charge.reason,
         due_date: charge.due_date,
         amount: parseFloat(charge.amount).toFixed(2),
         tax: parseFloat(charge.tax).toFixed(2),
         total: parseFloat(charge.total).toFixed(2),
+        tax_details: charge.tax_details,
       })),
     };
 
@@ -369,7 +419,7 @@ const CreateTenancyModal = () => {
   };
 
   const closeTaxModal = () => {
-    setTaxModalData({ isOpen: false, chargeId: null, taxDetails: null });
+    setTaxModalData({ isOpen: false, chargeId: null, taxDetails: [] });
   };
 
   if (!modalState.isOpen || modalState.type !== "tenancy-create") return null;
@@ -388,7 +438,7 @@ const CreateTenancyModal = () => {
               className="tenancy-close-btn hover:bg-gray-100 duration-200"
               aria-label="Close modal"
             >
-              <img src={closeicon} alt="close-button" />
+              <X size={24} color="#201D1E" />
             </button>
           </div>
 
@@ -449,7 +499,6 @@ const CreateTenancyModal = () => {
                 />
               </div>
             </div>
-
             <div className="md:flex tenancy-modal-column gap-4">
               <div className="w-1/2">
                 <label className="block tenancy-modal-label">Unit*</label>
@@ -520,7 +569,6 @@ const CreateTenancyModal = () => {
                 </div>
               </div>
             </div>
-
             <div className="md:flex tenancy-modal-column gap-4">
               <div className="w-1/2">
                 <label className="block tenancy-modal-label">
@@ -610,9 +658,7 @@ const CreateTenancyModal = () => {
           </div>
 
           <div className="mt-6">
-            <h3
-              className="text-[#2892CE] mb-3 text-[15px] font-semibold font-['Public_Sans']"
-            >
+            <h3 className="text-[#2892CE] mb-3 text-[15px] font-semibold font-['Public_Sans']">
               Additional Charges
             </h3>
             <div className="mt-6 tenancy-overflow-x-auto tenancy-additional-charges-container border border-[#E9E9E9] rounded-md">
@@ -733,7 +779,7 @@ const CreateTenancyModal = () => {
                         </td>
                         <td className="px-[10px] py-[5px] w-[70px]">
                           <button
-                            onClick={() => fetchTaxDetails(charge.charge_type, charge.due_date, charge.id)}
+                            onClick={() => showTaxDetails(charge.id, true)}
                             className="text-[#2892CE] underline"
                             disabled={!charge.tax}
                           >
@@ -745,10 +791,10 @@ const CreateTenancyModal = () => {
                         </td>
                         <td className="px-[10px] py-[5px] w-[30px]">
                           <button onClick={() => removeRow(charge.id)}>
-                            <img
-                              src={deleteicon}
-                              alt="delete"
-                              className="w-[60px] h-[20px] mt-1"
+                            <Trash2
+                              size={20}
+                              color="#201D1E"
+                              className="mt-1"
                             />
                           </button>
                         </td>
@@ -825,7 +871,6 @@ const CreateTenancyModal = () => {
                         />
                       </div>
                     </div>
-
                     <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
                       <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
                         DUE DATE
@@ -867,7 +912,6 @@ const CreateTenancyModal = () => {
                         />
                       </div>
                     </div>
-
                     <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
                       <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
                         TAX
@@ -879,7 +923,7 @@ const CreateTenancyModal = () => {
                     <div className="flex justify-start border-b border-[#E9E9E9] h-[67px]">
                       <div className="px-[9px] py-[13px] w-full">
                         <button
-                          onClick={() => fetchTaxDetails(charge.charge_type, charge.due_date, charge.id)}
+                          onClick={() => showTaxDetails(charge.id, true)}
                           className="text-[#2892CE] underline"
                           disabled={!charge.tax}
                         >
@@ -890,7 +934,6 @@ const CreateTenancyModal = () => {
                         {charge.total}
                       </div>
                     </div>
-
                     <div className="flex justify-between bg-[#F2F2F2] h-[57px] border-b border-[#E9E9E9]">
                       <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
                         REMOVE
@@ -899,11 +942,7 @@ const CreateTenancyModal = () => {
                     <div className="flex justify-between h-[57px]">
                       <div className="px-[10px] py-[3px] flex justify-center">
                         <button onClick={() => removeRow(charge.id)}>
-                          <img
-                            src={deleteicon}
-                            alt="delete"
-                            className="w-[60px] h-[20px]"
-                          />
+                          <Trash2 size={20} color="#201D1E" />
                         </button>
                       </div>
                     </div>
@@ -912,21 +951,17 @@ const CreateTenancyModal = () => {
               </div>
               <button
                 onClick={addRow}
-                className="mt-6 bg-[#2892CE] hover:bg-[#1f6c99] duration-200 text-white px-4 pl-6 mb-10 flex items-center tenancy-addrow-btn"
+                className="mt-6 bg-[#2892CE] hover:bg-[#1f6c99] duration-200 text-white px-4 pl-2 mb-10 flex items-center tenancy-addrow-btn"
               >
                 Add Row
-                <img
-                  src={plusicon}
-                  alt="add"
-                  className="w-[20px] h-[20px] ml-2"
-                />
+                <Plus size={20} color="#ffffff" className="ml-2" />
               </button>
             </div>
 
             <div className="mt-6">
               <button
                 onClick={togglePaymentSchedule}
-                className="bg-white text-[#2892CE] px-4 py-2 border border-[#E9E9E9] rounded tenancy-hidepayement-btn"
+                className="bg-white text-[#2892CE] px-4 py-2 border border-[#E9E9E9] rounded tenancy-btn"
               >
                 {showPaymentSchedule
                   ? "Hide Payment Schedule"
@@ -966,40 +1001,42 @@ const CreateTenancyModal = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {paymentSchedule.map((item) => (
+                        {paymentSchedule.map((schedule) => (
                           <tr
-                            key={item.id}
+                            key={schedule.id}
                             className="border-t border-[#E9E9E9] h-[57px]"
                           >
                             <td className="px-[10px] py-[5px] w-[20px] text-[14px] text-[#201D1E]">
-                              {item.id}
+                              {schedule.id}
                             </td>
                             <td className="px-[10px] py-[5px] w-[138px] text-[14px] text-[#201D1E]">
-                              {item.charge_type_name}
+                              {schedule.charge_type_name}
                             </td>
                             <td className="px-[10px] py-[5px] w-[162px] text-[14px] text-[#201D1E]">
-                              {item.reason}
+                              {schedule.reason}
                             </td>
                             <td className="px-[10px] py-[5px] w-[173px] text-[14px] text-[#201D1E]">
-                              {item.due_date}
+                              {schedule.due_date}
                             </td>
                             <td className="px-[10px] py-[5px] w-[55px] text-[14px] text-[#201D1E]">
-                              {item.status}
+                              {schedule.status}
                             </td>
                             <td className="px-[10px] py-[5px] w-[148px] text-[14px] text-[#201D1E]">
-                              {item.amount}
+                              {schedule.amount}
                             </td>
                             <td className="px-[10px] py-[5px] w-[70px]">
                               <button
-                                onClick={() => fetchTaxDetails(item.charge_type, item.due_date, item.id, false)}
+                                onClick={() =>
+                                  showTaxDetails(schedule.id, false)
+                                }
                                 className="text-[#2892CE] underline"
-                                disabled={!item.tax}
+                                disabled={!schedule.tax}
                               >
-                                {item.tax || "0.00"}
+                                {schedule.tax || "0.00"}
                               </button>
                             </td>
                             <td className="px-[10px] py-[5px] w-[43px] text-[14px] text-[#201D1E]">
-                              {item.total}
+                              {schedule.total}
                             </td>
                           </tr>
                         ))}
@@ -1007,12 +1044,12 @@ const CreateTenancyModal = () => {
                     </table>
                   </div>
                   <div className="tenancy-mobile-table">
-                    {paymentSchedule.map((item) => (
+                    {paymentSchedule.map((schedule) => (
                       <div
-                        key={item.id}
+                        key={schedule.id}
                         className="border-b border-[#E9E9E9] last:border-b-0"
                       >
-                        <div className="flex justify-start border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
+                        <div className="flex justify-start border-b border-[#E9E9E9] bg-[#F0F2F2] h-[57px]">
                           <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
                             NO
                           </div>
@@ -1023,19 +1060,18 @@ const CreateTenancyModal = () => {
                             REASON
                           </div>
                         </div>
-                        <div className="flex justify-start h-[67px] border-b border-[#E9E9E9]">
-                          <div className="px-[13px] py-[13px] text-[14px] text-[#201D1E]">
-                            {item.id}
+                        <div className="flex justify-start h-[17px] border-b border-[#E9E9E9]">
+                          <div className="px-[10px] py-[13px] text-[14px] text-[#201D1E]">
+                            {schedule.id}
                           </div>
                           <div className="px-[10px] py-[13px] w-full text-[14px] text-[#201D1E]">
-                            {item.charge_type_name}
+                            {schedule.charge_type_name}
                           </div>
                           <div className="px-[10px] py-[13px] w-full text-[14px] text-[#201D1E]">
-                            {item.reason}
+                            {schedule.reason}
                           </div>
                         </div>
-
-                        <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
+                        <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F0F2F2] h-[57px]">
                           <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
                             DUE DATE
                           </div>
@@ -1045,14 +1081,13 @@ const CreateTenancyModal = () => {
                         </div>
                         <div className="flex justify-start border-b border-[#E9E9E9] h-[67px]">
                           <div className="px-[9px] py-[13px] w-full text-[14px] text-[#201D1E]">
-                            {item.due_date}
+                            {schedule.due_date}
                           </div>
                           <div className="px-[10px] py-[13px] w-full text-[14px] text-[#201D1E]">
-                            {item.status}
+                            {schedule.status}
                           </div>
                         </div>
-
-                        <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
+                        <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F0F2F2] h-[57px]">
                           <div className="px-[10px] flex items-center tenancy-modal-thead uppercase">
                             AMOUNT
                           </div>
@@ -1065,19 +1100,19 @@ const CreateTenancyModal = () => {
                         </div>
                         <div className="flex justify-start h-[67px]">
                           <div className="px-[9px] py-[13px] w-full text-[14px] text-[#201D1E]">
-                            {item.amount}
+                            {schedule.amount}
                           </div>
                           <div className="px-[10px] py-[13px] w-full">
                             <button
-                              onClick={() => fetchTaxDetails(item.charge_type, item.due_date, item.id, false)}
+                              onClick={() => showTaxDetails(schedule.id, false)}
                               className="text-[#2892CE] underline"
-                              disabled={!item.tax}
+                              disabled={!schedule.tax}
                             >
-                              {item.tax || "0.00"}
+                              {schedule.tax || "0.00"}
                             </button>
                           </div>
                           <div className="px-[10px] py-[13px] w-full text-[14px] text-[#201D1E]">
-                            {item.total}
+                            {schedule.total}
                           </div>
                         </div>
                       </div>
@@ -1108,28 +1143,64 @@ const CreateTenancyModal = () => {
                     className="text-gray-500 hover:text-gray-700"
                     aria-label="Close tax details modal"
                   >
-                    <img src={closeicon} alt="close-button" className="w-6 h-6" />
+                    <X size={24} color="#201D1E" />
                   </button>
                 </div>
-                <div>
-                  {taxModalData.taxDetails ? (
-                    <>
-                      <p><strong>Charge Type:</strong> {taxModalData.taxDetails.tax_type}</p>
-                      <p><strong>Tax Percentage:</strong> {taxModalData.taxDetails.tax_percentage}%</p>
-                      <p><strong>Tax Amount:</strong> {taxModalData.taxDetails.tax_amount}</p>
-                    </>
+
+                <div className="overflow-x-auto">
+                  {taxModalData.taxDetails.length > 0 ? (
+                    <table className="w-full border border-gray-300 text-sm">
+                      <thead>
+                        <tr className="bg-gray-100">
+                          <th className="border border-gray-300 px-3 py-2 text-left">
+                            Charge Type
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-left">
+                            Tax %
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-left">
+                            Amount
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {taxModalData.taxDetails.map((tax, index) => (
+                          <tr key={index}>
+                            <td className="border border-gray-300 px-3 py-2">
+                              {tax.tax_type}
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              {tax.tax_percentage}%
+                            </td>
+                            <td className="border border-gray-300 px-3 py-2">
+                              {tax.tax_amount}
+                            </td>
+                          </tr>
+                        ))}
+                        <tr className="font-semibold bg-gray-50">
+                          <td
+                            colSpan={2}
+                            className="border border-gray-300 px-3 py-2 text-right"
+                          >
+                            Total
+                          </td>
+                          <td className="border border-gray-300 px-3 py-2">
+                            {taxModalData.taxDetails
+                              .reduce(
+                                (acc, curr) =>
+                                  acc + parseFloat(curr.tax_amount || 0),
+                                0
+                              )
+                              .toFixed(2)}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   ) : (
                     <p>No tax details available.</p>
                   )}
                 </div>
-                <div className="flex justify-end mt-4">
-                  <button
-                    onClick={closeTaxModal}
-                    className="bg-[#2892CE] hover:bg-[#1f6c99] text-white px-4 py-2 rounded"
-                  >
-                    Close
-                  </button>
-                </div>
+
               </div>
             </div>
           )}
