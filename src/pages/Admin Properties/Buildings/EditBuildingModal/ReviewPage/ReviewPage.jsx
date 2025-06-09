@@ -37,17 +37,13 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
     ? formData.documents.documents
     : [];
 
-  console.log("ReviewPage formData:", formData);
-  console.log("ReviewPage documents:", documents);
-
   // Fetch countries
   useEffect(() => {
     const fetchCountries = async () => {
       try {
         const response = await axios.get(`${BASE_URL}/accounts/countries/`);
         setCountries(response.data);
-        // Find country name
-        const country = response.data.find(c => c.id === parseInt(building.country));
+        const country = response.data.find((c) => c.id === parseInt(building.country));
         setCountryName(country ? country.name : "N/A");
       } catch (error) {
         console.error("Error fetching countries:", error);
@@ -66,8 +62,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
             `${BASE_URL}/accounts/countries/${building.country}/states/`
           );
           setStates(response.data);
-          // Find state name
-          const state = response.data.find(s => s.id === parseInt(building.state));
+          const state = response.data.find((s) => s.id === parseInt(building.state));
           setStateName(state ? state.name : "N/A");
         } catch (error) {
           console.error("Error fetching states:", error);
@@ -82,6 +77,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
     }
   }, [building.country, building.state]);
 
+  // Fetch document types
   useEffect(() => {
     const fetchDocTypes = async () => {
       try {
@@ -112,7 +108,6 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
       "building_no",
       "plot_no",
       "building_name",
-      "building_address",
       "company",
       "status",
     ];
@@ -125,16 +120,15 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
 
     // Validate documents based on docType properties
     const invalidDocs = documents.filter((doc) => {
-      if (!doc.doc_type) return true; // Document must have a doc_type
+      if (!doc.doc_type) return true;
       const docType = docTypes.find((type) => type.id === parseInt(doc.doc_type));
-      if (!docType) return true; // Invalid doc_type
+      if (!docType) return true;
 
-      // Check only the fields required by the doc_type
       return (
         (docType.number && !doc.number) ||
         (docType.issue_date && !doc.issued_date) ||
         (docType.expiry_date && !doc.expiry_date) ||
-        (docType.upload_file && !doc.upload_file?.length)
+        (docType.upload_file && !doc.upload_file)
       );
     });
 
@@ -145,29 +139,25 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
     }
 
     try {
+      const getFileNameFromUrl = (url) => {
+        if (!url || typeof url !== "string") return "unknown_file";
+        const parts = url.split("/");
+        return parts[parts.length - 1] || "unknown_file";
+      };
+
       const convertToBlob = async (fileData) => {
         if (!fileData) {
           console.warn("No file data provided");
-          return null;
+          return { blob: null, name: null };
         }
         if (fileData instanceof File || fileData instanceof Blob) {
-          return fileData;
+          return { blob: fileData, name: fileData.name || "unknown_file" };
         }
         if (typeof fileData === "string") {
-          try {
-            const response = await fetch(fileData);
-            if (!response.ok) {
-              throw new Error(`Failed to fetch file from ${fileData}: ${response.statusText}`);
-            }
-            const blob = await response.blob();
-            return new Blob([blob], { type: blob.type || "application/octet-stream" });
-          } catch (err) {
-            console.error(`Error converting string to blob: ${err.message}`);
-            return null;
-          }
+          return { blob: null, name: getFileNameFromUrl(fileData), url: fileData };
         }
         console.warn("Invalid file data type:", typeof fileData, fileData);
-        return null;
+        return { blob: null, name: null };
       };
 
       const formDataWithFiles = new FormData();
@@ -176,12 +166,13 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
         formDataWithFiles.append(key, value ?? "");
       });
 
-      // Add documents data, including only required fields
+      // Add documents data
       await Promise.all(
         documents.map(async (doc, index) => {
           const docType = docTypes.find((type) => type.id === parseInt(doc.doc_type));
           if (docType) {
             formDataWithFiles.append(`build_comp[${index}][doc_type]`, doc.doc_type || "");
+            formDataWithFiles.append(`build_comp[${index}][id]`, doc.id || "");
             if (docType.number) {
               formDataWithFiles.append(`build_comp[${index}][number]`, doc.number || "");
             }
@@ -191,15 +182,18 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
             if (docType.expiry_date) {
               formDataWithFiles.append(`build_comp[${index}][expiry_date]`, doc.expiry_date || "");
             }
-            if (docType.upload_file && doc.upload_file && doc.upload_file.length > 0) {
+            if (docType.upload_file && doc.upload_file) {
               const file = Array.isArray(doc.upload_file) ? doc.upload_file[0] : doc.upload_file;
-              const fileBlob = await convertToBlob(file);
-              if (fileBlob) {
+              const { blob, name, url } = await convertToBlob(file);
+              if (blob) {
                 formDataWithFiles.append(
                   `build_comp[${index}][upload_file]`,
-                  fileBlob,
-                  fileBlob.name || `file-${index}`
+                  blob,
+                  name || `file-${index}`
                 );
+              } else if (url) {
+                formDataWithFiles.append(`build_comp[${index}][existing_file]`, url);
+                formDataWithFiles.append(`build_comp[${index}][file_name]`, name);
               }
             }
           }
@@ -223,7 +217,13 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
       );
 
       console.log("Successfully updated building:", response.data);
-      onNext({ formData, response: response.data });
+      onNext({
+        formData: {
+          ...formData,
+          documents: response.data.documents || formData.documents,
+        },
+        response: response.data,
+      });
     } catch (err) {
       console.error("Error updating building:", err);
       setError(
@@ -235,12 +235,20 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
   };
 
   const handleBack = () => {
-  const backData = {
-    documents: documents // Make sure this matches the structure DocumentsForm expects
+    const backData = {
+      documents: documents.map((doc) => ({
+        id: doc.id || Math.random().toString(36).substring(2),
+        doc_type: parseInt(doc.doc_type) || null,
+        number: doc.number || null,
+        issued_date: doc.issued_date || null,
+        expiry_date: doc.expiry_date || null,
+        upload_file: doc.upload_file,
+      })),
+    };
+    console.log("ReviewPage passing back:", backData);
+    onBack(backData);
   };
-  console.log("ReviewPage passing back:", backData);
-  onBack(backData);
-};
+
   return (
     <div className="flex flex-col h-full">
       {error && (
@@ -251,15 +259,15 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
         <div className="grid grid-cols-1 md:grid-cols-2">
           <div className="space-y-8 border-r border-[#E9E9E9] max-[480px]:border-r-0">
             <div>
-              <p className="review-page-label">Building No*</p>
+              <p className="review-page-label">Building Number</p>
               <p className="review-page-data">{building.building_no || "N/A"}</p>
             </div>
             <div>
-              <p className="review-page-label">Building Name*</p>
+              <p className="review-page-label">Building Name</p>
               <p className="review-page-data">{building.building_name || "N/A"}</p>
             </div>
             <div>
-              <p className="review-page-label">Country*</p>
+              <p className="review-page-label">Country</p>
               <p className="review-page-data">{countryName}</p>
             </div>
             <div>
@@ -271,7 +279,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
               <p className="review-page-data">{building.latitude || "N/A"}</p>
             </div>
             <div>
-              <p className="review-page-label">Status*</p>
+              <p className="review-page-label">Status</p>
               <p className="review-page-data">
                 {building.status
                   ? building.status.charAt(0).toUpperCase() + building.status.slice(1)
@@ -281,15 +289,15 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
           </div>
           <div className="space-y-8 sm:ml-5 max-[480px]:mt-8">
             <div>
-              <p className="review-page-label">Plot No*</p>
+              <p className="review-page-label">Plot Number</p>
               <p className="review-page-data">{building.plot_no || "N/A"}</p>
             </div>
             <div>
-              <p className="review-page-label">Address*</p>
+              <p className="review-page-label">Address</p>
               <p className="review-page-data">{building.building_address || "N/A"}</p>
             </div>
             <div>
-              <p className="review-page-label">State*</p>
+              <p className="review-page-label">State</p>
               <p className="review-page-data">{stateName}</p>
             </div>
             <div>
@@ -301,7 +309,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
               <p className="review-page-data">{building.longitude || "N/A"}</p>
             </div>
             <div>
-              <p className="review-page-label">Near By Landmark</p>
+              <p className="review-page-label">Nearby Landmark</p>
               <p className="review-page-data">{building.land_mark || "N/A"}</p>
             </div>
           </div>
@@ -310,7 +318,7 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
       <div className="py-5">
         <h2 className="review-page-head">Documents</h2>
         <ErrorBoundary>
-          <DocumentsView documents={documents} />
+          <DocumentsView documents={documents} docTypes={docTypes} />
         </ErrorBoundary>
       </div>
       <div className="flex justify-end gap-4 pt-5 mt-auto">

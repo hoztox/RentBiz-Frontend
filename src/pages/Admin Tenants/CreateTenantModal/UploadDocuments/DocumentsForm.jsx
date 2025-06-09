@@ -11,8 +11,8 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
   const safeInitialDocuments = Array.isArray(initialData?.documents)
     ? initialData.documents
     : Array.isArray(initialData?.documents?.tenant_comp)
-      ? initialData.documents.tenant_comp
-      : [];
+    ? initialData.documents.tenant_comp
+    : [];
 
   const [documents, setDocuments] = useState(
     safeInitialDocuments.length > 0
@@ -39,24 +39,6 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Helper function to display file names
-  const getFileDisplayText = (files) => {
-    if (!files || files.length === 0) {
-      return "Attach Files";
-    }
-    
-    if (files.length === 1) {
-      return files[0].name;
-    }
-    
-    if (files.length === 2) {
-      return `${files[0].name}, ${files[1].name}`;
-    }
-    
-    // For more than 2 files, show first file name and count
-    return `${files[0].name} and ${files.length - 1} more`;
-  };
-
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
     const storedCompanyId = localStorage.getItem("company_id");
@@ -66,12 +48,32 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
     return null;
   };
 
+  // Helper function to display file names
+  const getFileDisplayText = (files) => {
+    if (!files || files.length === 0) {
+      return "Attach Files";
+    }
+
+    if (files.length === 1) {
+      return files[0].name;
+    }
+
+    if (files.length === 2) {
+      return `${files[0].name}, ${files[1].name}`;
+    }
+
+    // For more than 2 files, show first file name and count
+    return `${files[0].name} and ${files.length - 1} more`;
+  };
+
   useEffect(() => {
     const fetchDocTypes = async () => {
       setLoading(true);
       try {
         const companyId = getUserCompanyId();
-        const response = await axios.get(`${BASE_URL}/company/doc_type/company/${companyId}`);
+        const response = await axios.get(
+          `${BASE_URL}/company/doc_type/company/${companyId}`
+        );
         setDocTypes(Array.isArray(response.data) ? response.data : []);
         setError(null);
       } catch (error) {
@@ -87,24 +89,34 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const validDocuments = documents.filter(
-      (doc) =>
-        doc.doc_type &&
-        doc.number &&
-        doc.issued_date &&
-        doc.expiry_date &&
-        doc.upload_file?.length > 0
-    );
+    // Validate documents: ensure all required fields are filled based on doc_type properties
+    const validDocuments = documents.filter((doc) => {
+      if (!doc.doc_type) return false;
+      const docType = docTypes.find(
+        (type) => type.id === parseInt(doc.doc_type)
+      );
+      if (!docType) return false;
+
+      // Check if required fields are filled based on docType properties
+      return (
+        (!docType.number || doc.number) &&
+        (!docType.issue_date || doc.issued_date) &&
+        (!docType.expiry_date || doc.expiry_date) &&
+        (!docType.upload_file || doc.upload_file?.length > 0)
+      );
+    });
 
     if (documents.length > 0 && validDocuments.length === 0) {
-      setError("Please fill all required document fields or remove incomplete documents.");
+      setError(
+        "Please fill all required document fields or remove incomplete documents."
+      );
       return;
     }
 
     const tempData = {
-      ...initialData, // Include all TenantInfoForm data
+      ...initialData,
       tenant_comp: validDocuments.map((doc) => ({
-        doc_type: doc.doc_type || null, // Keep as string
+        doc_type: parseInt(doc.doc_type) || null,
         number: doc.number || null,
         issued_date: doc.issued_date || null,
         expiry_date: doc.expiry_date || null,
@@ -117,9 +129,9 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
 
   const handleBack = () => {
     const tempData = {
-      ...initialData, // Include all TenantInfoForm data
+      ...initialData,
       tenant_comp: documents.map((doc) => ({
-        doc_type: doc.doc_type || null,
+        doc_type: parseInt(doc.doc_type) || null,
         number: doc.number || null,
         issued_date: doc.issued_date || null,
         expiry_date: doc.expiry_date || null,
@@ -148,9 +160,7 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
 
   const handleChange = (id, field, value) => {
     setDocuments((prevDocs) =>
-      prevDocs.map((doc) =>
-        doc.id === id ? { ...doc, [field]: value } : doc
-      )
+      prevDocs.map((doc) => (doc.id === id ? { ...doc, [field]: value } : doc))
     );
   };
 
@@ -161,115 +171,156 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
         <div className="flex-1 overflow-y-auto">
           {loading && <p>Loading document types...</p>}
           <div>
-            {documents.map((doc) => (
-              <div key={doc.id} className="border-b first:pt-0 py-5">
-                <div className="sm:flex sm:gap-[10px] sm:justify-between max-[480px]:grid max-[480px]:grid-cols-2 max-[480px]:gap-4">
-                  <div>
-                    <label className="block documents-label">Doc.Type</label>
-                    <div className="relative">
-                      <select
-                        className="appearance-none documents-inputs w-[226px] cursor-pointer"
-                        value={doc.doc_type}
-                        onChange={(e) =>
-                          handleChange(doc.id, "doc_type", e.target.value)
-                        }
-                        disabled={loading}
+            {documents.map((doc) => {
+              const docType = docTypes.find(
+                (type) => type.id === parseInt(doc.doc_type)
+              );
+              return (
+                <div key={doc.id} className="border-b first:pt-0 py-5">
+                  <div className="sm:flex sm:gap-[10px] sm:justify-start max-[480px]:grid max-[480px]:grid-cols-2 max-[480px]:gap-4">
+                    {/* Document Type */}
+                    <div>
+                      <label className="block documents-label">Doc.Type</label>
+                      <div className="relative">
+                        <select
+                          className="appearance-none documents-inputs w-[226px] cursor-pointer"
+                          value={doc.doc_type}
+                          onChange={(e) =>
+                            handleChange(doc.id, "doc_type", e.target.value)
+                          }
+                          disabled={loading}
+                        >
+                          <option value="">Select Document</option>
+                          {docTypes.map((type) => (
+                            <option key={type.id} value={type.id}>
+                              {type.title}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown className="absolute right-2 top-[12px] h-4 w-4 text-[#000000] pointer-events-none" />
+                      </div>
+                    </div>
+
+                    {/* Conditional Fields based on docType properties */}
+                    {doc.doc_type && docType && (
+                      <>
+                        {docType.number && (
+                          <div>
+                            <label className="block documents-label">
+                              Number
+                            </label>
+                            <input
+                              type="text"
+                              className="documents-inputs w-[168px] outline-none"
+                              value={doc.number}
+                              onChange={(e) =>
+                                handleChange(doc.id, "number", e.target.value)
+                              }
+                              placeholder="Number"
+                            />
+                          </div>
+                        )}
+
+                        {docType.issue_date && (
+                          <div>
+                            <label className="block documents-label">
+                              Issue Date
+                            </label>
+                            <div className="relative">
+                              <input
+                                type="date"
+                                className="documents-inputs w-[149px] appearance-none outline-none cursor-pointer"
+                                value={doc.issued_date}
+                                onChange={(e) =>
+                                  handleChange(
+                                    doc.id,
+                                    "issued_date",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {docType.expiry_date && (
+                          <div>
+                            <label className="block documents-label">
+                              Expiry Date
+                            </label>
+                            <div className="relative">
+                              <input
+                                type="date"
+                                className="documents-inputs w-[150px] appearance-none outline-none cursor-pointer"
+                                value={doc.expiry_date}
+                                onChange={(e) =>
+                                  handleChange(
+                                    doc.id,
+                                    "expiry_date",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {docType.upload_file && (
+                          <div className="relative">
+                            <label className="block documents-label">
+                              Upload Files
+                            </label>
+                            <input
+                              type="file"
+                              className="hidden documents-inputs"
+                              id={`fileInput-${doc.id}`}
+                              multiple
+                              onChange={(e) =>
+                                handleChange(
+                                  doc.id,
+                                  "upload_file",
+                                  Array.from(e.target.files)
+                                )
+                              }
+                            />
+                            <label
+                              htmlFor={`fileInput-${doc.id}`}
+                              className="flex items-center justify-between documents-inputs cursor-pointer w-[161px] !py-2"
+                              title={
+                                doc.upload_file.length > 0
+                                  ? doc.upload_file
+                                      .map((file) => file.name)
+                                      .join(", ")
+                                  : ""
+                              }
+                            >
+                              <span className="text-[#4B465C60] text-sm truncate">
+                                {getFileDisplayText(doc.upload_file)}
+                              </span>
+                              <img
+                                src={documentIcon}
+                                alt="attach"
+                                className="ml-2 h-5 w-5 files-icon"
+                              />
+                            </label>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    <div className="col-span-1 flex items-end justify-end">
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveDocument(doc.id)}
+                        className="p-2 bg-[#E44747] hover:bg-[#d43939] remove-btn flex justify-center items-center duration-200"
                       >
-                        <option value="">Select Document</option>
-                        {docTypes.map((type) => (
-                          <option key={type.id} value={type.id}>
-                            {type.title}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-2 top-[12px] h-4 w-4 text-[#000000] pointer-events-none" />
+                        <img src={closeIcon} className="h-3 w-3" alt="remove" />
+                      </button>
                     </div>
                   </div>
-
-                  {doc.doc_type && (
-                    <>
-                      <div>
-                        <label className="block documents-label">Number</label>
-                        <input
-                          type="text"
-                          className="documents-inputs w-[168px] outline-none"
-                          value={doc.number}
-                          onChange={(e) =>
-                            handleChange(doc.id, "number", e.target.value)
-                          }
-                          placeholder="Number"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block documents-label">Issue Date</label>
-                        <div className="relative">
-                          <input
-                            type="date"
-                            className="documents-inputs w-[149px] appearance-none outline-none cursor-pointer"
-                            value={doc.issued_date}
-                            onChange={(e) =>
-                              handleChange(doc.id, "issued_date", e.target.value)
-                            }
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block documents-label">Expiry Date</label>
-                        <div className="relative">
-                          <input
-                            type="date"
-                            className="documents-inputs w-[150px] appearance-none outline-none cursor-pointer"
-                            value={doc.expiry_date}
-                            onChange={(e) =>
-                              handleChange(doc.id, "expiry_date", e.target.value)
-                            }
-                          />
-                        </div>
-                      </div>
-
-                      <div className="relative">
-                        <label className="block documents-label">Upload Files</label>
-                        <input
-                          type="file"
-                          className="hidden documents-inputs"
-                          id={`fileInput-${doc.id}`}
-                          multiple
-                          onChange={(e) =>
-                            handleChange(doc.id, "upload_file", Array.from(e.target.files))
-                          }
-                        />
-                        <label
-                          htmlFor={`fileInput-${doc.id}`}
-                          className="flex items-center justify-between documents-inputs cursor-pointer w-[161px] !py-2"
-                          title={doc.upload_file.length > 0 ? doc.upload_file.map(file => file.name).join(', ') : ''}
-                        >
-                          <span className="text-[#4B465C60] text-sm truncate">
-                            {getFileDisplayText(doc.upload_file)}
-                          </span>
-                          <img
-                            src={documentIcon}
-                            alt="attach"
-                            className="ml-2 h-5 w-5 files-icon"
-                          />
-                        </label>
-                      </div>
-                    </>
-                  )}
-
-                  <div className="col-span-1 flex items-end justify-end">
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveDocument(doc.id)}
-                      className="p-2 bg-[#E44747] hover:bg-[#d43939] remove-btn flex justify-center items-center duration-200"
-                    >
-                      <img src={closeIcon} className="h-3 w-3" alt="remove" />
-                    </button>
-                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="py-4 flex justify-end">
