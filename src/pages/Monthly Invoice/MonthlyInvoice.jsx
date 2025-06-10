@@ -7,6 +7,7 @@ import viewicon from "../../assets/Images/Monthly Invoice/view-icon.svg";
 import downarrow from "../../assets/Images/Monthly Invoice/downarrow.svg";
 import { useModal } from "../../context/ModalContext";
 import CustomDropDown from "../../components/CustomDropDown";
+import { motion, AnimatePresence } from "framer-motion";
 
 const MonthlyInvoice = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,30 +26,6 @@ const MonthlyInvoice = () => {
   const [selectedOption, setSelectedOption] = useState("showing");
 
   const demoData = [
-    {
-      id: "INV2412001",
-      date: "24 Nov 2024",
-      tenancyId: "TC0013-1",
-      tenantName: "Pharmacy",
-      amountDue: "300.00",
-      view: viewicon,
-    },
-    {
-      id: "INV2412001",
-      date: "24 Nov 2024",
-      tenancyId: "TC0013-1",
-      tenantName: "Pharmacy",
-      amountDue: "300.00",
-      view: viewicon,
-    },
-    {
-      id: "INV2412001",
-      date: "24 Nov 2024",
-      tenancyId: "TC0013-1",
-      tenantName: "Pharmacy",
-      amountDue: "300.00",
-      view: viewicon,
-    },
     {
       id: "INV2412001",
       date: "24 Nov 2024",
@@ -91,6 +68,25 @@ const MonthlyInvoice = () => {
       ...prev,
       [id]: !prev[id],
     }));
+  };
+
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
   };
 
   return (
@@ -230,64 +226,76 @@ const MonthlyInvoice = () => {
                     </div>
                   </td>
                 </tr>
-                {expandedRows[invoice.id + index] && (
-                  <tr className="mi-mobile-with-border border-b border-[#E9E9E9]">
-                    <td colSpan={3} className="px-5">
-                      <div className="mi-dropdown-content">
-                        <div className="mi-dropdown-content-grid">
-                          <div className="mi-dropdown-content-item w-[50%]">
-                            <div className="mi-dropdown-label">TENANCY ID</div>
-                            <div className="mi-dropdown-value">
-                              {invoice.tenancyId}
+                <AnimatePresence>
+                  {expandedRows[invoice.id + index] && (
+                    <motion.tr
+                      className="mi-mobile-with-border border-b border-[#E9E9E9]"
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={dropdownVariants}
+                    >
+                      <td colSpan={3} className="px-5">
+                        <div className="mi-dropdown-content">
+                          <div className="mi-dropdown-content-grid">
+                            <div className="mi-dropdown-content-item w-[50%]">
+                              <div className="mi-dropdown-label">
+                                TENANCY ID
+                              </div>
+                              <div className="mi-dropdown-value">
+                                {invoice.tenancyId}
+                              </div>
+                            </div>
+                            <div className="mi-dropdown-content-item w-[50%]">
+                              <div className="mi-dropdown-label">DATE</div>
+                              <div className="mi-dropdown-value">
+                                {invoice.date}
+                              </div>
                             </div>
                           </div>
-                          <div className="mi-dropdown-content-item w-[50%]">
-                            <div className="mi-dropdown-label">DATE</div>
-                            <div className="mi-dropdown-value">
-                              {invoice.date}
+                          <div className="mi-dropdown-content-grid">
+                            <div className="mi-dropdown-content-item w-[50%]">
+                              <div className="mi-dropdown-label">
+                                AMOUNT DUE
+                              </div>
+                              <div className="mi-dropdown-value">
+                                {invoice.amountDue}
+                              </div>
+                            </div>
+                            <div className="mi-dropdown-content-item w-[25%]">
+                              <div className="mi-dropdown-label">VIEW</div>
+                              <div className="mi-dropdown-value">
+                                <button
+                                  onClick={() =>
+                                    openModal("view-monthly-invoice")
+                                  }
+                                >
+                                  <img
+                                    src={invoice.view}
+                                    alt="View"
+                                    className="w-[30px] h-[24px] mi-action-btn duration-200"
+                                  />
+                                </button>
+                              </div>
+                            </div>
+                            <div className="mi-dropdown-content-item w-[25%]">
+                              <div className="mi-dropdown-label">ACTION</div>
+                              <div className="mi-dropdown-value flex items-center gap-4">
+                                <button>
+                                  <img
+                                    src={deleteicon}
+                                    alt="Delete"
+                                    className="w-[18px] h-[18px] mi-action-btn duration-200"
+                                  />
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <div className="mi-dropdown-content-grid">
-                          <div className="mi-dropdown-content-item w-[50%]">
-                            <div className="mi-dropdown-label">AMOUNT DUE</div>
-                            <div className="mi-dropdown-value">
-                              {invoice.amountDue}
-                            </div>
-                          </div>
-                          <div className="mi-dropdown-content-item w-[25%]">
-                            <div className="mi-dropdown-label">VIEW</div>
-                            <div className="mi-dropdown-value">
-                              <button
-                                onClick={() =>
-                                  openModal("view-monthly-invoice")
-                                }
-                              >
-                                <img
-                                  src={invoice.view}
-                                  alt="View"
-                                  className="w-[30px] h-[24px] mi-action-btn duration-200"
-                                />
-                              </button>
-                            </div>
-                          </div>
-                          <div className="mi-dropdown-content-item w-[25%]">
-                            <div className="mi-dropdown-label">ACTION</div>
-                            <div className="mi-dropdown-value flex items-center gap-4">
-                              <button>
-                                <img
-                                  src={deleteicon}
-                                  alt="Delete"
-                                  className="w-[18px] h-[18px] mi-action-btn duration-200"
-                                />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
+                      </td>
+                    </motion.tr>
+                  )}
+                </AnimatePresence>
               </React.Fragment>
             ))}
           </tbody>

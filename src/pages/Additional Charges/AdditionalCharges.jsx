@@ -6,7 +6,8 @@ import editicon from "../../assets/Images/Additional Charges/edit-icon.svg";
 import deleteicon from "../../assets/Images/Additional Charges/delete-icon.svg";
 import downarrow from "../../assets/Images/Additional Charges/downarrow.svg";
 import { useModal } from "../../context/ModalContext";
-import CustomDropDown from "../../components/CustomDropDown"
+import CustomDropDown from "../../components/CustomDropDown";
+import { motion, AnimatePresence } from "framer-motion";
 
 const AdminAdditionalCharges = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -41,33 +42,6 @@ const AdminAdditionalCharges = () => {
       dueDate: "24 Nov 2024",
       status: "Paid",
     },
-    {
-      id: "#836",
-      chargeId: "Rent",
-      date: "24 Nov 2024",
-      amountDue: "300.00",
-      reason: "Monthly Rent",
-      dueDate: "24 Nov 2024",
-      status: "Paid",
-    },
-    {
-      id: "#837",
-      chargeId: "Rent",
-      date: "24 Nov 2024",
-      amountDue: "300.00",
-      reason: "Monthly Rent",
-      dueDate: "24 Nov 2024",
-      status: "Paid",
-    },
-    {
-      id: "#838",
-      chargeId: "Rent",
-      date: "24 Nov 2024",
-      amountDue: "300.00",
-      reason: "Monthly Rent",
-      dueDate: "24 Nov 2024",
-      status: "Paid",
-    },
   ];
 
   const filteredData = demoData.filter(
@@ -93,7 +67,11 @@ const AdminAdditionalCharges = () => {
 
   const handleEditClick = (charges) => {
     console.log("ID Types: Selected IdType:", charges);
-    openModal("update-additional-charges", "Update Additional Charges", charges);
+    openModal(
+      "update-additional-charges",
+      "Update Additional Charges",
+      charges
+    );
   };
 
   const toggleRowExpand = (id) => {
@@ -101,6 +79,25 @@ const AdminAdditionalCharges = () => {
       ...prev,
       [id]: !prev[id],
     }));
+  };
+
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
   };
 
   return (
@@ -281,79 +278,89 @@ const AdminAdditionalCharges = () => {
                     </div>
                   </td>
                 </tr>
-                {expandedRows[charges.id + index] && (
-                  <tr className="admin-add-charges-mobile-with-border border-b border-[#E9E9E9]">
-                    <td colSpan={4} className="px-5">
-                      <div className="admin-add-charges-dropdown-content">
-                        <div className="admin-add-charges-dropdown-grid">
-                          <div className="admin-add-charges-dropdown-item w-[30%]">
-                            <div className="admin-add-charges-dropdown-label">
-                              AMOUNT DUE
+                <AnimatePresence>
+                  {expandedRows[charges.id + index] && (
+                    <motion.tr
+                      className="admin-add-charges-mobile-with-border border-b border-[#E9E9E9]"
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={dropdownVariants}
+                    >
+                      <td colSpan={4} className="px-5">
+                        <div className="admin-add-charges-dropdown-content">
+                          <div className="admin-add-charges-dropdown-grid">
+                            <div className="admin-add-charges-dropdown-item w-[30%]">
+                              <div className="admin-add-charges-dropdown-label">
+                                AMOUNT DUE
+                              </div>
+                              <div className="admin-add-charges-dropdown-value">
+                                {charges.amountDue}
+                              </div>
                             </div>
-                            <div className="admin-add-charges-dropdown-value">
-                              {charges.amountDue}
+                            <div className="admin-add-charges-dropdown-item label-reason w-[30%]">
+                              <div className="admin-add-charges-dropdown-label">
+                                REASON
+                              </div>
+                              <div className="admin-add-charges-dropdown-value">
+                                {charges.reason}
+                              </div>
+                            </div>
+                            <div className="admin-add-charges-dropdown-item label-due w-[35%]">
+                              <div className="admin-add-charges-dropdown-label">
+                                DUE DATE
+                              </div>
+                              <div className="admin-add-charges-dropdown-value">
+                                {charges.dueDate}
+                              </div>
                             </div>
                           </div>
-                          <div className="admin-add-charges-dropdown-item label-reason w-[30%]">
-                            <div className="admin-add-charges-dropdown-label">
-                              REASON
+                          <div className="admin-add-charges-dropdown-grid">
+                            <div className="admin-add-charges-dropdown-item w-[30%]">
+                              <div className="admin-add-charges-dropdown-label">
+                                STATUS
+                              </div>
+                              <div className="admin-add-charges-dropdown-value">
+                                <span
+                                  className={`admin-add-charges-status ${
+                                    charges.status === "Paid"
+                                      ? "bg-[#28C76F29] text-[#28C76F]"
+                                      : "bg-[#FFE1E1] text-[#C72828]"
+                                  }`}
+                                >
+                                  {charges.status}
+                                </span>
+                              </div>
                             </div>
-                            <div className="admin-add-charges-dropdown-value">
-                              {charges.reason}
-                            </div>
-                          </div>
-                          <div className="admin-add-charges-dropdown-item label-due w-[35%]">
-                            <div className="admin-add-charges-dropdown-label">
-                              DUE DATE
-                            </div>
-                            <div className="admin-add-charges-dropdown-value">
-                              {charges.dueDate}
+                            <div className="admin-add-charges-dropdown-item w-[67%] label-action">
+                              <div className="admin-add-charges-dropdown-label">
+                                ACTION
+                              </div>
+                              <div className="admin-add-charges-dropdown-value flex items-center gap-4 mt-[10px]">
+                                <button
+                                  onClick={() => handleEditClick(charges)}
+                                >
+                                  <img
+                                    src={editicon}
+                                    alt="Edit"
+                                    className="w-[18px] h-[18px] admin-add-charges-action-btn duration-200"
+                                  />
+                                </button>
+                                <button>
+                                  <img
+                                    src={deleteicon}
+                                    alt="Delete"
+                                    className="w-[18px] h-[18px] admin-add-charges-action-btn duration-200"
+                                  />
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <div className="admin-add-charges-dropdown-grid">
-                          <div className="admin-add-charges-dropdown-item w-[30%]">
-                            <div className="admin-add-charges-dropdown-label">
-                              STATUS
-                            </div>
-                            <div className="admin-add-charges-dropdown-value">
-                              <span
-                                className={`admin-add-charges-status ${
-                                  charges.status === "Paid"
-                                    ? "bg-[#28C76F29] text-[#28C76F]"
-                                    : "bg-[#FFE1E1] text-[#C72828]"
-                                }`}
-                              >
-                                {charges.status}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="admin-add-charges-dropdown-item w-[67%] label-action">
-                            <div className="admin-add-charges-dropdown-label">
-                              ACTION
-                            </div>
-                            <div className="admin-add-charges-dropdown-value flex items-center gap-4">
-                              <button onClick={() => handleEditClick(charges)}>
-                                <img
-                                  src={editicon}
-                                  alt="Edit"
-                                  className="w-[18px] h-[18px] admin-add-charges-action-btn duration-200"
-                                />
-                              </button>
-                              <button>
-                                <img
-                                  src={deleteicon}
-                                  alt="Delete"
-                                  className="w-[18px] h-[18px] admin-add-charges-action-btn duration-200"
-                                />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
+                      </td>
+                    </motion.tr>
+                  )}
+                </AnimatePresence>
               </React.Fragment>
             ))}
           </tbody>

@@ -8,6 +8,7 @@ import downloadactionicon from "../../assets/Images/Refund/download-action-icon.
 import downarrow from "../../assets/Images/Refund/downarrow.svg";
 import { useModal } from "../../context/ModalContext";
 import CustomDropDown from "../../components/CustomDropDown";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Refund = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -51,24 +52,6 @@ const Refund = () => {
       paymentMethod: "Bank Transfer",
       status: "Paid",
     },
-    {
-      id: "04",
-      date: "24 Nov 2024",
-      tenancyId: "TC0013-1",
-      tenantName: "Pharmacy",
-      amount: "300.00",
-      paymentMethod: "Cash",
-      status: "Paid",
-    },
-    {
-      id: "05",
-      date: "24 Nov 2024",
-      tenancyId: "TC0013-1",
-      tenantName: "Pharmacy",
-      amount: "300.00",
-      paymentMethod: "Bank Transfer",
-      status: "Paid",
-    },
   ];
 
   const filteredData = demoData.filter(
@@ -102,6 +85,25 @@ const Refund = () => {
       ...prev,
       [id]: !prev[id],
     }));
+  };
+
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
   };
 
   return (
@@ -273,80 +275,94 @@ const Refund = () => {
                     </div>
                   </td>
                 </tr>
-                {expandedRows[refund.id + index] && (
-                  <tr className="refund-mobile-with-border border-b border-[#E9E9E9]">
-                    <td colSpan={4} className="pl-3">
-                      <div className="refund-dropdown-content">
-                        <div className="refund-dropdown-grid">
-                          <div className="refund-dropdown-item refund-tenant-name-column">
-                            <div className="refund-dropdown-label">
-                              TENANT NAME
+                <AnimatePresence>
+                  {expandedRows[refund.id + index] && (
+                    <motion.tr
+                      className="refund-mobile-with-border border-b border-[#E9E9E9]"
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={dropdownVariants}
+                    >
+                      <td colSpan={4} className="pl-3">
+                        <div className="refund-dropdown-content">
+                          <div className="refund-dropdown-grid">
+                            <div className="refund-dropdown-item refund-tenant-name-column">
+                              <div className="refund-dropdown-label">
+                                TENANT NAME
+                              </div>
+                              <div className="refund-dropdown-value">
+                                {refund.tenantName}
+                              </div>
                             </div>
-                            <div className="refund-dropdown-value">
-                              {refund.tenantName}
+                            <div className="refund-dropdown-item refund-amount-column">
+                              <div className="refund-dropdown-label">
+                                AMOUNT
+                              </div>
+                              <div className="refund-dropdown-value">
+                                {refund.amount}
+                              </div>
+                            </div>
+                            <div className="refund-dropdown-item refund-payment-method-column">
+                              <div className="refund-dropdown-label">
+                                PAYMENT METHOD
+                              </div>
+                              <div className="refund-dropdown-value">
+                                {refund.paymentMethod}
+                              </div>
                             </div>
                           </div>
-                          <div className="refund-dropdown-item refund-amount-column">
-                            <div className="refund-dropdown-label">AMOUNT</div>
-                            <div className="refund-dropdown-value">
-                              {refund.amount}
+                          <div className="refund-dropdown-grid">
+                            <div className="refund-dropdown-item refund-status-column">
+                              <div className="refund-dropdown-label">
+                                STATUS
+                              </div>
+                              <div className="refund-dropdown-value">
+                                <span
+                                  className={`refund-status ${
+                                    refund.status === "Paid"
+                                      ? "bg-[#28C76F29] text-[#28C76F]"
+                                      : "bg-[#FFE1E1] text-[#C72828]"
+                                  }`}
+                                >
+                                  {refund.status}
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                          <div className="refund-dropdown-item refund-payment-method-column">
-                            <div className="refund-dropdown-label">
-                              PAYMENT METHOD
-                            </div>
-                            <div className="refund-dropdown-value">
-                              {refund.paymentMethod}
+                            <div className="refund-dropdown-item refund-action-column">
+                              <div className="refund-dropdown-label">
+                                ACTION
+                              </div>
+                              <div className="refund-dropdown-value flex items-center gap-4 p-[5px]">
+                                <button onClick={() => handleEditClick(refund)}>
+                                  <img
+                                    src={editicon}
+                                    alt="Edit"
+                                    className="w-[18px] h-[18px] action-btn duration-200"
+                                  />
+                                </button>
+                                <button>
+                                  <img
+                                    src={downloadactionicon}
+                                    alt="Download"
+                                    className="w-[18px] h-[18px] action-btn duration-200"
+                                  />
+                                </button>
+                                <button>
+                                  <img
+                                    src={printericon}
+                                    alt="Print"
+                                    className="w-[18px] h-[18px] action-btn duration-200"
+                                  />
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <div className="refund-dropdown-grid">
-                          <div className="refund-dropdown-item refund-status-column">
-                            <div className="refund-dropdown-label">STATUS</div>
-                            <div className="refund-dropdown-value">
-                              <span
-                                className={`refund-status ${
-                                  refund.status === "Paid"
-                                    ? "bg-[#28C76F29] text-[#28C76F]"
-                                    : "bg-[#FFE1E1] text-[#C72828]"
-                                }`}
-                              >
-                                {refund.status}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="refund-dropdown-item refund-action-column">
-                            <div className="refund-dropdown-label">ACTION</div>
-                            <div className="refund-dropdown-value flex items-center gap-4 p-[5px]">
-                              <button onClick={() => handleEditClick(refund)}>
-                                <img
-                                  src={editicon}
-                                  alt="Edit"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
-                                />
-                              </button>
-                              <button>
-                                <img
-                                  src={downloadactionicon}
-                                  alt="Download"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
-                                />
-                              </button>
-                              <button>
-                                <img
-                                  src={printericon}
-                                  alt="Print"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
-                                />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
+                      </td>
+                    </motion.tr>
+                  )}
+                </AnimatePresence>
               </React.Fragment>
             ))}
           </tbody>
