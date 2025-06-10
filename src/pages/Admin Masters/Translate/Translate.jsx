@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./Translate.css";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import CustomDropDown from "../../../components/CustomDropDown";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Translate = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -10,11 +11,11 @@ const Translate = () => {
   const itemsPerPage = 10;
 
   const dropdownOption = [
-    {value: "showing", label: "Showing"},
-    {value: "all", label:"All"}
+    { value: "showing", label: "Showing" },
+    { value: "all", label: "All" },
   ];
 
-  const [selectedOption, setSelectedOption] = useState("showing")
+  const [selectedOption, setSelectedOption] = useState("showing");
 
   const demoData = [
     {
@@ -35,26 +36,6 @@ const Translate = () => {
     },
     {
       id: "#315",
-      variable: "test",
-    },
-    {
-      id: "#316",
-      variable: "test",
-    },
-    {
-      id: "#317",
-      variable: "test",
-    },
-    {
-      id: "#318",
-      variable: "test",
-    },
-    {
-      id: "#319",
-      variable: "test",
-    },
-    {
-      id: "#31",
       variable: "test",
     },
   ];
@@ -82,6 +63,25 @@ const Translate = () => {
     }));
   };
 
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
+  };
+
   return (
     <div className="border border-[#E9E9E9] rounded-md translate-table">
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] translate-table-header">
@@ -96,13 +96,13 @@ const Translate = () => {
           />
           <div className="flex flex-row gap-[10px] w-full md:w-auto second-row-container">
             <div className="relative flex-1 md:flex-none w-[45%] md:w-auto">
-             <CustomDropDown
-              options={dropdownOption}
-              value={selectedOption}
-              onChange={setSelectedOption}
-              className="w-full md:w-[121px]"
-              dropdownClassName="px-[14px] py-[7px] h-[38px] border-[#201D1E20] focus:border-gray-300 translate-selection"
-             />
+              <CustomDropDown
+                options={dropdownOption}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                className="w-full md:w-[121px]"
+                dropdownClassName="px-[14px] py-[7px] h-[38px] border-[#201D1E20] focus:border-gray-300 translate-selection"
+              />
             </div>
             <button className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md update-btn duration-200">
               Update
@@ -183,7 +183,9 @@ const Translate = () => {
                       : "mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left translate-data">{translate.id}</td>
+                  <td className="px-5 text-left translate-data">
+                    {translate.id}
+                  </td>
                   <td className="px-5 text-left translate-data variable-column">
                     {translate.variable}
                   </td>
@@ -204,37 +206,45 @@ const Translate = () => {
                     </div>
                   </td>
                 </tr>
-                {expandedRows[translate.id] && (
-                  <tr className="mobile-with-border border-b border-[#E9E9E9]">
-                    <td colSpan={3} className="px-5">
-                      <div className="translate-dropdown-content">
-                        <div className="translate-grid">
-                          <div className="translate-grid-items">
-                            <div className="dropdown-label">ENGLISH</div>
-                            <div className="dropdown-value">
-                              <input
-                                type="text"
-                                placeholder="Test"
-                                className="w-full border border-[#E9E9E9] px-[14px] py-[7px] custom-input"
-                              />
+                <AnimatePresence>
+                  {expandedRows[translate.id] && (
+                    <motion.tr
+                      className="mobile-with-border border-b border-[#E9E9E9]"
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={dropdownVariants}
+                    >
+                      <td colSpan={3} className="px-5">
+                        <div className="translate-dropdown-content">
+                          <div className="translate-grid">
+                            <div className="translate-grid-items">
+                              <div className="dropdown-label">ENGLISH</div>
+                              <div className="dropdown-value">
+                                <input
+                                  type="text"
+                                  placeholder="Test"
+                                  className="w-full border border-[#E9E9E9] px-[14px] py-[7px] custom-input"
+                                />
+                              </div>
                             </div>
-                          </div>
-                          <div className="translate-grid-items">
-                            <div className="dropdown-label">ARABIC</div>
-                            <div className="dropdown-value">
-                              <input
-                                type="text"
-                                placeholder="امتحان"
-                                className="w-full border border-[#E9E9E9] px-[14px] py-[7px] text-right custom-input"
-                                dir="rtl"
-                              />
+                            <div className="translate-grid-items">
+                              <div className="dropdown-label">ARABIC</div>
+                              <div className="dropdown-value">
+                                <input
+                                  type="text"
+                                  placeholder="امتحان"
+                                  className="w-full border border-[#E9E9E9] px-[14px] py-[7px] text-right custom-input"
+                                  dir="rtl"
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
+                      </td>
+                    </motion.tr>
+                  )}
+                </AnimatePresence>
               </React.Fragment>
             ))}
           </tbody>

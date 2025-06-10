@@ -11,6 +11,7 @@ import { toast, Toaster } from "react-hot-toast";
 import ChargeCodeDeleteModal from "./ChargeCodeDeleteModal/ChargeCodeDeleteModal";
 import { chargeCodesApi } from "../MastersApi";
 import CustomDropDown from "../../../components/CustomDropDown";
+import { motion, AnimatePresence } from "framer-motion";
 
 const ChargeCodeType = () => {
   const { openModal, refreshCounter } = useModal();
@@ -136,6 +137,25 @@ const ChargeCodeType = () => {
       ...prev,
       [id]: !prev[id],
     }));
+  };
+
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
   };
 
   return (
@@ -359,53 +379,61 @@ const ChargeCodeType = () => {
                           </div>
                         </td>
                       </tr>
-                      {expandedRows[chargeCode.id] && (
-                        <tr className="mobile-with-border border-b border-[#E9E9E9]">
-                          <td colSpan={3} className="px-5">
-                            <div className="idtype-dropdown-content">
-                              <div className="idtype-grid">
-                                <div className="idtype-grid-items">
-                                  <div className="dropdown-label">
-                                    ENTRY DATE
+                      <AnimatePresence>
+                        {expandedRows[chargeCode.id] && (
+                          <motion.tr
+                            className="mobile-with-border border-b border-[#E9E9E9]"
+                            initial="hidden"
+                            animate="visible"
+                            exit="hidden"
+                            variants={dropdownVariants}
+                          >
+                            <td colSpan={3} className="px-5">
+                              <div className="idtype-dropdown-content">
+                                <div className="idtype-grid">
+                                  <div className="idtype-grid-items">
+                                    <div className="dropdown-label">
+                                      ENTRY DATE
+                                    </div>
+                                    <div className="dropdown-value">
+                                      {formatDate(chargeCode.created_at)}
+                                    </div>
                                   </div>
-                                  <div className="dropdown-value">
-                                    {formatDate(chargeCode.created_at)}
-                                  </div>
-                                </div>
-                                <div className="idtype-grid-items">
-                                  <div className="dropdown-label">ACTION</div>
-                                  <div className="dropdown-value flex items-center gap-2 p-1 ml-[5px]">
-                                    <button
-                                      onClick={() =>
-                                        handleEditClick(chargeCode)
-                                      }
-                                      disabled={loading}
-                                    >
-                                      <img
-                                        src={editIcon}
-                                        alt="Edit"
-                                        className="w-[18px] h-[18px] action-btn duration-200"
-                                      />
-                                    </button>
-                                    <button
-                                      onClick={() =>
-                                        handleDelete(chargeCode.id)
-                                      }
-                                      disabled={loading}
-                                    >
-                                      <img
-                                        src={deleteIcon}
-                                        alt="Delete"
-                                        className="w-[18px] h-[18px] ml-[5px] action-btn duration-200"
-                                      />
-                                    </button>
+                                  <div className="idtype-grid-items">
+                                    <div className="dropdown-label">ACTION</div>
+                                    <div className="dropdown-value flex items-center gap-2 p-1 ml-[5px]">
+                                      <button
+                                        onClick={() =>
+                                          handleEditClick(chargeCode)
+                                        }
+                                        disabled={loading}
+                                      >
+                                        <img
+                                          src={editIcon}
+                                          alt="Edit"
+                                          className="w-[18px] h-[18px] action-btn duration-200"
+                                        />
+                                      </button>
+                                      <button
+                                        onClick={() =>
+                                          handleDelete(chargeCode.id)
+                                        }
+                                        disabled={loading}
+                                      >
+                                        <img
+                                          src={deleteIcon}
+                                          alt="Delete"
+                                          className="w-[18px] h-[18px] ml-[5px] action-btn duration-200"
+                                        />
+                                      </button>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
+                            </td>
+                          </motion.tr>
+                        )}
+                      </AnimatePresence>
                     </React.Fragment>
                   ))
                 )}

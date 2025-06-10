@@ -11,6 +11,7 @@ import { useModal } from "../../../context/ModalContext";
 import IdTypeDeleteModal from "./IdTypeDeleteModal/IdTypeDeleteModal";
 import { idTypesApi } from "../MastersApi"; // Updated import
 import CustomDropDown from "../../../components/CustomDropDown";
+import { motion, AnimatePresence } from "framer-motion";
 
 const IdType = () => {
   const { openModal, refreshCounter } = useModal();
@@ -29,7 +30,7 @@ const IdType = () => {
     { value: "all", label: "All" },
   ];
 
-  const [selectedOption, setSelectedOption] = useState("showing")
+  const [selectedOption, setSelectedOption] = useState("showing");
 
   // Fetch ID types from backend
   const fetchData = async () => {
@@ -131,6 +132,25 @@ const IdType = () => {
     }));
   };
 
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
+  };
+
   // Loading state
   if (loading) {
     return (
@@ -177,19 +197,21 @@ const IdType = () => {
               disabled={loading}
             />
             <div className="relative w-[40%] md:w-auto">
-              <CustomDropDown 
+              <CustomDropDown
                 options={dropdownOptions}
                 value={selectedOption}
                 onChange={setSelectedOption}
                 className="w-full md:w-[121px]"
                 dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 idtype-selection"
               />
-          </div>
+            </div>
           </div>
           <div className="flex gap-[10px] action-buttons-container">
             <button
               className="flex items-center justify-center gap-2 w-full md:w-[176px] h-[38px] rounded-md idtype-add-new-master duration-200"
-              onClick={() => openModal("create-id-type-master", "Create New ID Type Master")}
+              onClick={() =>
+                openModal("create-id-type-master", "Create New ID Type Master")
+              }
               disabled={loading}
             >
               Add New Master
@@ -355,47 +377,55 @@ const IdType = () => {
                       </div>
                     </td>
                   </tr>
-                  {expandedRows[idType.id] && (
-                    <tr className="mobile-with-border border-b border-[#E9E9E9]">
-                      <td colSpan={3} className="px-5">
-                        <div className="idtype-dropdown-content">
-                          <div className="idtype-grid">
-                            <div className="idtype-grid-items">
-                              <div className="dropdown-label">ENTRY DATE</div>
-                              <div className="dropdown-value">
-                                {formatDate(idType.created_at)}
+                  <AnimatePresence>
+                    {expandedRows[idType.id] && (
+                      <motion.tr
+                        className="mobile-with-border border-b border-[#E9E9E9]"
+                        initial="hidden"
+                        animate="visible"
+                        exit="hidden"
+                        variants={dropdownVariants}
+                      >
+                        <td colSpan={3} className="px-5">
+                          <div className="idtype-dropdown-content">
+                            <div className="idtype-grid">
+                              <div className="idtype-grid-items">
+                                <div className="dropdown-label">ENTRY DATE</div>
+                                <div className="dropdown-value">
+                                  {formatDate(idType.created_at)}
+                                </div>
                               </div>
-                            </div>
-                            <div className="idtype-grid-items">
-                              <div className="dropdown-label">ACTION</div>
-                              <div className="dropdown-value flex items-center gap-2 p-1 ml-[5px]">
-                                <button
-                                  onClick={() => handleEditClick(idType)}
-                                  disabled={loading}
-                                >
-                                  <img
-                                    src={editIcon}
-                                    alt="Edit"
-                                    className="w-[18px] h-[18px] action-btn duration-200"
-                                  />
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(idType.id)}
-                                  disabled={loading}
-                                >
-                                  <img
-                                    src={deleteIcon}
-                                    alt="Delete"
-                                    className="w-[18px] h-[18px] ml-[5px] action-btn duration-200"
-                                  />
-                                </button>
+                              <div className="idtype-grid-items">
+                                <div className="dropdown-label">ACTION</div>
+                                <div className="dropdown-value flex items-center gap-2 p-1 ml-[5px]">
+                                  <button
+                                    onClick={() => handleEditClick(idType)}
+                                    disabled={loading}
+                                  >
+                                    <img
+                                      src={editIcon}
+                                      alt="Edit"
+                                      className="w-[18px] h-[18px] action-btn duration-200"
+                                    />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDelete(idType.id)}
+                                    disabled={loading}
+                                  >
+                                    <img
+                                      src={deleteIcon}
+                                      alt="Delete"
+                                      className="w-[18px] h-[18px] ml-[5px] action-btn duration-200"
+                                    />
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
+                        </td>
+                      </motion.tr>
+                    )}
+                  </AnimatePresence>
                 </React.Fragment>
               ))
             )}
