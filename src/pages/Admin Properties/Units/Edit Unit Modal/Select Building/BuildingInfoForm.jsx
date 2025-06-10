@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./buildinginfoform.css";
 import { ChevronDown } from "lucide-react";
 import axios from "axios";
@@ -18,6 +18,10 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isSelectFocused, setIsSelectFocused] = useState(false);
+  const [nextPageUrl, setNextPageUrl] = useState(null);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const observerRef = useRef(null);
+  const lastOptionRef = useRef(null);
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -25,25 +29,31 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
     return role === "company" || role === "user" || role === "admin" ? storedCompanyId : null;
   };
 
-  // Fetch buildings list on component mount
+  // Fetch buildings (initial load or subsequent pages)
+  const fetchBuildings = async (url = null) => {
+    setLoading(true);
+    setIsFetchingMore(!!url);
+    try {
+      const companyId = getUserCompanyId();
+      if (!companyId && !url) throw new Error("Company ID not found.");
+      const apiUrl = url || `${BASE_URL}/company/buildings/company/${companyId}`;
+      const response = await axios.get(apiUrl);
+      const newBuildings = Array.isArray(response.data.results) ? response.data.results : [];
+      setBuildings((prev) => (url ? [...prev, ...newBuildings] : newBuildings));
+      setNextPageUrl(response.data.next);
+      setError(null);
+    } catch (error) {
+      console.error("Error fetching buildings:", error);
+      setError("Failed to load buildings. Please try again.");
+      if (!url) setBuildings([]);
+    } finally {
+      setLoading(false);
+      setIsFetchingMore(false);
+    }
+  };
+
+  // Initial fetch on component mount
   useEffect(() => {
-    const fetchBuildings = async () => {
-      setLoading(true);
-      try {
-        const companyId = getUserCompanyId();
-        if (!companyId) throw new Error("Company ID not found.");
-        const response = await axios.get(`${BASE_URL}/company/buildings/company/${companyId}`);
-        const fetchedBuildings = Array.isArray(response.data) ? response.data : [];
-        setBuildings(fetchedBuildings);
-        setError(null);
-      } catch (error) {
-        console.error("Error fetching buildings:", error);
-        setError("Failed to load buildings. Please try again.");
-        setBuildings([]);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchBuildings();
   }, []);
 
@@ -59,23 +69,18 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
         building_no: initialData.building_no || "",
         plot_no: initialData.plot_no || "",
       });
+      // If initialData has a buildingId and buildings list is empty, fetch buildings to ensure the selected building is in the list
+      if (buildingId && buildings.length === 0) {
+        fetchBuildings();
+      }
     }
-  }, [initialData]);
+  }, [initialData, buildings.length]);
 
-  // Fetch building details when buildingId changes
+  // Fetch building details when buildingId changes (only if not provided by initialData)
   useEffect(() => {
     const fetchBuildingDetails = async () => {
-      if (!formState.buildingId) {
-        // Reset form fields if no building is selected
-        setFormState((prev) => ({
-          ...prev,
-          building_name: "",
-          description: "",
-          building_address: "",
-          building_no: "",
-          plot_no: "",
-        }));
-        return;
+      if (!formState.buildingId || (initialData && initialData.buildingId === formState.buildingId)) {
+        return; // Skip fetch if buildingId is from initialData or empty
       }
 
       setLoading(true);
@@ -107,7 +112,31 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
       }
     };
     fetchBuildingDetails();
-  }, [formState.buildingId]);
+  }, [formState.buildingId, initialData]);
+
+  // Set up IntersectionObserver for infinite scroll
+  useEffect(() => {
+    if (!lastOptionRef.current || !nextPageUrl || isFetchingMore) return;
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && nextPageUrl) {
+          fetchBuildings(nextPageUrl);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (lastOptionRef.current) {
+      observerRef.current.observe(lastOptionRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [nextPageUrl, isFetchingMore, buildings]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -164,21 +193,25 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
               onFocus={() => setIsSelectFocused(true)}
               onBlur={() => setIsSelectFocused(false)}
               className="w-full appearance-none building-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer"
+              style={{ maxHeight: "200px", overflowY: "auto" }}
               required
-              disabled={loading}
+              disabled={loading || isFetchingMore}
             >
               <option value="">Select Building</option>
-              {loading ? (
-                <option value="">Loading...</option>
-              ) : buildings.length > 0 ? (
-                buildings.map((building) => (
-                  <option key={building.id} value={building.id}>
+              {buildings.length > 0 ? (
+                buildings.map((building, index) => (
+                  <option
+                    key={building.id}
+                    value={building.id}
+                    ref={index === buildings.length - 1 ? lastOptionRef : null}
+                  >
                     {building.building_name}
                   </option>
                 ))
               ) : (
                 <option value="">No buildings available</option>
               )}
+              {isFetchingMore && <option disabled>Loading more...</option>}
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
@@ -245,9 +278,9 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
           <button
             type="submit"
             className="w-[150px] h-[38px] next-btn duration-300"
-            disabled={loading}
+            disabled={loading || isFetchingMore}
           >
-            {loading ? "Loading..." : "Next"}
+            {loading || isFetchingMore ? "Loading..." : "Next"}
           </button>
         </div>
       </div>
