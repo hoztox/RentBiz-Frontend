@@ -35,7 +35,9 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
     const fetchIdTypes = async () => {
       try {
         const companyId = getUserCompanyId();
-        const response = await axios.get(`${BASE_URL}/company/id_type/company/${companyId}`); 
+        const response = await axios.get(
+          `${BASE_URL}/company/id_type/company/${companyId}`
+        );
         setIdTypes(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error("Error fetching ID types:", error);
@@ -49,7 +51,7 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
   // Function to get ID type title by ID
   const getIdTypeTitle = (idTypeId) => {
     if (!idTypeId) return "N/A";
-    const idType = idTypes.find(type => type.id === parseInt(idTypeId));
+    const idType = idTypes.find((type) => type.id === parseInt(idTypeId));
     return idType ? idType.title : `ID: ${idTypeId}`;
   };
 
@@ -78,21 +80,6 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
       setLoading(false);
       return;
     }
-    if (documents.length > 0) {
-      const invalidDocs = documents.filter(
-        (doc) =>
-          !doc.doc_type ||
-          !doc.number ||
-          !doc.issued_date ||
-          !doc.expiry_date ||
-          !doc.upload_file?.length
-      );
-      if (invalidDocs.length > 0) {
-        setError("All documents must have doc_type, number, dates, and at least one file.");
-        setLoading(false);
-        return;
-      }
-    }
     try {
       const getValueOrEmpty = (value) => {
         return value === null || value === undefined ? "" : value;
@@ -104,9 +91,15 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
       formDataWithFiles.append("tenant_name", tenant.tenant_name);
       formDataWithFiles.append("nationality", tenant.nationality);
       formDataWithFiles.append("phone", tenant.phone);
-      formDataWithFiles.append("alternative_phone", getValueOrEmpty(tenant.alternative_phone));
+      formDataWithFiles.append(
+        "alternative_phone",
+        getValueOrEmpty(tenant.alternative_phone)
+      );
       formDataWithFiles.append("email", tenant.email);
-      formDataWithFiles.append("description", getValueOrEmpty(tenant.description));
+      formDataWithFiles.append(
+        "description",
+        getValueOrEmpty(tenant.description)
+      );
       formDataWithFiles.append("address", tenant.address);
       formDataWithFiles.append("tenant_type", tenant.tenant_type);
       formDataWithFiles.append("license_no", tenant.license_no);
@@ -116,7 +109,10 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
       formDataWithFiles.append("sponser_name", tenant.sponser_name);
       formDataWithFiles.append("sponser_id_type", tenant.sponser_id_type);
       formDataWithFiles.append("sponser_id_number", tenant.sponser_id_number);
-      formDataWithFiles.append("sponser_id_validity_date", tenant.sponser_id_validity_date);
+      formDataWithFiles.append(
+        "sponser_id_validity_date",
+        tenant.sponser_id_validity_date
+      );
       formDataWithFiles.append("status", tenant.status);
       formDataWithFiles.append("remarks", getValueOrEmpty(tenant.remarks));
       // Prepare documents in the format backend expects
@@ -126,20 +122,29 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
           number: doc.number,
           issued_date: doc.issued_date,
           expiry_date: doc.expiry_date,
-          file_index: index // This tells backend which file corresponds to this document
+          file_index: index, // This tells backend which file corresponds to this document
         }));
         // Add document JSON data
-        formDataWithFiles.append("document_comp_json", JSON.stringify(documentData));
+        formDataWithFiles.append(
+          "document_comp_json",
+          JSON.stringify(documentData)
+        );
         // Add document files with the expected naming convention
         documents.forEach((doc, index) => {
           if (doc.upload_file && doc.upload_file[0]) {
-            formDataWithFiles.append(`document_file_${index}`, doc.upload_file[0]);
+            formDataWithFiles.append(
+              `document_file_${index}`,
+              doc.upload_file[0]
+            );
           }
         });
       }
       console.log("FormData contents:");
       for (const [key, value] of formDataWithFiles.entries()) {
-        console.log(`${key}:`, value instanceof File ? `File: ${value.name}` : value);
+        console.log(
+          `${key}:`,
+          value instanceof File ? `File: ${value.name}` : value
+        );
       }
       const response = await axios.post(
         `${BASE_URL}/company/tenant/create/`,
@@ -210,7 +215,9 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
             </div>
             <div>
               <p className="review-page-label">Sponsor ID Number *</p>
-              <p className="review-page-data">{tenant.sponser_id_number || "N/A"}</p>
+              <p className="review-page-data">
+                {tenant.sponser_id_number || "N/A"}
+              </p>
             </div>
             <div>
               <p className="review-page-label">Status *</p>
@@ -224,7 +231,9 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
             </div>
             <div>
               <p className="review-page-label">Alternative Mobile Number</p>
-              <p className="review-page-data">{tenant.alternative_phone || "N/A"}</p>
+              <p className="review-page-data">
+                {tenant.alternative_phone || "N/A"}
+              </p>
             </div>
             <div>
               <p className="review-page-label">Description</p>
@@ -236,19 +245,27 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
             </div>
             <div>
               <p className="review-page-label">ID Type</p>
-              <p className="review-page-data">{getIdTypeTitle(tenant.id_type)}</p>
+              <p className="review-page-data">
+                {getIdTypeTitle(tenant.id_type)}
+              </p>
             </div>
             <div>
               <p className="review-page-label">ID Validity</p>
-              <p className="review-page-data">{tenant.id_validity_date || "N/A"}</p>
+              <p className="review-page-data">
+                {tenant.id_validity_date || "N/A"}
+              </p>
             </div>
             <div>
               <p className="review-page-label">Sponsor ID Type *</p>
-              <p className="review-page-data">{getIdTypeTitle(tenant.sponser_id_type)}</p>
+              <p className="review-page-data">
+                {getIdTypeTitle(tenant.sponser_id_type)}
+              </p>
             </div>
             <div>
               <p className="review-page-label">Sponsor ID Validity *</p>
-              <p className="review-page-data">{tenant.sponser_id_validity_date || "N/A"}</p>
+              <p className="review-page-data">
+                {tenant.sponser_id_validity_date || "N/A"}
+              </p>
             </div>
             <div>
               <p className="review-page-label">Remarks</p>

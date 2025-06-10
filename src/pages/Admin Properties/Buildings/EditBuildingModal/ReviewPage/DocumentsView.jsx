@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./documentview.css";
 import { BASE_URL } from "../../../../../utils/config";
 
@@ -49,31 +49,29 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
   };
 
   const getDocumentIcon = (type) => {
-    try {
-      switch (type) {
-        case "pdf":
-          return <FileText className="text-blue-500" size={24} />;
-        case "image":
-          return <Image className="text-blue-500" size={24} />;
-        default:
-          return <File className="text-blue-500" size={24} />;
-      }
-    } catch (error) {
-      console.error("Failed to render lucide-react icon:", error);
-      return <span className="text-blue-500">📄</span>;
+    switch (type) {
+      case "pdf":
+        return <span className="text-blue-500">📕</span>;
+      case "image":
+        return <span className="text-blue-500">🖼️</span>;
+      default:
+        return <span className="text-blue-500">📄</span>;
     }
   };
 
   const getFileSource = (file) => {
     if (!file || (typeof file === "string" && file.includes("The submitted data was not a file"))) {
+      console.warn("Invalid file data:", file);
       return null;
     }
     if (file instanceof File) {
       return URL.createObjectURL(file);
     }
     if (typeof file === "string") {
-      return file.startsWith("http") ? file : `${BASE_URL}${file.startsWith("/") ? "" : "/"}${file}`;
+      const url = file.startsWith("http") ? file : `${BASE_URL}${file.startsWith("/") ? "" : "/"}${file}`;
+      return url;
     }
+    console.warn("Unexpected file type:", file);
     return null;
   };
 
@@ -89,7 +87,25 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
     }
   };
 
-  console.log("DocumentsView: Visible documents:", visibleDocuments);
+  // Cleanup object URLs on component unmount
+  useEffect(() => {
+    return () => {
+      visibleDocuments.forEach((doc) => {
+        const file = Array.isArray(doc.upload_file) ? doc.upload_file[0] : doc.upload_file;
+        if (file instanceof File) {
+          const url = getFileSource(file);
+          if (url) URL.revokeObjectURL(url);
+        }
+      });
+    };
+  }, [visibleDocuments]);
+
+  console.log("DocumentsView: Visible documents:", visibleDocuments.map(doc => ({
+    ...doc,
+    upload_file: doc.upload_file,
+    fileSrc: getFileSource(Array.isArray(doc.upload_file) ? doc.upload_file[0] : doc.upload_file),
+    fileType: getDocumentInfo(Array.isArray(doc.upload_file) ? doc.upload_file[0] : doc.upload_file).type
+  })));
 
   return (
     <div className="flex flex-col w-full max-w-full overflow-x-hidden">
@@ -110,7 +126,7 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
 
               return (
                 <div
-                  key={index}
+                  key={doc.id || index}
                   className="flex flex-col w-full max-w-[150px] min-[480px]:max-w-none mx-auto min-[480px]:mx-0"
                 >
                   <div className="bg-gray-100 rounded-md overflow-hidden cursor-pointer box-border relative">
@@ -126,24 +142,24 @@ const DocumentsView = ({ documents = [], docTypes = [] }) => {
                             }
                           }}
                           onError={(e) => {
-                            console.error("Failed to load image:", name);
+                            console.error("Failed to load image:", name, fileSrc);
                             e.target.style.display = "none";
                             e.target.parentNode.innerHTML = `
                               <div class="w-full h-[220px] flex items-center justify-center bg-[#1458A2]">
-                                <span className="text-blue-500">📄</span>
+                                <span className="text-blue-500">🖼️</span>
                               </div>
                             `;
                           }}
                         />
                       ) : (
                         <div className="w-full h-auto max-h-[120px] min-[480px]:h-[220px] min-[480px]:max-h-[220px] aspect-[4/3] flex items-center justify-center bg-[#1458A2]">
-                          {getDocumentIcon(type)}
+                          {fileSrc ? getDocumentIcon(type) : <span className="text-blue-500">📄</span>}
                         </div>
                       )}
                     </div>
                     <div className="p-2 min-[480px]:p-2 min-[480px]:px-3 bg-[#1458A2] text-start">
                       <p className="document-name text-white text-xs min-[480px]:text-base truncate">
-                        {getDocTypeName(doc.doc_type)} {name}
+                        {getDocTypeName(doc.doc_type)} - {name}
                       </p>
                     </div>
                   </div>

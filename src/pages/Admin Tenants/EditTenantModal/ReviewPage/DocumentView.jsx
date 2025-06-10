@@ -14,7 +14,7 @@ const DocumentView = ({ documents = [], docTypes = [] }) => {
   const totalPages = Math.ceil(safeDocuments.length / documentsPerPage);
 
   const getDocTypeName = (docType) => {
-    if (!docTypes.length) return docType || "N/A";
+    if (!docType) return "N/A";
     const type = docTypes.find((t) => t.id === parseInt(docType));
     return type ? type.title : docType || "N/A";
   };
@@ -26,7 +26,7 @@ const DocumentView = ({ documents = [], docTypes = [] }) => {
 
     let extension, name;
     if (typeof file === "string") {
-      const fileName = file.split("/").pop();
+      const fileName = file.split("/").pop() || "Unknown File";
       extension = fileName.split(".").pop()?.toLowerCase() || "";
       name = fileName;
     } else if (file instanceof File) {
@@ -107,7 +107,7 @@ const DocumentView = ({ documents = [], docTypes = [] }) => {
                 ? getDocumentInfo(file)
                 : {
                     type: "unknown",
-                    name: doc.number || `Document ${index + 1}`,
+                    name: doc.number || `Document ${startIndex + index + 1}`,
                   };
               const fileSrc = getFileSource(file);
 
@@ -143,7 +143,7 @@ const DocumentView = ({ documents = [], docTypes = [] }) => {
                     </div>
                     <div className="p-2 min-[480px]:p-2 min-[480px]:px-3 bg-[#1458A2] text-start">
                       <p className="document-name text-white text-xs min-[480px]:text-base truncate">
-                        {getDocTypeName} {name}
+                        {getDocTypeName(doc.doc_type)} {name}
                       </p>
                     </div>
                   </div>
