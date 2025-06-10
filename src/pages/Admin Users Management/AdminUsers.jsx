@@ -11,7 +11,7 @@ import { useModal } from "../../context/ModalContext";
 import { BASE_URL } from "../../utils/config";
 import UserDeleteModal from "./UserDeleteModal/UserDeleteModal";
 import CustomDropDown from "../../components/CustomDropDown";
-
+import { motion, AnimatePresence } from "framer-motion";
 
 const AdminUsers = () => {
   const [selectedOption, setSelectedOption] = useState("showing");
@@ -172,6 +172,25 @@ const AdminUsers = () => {
       ...prev,
       [id]: !prev[id],
     }));
+  };
+
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
   };
 
   const isBlocked = (id) =>
@@ -408,90 +427,100 @@ const AdminUsers = () => {
                       </div>
                     </td>
                   </tr>
-                  {expandedRows[user.id] && (
-                    <tr className="mobile-with-border border-b border-[#E9E9E9]">
-                      <td colSpan={3} className="px-5">
-                        <div className="user-dropdown-content">
-                          <div className="user-grid">
-                            <div className="user-grid-item w-[33.33%]">
-                              <div className="dropdown-label">CREATED DATE</div>
-                              <div className="dropdown-value">
-                                {user.created_at
-                                  ? new Date(
-                                      user.created_at
-                                    ).toLocaleDateString("en-GB", {
-                                      day: "2-digit",
-                                      month: "short",
-                                      year: "numeric",
-                                    })
-                                  : "N/A"}
+                  <AnimatePresence>
+                    {expandedRows[user.id] && (
+                      <motion.tr
+                        className="mobile-with-border border-b border-[#E9E9E9]"
+                        initial="hidden"
+                        animate="visible"
+                        exit="hidden"
+                        variants={dropdownVariants}
+                      >
+                        <td colSpan={3} className="px-5">
+                          <div className="user-dropdown-content">
+                            <div className="user-grid">
+                              <div className="user-grid-item w-[33.33%]">
+                                <div className="dropdown-label">
+                                  CREATED DATE
+                                </div>
+                                <div className="dropdown-value">
+                                  {user.created_at
+                                    ? new Date(
+                                        user.created_at
+                                      ).toLocaleDateString("en-GB", {
+                                        day: "2-digit",
+                                        month: "short",
+                                        year: "numeric",
+                                      })
+                                    : "N/A"}
+                                </div>
+                              </div>
+                              <div className="user-grid-item w-[35.33%]">
+                                <div className="dropdown-label">USERNAME</div>
+                                <div className="dropdown-value">
+                                  {user.username || "N/A"}
+                                </div>
+                              </div>
+                              <div className="user-grid-item w-[20%]">
+                                <div className="dropdown-label">ROLE</div>
+                                <div className="dropdown-value">
+                                  {user.user_role || "N/A"}
+                                </div>
                               </div>
                             </div>
-                            <div className="user-grid-item w-[35.33%]">
-                              <div className="dropdown-label">USERNAME</div>
-                              <div className="dropdown-value">
-                                {user.username || "N/A"}
+                            <div className="user-grid">
+                              <div className="user-grid-item w-[33.33%]">
+                                <div className="dropdown-label !mb-[10px]">
+                                  STATUS
+                                </div>
+                                <div className="dropdown-value">
+                                  <span
+                                    className={`px-[10px] py-[5px] w-[53px] h-[24px] rounded-[4px] user-status ${
+                                      user.status === "active"
+                                        ? "bg-[#e1ffea] text-[#28C76F]"
+                                        : "bg-[#FFE1E1] text-[#C72828] !pr-[5px] !pl-[5px]"
+                                    }`}
+                                  >
+                                    {user.status.charAt(0).toUpperCase() +
+                                      user.status.slice(1)}
+                                  </span>
+                                </div>
                               </div>
-                            </div>
-                            <div className="user-grid-item w-[20%]">
-                              <div className="dropdown-label">ROLE</div>
-                              <div className="dropdown-value">
-                                {user.user_role || "N/A"}
+                              <div className="user-grid-item w-[35.33%]">
+                                <div className="dropdown-label">BLOCK</div>
+                                <div className="dropdown-value flex items-center gap-2 mt-[10px]">
+                                  <ToggleSwitch
+                                    id={user.id}
+                                    isActive={isBlocked(user.id)}
+                                    onChange={handleToggle}
+                                  />
+                                </div>
+                              </div>
+                              <div className="user-grid-item w-[20%]">
+                                <div className="dropdown-label">ACTION</div>
+                                <div className="dropdown-value flex items-center gap-[15px] ml-[5px] mt-[10px]">
+                                  <button onClick={() => handleEditUser(user)}>
+                                    <img
+                                      src={editicon}
+                                      alt="Edit"
+                                      className="w-[18px] h-[18px] action-btn duration-200"
+                                    />
+                                  </button>
+                                  <button onClick={() => handleDelete(user.id)}>
+                                    <img
+                                      src={deletesicon}
+                                      alt="Delete"
+                                      className="w-[18px] h-[18px] action-btn duration-200"
+                                    />
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </div>
-                          <div className="user-grid">
-                            <div className="user-grid-item w-[33.33%]">
-                              <div className="dropdown-label !mb-[10px]">
-                                STATUS
-                              </div>
-                              <div className="dropdown-value">
-                                <span
-                                  className={`px-[10px] py-[5px] w-[53px] h-[24px] rounded-[4px] user-status ${
-                                    user.status === "active"
-                                      ? "bg-[#e1ffea] text-[#28C76F]"
-                                      : "bg-[#FFE1E1] text-[#C72828] !pr-[5px] !pl-[5px]"
-                                  }`}
-                                >
-                                  {user.status.charAt(0).toUpperCase() +
-                                    user.status.slice(1)}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="user-grid-item w-[35.33%]">
-                              <div className="dropdown-label">BLOCK</div>
-                              <div className="dropdown-value flex items-center gap-2 mt-[10px]">
-                                <ToggleSwitch
-                                  id={user.id}
-                                  isActive={isBlocked(user.id)}
-                                  onChange={handleToggle}
-                                />
-                              </div>
-                            </div>
-                            <div className="user-grid-item w-[20%]">
-                              <div className="dropdown-label">ACTION</div>
-                              <div className="dropdown-value flex items-center gap-[15px] ml-[5px] mt-[10px]">
-                                <button onClick={() => handleEditUser(user)}>
-                                  <img
-                                    src={editicon}
-                                    alt="Edit"
-                                    className="w-[18px] h-[18px] action-btn duration-200"
-                                  />
-                                </button>
-                                <button onClick={() => handleDelete(user.id)}>
-                                  <img
-                                    src={deletesicon}
-                                    alt="Delete"
-                                    className="w-[18px] h-[18px] action-btn duration-200"
-                                  />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
+                        </td>
+                      </motion.tr>
+                    )}
+                  </AnimatePresence>
                 </React.Fragment>
               ))
             )}

@@ -10,10 +10,11 @@ import { BASE_URL } from "../../../utils/config";
 import DeleteBuildingModal from "./DeleteBuildingModal/DeleteBuildingModal";
 import { useModal } from "../../../context/ModalContext";
 import CustomDropDown from "../../../components/CustomDropDown";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Buildings = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState("");
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
@@ -24,8 +25,6 @@ const Buildings = () => {
   const [buildingToDelete, setBuildingToDelete] = useState(null);
   const [error, setError] = useState(null);
   const itemsPerPage = 10;
-
-
 
   // Dropdown options for status filter
   const statusFilterOptions = [
@@ -88,43 +87,61 @@ const Buildings = () => {
   useEffect(() => {
     const fetchBuildings = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/company/buildings/company/${companyId}`, {
-          params: { search: searchTerm, status: statusFilter, page: currentPage, page_size: itemsPerPage }
-        });
+        const response = await axios.get(
+          `${BASE_URL}/company/buildings/company/${companyId}`,
+          {
+            params: {
+              search: searchTerm,
+              status: statusFilter,
+              page: currentPage,
+              page_size: itemsPerPage,
+            },
+          }
+        );
         setBuildings(response.data.results);
         setTotalCount(response.data.count);
       } catch (error) {
-        console.error('Error fetching buildings:', error);
+        console.error("Error fetching buildings:", error);
       }
     };
 
     if (companyId) {
       fetchBuildings();
     }
-  }, [searchTerm, companyId, statusFilter, currentPage, itemsPerPage, refreshCounter]);
+  }, [
+    searchTerm,
+    companyId,
+    statusFilter,
+    currentPage,
+    itemsPerPage,
+    refreshCounter,
+  ]);
 
   const totalPages = Math.ceil(totalCount / itemsPerPage);
   const paginatedData = buildings;
 
   const deleteBuilding = async () => {
-      try {
-        const response = await axios.delete(
-          `${BASE_URL}/company/buildings/${buildingToDelete}/`
+    try {
+      const response = await axios.delete(
+        `${BASE_URL}/company/buildings/${buildingToDelete}/`
+      );
+      if (response.status === 204) {
+        setBuildings(
+          buildings.filter((building) => building.id !== buildingToDelete)
         );
-        if (response.status === 204) {
-          setBuildings(
-            buildings.filter((building) => building.id !== buildingToDelete)
-          );
-          setDeleteModalOpen(false);
-          console.log("Buildings: Successfully deleted building", buildingToDelete);
-        }
-      } catch (err) {
-        console.error("Failed to delete building", err);
-        setError(
-          "Failed to delete building: " +
-          (err.response?.data?.message || err.message)
+        setDeleteModalOpen(false);
+        console.log(
+          "Buildings: Successfully deleted building",
+          buildingToDelete
         );
       }
+    } catch (err) {
+      console.error("Failed to delete building", err);
+      setError(
+        "Failed to delete building: " +
+          (err.response?.data?.message || err.message)
+      );
+    }
   };
 
   const handleEditClick = (buildingId) => {
@@ -135,6 +152,27 @@ const Buildings = () => {
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        type: "spring",
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        type: "spring",
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
+  };
 
   // if (loading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500 p-5">{error}</div>;
@@ -174,7 +212,7 @@ const Buildings = () => {
                 className="relative right-[5px] md:right-0 w-[15px] h-[15px]"
               />
             </button>
-            <button className="flex items-center justify-center gap-[2] w-full md:w-[122px] h-[38px] rounded-md duration-200 bldg-download-btn">
+            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 bldg-download-btn">
               Download
               <img
                 src={downloadicon}
@@ -227,9 +265,10 @@ const Buildings = () => {
                 </td>
                 <td className="px-5 text-left bldg-data">
                   <span
-                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${building.status === "active"
-                      ? "bg-[#e1ffea] text-[#28C76F]"
-                      : building.status === "inactive"
+                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
+                      building.status === "active"
+                        ? "bg-[#e1ffea] text-[#28C76F]"
+                        : building.status === "inactive"
                         ? "bg-[#FFE1E1] text-[#C72828]"
                         : "bg-[#FFF4E1] text-[#FFA500]"
                     }`}
@@ -271,7 +310,9 @@ const Buildings = () => {
           <thead>
             <tr className="bldg-table-row-head">
               <th className="px-5 text-left bldg-thead bldg-id-column">ID</th>
-              <th className="px-5 text-left bldg-thead bldg-date-column">NAME</th>
+              <th className="px-5 text-left bldg-thead bldg-date-column">
+                NAME
+              </th>
               <th className="px-5 text-right bldg-thead"></th>
             </tr>
           </thead>
@@ -279,9 +320,10 @@ const Buildings = () => {
             {paginatedData.map((building, index) => (
               <React.Fragment key={building.id || index}>
                 <tr
-                  className={`${expandedRows[building.building_no]
-                    ? "bldg-mobile-no-border"
-                    : "bldg-mobile-with-border"
+                  className={`${
+                    expandedRows[building.building_no]
+                      ? "bldg-mobile-no-border"
+                      : "bldg-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
                   <td className="px-5 text-left bldg-data bldg-id-column">
@@ -292,100 +334,118 @@ const Buildings = () => {
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
-                      className={`bldg-dropdown-field ${expandedRows[building.building_no] ? "active" : ""
+                      className={`bldg-dropdown-field ${
+                        expandedRows[building.building_no] ? "active" : ""
                       }`}
                       onClick={() => toggleRowExpand(building.building_no)}
                     >
                       <img
                         src={downarrow}
                         alt="drop-down-arrow"
-                        className={`bldg-dropdown-img ${expandedRows[building.building_no] ? "text-white" : ""
+                        className={`bldg-dropdown-img ${
+                          expandedRows[building.building_no] ? "text-white" : ""
                         }`}
                       />
                     </div>
                   </td>
                 </tr>
-                {expandedRows[building.building_no] && (
-                  <tr className="bldg-mobile-with-border border-b border-[#E9E9E9]">
-                    <td colSpan={3} className="px-5">
-                      <div className="bldg-dropdown-content">
-                        <div className="bldg-grid">
-                          <div className="bldg-grid-item w-[45%]">
-                            <div className="bldg-dropdown-label">DATE</div>
-                            <div className="bldg-dropdown-value">
-                              {new Date(building.created_at).toLocaleDateString(
-                                "en-GB",
-                                {
+                <AnimatePresence>
+                  {expandedRows[building.building_no] && (
+                    <motion.tr
+                      className="bldg-mobile-with-border border-b border-[#E9E9E9]"
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={dropdownVariants}
+                    >
+                      <td colSpan={3} className="px-5">
+                        <motion.div
+                          className="bldg-dropdown-content"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3, ease: "easeInOut" }}
+                        >
+                          <div className="bldg-grid">
+                            <div className="bldg-grid-item w-[45%]">
+                              <div className="bldg-dropdown-label">DATE</div>
+                              <div className="bldg-dropdown-value">
+                                {new Date(
+                                  building.created_at
+                                ).toLocaleDateString("en-GB", {
                                   day: "2-digit",
                                   month: "short",
                                   year: "numeric",
-                                }
-                              )}
+                                })}
+                              </div>
+                            </div>
+                            <div className="bldg-grid-item w-[60%]">
+                              <div className="bldg-dropdown-label">ADDRESS</div>
+                              <div className="bldg-dropdown-value">
+                                {building.building_address || "N/A"}
+                              </div>
                             </div>
                           </div>
-                          <div className="bldg-grid-item w-[60%]">
-                            <div className="bldg-dropdown-label">ADDRESS</div>
-                            <div className="bldg-dropdown-value">
-                              {building.building_address || "N/A"}
+                          <div className="bldg-grid">
+                            <div className="bldg-grid-item w-[33%]">
+                              <div className="bldg-dropdown-label">
+                                NO. OF UNITS
+                              </div>
+                              <div className="bldg-dropdown-value">
+                                {building.unit_count || "N/A"}
+                              </div>
+                            </div>
+                            <div className="bldg-grid-item w-[27%]">
+                              <div className="bldg-dropdown-label">STATUS</div>
+                              <div className="bldg-dropdown-value">
+                                <span
+                                  className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] bldg-status ${
+                                    building.status === "active"
+                                      ? "bg-[#e1ffea] text-[#28C76F]"
+                                      : building.status === "inactive"
+                                      ? "bg-[#FFE1E1] text-[#C72828]"
+                                      : "bg-[#FFF4E1] text-[#FFA500]"
+                                  }`}
+                                >
+                                  {building.status
+                                    ? building.status.charAt(0).toUpperCase() +
+                                      building.status.slice(1)
+                                    : "N/A"}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="bldg-grid-item bldg-action-column w-[20%]">
+                              <div className="bldg-dropdown-label">ACTION</div>
+                              <div className="bldg-dropdown-value bldg-flex bldg-items-center bldg-gap-2">
+                                <button
+                                  onClick={() => handleEditClick(building.id)}
+                                >
+                                  <img
+                                    src={editicon}
+                                    alt="Edit"
+                                    className="w-[18px] h-[18px] bldg-action-btn duration-200"
+                                  />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setBuildingToDelete(building.id);
+                                    setDeleteModalOpen(true);
+                                  }}
+                                >
+                                  <img
+                                    src={deletesicon}
+                                    alt="Delete"
+                                    className="w-[18px] h-[18px] bldg-action-btn duration-200"
+                                  />
+                                </button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="bldg-grid">
-                          <div className="bldg-grid-item w-[33%]">
-                            <div className="bldg-dropdown-label">
-                              NO. OF UNITS
-                            </div>
-                            <div className="bldg-dropdown-value">{building.unit_count || "N/A"}</div>
-                          </div>
-                          <div className="bldg-grid-item w-[27%]">
-                            <div className="bldg-dropdown-label">STATUS</div>
-                            <div className="bldg-dropdown-value">
-                              <span
-                                className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] bldg-status ${building.status === "active"
-                                  ? "bg-[#e1ffea] text-[#28C76F]"
-                                  : building.status === "inactive"
-                                    ? "bg-[#FFE1E1] text-[#C72828]"
-                                    : "bg-[#FFF4E1] text-[#FFA500]"
-                                }`}
-                              >
-                                {building.status
-                                  ? building.status.charAt(0).toUpperCase() +
-                                    building.status.slice(1)
-                                  : "N/A"}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="bldg-grid-item bldg-action-column w-[20%]">
-                            <div className="bldg-dropdown-label">ACTION</div>
-                            <div className="bldg-dropdown-value bldg-flex bldg-items-center bldg-gap-2">
-                              <button
-                                onClick={() => handleEditClick(building.id)}
-                              >
-                                <img
-                                  src={editicon}
-                                  alt="Edit"
-                                  className="w-[18px] h-[18px] bldg-action-btn duration-200"
-                                />
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setBuildingToDelete(building.id);
-                                  setDeleteModalOpen(true);
-                                }}
-                              >
-                                <img
-                                  src={deletesicon}
-                                  alt="Delete"
-                                  className="w-[18px] h-[18px] bldg-action-btn duration-200"
-                                />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
+                        </motion.div>
+                      </td>
+                    </motion.tr>
+                  )}
+                </AnimatePresence>
               </React.Fragment>
             ))}
           </tbody>
@@ -393,10 +453,9 @@ const Buildings = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 bldg-pagination-container">
         <span className="bldg-pagination bldg-collection-list-pagination">
-          Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, totalCount)}{" "}
-          to {Math.min(currentPage * itemsPerPage, totalCount)} of{" "}
-          {totalCount} entries
+          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, totalCount)}{" "}
+          to {Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount}{" "}
+          entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto bldg-pagination-buttons">
           <button
