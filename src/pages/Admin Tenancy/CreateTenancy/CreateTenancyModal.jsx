@@ -47,8 +47,8 @@ const CreateTenancyModal = () => {
       reason: "",
       due_date: "",
       amount: "",
-      tax: "",
-      total: "",
+      tax: "0.00",
+      total: "0.00",
       tax_details: [],
     },
   ]);
@@ -194,6 +194,79 @@ const CreateTenancyModal = () => {
     fetchPaymentSchedulePreview();
   }, [showPaymentSchedule]);
 
+  // Fetch tax preview for additional charges when charge_type, amount, or due_date changes
+  useEffect(() => {
+    const fetchTaxPreview = async (charge) => {
+      const companyId = getUserCompanyId();
+      if (
+        companyId &&
+        charge.charge_type &&
+        charge.amount &&
+        charge.due_date &&
+        charge.reason
+      ) {
+        try {
+          const previewPayload = {
+            company: companyId,
+            charge_type: parseInt(charge.charge_type),
+            amount: parseFloat(charge.amount),
+            due_date: charge.due_date,
+            reason: charge.reason,
+          };
+
+          const response = await axios.post(
+            `${BASE_URL}/company/tenancies/preview-additional-charge-tax/`,
+            previewPayload
+          );
+          const { additional_charge } = response.data;
+
+          setAdditionalCharges((prev) =>
+            prev.map((c) =>
+              c.id === charge.id
+                ? {
+                    ...c,
+                    tax: additional_charge.tax.toFixed(2),
+                    total: additional_charge.total.toFixed(2),
+                    tax_details: additional_charge.tax_details,
+                  }
+                : c
+            )
+          );
+        } catch (error) {
+          console.error("Error fetching tax preview for additional charge:", error);
+          setAdditionalCharges((prev) =>
+            prev.map((c) =>
+              c.id === charge.id
+                ? { ...c, tax: "0.00", total: c.amount || "0.00", tax_details: [] }
+                : c
+            )
+          );
+        }
+      } else {
+        setAdditionalCharges((prev) =>
+          prev.map((c) =>
+            c.id === charge.id
+              ? { ...c, tax: "0.00", total: c.amount || "0.00", tax_details: [] }
+              : c
+          )
+        );
+      }
+    };
+
+    additionalCharges.forEach((charge) => {
+      fetchTaxPreview(charge);
+    });
+  }, [
+    JSON.stringify(
+      additionalCharges.map(({ charge_type, amount, due_date, reason }) => ({
+        charge_type,
+        amount,
+        due_date,
+        reason,
+      }))
+    ),
+  ]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -205,36 +278,9 @@ const CreateTenancyModal = () => {
 
   const handleAdditionalChargeChange = (id, field, value) => {
     setAdditionalCharges((prev) =>
-      prev.map((charge) => {
-        if (charge.id === id) {
-          const updatedCharge = { ...charge, [field]: value };
-          if (
-            field === "charge_type" ||
-            field === "amount" ||
-            field === "due_date"
-          ) {
-            const selectedChargeType = chargeTypes.find(
-              (type) => type.id === parseInt(updatedCharge.charge_type)
-            );
-            if (
-              selectedChargeType &&
-              updatedCharge.amount &&
-              updatedCharge.due_date
-            ) {
-              const amount = parseFloat(updatedCharge.amount || 0);
-              updatedCharge.tax = "0.00";
-              updatedCharge.total = amount.toFixed(2);
-              updatedCharge.tax_details = [];
-            } else {
-              updatedCharge.tax = "0.00";
-              updatedCharge.total = updatedCharge.amount || "0.00";
-              updatedCharge.tax_details = [];
-            }
-          }
-          return updatedCharge;
-        }
-        return charge;
-      })
+      prev.map((charge) =>
+        charge.id === id ? { ...charge, [field]: value } : charge
+      )
     );
   };
 
@@ -266,17 +312,15 @@ const CreateTenancyModal = () => {
         reason: "",
         due_date: "",
         amount: "",
-        tax: "",
-        total: "",
+        tax: "0.00",
+        total: "0.00",
         tax_details: [],
       },
     ]);
   };
 
   const removeRow = (id) => {
-    setAdditionalCharges(
-      additionalCharges.filter((charge) => charge.id !== id)
-    );
+    setAdditionalCharges(additionalCharges.filter((charge) => charge.id !== id));
   };
 
   const toggleSelectOpen = (field) => {
@@ -323,55 +367,6 @@ const CreateTenancyModal = () => {
     const companyId = getUserCompanyId();
     const userId = getRelevantUserId();
 
-    let updatedAdditionalCharges = [...additionalCharges];
-    try {
-      for (let i = 0; i < additionalCharges.length; i++) {
-        const charge = additionalCharges[i];
-        const previewPayload = {
-          company: companyId,
-          rental_months: 1,
-          no_payments: 0,
-          first_rent_due_on: charge.due_date,
-          rent_per_frequency: 0,
-          deposit: 0,
-          commission: 0,
-          start_date: charge.due_date,
-          [chargeTypes
-            .find((type) => type.id === parseInt(charge.charge_type))
-            ?.name.toLowerCase()]: parseFloat(charge.amount),
-        };
-
-        const response = await axios.post(
-          `${BASE_URL}/company/tenancies/preview-payment-schedule/`,
-          previewPayload
-        );
-        const schedule = response.data.payment_schedules.find(
-          (s) =>
-            s.charge_type_name.toLowerCase() ===
-            chargeTypes
-              .find((type) => type.id === parseInt(charge.charge_type))
-              ?.name.toLowerCase()
-        );
-        if (schedule) {
-          updatedAdditionalCharges[i] = {
-            ...charge,
-            tax: schedule.tax.toFixed(2),
-            total: schedule.total.toFixed(2),
-            tax_details: schedule.tax_details,
-          };
-        }
-      }
-    } catch (error) {
-      console.error(
-        "Error fetching tax details for additional charges:",
-        error
-      );
-      alert(
-        "Failed to calculate taxes for additional charges. Please try again."
-      );
-      return;
-    }
-
     const payload = {
       company: companyId,
       user: userId,
@@ -383,13 +378,11 @@ const CreateTenancyModal = () => {
       end_date: formData.end_date,
       no_payments: parseInt(formData.no_payments),
       first_rent_due_on: formData.first_rent_due_on,
-      rent_per_frequency: parseFloat(formData.rent_per_frequency || 0).toFixed(
-        2
-      ),
+      rent_per_frequency: parseFloat(formData.rent_per_frequency || 0).toFixed(2),
       deposit: parseFloat(formData.deposit || 0).toFixed(2),
       commission: parseFloat(formData.commission || 0).toFixed(2),
       remarks: formData.remarks,
-      additional_charges: updatedAdditionalCharges.map((charge) => ({
+      additional_charges: additionalCharges.map((charge) => ({
         charge_type: parseInt(charge.charge_type),
         reason: charge.reason,
         due_date: charge.due_date,
@@ -781,9 +774,9 @@ const CreateTenancyModal = () => {
                           <button
                             onClick={() => showTaxDetails(charge.id, true)}
                             className="text-[#2892CE] underline"
-                            disabled={!charge.tax}
+                            disabled={charge.tax === "0.00"}
                           >
-                            {charge.tax || "0.00"}
+                            {charge.tax}
                           </button>
                         </td>
                         <td className="px-[10px] py-[5px] w-[43px] text-[14px] text-[#201D1E]">
@@ -925,9 +918,9 @@ const CreateTenancyModal = () => {
                         <button
                           onClick={() => showTaxDetails(charge.id, true)}
                           className="text-[#2892CE] underline"
-                          disabled={!charge.tax}
+                          disabled={charge.tax === "0.00"}
                         >
-                          {charge.tax || "0.00"}
+                          {charge.tax}
                         </button>
                       </div>
                       <div className="px-[10px] py-[13px] w-full text-[14px] text-[#201D1E]">
@@ -1200,7 +1193,6 @@ const CreateTenancyModal = () => {
                     <p>No tax details available.</p>
                   )}
                 </div>
-
               </div>
             </div>
           )}
