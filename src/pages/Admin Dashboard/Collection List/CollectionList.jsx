@@ -16,14 +16,10 @@ const CollectionList = () => {
 
     const toggleDropdown = (collectionId) => {
         setActiveDropdowns(prev => {
-            // Create a new object where only the clicked traveler's dropdown is open
             const newActiveDropdowns = {};
-
-            // If the clicked dropdown is not already open, open it
             if (!prev[collectionId]) {
                 newActiveDropdowns[collectionId] = true;
             }
-
             return newActiveDropdowns;
         });
     };
@@ -68,11 +64,11 @@ const CollectionList = () => {
         );
 
     // Calculate pagination
-    const totalItems = filteredData.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
-    const currentItems = filteredData.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    const paginatedData = filteredData.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
 
     // Reset to first page when filter changes
     useEffect(() => {
@@ -89,52 +85,10 @@ const CollectionList = () => {
         setActiveFilter(filter);
     };
 
-    // Generate pagination buttons
-    const generatePaginationButtons = () => {
-        const buttons = [];
-        const maxButtonsToShow = 5;
-        let startPage, endPage;
-
-        if (totalPages <= maxButtonsToShow) {
-            // Display all pages
-            startPage = 1;
-            endPage = totalPages;
-        } else {
-            // Calculate which pages to show
-            const halfButtons = Math.floor(maxButtonsToShow / 2);
-
-            if (currentPage <= halfButtons + 1) {
-                // Near the start
-                startPage = 1;
-                endPage = maxButtonsToShow;
-            } else if (currentPage >= totalPages - halfButtons) {
-                // Near the end
-                startPage = totalPages - maxButtonsToShow + 1;
-                endPage = totalPages;
-            } else {
-                // In the middle
-                startPage = currentPage - halfButtons;
-                endPage = currentPage + halfButtons;
-            }
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            buttons.push(
-                <button
-                    key={i}
-                    className={`px-4 h-[38px] rounded-[3px] cursor-pointer duration-200 page-no-btns ${currentPage === i
-                        ? 'bg-[#1458A2] text-white'
-                        : 'bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]'
-                        }`}
-                    onClick={() => setCurrentPage(i)}
-                >
-                    {i}
-                </button>
-            );
-        }
-
-        return buttons;
-    };
+    // Generate pagination buttons (Copied from AdminUsers)
+    const maxPageButtons = 5;
+    const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+    const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
     const StatusBadge = ({ status }) => {
         let bgColor = '';
@@ -214,7 +168,6 @@ const CollectionList = () => {
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
                     <div className="relative w-[121px]">
-                        {/* Dropdown button */}
                         <button
                             className="w-full px-[14px] py-[7px] border border-[#E9E9E9] rounded-md h-[38px] flex items-center justify-between cursor-pointer focus:border-gray-300 duration-150 table-drop-down-btn"
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -226,7 +179,6 @@ const CollectionList = () => {
                             />
                         </button>
 
-                        {/* Dropdown options with animation */}
                         <AnimatePresence>
                             {isDropdownOpen && (
                                 <motion.div
@@ -267,11 +219,11 @@ const CollectionList = () => {
                             <th className="px-5 collection-list-thead w-[13%] list-mob">TOTAL</th>
                             <th className="px-5 collection-list-thead list-mob">DUE DATE</th>
                             <th className="px-5 collection-list-thead text-end w-[7%] list-mob">STATUS</th>
-                            <div className="collection-drop-down-fields"></div>
+                            <th className="collection-drop-down-fields"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        {currentItems.map((item, index) => (
+                        {paginatedData.map((item, index) => (
                             <React.Fragment key={`${item.id}-${index}`}>
                                 <tr
                                     key={index}
@@ -290,7 +242,7 @@ const CollectionList = () => {
                                     <td className="px-5 collection-list-data flex justify-end items-center h-[57px] list-mob">
                                         <StatusBadge status={item.status} />
                                     </td>
-                                    <div
+                                    <td
                                         className={`collection-drop-down-field ${activeDropdowns[item.id] ? "active" : ""}`}
                                         onClick={() => toggleDropdown(item.id)}
                                     >
@@ -299,7 +251,7 @@ const CollectionList = () => {
                                             alt="drop-down arrow"
                                             className={`collection-dropdown-img w-[13px] ${activeDropdowns[item.id] ? "rotated" : ""}`}
                                         />
-                                    </div>
+                                    </td>
                                 </tr>
                                 <AnimatePresence>
                                     {activeDropdowns[item.id] && (
@@ -314,7 +266,6 @@ const CollectionList = () => {
                                             variants={dropdownVariants}
                                         >
                                             <td colSpan="4" className="pb-5">
-                                                {/* Dropdown content goes here */}
                                                 <div className="grid !grid-cols-3 px-5">
                                                     <div className='flex flex-col items-start'>
                                                         <h4 className='drop-down-head'>UNIT NAME</h4>
@@ -348,11 +299,9 @@ const CollectionList = () => {
                                                         <StatusBadge status={item.status} />
                                                     </div>
                                                     <div>
-
                                                     </div>
                                                 </div>
                                             </td>
-
                                         </motion.tr>
                                     )}
                                 </AnimatePresence>
@@ -362,26 +311,59 @@ const CollectionList = () => {
                 </table>
             </div>
 
-            {/* Pagination */}
-            <div className="flex items-center justify-between px-5 h-[78px] collection-list-pagination-div ">
-                <div className="collection-list-pagination">
-                    Showing {startIndex + 1} to {endIndex} of {totalItems} entries
-                </div>
-                <div className="flex gap-[5px]">
+            {/* Pagination (Copied from AdminUsers) */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:py-[10px] md:px-5 pagination-container">
+                <span className="pagination collection-list-pagination">
+                    Showing{" "}
+                    {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
+                    to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
+                    {filteredData.length} entries
+                </span>
+                <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
                     <button
-                        className="px-[10px] py-[6px] rounded-[3px] bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+                        className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
                         disabled={currentPage === 1}
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        onClick={() => setCurrentPage(currentPage - 1)}
                     >
                         Previous
                     </button>
-
-                    {generatePaginationButtons()}
-
+                    {startPage > 1 && (
+                        <button
+                            className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+                            onClick={() => setCurrentPage(1)}
+                        >
+                            1
+                        </button>
+                    )}
+                    {startPage > 2 && <span className="px-2 flex items-center">...</span>}
+                    {[...Array(endPage - startPage + 1)].map((_, i) => (
+                        <button
+                            key={startPage + i}
+                            className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+                                currentPage === startPage + i
+                                    ? "bg-[#1458A2] text-white"
+                                    : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+                            }`}
+                            onClick={() => setCurrentPage(startPage + i)}
+                        >
+                            {startPage + i}
+                        </button>
+                    ))}
+                    {endPage < totalPages - 1 && (
+                        <span className="px-2 flex items-center">...</span>
+                    )}
+                    {endPage < totalPages && (
+                        <button
+                            className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+                            onClick={() => setCurrentPage(totalPages)}
+                        >
+                            {totalPages}
+                        </button>
+                    )}
                     <button
-                        className="px-[10px] py-[6px] rounded-[3px] bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+                        className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
                         disabled={currentPage === totalPages}
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        onClick={() => setCurrentPage(currentPage + 1)}
                     >
                         Next
                     </button>

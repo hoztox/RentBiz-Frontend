@@ -21,17 +21,16 @@ import tenancyReport from "../../assets/Images/Admin Sidebar/tenancy report.svg"
 import upcomingCollection from "../../assets/Images/Admin Sidebar/upcoming collection.svg";
 import reportCollection from "../../assets/Images/Admin Sidebar/report collection.svg";
 import incomeExpense from "../../assets/Images/Admin Sidebar/income-expense.svg";
-import logout from "../../assets/Images/Admin Sidebar/logout-icon.svg";
+import logoutIcon from "../../assets/Images/Admin Sidebar/logout-icon.svg";
 import closeicon from "../../assets/Images/Admin Navbar/close-icon.svg";
+import { useAuth } from "../../context/AuthContext";
+import {toast} from "react-hot-toast";
 
 const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
   const [activeItem, setActiveItem] = useState("Dashboard");
   const navigate = useNavigate();
-  const { openModal } = useModal();
-
-  // const openCreateTenant = () => {
-  //   navigate("/admin/tenant-timeline");
-  // };
+  const { openModal, closeModal } = useModal();
+  const { logout } = useAuth();
 
   const [expandedMenus, setExpandedMenus] = useState({
     Users: false,
@@ -72,15 +71,17 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
     toggleMobileMenu();
   };
 
-  const handleLogout = () => {
-    // Clear all localStorage data
-    localStorage.clear();
+  const handleLogout = async () => {
+   closeModal();
+   
+  // Call AuthContext logout
+  logout();
 
-    // Navigate to login page
-    navigate("/");
+  // Show toast
+  toast.success("Logged out successfully!")
 
-    // Update active item to reflect logout
-    setActiveItem("Logout");
+  // Update active item
+  setActiveItem("Logout");
   };
 
   return (
@@ -804,7 +805,7 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
                 }}
               >
                 <img
-                  src={logout}
+                  src={logoutIcon}
                   alt="Logout"
                   className="w-[18px] sidebar-icon"
                 />

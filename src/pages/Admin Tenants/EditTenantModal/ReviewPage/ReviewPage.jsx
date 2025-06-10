@@ -27,6 +27,7 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [idTypes, setIdTypes] = useState([]);
+  const [docTypes, setDocTypes] = useState([]);
 
   const tenant = formData?.tenant || {};
   const documents = Array.isArray(formData?.documents?.documents)
@@ -40,21 +41,24 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
     console.log("Role:", role);
     console.log("Raw company_id from localStorage:", storedCompanyId);
 
-    if (role === "company") {
-      return storedCompanyId;
-    } else if (role === "user" || role === "admin") {
+    if (role === "company" || role === "user" || role === "admin") {
       return storedCompanyId;
     }
 
     return null;
   };
 
-  // Fetch ID types to display titles instead of IDs
+  // Fetch ID types and doc types
   useEffect(() => {
-    const fetchIdTypes = async () => {
+    const fetchData = async () => {
       try {
         const companyId = getUserCompanyId();
-        const response = await axios.get(
+        if (!companyId) {
+          throw new Error("Company ID not found.");
+        }
+
+        // Fetch ID types
+        const idTypeResponse = await axios.get(
           `${BASE_URL}/company/id_type/company/${companyId}`,
           {
             headers: {
@@ -62,18 +66,30 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
             },
           }
         );
-        setIdTypes(Array.isArray(response.data) ? response.data : []);
+        setIdTypes(Array.isArray(idTypeResponse.data) ? idTypeResponse.data : []);
+
+        // Fetch document types
+        const docTypeResponse = await axios.get(
+          `${BASE_URL}/company/doc_type/company/${companyId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setDocTypes(Array.isArray(docTypeResponse.data) ? docTypeResponse.data : []);
       } catch (error) {
-        console.error("Error fetching ID types:", error);
+        console.error("Error fetching types:", error);
+        setError("Failed to load types.");
       }
     };
-    fetchIdTypes();
+    fetchData();
   }, []);
 
   // Helper function to get ID type title by ID
   const getIdTypeTitle = (idTypeId) => {
     if (!idTypeId) return "N/A";
-    const idType = idTypes.find(type => type.id === parseInt(idTypeId));
+    const idType = idTypes.find((type) => type.id === parseInt(idTypeId));
     return idType ? idType.title : "N/A";
   };
 
@@ -81,11 +97,11 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
     setLoading(true);
     setError(null);
 
+    // Validate tenant required fields
     const requiredFields = [
       "tenant_name",
       "nationality",
       "phone",
-      "alternative_phone",
       "email",
       "address",
       "status",
@@ -95,7 +111,12 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
       "id_validity_date",
       "sponser_name",
       "sponser_id_type",
+      "sponser_id_number",
+      "sponser_id_validity_date",
     ];
+    if (tenant.tenant_type === "Organization" && !tenant.license_no) {
+      requiredFields.push("license_no");
+    }
     const missingFields = requiredFields.filter((field) => !tenant[field]);
     if (missingFields.length > 0) {
       setError(`Please fill required fields: ${missingFields.join(", ")}`);
@@ -103,28 +124,28 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
       return;
     }
 
-    if (documents.length > 0) {
-      const invalidDocs = documents.filter(
-        (doc) =>
-          !doc.doc_type ||
-          !doc.number ||
-          !doc.issued_date ||
-          !doc.expiry_date ||
-          (!doc.upload_file && !doc.existing_files?.length)
+    // Validate documents based on docType properties
+    const invalidDocs = documents.filter((doc) => {
+      if (!doc.doc_type) return true; // Document must have a doc_type
+      const docType = docTypes.find((type) => type.id === parseInt(doc.doc_type));
+      if (!docType) return true; // Invalid doc_type
+
+      // Check only the fields required by the doc_type
+      return (
+        (docType.number && !doc.number) ||
+        (docType.issue_date && !doc.issued_date) ||
+        (docType.expiry_date && !doc.expiry_date) ||
+        (docType.upload_file && !doc.upload_file?.length)
       );
-      if (invalidDocs.length > 0) {
-        setError("All documents must have doc_type, number, dates, and at least one file.");
-        setLoading(false);
-        return;
-      }
+    });
+
+    if (documents.length > 0 && invalidDocs.length > 0) {
+      setError("Some documents are missing required fields based on their document type.");
+      setLoading(false);
+      return;
     }
 
     try {
-      console.log("Documents array:", documents);
-      documents.forEach((doc, index) => {
-        console.log(`Document ${index} upload_file:`, doc.upload_file, typeof doc.upload_file);
-      });
-
       const convertToBlob = async (fileData) => {
         if (!fileData) {
           console.warn("No file data provided");
@@ -150,44 +171,37 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
         return null;
       };
 
-      const payload = {
-        ...tenant,
-        tenant_comp: documents.map((doc) => ({
-          id: doc.id || null,
-          doc_type: doc.doc_type,
-          number: doc.number,
-          issued_date: doc.issued_date,
-          expiry_date: doc.expiry_date,
-          upload_file: doc.has_new_files ? (doc.upload_file || null) : null,
-        })),
-      };
-
       const formDataWithFiles = new FormData();
-      Object.entries(payload).forEach(([key, value]) => {
-        if (key !== "tenant_comp") {
-          formDataWithFiles.append(key, value ?? "");
-        }
+      // Add tenant fields
+      Object.entries(tenant).forEach(([key, value]) => {
+        formDataWithFiles.append(key, value ?? "");
       });
 
+      // Add documents data, including only required fields
       await Promise.all(
-        payload.tenant_comp.map(async (doc, index) => {
-          formDataWithFiles.append(`tenant_comp[${index}][id]`, doc.id || "");
-          formDataWithFiles.append(`tenant_comp[${index}][doc_type]`, doc.doc_type || "");
-          formDataWithFiles.append(`tenant_comp[${index}][number]`, doc.number || "");
-          formDataWithFiles.append(`tenant_comp[${index}][issued_date]`, doc.issued_date || "");
-          formDataWithFiles.append(`tenant_comp[${index}][expiry_date]`, doc.expiry_date || "");
-
-          if (doc.upload_file) {
-            const file = Array.isArray(doc.upload_file) ? doc.upload_file[0] : doc.upload_file;
-            const fileBlob = await convertToBlob(file);
-            if (fileBlob) {
-              formDataWithFiles.append(
-                `tenant_comp[${index}][upload_file]`,
-                fileBlob,
-                fileBlob.name || `file-${index}`
-              );
-            } else {
-              console.warn(`Skipping invalid file for document ${index}`);
+        documents.map(async (doc, index) => {
+          const docType = docTypes.find((type) => type.id === parseInt(doc.doc_type));
+          if (docType) {
+            formDataWithFiles.append(`tenant_comp[${index}][doc_type]`, doc.doc_type || "");
+            if (docType.number) {
+              formDataWithFiles.append(`tenant_comp[${index}][number]`, doc.number || "");
+            }
+            if (docType.issue_date) {
+              formDataWithFiles.append(`tenant_comp[${index}][issued_date]`, doc.issued_date || "");
+            }
+            if (docType.expiry_date) {
+              formDataWithFiles.append(`tenant_comp[${index}][expiry_date]`, doc.expiry_date || "");
+            }
+            if (docType.upload_file && doc.upload_file && doc.upload_file.length > 0) {
+              const file = Array.isArray(doc.upload_file) ? doc.upload_file[0] : doc.upload_file;
+              const fileBlob = await convertToBlob(file);
+              if (fileBlob) {
+                formDataWithFiles.append(
+                  `tenant_comp[${index}][upload_file]`,
+                  fileBlob,
+                  fileBlob.name || `file-${index}`
+                );
+              }
             }
           }
         })
@@ -204,6 +218,7 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -222,21 +237,16 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
 
   const handleBack = () => {
     const backData = {
-      ...formData,
-      documents: documents,
+      documents: documents.map((doc) => ({
+        doc_type: parseInt(doc.doc_type) || null,
+        number: doc.number || null,
+        issued_date: doc.issued_date || null,
+        expiry_date: doc.expiry_date || null,
+        upload_file: doc.upload_file || [],
+      })),
     };
     console.log("ReviewPage passing back:", backData);
     onBack(backData);
-  };
-
-  // Helper function to display file information
-  const getDocumentFileInfo = (doc) => {
-    if (doc.has_new_files && doc.upload_file?.length > 0) {
-      return `${doc.upload_file.length} new file(s) will be uploaded`;
-    } else if (doc.existing_files?.length > 0) {
-      return `${doc.existing_files.length} existing file(s) will be kept`;
-    }
-    return "No files";
   };
 
   return (
@@ -315,7 +325,7 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
       </div>
       <div className="py-5">
         <ErrorBoundary>
-          <DocumentView documents={documents} />
+          <DocumentView documents={documents} docTypes={docTypes} />
         </ErrorBoundary>
       </div>
       <div className="flex justify-end gap-4 pt-5 mt-auto">
