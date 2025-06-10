@@ -3,6 +3,7 @@ import "./upcomingcollection.css";
 import { ChevronDown } from "lucide-react";
 import downarrow from "../../assets/Images/UpcomingCollection/downarrow.svg";
 import CustomDropDown from "../../components/CustomDropDown";
+import { motion, AnimatePresence } from "framer-motion";
 
 const UpcomingCollection = () => {
   const [openSelectKey, setOpenSelectKey] = useState(null);
@@ -73,30 +74,6 @@ const UpcomingCollection = () => {
       amount: "120.00",
       due_date: "2024-09-18",
       status: "Unpaid",
-    },
-    {
-      id: "B24090003",
-      invoice_no: "457894",
-      invoice_date: "2024-09-10",
-      tenant: "Shoes shop",
-      building: "Al Reem",
-      unit: "SHOP11",
-      charge: "Rent",
-      amount: "120.00",
-      due_date: "2024-09-18",
-      status: "Unpaid",
-    },
-    {
-      id: "B24090004",
-      invoice_no: "457893",
-      invoice_date: "09 sept 2024 ",
-      tenant: "Coffee",
-      building: "Down Town",
-      unit: "SHOP10",
-      charge: "Rent",
-      amount: "120.00",
-      due_date: "2024-09-15",
-      status: "Paid",
     },
   ];
 
@@ -218,6 +195,25 @@ const UpcomingCollection = () => {
       default:
         return "bg-[#E8EFF6] text-[#1458A2]";
     }
+  };
+
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
   };
 
   return (
@@ -472,92 +468,100 @@ const UpcomingCollection = () => {
                     </div>
                   </td>
                 </tr>
-                {expandedRows[report.id] && (
-                  <tr className="upcoming-collection-mobile-with-border border-b border-[#E9E9E9]">
-                    <td colSpan={3} className="px-5">
-                      <div className="upcoming-collection-dropdown-content">
-                        <div className="upcoming-collection-grid">
-                          <div className="upcoming-collection-grid-item">
-                            <div className="upcoming-collection-dropdown-label">
-                              INVOICE DATE
+                <AnimatePresence>
+                  {expandedRows[report.id] && (
+                    <motion.tr
+                      className="upcoming-collection-mobile-with-border border-b border-[#E9E9E9]"
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={dropdownVariants}
+                    >
+                      <td colSpan={3} className="px-5">
+                        <div className="upcoming-collection-dropdown-content">
+                          <div className="upcoming-collection-grid">
+                            <div className="upcoming-collection-grid-item">
+                              <div className="upcoming-collection-dropdown-label">
+                                INVOICE DATE
+                              </div>
+                              <div className="upcoming-collection-dropdown-value">
+                                {report.invoice_date}
+                              </div>
                             </div>
-                            <div className="upcoming-collection-dropdown-value">
-                              {report.invoice_date}
+                            <div className="upcoming-collection-grid-item">
+                              <div className="upcoming-collection-dropdown-label">
+                                INVOICE NO
+                              </div>
+                              <div className="upcoming-collection-dropdown-value">
+                                {report.invoice_no}
+                              </div>
                             </div>
                           </div>
-                          <div className="upcoming-collection-grid-item">
-                            <div className="upcoming-collection-dropdown-label">
-                              INVOICE NO
+                          <div className="upcoming-collection-grid">
+                            <div className="upcoming-collection-grid-item">
+                              <div className="upcoming-collection-dropdown-label">
+                                TENANT
+                              </div>
+                              <div className="upcoming-collection-dropdown-value">
+                                {report.tenant}
+                              </div>
                             </div>
-                            <div className="upcoming-collection-dropdown-value">
-                              {report.invoice_no}
+                            <div className="upcoming-collection-grid-item">
+                              <div className="upcoming-collection-dropdown-label">
+                                UNIT
+                              </div>
+                              <div className="upcoming-collection-dropdown-value">
+                                {report.unit}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="upcoming-collection-grid">
+                            <div className="upcoming-collection-grid-item">
+                              <div className="upcoming-collection-dropdown-label">
+                                CHARGE
+                              </div>
+                              <div className="upcoming-collection-dropdown-value">
+                                {report.charge}
+                              </div>
+                            </div>
+                            <div className="upcoming-collection-grid-item">
+                              <div className="upcoming-collection-dropdown-label">
+                                AMOUNT
+                              </div>
+                              <div className="upcoming-collection-dropdown-value">
+                                {report.amount}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="upcoming-collection-grid">
+                            <div className="upcoming-collection-grid-item">
+                              <div className="upcoming-collection-dropdown-label">
+                                DUE DATE
+                              </div>
+                              <div className="upcoming-collection-dropdown-value">
+                                {report.due_date}
+                              </div>
+                            </div>
+                            <div className="upcoming-collection-grid-item">
+                              <div className="upcoming-collection-dropdown-label">
+                                STATUS
+                              </div>
+                              <div className="upcoming-collection-dropdown-value">
+                                <span
+                                  className={`px-[10px] py-[5px] h-[24px] rounded-[4px] upcoming-collection-status ${getStatusStyle(
+                                    report.status
+                                  )}`}
+                                >
+                                  {report.status}
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <div className="upcoming-collection-grid">
-                          <div className="upcoming-collection-grid-item">
-                            <div className="upcoming-collection-dropdown-label">
-                              TENANT
-                            </div>
-                            <div className="upcoming-collection-dropdown-value">
-                              {report.tenant}
-                            </div>
-                          </div>
-                          <div className="upcoming-collection-grid-item">
-                            <div className="upcoming-collection-dropdown-label">
-                              UNIT
-                            </div>
-                            <div className="upcoming-collection-dropdown-value">
-                              {report.unit}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="upcoming-collection-grid">
-                          <div className="upcoming-collection-grid-item">
-                            <div className="upcoming-collection-dropdown-label">
-                              CHARGE
-                            </div>
-                            <div className="upcoming-collection-dropdown-value">
-                              {report.charge}
-                            </div>
-                          </div>
-                          <div className="upcoming-collection-grid-item">
-                            <div className="upcoming-collection-dropdown-label">
-                              AMOUNT
-                            </div>
-                            <div className="upcoming-collection-dropdown-value">
-                              {report.amount}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="upcoming-collection-grid">
-                          <div className="upcoming-collection-grid-item">
-                            <div className="upcoming-collection-dropdown-label">
-                              DUE DATE
-                            </div>
-                            <div className="upcoming-collection-dropdown-value">
-                              {report.due_date}
-                            </div>
-                          </div>
-                          <div className="upcoming-collection-grid-item">
-                            <div className="upcoming-collection-dropdown-label">
-                              STATUS
-                            </div>
-                            <div className="upcoming-collection-dropdown-value">
-                              <span
-                                className={`px-[10px] py-[5px] h-[24px] rounded-[4px] upcoming-collection-status ${getStatusStyle(
-                                  report.status
-                                )}`}
-                              >
-                                {report.status}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
+                      </td>
+                    </motion.tr>
+                  )}
+                </AnimatePresence>
               </React.Fragment>
             ))}
           </tbody>
