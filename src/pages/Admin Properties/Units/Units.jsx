@@ -10,6 +10,7 @@ import { BASE_URL } from "../../../utils/config";
 import DeleteUnitModal from "./DeleteUnitModal/DeleteUnitModal";
 import { useModal } from "../../../context/ModalContext";
 import CustomDropDown from "../../../components/CustomDropDown";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Units = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -117,6 +118,25 @@ const Units = () => {
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
+  };
 
   return (
     <div className="border border-[#E9E9E9] rounded-md unit-table">
@@ -283,95 +303,104 @@ const Units = () => {
                     </div>
                   </td>
                 </tr>
-                {expandedRows[unit.code] && (
-                  <tr className="unit-mobile-with-border border-b border-[#E9E9E9]">
-                    <td colSpan={3} className="px-5">
-                      <div className="unit-dropdown-content">
-                        <div className="unit-grid">
-                          <div className="unit-grid-item">
-                            <div className="unit-dropdown-label">DATE</div>
-                            <div className="unit-dropdown-value">
-                              {new Date(unit.created_at).toLocaleDateString(
-                                "en-GB",
-                                {
-                                  day: "2-digit",
-                                  month: "short",
-                                  year: "numeric",
-                                }
-                              )}
+                <AnimatePresence>
+                  {expandedRows[unit.code] && (
+                    <motion.tr className="unit-mobile-with-border border-b border-[#E9E9E9]"
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={dropdownVariants}
+                    >
+                      <td colSpan={3} className="px-5">
+                        <div className="unit-dropdown-content">
+                          <div className="unit-grid">
+                            <div className="unit-grid-item">
+                              <div className="unit-dropdown-label">DATE</div>
+                              <div className="unit-dropdown-value">
+                                {new Date(unit.created_at).toLocaleDateString(
+                                  "en-GB",
+                                  {
+                                    day: "2-digit",
+                                    month: "short",
+                                    year: "numeric",
+                                  }
+                                )}
+                              </div>
+                            </div>
+                            <div className="unit-grid-item">
+                              <div className="unit-dropdown-label">
+                                BUILDING
+                              </div>
+                              <div className="unit-dropdown-value">
+                                {unit.building?.building_name || "N/A"}
+                              </div>
                             </div>
                           </div>
-                          <div className="unit-grid-item">
-                            <div className="unit-dropdown-label">BUILDING</div>
-                            <div className="unit-dropdown-value">
-                              {unit.building?.building_name || "N/A"}
+                          <div className="unit-grid">
+                            <div className="unit-grid-item">
+                              <div className="unit-dropdown-label">ADDRESS</div>
+                              <div className="unit-dropdown-value">
+                                {unit.address}
+                              </div>
+                            </div>
+                            <div className="unit-grid-item">
+                              <div className="unit-dropdown-label">TYPE</div>
+                              <div className="unit-dropdown-value">
+                                {unit.unit_type?.title || "N/A"}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="unit-grid">
+                            <div className="unit-grid-item">
+                              <div className="unit-dropdown-label">STATUS</div>
+                              <div className="unit-dropdown-value">
+                                <span
+                                  className={`px-[10px] py-[5px] h-[24px] rounded-[4px] unit-status ${
+                                    unit.unit_status === "occupied"
+                                      ? "bg-[#D1E8FF] text-[#1A73E8] !w-[75px]"
+                                      : unit.unit_status === "renovation"
+                                      ? "bg-[#FFF0F0] text-[#D32F2F] !w-[90px]"
+                                      : unit.unit_status === "vacant"
+                                      ? "bg-[#ebffea] text-[#18ac18] !w-[60px]"
+                                      : unit.unit_status === "disputed"
+                                      ? "bg-[#FDEDED] text-[#C62828] !w-[75px]"
+                                      : ""
+                                  }`}
+                                >
+                                  {unit.unit_status.charAt(0).toUpperCase() +
+                                    unit.unit_status.slice(1)}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="unit-grid-item unit-action-column">
+                              <div className="unit-dropdown-label">ACTION</div>
+                              <div className="unit-dropdown-value unit-flex unit-items-center mt-[10px]">
+                                <button
+                                  onClick={() => handleEditUnitClick(unit.id)}
+                                >
+                                  <img
+                                    src={editicon}
+                                    alt="Edit"
+                                    className="w-[18px] h-[18px] unit-action-btn duration-200"
+                                  />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteUnitClick(unit.id)}
+                                >
+                                  <img
+                                    src={deletesicon}
+                                    alt="Delete"
+                                    className="w-[18px] h-[18px] unit-action-btn duration-200 ml-3"
+                                  />
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <div className="unit-grid">
-                          <div className="unit-grid-item">
-                            <div className="unit-dropdown-label">ADDRESS</div>
-                            <div className="unit-dropdown-value">
-                              {unit.address}
-                            </div>
-                          </div>
-                          <div className="unit-grid-item">
-                            <div className="unit-dropdown-label">TYPE</div>
-                            <div className="unit-dropdown-value">
-                              {unit.unit_type?.name || "N/A"}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="unit-grid">
-                          <div className="unit-grid-item">
-                            <div className="unit-dropdown-label">STATUS</div>
-                            <div className="unit-dropdown-value">
-                              <span
-                                className={`px-[10px] py-[5px] h-[24px] rounded-[4px] unit-status ${
-                                  unit.unit_status === "occupied"
-                                    ? "bg-[#D1E8FF] text-[#1A73E8] !w-[75px]"
-                                    : unit.unit_status === "renovation"
-                                    ? "bg-[#FFF0F0] text-[#D32F2F] !w-[90px]"
-                                    : unit.unit_status === "vacant"
-                                    ? "bg-[#ebffea] text-[#18ac18] !w-[60px]"
-                                    : unit.unit_status === "disputed"
-                                    ? "bg-[#FDEDED] text-[#C62828] !w-[75px]"
-                                    : ""
-                                }`}
-                              >
-                                {unit.unit_status.charAt(0).toUpperCase() +
-                                  unit.unit_status.slice(1)}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="unit-grid-item unit-action-column">
-                            <div className="unit-dropdown-label">ACTION</div>
-                            <div className="unit-dropdown-value unit-flex unit-items-center unit-gap-2">
-                              <button
-                                onClick={() => handleEditUnitClick(unit.id)}
-                              >
-                                <img
-                                  src={editicon}
-                                  alt="Edit"
-                                  className="w-[18px] h-[18px] unit-action-btn duration-200"
-                                />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteUnitClick(unit.id)}
-                              >
-                                <img
-                                  src={deletesicon}
-                                  alt="Delete"
-                                  className="w-[18px] h-[18px] unit-action-btn duration-200 ml-3"
-                                />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
+                      </td>
+                    </motion.tr>
+                  )}
+                </AnimatePresence>
               </React.Fragment>
             ))}
           </tbody>

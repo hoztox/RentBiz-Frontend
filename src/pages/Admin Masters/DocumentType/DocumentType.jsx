@@ -11,6 +11,7 @@ import { useModal } from "../../../context/ModalContext";
 import DeleteDocumentTypeModal from "./DeleteDocumentTypeModal/DeleteDocumentTypeModal";
 import { documentTypesApi } from "../MastersApi";
 import CustomDropDown from "../../../components/CustomDropDown";
+import { motion, AnimatePresence } from "framer-motion";
 
 const DocumentType = () => {
   const { openModal, refreshCounter } = useModal();
@@ -62,7 +63,9 @@ const DocumentType = () => {
       setLoading(true);
       setError(null);
       await documentTypesApi.delete(docTypeIdToDelete);
-      setDocTypes((prev) => prev.filter((item) => item.id !== docTypeIdToDelete));
+      setDocTypes((prev) =>
+        prev.filter((item) => item.id !== docTypeIdToDelete)
+      );
       toast.success("Document Type deleted successfully");
       if (paginatedData.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
@@ -92,11 +95,11 @@ const DocumentType = () => {
       month: "short",
       year: "numeric",
     });
-  }
+  };
 
   // Sort and filter data
   const sortedData = [...docTypes].sort((a, b) => {
-      return a.id - b.id;
+    return a.id - b.id;
   });
 
   const filteredData = sortedData.filter((docType) => {
@@ -127,7 +130,11 @@ const DocumentType = () => {
 
   const handleEditClick = (docType) => {
     console.log("Document Types: Selected Document:", docType);
-    openModal("update-document-type-master", "Update Document Type Master", docType);
+    openModal(
+      "update-document-type-master",
+      "Update Document Type Master",
+      docType
+    );
   };
 
   const toggleRowExpand = (id) => {
@@ -135,6 +142,25 @@ const DocumentType = () => {
       ...prev,
       [id]: !prev[id],
     }));
+  };
+
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
   };
 
   // Loading state
@@ -227,9 +253,7 @@ const DocumentType = () => {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-[#E9E9E9] h-[57px]">
-                  <th
-                    className="px-4 py-3 text-left doctype-thead cursor-pointer"
-                  >
+                  <th className="px-4 py-3 text-left doctype-thead cursor-pointer">
                     ID
                   </th>
                   <th className="px-4 py-3 text-left doctype-thead">
@@ -315,9 +339,7 @@ const DocumentType = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="doctype-table-row-head">
-              <th
-                className="px-5 w-[52%] text-left doctype-thead doctype-id-column cursor-pointer"
-              >
+              <th className="px-5 w-[52%] text-left doctype-thead doctype-id-column cursor-pointer">
                 ID
               </th>
               <th className="px-5 w-[47%] text-left doctype-thead doctype-entry-date-column">
@@ -366,47 +388,55 @@ const DocumentType = () => {
                       </div>
                     </td>
                   </tr>
-                  {expandedRows[docType.id] && (
-                    <tr className="mobile-with-border border-b border-[#E9E9E9]">
-                      <td colSpan={3} className="px-5">
-                        <div className="doctype-dropdown-content">
-                          <div className="doctype-grid">
-                            <div className="doctype-grid-items">
-                              <div className="dropdown-label">ENTRY DATE</div>
-                              <div className="dropdown-value">
-                                {formatDate(docType.created_at)}
+                  <AnimatePresence>
+                    {expandedRows[docType.id] && (
+                      <motion.tr
+                        className="mobile-with-border border-b border-[#E9E9E9]"
+                        initial="hidden"
+                        animate="visible"
+                        exit="hidden"
+                        variants={dropdownVariants}
+                      >
+                        <td colSpan={3} className="px-5">
+                          <div className="doctype-dropdown-content">
+                            <div className="doctype-grid">
+                              <div className="doctype-grid-items">
+                                <div className="dropdown-label">ENTRY DATE</div>
+                                <div className="dropdown-value">
+                                  {formatDate(docType.created_at)}
+                                </div>
                               </div>
-                            </div>
-                            <div className="doctype-grid-items">
-                              <div className="dropdown-label">ACTION</div>
-                              <div className="dropdown-value flex items-center gap-2 p-1 ml-[5px]">
-                                <button
-                                  onClick={() => handleEditClick(docType)}
-                                  disabled={loading}
-                                >
-                                  <img
-                                    src={editicon}
-                                    alt="Edit"
-                                    className="w-[18px] h-[18px] action-btn duration-200"
-                                  />
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(docType.id)}
-                                  disabled={loading}
-                                >
-                                  <img
-                                    src={deleteicon}
-                                    alt="Delete"
-                                    className="w-[18px] h-[18px] ml-[5px] action-btn duration-200"
-                                  />
-                                </button>
+                              <div className="doctype-grid-items">
+                                <div className="dropdown-label">ACTION</div>
+                                <div className="dropdown-value flex items-center gap-2 p-1 ml-[5px]">
+                                  <button
+                                    onClick={() => handleEditClick(docType)}
+                                    disabled={loading}
+                                  >
+                                    <img
+                                      src={editicon}
+                                      alt="Edit"
+                                      className="w-[18px] h-[18px] action-btn duration-200"
+                                    />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDelete(docType.id)}
+                                    disabled={loading}
+                                  >
+                                    <img
+                                      src={deleteicon}
+                                      alt="Delete"
+                                      className="w-[18px] h-[18px] ml-[5px] action-btn duration-200"
+                                    />
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
+                        </td>
+                      </motion.tr>
+                    )}
+                  </AnimatePresence>
                 </React.Fragment>
               ))
             )}

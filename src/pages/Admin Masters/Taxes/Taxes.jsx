@@ -10,6 +10,7 @@ import { toast, Toaster } from "react-hot-toast";
 import DeleteTaxModal from "./DeleteTaxModal/DeleteTaxModal";
 import CustomDropDown from "../../../components/CustomDropDown";
 import { taxesApi } from "../MastersApi";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Taxes = () => {
   const { openModal, refreshCounter } = useModal();
@@ -87,7 +88,7 @@ const Taxes = () => {
   };
 
   const openUpdateModal = (tax) => {
-    openModal("update-tax-master", "", { 
+    openModal("update-tax-master", "", {
       tax_id: tax.id,
       initialData: {
         taxType: tax.tax_type,
@@ -95,22 +96,29 @@ const Taxes = () => {
         country: tax.country,
         state: tax.state,
         applicableFrom: tax.applicable_from,
-        applicableTo: tax.applicable_to
-      }
+        applicableTo: tax.applicable_to,
+      },
     });
   };
 
   const filteredData = Array.isArray(data)
     ? data.filter(
         (tax) =>
-          (tax.id?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+          tax.id?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
           tax?.country_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           tax.tax_type?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          tax.tax_percentage?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-          tax.applicable_from?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          tax.tax_percentage
+            ?.toString()
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          tax.applicable_from
+            ?.toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
           tax.applicable_to?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           tax?.state_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (tax.is_active ? "active" : "inactive").toLowerCase().includes(searchTerm.toLowerCase()))
+          (tax.is_active ? "active" : "inactive")
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase())
       )
     : [];
 
@@ -136,6 +144,25 @@ const Taxes = () => {
     if (value !== "effective_date") {
       setEffectiveDate("");
     }
+  };
+
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
   };
 
   return (
@@ -253,7 +280,9 @@ const Taxes = () => {
                       <td className="px-5 text-left tax-data">
                         {tax?.state_name || "N/A"}
                       </td>
-                      <td className="px-5 text-left tax-data">{tax.tax_type}</td>
+                      <td className="px-5 text-left tax-data">
+                        {tax.tax_type}
+                      </td>
                       <td className="px-5 text-left tax-data">{`${tax.tax_percentage}%`}</td>
                       <td className="px-5 text-left tax-data">
                         {tax.applicable_from || "N/A"}
@@ -265,14 +294,20 @@ const Taxes = () => {
                         {tax.is_active ? "Active" : "Inactive"}
                       </td>
                       <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                        <button onClick={() => openUpdateModal(tax)} disabled={loading}>
+                        <button
+                          onClick={() => openUpdateModal(tax)}
+                          disabled={loading}
+                        >
                           <img
                             src={editicon}
                             alt="Edit"
                             className="w-[18px] h-[18px] tax-action-btn duration-200"
                           />
                         </button>
-                        <button onClick={() => handleDelete(tax.id)} disabled={loading}>
+                        <button
+                          onClick={() => handleDelete(tax.id)}
+                          disabled={loading}
+                        >
                           <img
                             src={deleteicon}
                             alt="Delete"
@@ -342,95 +377,103 @@ const Taxes = () => {
                           </div>
                         </td>
                       </tr>
-                      {expandedRows[tax.id] && (
-                        <tr className="tax-mobile-with-border border-b border-[#E9E9E9]">
-                          <td colSpan={3} className="px-5">
-                            <div className="tax-dropdown-content">
-                              <div className="tax-dropdown-content-grid">
-                                <div className="tax-dropdown-content-item w-[50%]">
-                                  <div className="tax-dropdown-label">
-                                    TAX ID
+                      <AnimatePresence>
+                        {expandedRows[tax.id] && (
+                          <motion.tr
+                            className="tax-mobile-with-border border-b border-[#E9E9E9]"
+                            initial="hidden"
+                            animate="visible"
+                            exit="hidden"
+                            variants={dropdownVariants}
+                          >
+                            <td colSpan={3} className="px-5">
+                              <div className="tax-dropdown-content">
+                                <div className="tax-dropdown-content-grid">
+                                  <div className="tax-dropdown-content-item w-[50%]">
+                                    <div className="tax-dropdown-label">
+                                      TAX ID
+                                    </div>
+                                    <div className="tax-dropdown-value">
+                                      {tax.id}
+                                    </div>
                                   </div>
-                                  <div className="tax-dropdown-value">
-                                    {tax.id}
+                                  <div className="tax-dropdown-content-item w-[50%]">
+                                    <div className="tax-dropdown-label">
+                                      STATE
+                                    </div>
+                                    <div className="tax-dropdown-value">
+                                      {tax?.state_name || "N/A"}
+                                    </div>
                                   </div>
                                 </div>
-                                <div className="tax-dropdown-content-item w-[50%]">
-                                  <div className="tax-dropdown-label">
-                                    STATE
+                                <div className="tax-dropdown-content-grid">
+                                  <div className="tax-dropdown-content-item w-[50%]">
+                                    <div className="tax-dropdown-label">
+                                      PERCENTAGE
+                                    </div>
+                                    <div className="tax-dropdown-value">{`${tax.tax_percentage}%`}</div>
                                   </div>
-                                  <div className="tax-dropdown-value">
-                                    {tax?.state_name || "N/A"}
+                                  <div className="tax-dropdown-content-item w-[50%]">
+                                    <div className="tax-dropdown-label">
+                                      APPLICABLE FROM
+                                    </div>
+                                    <div className="tax-dropdown-value">
+                                      {tax.applicable_from || "N/A"}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="tax-dropdown-content-grid">
+                                  <div className="tax-dropdown-content-item w-[50%]">
+                                    <div className="tax-dropdown-label">
+                                      APPLICABLE TO
+                                    </div>
+                                    <div className="tax-dropdown-value">
+                                      {tax.applicable_to || "Ongoing"}
+                                    </div>
+                                  </div>
+                                  <div className="tax-dropdown-content-item w-[50%]">
+                                    <div className="tax-dropdown-label">
+                                      STATUS
+                                    </div>
+                                    <div className="tax-dropdown-value">
+                                      {tax.is_active ? "Active" : "Inactive"}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="tax-dropdown-content-grid">
+                                  <div className="tax-dropdown-content-item w-[50%]">
+                                    <div className="tax-dropdown-label">
+                                      ACTION
+                                    </div>
+                                    <div className="tax-dropdown-value flex items-center gap-4">
+                                      <button
+                                        onClick={() => openUpdateModal(tax)}
+                                        disabled={loading}
+                                      >
+                                        <img
+                                          src={editicon}
+                                          alt="Edit"
+                                          className="w-[18px] h-[18px] tax-action-btn duration-200"
+                                        />
+                                      </button>
+                                      <button
+                                        onClick={() => handleDelete(tax.id)}
+                                        disabled={loading}
+                                      >
+                                        <img
+                                          src={deleteicon}
+                                          alt="Delete"
+                                          className="w-[18px] h-[18px] tax-action-btn duration-200"
+                                        />
+                                      </button>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                              <div className="tax-dropdown-content-grid">
-                                <div className="tax-dropdown-content-item w-[50%]">
-                                  <div className="tax-dropdown-label">
-                                    PERCENTAGE
-                                  </div>
-                                  <div className="tax-dropdown-value">{`${tax.tax_percentage}%`}</div>
-                                </div>
-                                <div className="tax-dropdown-content-item w-[50%]">
-                                  <div className="tax-dropdown-label">
-                                    APPLICABLE FROM
-                                  </div>
-                                  <div className="tax-dropdown-value">
-                                    {tax.applicable_from || "N/A"}
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="tax-dropdown-content-grid">
-                                <div className="tax-dropdown-content-item w-[50%]">
-                                  <div className="tax-dropdown-label">
-                                    APPLICABLE TO
-                                  </div>
-                                  <div className="tax-dropdown-value">
-                                    {tax.applicable_to || "Ongoing"}
-                                  </div>
-                                </div>
-                                <div className="tax-dropdown-content-item w-[50%]">
-                                  <div className="tax-dropdown-label">
-                                    STATUS
-                                  </div>
-                                  <div className="tax-dropdown-value">
-                                    {tax.is_active ? "Active" : "Inactive"}
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="tax-dropdown-content-grid">
-                                <div className="tax-dropdown-content-item w-[50%]">
-                                  <div className="tax-dropdown-label">
-                                    ACTION
-                                  </div>
-                                  <div className="tax-dropdown-value flex items-center gap-4">
-                                    <button
-                                      onClick={() => openUpdateModal(tax)}
-                                      disabled={loading}
-                                    >
-                                      <img
-                                        src={editicon}
-                                        alt="Edit"
-                                        className="w-[18px] h-[18px] tax-action-btn duration-200"
-                                      />
-                                    </button>
-                                    <button
-                                      onClick={() => handleDelete(tax.id)}
-                                      disabled={loading}
-                                    >
-                                      <img
-                                        src={deleteicon}
-                                        alt="Delete"
-                                        className="w-[18px] h-[18px] tax-action-btn duration-200"
-                                      />
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
+                            </td>
+                          </motion.tr>
+                        )}
+                      </AnimatePresence>
                     </React.Fragment>
                   ))
                 )}

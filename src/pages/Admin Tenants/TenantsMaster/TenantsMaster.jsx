@@ -10,7 +10,7 @@ import DeleteTenantModal from "../DeleteTenantModal/DeleteTenantModal";
 import { BASE_URL } from "../../../utils/config";
 import { useModal } from "../../../context/ModalContext";
 import CustomDropDown from "../../../components/CustomDropDown";
-
+import { motion, AnimatePresence } from "framer-motion";
 
 const TenantsMaster = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -151,6 +151,25 @@ const TenantsMaster = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
+  };
+
   if (loading) return <div className="p-5">Loading...</div>;
   if (error) return <div className="text-red-500 p-5">{error}</div>;
 
@@ -252,7 +271,13 @@ const TenantsMaster = () => {
                   {tenant.id_type?.title || "N/A"}
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={() => openModal("edit-tenant", "Update Tenant", { tenantId: tenant.id })}>
+                  <button
+                    onClick={() =>
+                      openModal("edit-tenant", "Update Tenant", {
+                        tenantId: tenant.id,
+                      })
+                    }
+                  >
                     <img
                       src={editicon}
                       alt="Edit"
@@ -321,87 +346,99 @@ const TenantsMaster = () => {
                     </div>
                   </td>
                 </tr>
-                {expandedRows[tenant.code] && (
-                  <tr className="mobile-with-border border-b border-[#E9E9E9]">
-                    <td colSpan={3} className="px-5">
-                      <div className="tenant-dropdown-content">
-                        <div className="tenant-grid">
-                          <div className="tenant-grid-item">
-                            <div className="dropdown-label">DATE</div>
-                            <div className="dropdown-value w-[95px]">
-                              {new Date(tenant.created_at).toLocaleDateString(
-                                "en-GB",
-                                {
-                                  day: "2-digit",
-                                  month: "short",
-                                  year: "numeric",
-                                }
-                              )}
+                <AnimatePresence>
+                  {expandedRows[tenant.code] && (
+                    <motion.tr
+                      className="bldg-mobile-with-border border-b border-[#E9E9E9]"
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={dropdownVariants}
+                    >
+                      <td colSpan={3} className="px-5">
+                        <div className="tenant-dropdown-content">
+                          <div className="tenant-grid">
+                            <div className="tenant-grid-item">
+                              <div className="dropdown-label">DATE</div>
+                              <div className="dropdown-value w-[95px]">
+                                {new Date(tenant.created_at).toLocaleDateString(
+                                  "en-GB",
+                                  {
+                                    day: "2-digit",
+                                    month: "short",
+                                    year: "numeric",
+                                  }
+                                )}
+                              </div>
+                            </div>
+                            <div className="tenant-grid-item w-[61%]">
+                              <div className="dropdown-label">CONTACTS</div>
+                              <div className="dropdown-value w-[113px]">
+                                {tenant.phone && tenant.email
+                                  ? `${tenant.phone}, ${tenant.email}`
+                                  : tenant.phone || tenant.email || "N/A"}
+                              </div>
                             </div>
                           </div>
-                          <div className="tenant-grid-item w-[61%]">
-                            <div className="dropdown-label">CONTACTS</div>
-                            <div className="dropdown-value w-[113px]">
-                              {tenant.phone && tenant.email
-                                ? `${tenant.phone}, ${tenant.email}`
-                                : tenant.phone || tenant.email || "N/A"}
+                          <div className="tenant-grid">
+                            <div className="tenant-grid-item w-[36%]">
+                              <div className="dropdown-label">STATUS</div>
+                              <div className="dropdown-value">
+                                <span
+                                  className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] tenant-status ${
+                                    tenant.status === "Active"
+                                      ? "bg-[#E6F5EC] text-[#1C7D4D]"
+                                      : tenant.status === "Inactive"
+                                      ? "bg-[#FDEAEA] text-[#D1293D]"
+                                      : "bg-[#FFF8E1] text-[#A67C00]"
+                                  }`}
+                                >
+                                  {tenant.status || "N/A"}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="tenant-grid-item w-[38%]">
+                              <div className="dropdown-label">ID TYPE</div>
+                              <div className="dropdown-value">
+                                {tenant.id_type?.title || "N/A"}
+                              </div>
+                            </div>
+                            <div className="tenant-grid-item w-[20%]">
+                              <div className="dropdown-label">ACTION</div>
+                              <div className="dropdown-value flex items-center gap-2 mt-[10px]">
+                                <button
+                                  onClick={() =>
+                                    openModal("edit-tenant", "Update Tenant", {
+                                      tenantId: tenant.id,
+                                    })
+                                  }
+                                >
+                                  <img
+                                    src={editicon}
+                                    alt="Edit"
+                                    className="w-[18px] h-[18px] action-btn duration-200"
+                                  />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setTenantToDelete(tenant.id);
+                                    setDeleteModalOpen(true);
+                                  }}
+                                >
+                                  <img
+                                    src={deletesicon}
+                                    alt="Delete"
+                                    className="w-[18px] h-[18px] action-btn duration-200"
+                                  />
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <div className="tenant-grid">
-                          <div className="tenant-grid-item w-[36%]">
-                            <div className="dropdown-label">STATUS</div>
-                            <div className="dropdown-value">
-                              <span
-                                className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] tenant-status ${
-                                  tenant.status === "Active"
-                                    ? "bg-[#E6F5EC] text-[#1C7D4D]"
-                                    : tenant.status === "Inactive"
-                                    ? "bg-[#FDEAEA] text-[#D1293D]"
-                                    : "bg-[#FFF8E1] text-[#A67C00]"
-                                }`}
-                              >
-                                {tenant.status || "N/A"}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="tenant-grid-item w-[38%]">
-                            <div className="dropdown-label">ID TYPE</div>
-                            <div className="dropdown-value">
-                              {tenant.id_type?.title || "N/A"}
-                            </div>
-                          </div>
-                          <div className="tenant-grid-item w-[20%]">
-                            <div className="dropdown-label">ACTION</div>
-                            <div className="dropdown-value flex items-center gap-2 mt-[10px]">
-                              <button
-                                onClick={() => openModal("edit-tenant", "Update Tenant", { tenantId: tenant.id })}
-                              >
-                                <img
-                                  src={editicon}
-                                  alt="Edit"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
-                                />
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setTenantToDelete(tenant.id);
-                                  setDeleteModalOpen(true);
-                                }}
-                              >
-                                <img
-                                  src={deletesicon}
-                                  alt="Delete"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
-                                />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
+                      </td>
+                    </motion.tr>
+                  )}
+                </AnimatePresence>
               </React.Fragment>
             ))}
           </tbody>

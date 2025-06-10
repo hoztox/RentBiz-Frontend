@@ -3,6 +3,7 @@ import "./reportcollection.css";
 import downarrow from "../../assets/Images/CollectionReport/downarrow.svg";
 import CustomDropDown from "../../components/CustomDropDown";
 import { ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const ReportCollection = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -66,28 +67,6 @@ const ReportCollection = () => {
     },
     {
       id: "B24090002",
-      tenancy: "TC0013-1",
-      date: "09 sept 2024",
-      tenant: "Shoes shop",
-      building: "Al Reem",
-      unit: "SHOP11",
-      amount: "120.00",
-      remark: "Anonymous",
-      payment: "Bank",
-    },
-    {
-      id: "B24090003",
-      tenancy: "TC0013-1",
-      date: "09 sept 2024",
-      tenant: "Coffee",
-      building: "Down Town",
-      unit: "SHOP10",
-      amount: "120.00",
-      remark: "Anonymous",
-      payment: "Cash",
-    },
-    {
-      id: "B24090004",
       tenancy: "TC0013-1",
       date: "09 sept 2024",
       tenant: "Shoes shop",
@@ -197,6 +176,25 @@ const ReportCollection = () => {
       ...prev,
       [id]: !prev[id],
     }));
+  };
+
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
   };
 
   return (
@@ -424,78 +422,86 @@ const ReportCollection = () => {
                     </div>
                   </td>
                 </tr>
-                {expandedRows[report.id] && (
-                  <tr className="report-collection-mobile-with-border border-b border-[#E9E9E9]">
-                    <td colSpan={3} className="px-5">
-                      <div className="report-collection-dropdown-content">
-                        <div className="report-collection-grid">
-                          <div className="report-collection-grid-item">
-                            <div className="report-collection-dropdown-label">
-                              DATE
+                <AnimatePresence>
+                  {expandedRows[report.id] && (
+                    <motion.tr
+                      className="report-collection-mobile-with-border border-b border-[#E9E9E9]"
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={dropdownVariants}
+                    >
+                      <td colSpan={3} className="px-5">
+                        <div className="report-collection-dropdown-content">
+                          <div className="report-collection-grid">
+                            <div className="report-collection-grid-item">
+                              <div className="report-collection-dropdown-label">
+                                DATE
+                              </div>
+                              <div className="report-collection-dropdown-value">
+                                {report.date}
+                              </div>
                             </div>
-                            <div className="report-collection-dropdown-value">
-                              {report.date}
+                            <div className="report-collection-grid-item">
+                              <div className="report-collection-dropdown-label">
+                                TENANCY
+                              </div>
+                              <div className="report-collection-dropdown-value">
+                                {report.tenancy}
+                              </div>
                             </div>
                           </div>
-                          <div className="report-collection-grid-item">
-                            <div className="report-collection-dropdown-label">
-                              TENANCY
+                          <div className="report-collection-grid">
+                            <div className="report-collection-grid-item">
+                              <div className="report-collection-dropdown-label">
+                                TENANT
+                              </div>
+                              <div className="report-collection-dropdown-value">
+                                {report.tenant}
+                              </div>
                             </div>
-                            <div className="report-collection-dropdown-value">
-                              {report.tenancy}
+                            <div className="report-collection-grid-item">
+                              <div className="report-collection-dropdown-label">
+                                UNIT
+                              </div>
+                              <div className="report-collection-dropdown-value">
+                                {report.unit}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="report-collection-grid">
+                            <div className="report-collection-grid-item">
+                              <div className="report-collection-dropdown-label">
+                                AMOUNT
+                              </div>
+                              <div className="report-collection-dropdown-value">
+                                {report.amount}
+                              </div>
+                            </div>
+                            <div className="report-collection-grid-item">
+                              <div className="report-collection-dropdown-label">
+                                REMARK
+                              </div>
+                              <div className="report-collection-dropdown-value">
+                                {report.remark}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="report-collection-grid">
+                            <div className="report-collection-grid-item">
+                              <div className="report-collection-dropdown-label">
+                                PAYMENT METHOD
+                              </div>
+                              <div className="report-collection-dropdown-value">
+                                {report.payment}
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <div className="report-collection-grid">
-                          <div className="report-collection-grid-item">
-                            <div className="report-collection-dropdown-label">
-                              TENANT
-                            </div>
-                            <div className="report-collection-dropdown-value">
-                              {report.tenant}
-                            </div>
-                          </div>
-                          <div className="report-collection-grid-item">
-                            <div className="report-collection-dropdown-label">
-                              UNIT
-                            </div>
-                            <div className="report-collection-dropdown-value">
-                              {report.unit}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="report-collection-grid">
-                          <div className="report-collection-grid-item">
-                            <div className="report-collection-dropdown-label">
-                              AMOUNT
-                            </div>
-                            <div className="report-collection-dropdown-value">
-                              {report.amount}
-                            </div>
-                          </div>
-                          <div className="report-collection-grid-item">
-                            <div className="report-collection-dropdown-label">
-                              REMARK
-                            </div>
-                            <div className="report-collection-dropdown-value">
-                              {report.remark}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="report-collection-grid">
-                          <div className="report-collection-grid-item">
-                            <div className="report-collection-dropdown-label">
-                              PAYMENT METHOD
-                            </div>
-                            <div className="report-collection-dropdown-value">
-                              {report.payment}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
+                      </td>
+                    </motion.tr>
+                  )}
+                </AnimatePresence>
               </React.Fragment>
             ))}
           </tbody>

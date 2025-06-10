@@ -11,6 +11,7 @@ import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 import CurrencyDeleteModal from "./CurrencyDeleteModal/CurrencyDeleteModal";
 import CustomDropDown from "../../../components/CustomDropDown";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Currency = () => {
   const { openModal, refreshCounter } = useModal();
@@ -182,6 +183,25 @@ const Currency = () => {
       ...prev,
       [id]: !prev[id],
     }));
+  };
+
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
   };
 
   // Loading state
@@ -401,65 +421,73 @@ const Currency = () => {
                       </div>
                     </td>
                   </tr>
-                  {expandedRows[currency.id] && (
-                    <tr className="mobile-with-border border-b border-[#E9E9E9]">
-                      <td colSpan={3} className="px-5">
-                        <div className="currency-dropdown-content">
-                          <div className="currency-grid">
-                            <div className="currency-grid-items w-[40%]">
-                              <div className="dropdown-label">CURRENCY</div>
-                              <div className="dropdown-value">
-                                {currency.currency || "N/A"}
+                  <AnimatePresence>
+                    {expandedRows[currency.id] && (
+                      <motion.tr
+                        className="mobile-with-border border-b border-[#E9E9E9]"
+                        initial="hidden"
+                        animate="visible"
+                        exit="hidden"
+                        variants={dropdownVariants}
+                      >
+                        <td colSpan={3} className="px-5">
+                          <div className="currency-dropdown-content">
+                            <div className="currency-grid">
+                              <div className="currency-grid-items w-[40%]">
+                                <div className="dropdown-label">CURRENCY</div>
+                                <div className="dropdown-value">
+                                  {currency.currency || "N/A"}
+                                </div>
+                              </div>
+                              <div className="currency-grid-items w-[60%]">
+                                <div className="dropdown-label">CODE</div>
+                                <div className="dropdown-value">
+                                  {currency.currency_code || "N/A"}
+                                </div>
                               </div>
                             </div>
-                            <div className="currency-grid-items w-[60%]">
-                              <div className="dropdown-label">CODE</div>
-                              <div className="dropdown-value">
-                                {currency.currency_code || "N/A"}
+                            <div className="currency-grid">
+                              <div className="currency-grid-items w-[40%]">
+                                <div className="dropdown-label">MINOR UNIT</div>
+                                <div className="dropdown-value">
+                                  {currency.minor_unit !== undefined &&
+                                  currency.minor_unit !== null &&
+                                  currency.minor_unit !== ""
+                                    ? `${currency.minor_unit} unit`
+                                    : "N/A"}
+                                </div>
+                              </div>
+                              <div className="currency-grid-items w-[60%]">
+                                <div className="dropdown-label">ACTION</div>
+                                <div className="dropdown-value flex items-center gap-2 p-[5px]">
+                                  <button
+                                    onClick={() => handelEditClick(currency)}
+                                    disabled={loading}
+                                  >
+                                    <img
+                                      src={editicon}
+                                      alt="Edit"
+                                      className="w-[18px] h-[18px] action-btn duration-200"
+                                    />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDelete(currency.id)}
+                                    disabled={loading}
+                                  >
+                                    <img
+                                      src={deleteicon}
+                                      alt="Delete"
+                                      className="w-[18px] h-[18px] ml-[5px] action-btn duration-200"
+                                    />
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </div>
-                          <div className="currency-grid">
-                            <div className="currency-grid-items w-[40%]">
-                              <div className="dropdown-label">MINOR UNIT</div>
-                              <div className="dropdown-value">
-                                {currency.minor_unit !== undefined &&
-                                currency.minor_unit !== null &&
-                                currency.minor_unit !== ""
-                                  ? `${currency.minor_unit} unit`
-                                  : "N/A"}
-                              </div>
-                            </div>
-                            <div className="currency-grid-items w-[60%]">
-                              <div className="dropdown-label">ACTION</div>
-                              <div className="dropdown-value flex items-center gap-2 p-[5px]">
-                                <button
-                                  onClick={() => handelEditClick(currency)}
-                                  disabled={loading}
-                                >
-                                  <img
-                                    src={editicon}
-                                    alt="Edit"
-                                    className="w-[18px] h-[18px] action-btn duration-200"
-                                  />
-                                </button>
-                                <button
-                                  onClick={() => handleDelete(currency.id)}
-                                  disabled={loading}
-                                >
-                                  <img
-                                    src={deleteicon}
-                                    alt="Delete"
-                                    className="w-[18px] h-[18px] ml-[5px] action-btn duration-200"
-                                  />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
+                        </td>
+                      </motion.tr>
+                    )}
+                  </AnimatePresence>
                 </React.Fragment>
               ))
             )}

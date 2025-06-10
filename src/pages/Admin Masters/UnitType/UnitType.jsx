@@ -9,8 +9,9 @@ import unitimg from "../../../assets/Images/Admin Masters/units-img.svg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import UnitTypeDeleteModal from "./UnitTypeDeleteModal/UnitTypeDeleteModal";
-import { unitTypesApi } from "../MastersApi"; // Updated import
+import { unitTypesApi } from "../MastersApi";
 import CustomDropDown from "../../../components/CustomDropDown";
+import { motion, AnimatePresence } from "framer-motion";
 
 const UnitType = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -29,7 +30,7 @@ const UnitType = () => {
     { value: "all", label: "All" },
   ];
 
-  const [selectedOption, setSelectedOption] = useState("showing")
+  const [selectedOption, setSelectedOption] = useState("showing");
 
   // Fetch unit types from backend
   const fetchData = async () => {
@@ -147,6 +148,25 @@ const UnitType = () => {
     }));
   };
 
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
+  };
+
   // Loading state
   if (loading) {
     return (
@@ -191,13 +211,13 @@ const UnitType = () => {
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 unit-search"
             />
             <div className="relative w-[40%] md:w-auto">
-            <CustomDropDown
-              options={dropdownOptions}
-              value={selectedOption}
-              onChange={setSelectedOption}
-              className="w-full md:w-[121px]"
-              dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 unit-selection"
-            />
+              <CustomDropDown
+                options={dropdownOptions}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                className="w-full md:w-[121px]"
+                dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 unit-selection"
+              />
             </div>
           </div>
           <div className="flex gap-[10px] utype-action-buttons-container">
@@ -406,43 +426,53 @@ const UnitType = () => {
                       </div>
                     </td>
                   </tr>
-                  {expandedRows[unit.id] && (
-                    <tr className="utype-mobile-with-border border-b border-[#E9E9E9]">
-                      <td colSpan={3} className="px-5">
-                        <div className="unit-dropdown-content">
-                          <div className="utype-grid">
-                            <div className="utype-grid-items">
-                              <div className="utype-dropdown-label">
-                                ENTRY DATE
+                  <AnimatePresence>
+                    {expandedRows[unit.id] && (
+                      <motion.tr
+                        className="utype-mobile-with-border border-b border-[#E9E9E9]"
+                        initial="hidden"
+                        animate="visible"
+                        exit="hidden"
+                        variants={dropdownVariants}
+                      >
+                        <td colSpan={3} className="px-5">
+                          <div className="unit-dropdown-content">
+                            <div className="utype-grid">
+                              <div className="utype-grid-items">
+                                <div className="utype-dropdown-label">
+                                  ENTRY DATE
+                                </div>
+                                <div className="utype-dropdown-value">
+                                  {formatDate(unit.created_at)}
+                                </div>
                               </div>
-                              <div className="utype-dropdown-value">
-                                {formatDate(unit.created_at)}
-                              </div>
-                            </div>
-                            <div className="utype-grid-items">
-                              <div className="utype-dropdown-label">ACTION</div>
-                              <div className="utype-dropdown-value utype-flex-items-center-gap-2 p-1 ml-[5px]">
-                                <button onClick={() => handleEditClick(unit)}>
-                                  <img
-                                    src={editicon}
-                                    alt="Edit"
-                                    className="w-[18px] h-[18px] utype-action-btn duration-200"
-                                  />
-                                </button>
-                                <button onClick={() => handleDelete(unit.id)}>
-                                  <img
-                                    src={deleteicon}
-                                    alt="Delete"
-                                    className="w-[18px] h-[18px] ml-[5px] utype-delete-btn duration-200"
-                                  />
-                                </button>
+                              <div className="utype-grid-items">
+                                <div className="utype-dropdown-label">
+                                  ACTION
+                                </div>
+                                <div className="utype-dropdown-value utype-flex-items-center-gap-2 p-1 ml-[5px]">
+                                  <button onClick={() => handleEditClick(unit)}>
+                                    <img
+                                      src={editicon}
+                                      alt="Edit"
+                                      className="w-[18px] h-[18px] utype-action-btn duration-200"
+                                    />
+                                  </button>
+                                  <button onClick={() => handleDelete(unit.id)}>
+                                    <img
+                                      src={deleteicon}
+                                      alt="Delete"
+                                      className="w-[18px] h-[18px] ml-[5px] utype-delete-btn duration-200"
+                                    />
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
+                        </td>
+                      </motion.tr>
+                    )}
+                  </AnimatePresence>
                 </React.Fragment>
               ))
             )}

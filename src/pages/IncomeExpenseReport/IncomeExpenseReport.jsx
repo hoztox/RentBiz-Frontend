@@ -3,6 +3,7 @@ import "./IncomeExpenseReport.css";
 import { ChevronDown } from "lucide-react";
 import downarrow from "../../assets/Images/IncomeExpenseReport/downarrow.svg";
 import CustomDropDown from "../../components/CustomDropDown";
+import { motion, AnimatePresence } from "framer-motion";
 
 const IncomeExpenseReport = () => {
   const [openSelectKey, setOpenSelectKey] = useState(null);
@@ -190,6 +191,25 @@ const IncomeExpenseReport = () => {
       ...prev,
       [id]: !prev[id],
     }));
+  };
+
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
   };
 
   return (
@@ -480,112 +500,120 @@ const IncomeExpenseReport = () => {
                     </div>
                   </td>
                 </tr>
-                {expandedRows[report.id] && (
-                  <tr className="income-expense-mobile-with-border border-b border-[#E9E9E9]">
-                    <td colSpan={3} className="p-0">
-                      <div className="income-expense-grid-container">
-                        <div className="income-expense-grid">
-                          <div className="income-expense-grid-item">
-                            <div className="income-expense-dropdown-label w-[50%]">
-                              UNIT
+                <AnimatePresence>
+                  {expandedRows[report.id] && (
+                    <motion.tr
+                      className="income-expense-mobile-with-border border-b border-[#E9E9E9]"
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={dropdownVariants}
+                    >
+                      <td colSpan={3} className="p-0">
+                        <div className="income-expense-grid-container">
+                          <div className="income-expense-grid">
+                            <div className="income-expense-grid-item">
+                              <div className="income-expense-dropdown-label w-[50%]">
+                                UNIT
+                              </div>
+                              <div className="income-expense-dropdown-value">
+                                {report.unit}
+                              </div>
                             </div>
-                            <div className="income-expense-dropdown-value">
-                              {report.unit}
+                            <div className="income-expense-grid-item w-[50%]">
+                              <div className="income-expense-dropdown-label">
+                                TENANT
+                              </div>
+                              <div className="income-expense-dropdown-value">
+                                {report.tenant}
+                              </div>
                             </div>
                           </div>
-                          <div className="income-expense-grid-item w-[50%]">
-                            <div className="income-expense-dropdown-label">
-                              TENANT
+                          <div className="income-expense-grid">
+                            <div className="income-expense-grid-item w-[50%]">
+                              <div className="income-expense-dropdown-label">
+                                CHARGE
+                              </div>
+                              <div className="income-expense-dropdown-value">
+                                {report.charge}
+                              </div>
                             </div>
-                            <div className="income-expense-dropdown-value">
-                              {report.tenant}
+                            <div className="income-expense-grid-item w-[50%]">
+                              <div className="income-expense-dropdown-label">
+                                INVOICE NO/EXPENSE NO
+                              </div>
+                              <div className="income-expense-dropdown-value">
+                                {report.invoice_no}
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <div className="income-expense-grid">
-                          <div className="income-expense-grid-item w-[50%]">
-                            <div className="income-expense-dropdown-label">
-                              CHARGE
-                            </div>
-                            <div className="income-expense-dropdown-value">
-                              {report.charge}
-                            </div>
-                          </div>
-                          <div className="income-expense-grid-item w-[50%]">
-                            <div className="income-expense-dropdown-label">
-                              INVOICE NO/EXPENSE NO
-                            </div>
-                            <div className="income-expense-dropdown-value">
-                              {report.invoice_no}
-                            </div>
-                          </div>
+                        <div className="income-expense-table-container">
+                          <table className="income-expense-dropdown-table">
+                            <thead>
+                              <tr className="income-expense-dropdown-table-header">
+                                <th
+                                  colSpan="3"
+                                  className="income-expense-income-header"
+                                >
+                                  INCOME
+                                </th>
+                                <th
+                                  colSpan="3"
+                                  className="income-expense-expense-header"
+                                >
+                                  EXPENSE
+                                </th>
+                              </tr>
+                              <tr className="income-expense-dropdown-table-subheader">
+                                <th className="income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">
+                                  AMOUNT
+                                </th>
+                                <th className="income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">
+                                  VAT
+                                </th>
+                                <th className="income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">
+                                  TOTAL
+                                </th>
+                                <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
+                                  AMOUNT
+                                </th>
+                                <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
+                                  VAT
+                                </th>
+                                <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
+                                  TOTAL
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr className="income-expense-dropdown-table-row">
+                                <td className="income-expense-data bg-[#F2FCF7] !text-[#28C76F]">
+                                  {report.income_amount}
+                                </td>
+                                <td className="income-expense-data bg-[#F2FCF7] !text-[#28C76F]">
+                                  {report.income_vat}
+                                </td>
+                                <td className="income-expense-data bg-[#F2FCF7] !text-[#28C76F]">
+                                  {report.income_total}
+                                </td>
+                                <td className="income-expense-data bg-[#FFF7F6] !text-[#FE7062]">
+                                  {report.expense_amount}
+                                </td>
+                                <td className="income-expense-data bg-[#FFF7F6] !text-[#FE7062]">
+                                  {report.expense_vat}
+                                </td>
+                                <td className="income-expense-data bg-[#FFF7F6] !text-[#FE7062]">
+                                  {report.expense_total}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
                         </div>
-                      </div>
-                      <div className="income-expense-table-container">
-                        <table className="income-expense-dropdown-table">
-                          <thead>
-                            <tr className="income-expense-dropdown-table-header">
-                              <th
-                                colSpan="3"
-                                className="income-expense-income-header"
-                              >
-                                INCOME
-                              </th>
-                              <th
-                                colSpan="3"
-                                className="income-expense-expense-header"
-                              >
-                                EXPENSE
-                              </th>
-                            </tr>
-                            <tr className="income-expense-dropdown-table-subheader">
-                              <th className="income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">
-                                AMOUNT
-                              </th>
-                              <th className="income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">
-                                VAT
-                              </th>
-                              <th className="income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">
-                                TOTAL
-                              </th>
-                              <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
-                                AMOUNT
-                              </th>
-                              <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
-                                VAT
-                              </th>
-                              <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
-                                TOTAL
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr className="income-expense-dropdown-table-row">
-                              <td className="income-expense-data bg-[#F2FCF7] !text-[#28C76F]">
-                                {report.income_amount}
-                              </td>
-                              <td className="income-expense-data bg-[#F2FCF7] !text-[#28C76F]">
-                                {report.income_vat}
-                              </td>
-                              <td className="income-expense-data bg-[#F2FCF7] !text-[#28C76F]">
-                                {report.income_total}
-                              </td>
-                              <td className="income-expense-data bg-[#FFF7F6] !text-[#FE7062]">
-                                {report.expense_amount}
-                              </td>
-                              <td className="income-expense-data bg-[#FFF7F6] !text-[#FE7062]">
-                                {report.expense_vat}
-                              </td>
-                              <td className="income-expense-data bg-[#FFF7F6] !text-[#FE7062]">
-                                {report.expense_total}
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </td>
-                  </tr>
-                )}
+                      </td>
+                    </motion.tr>
+                  )}
+                </AnimatePresence>
               </React.Fragment>
             ))}
           </tbody>

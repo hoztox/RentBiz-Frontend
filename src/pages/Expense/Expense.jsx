@@ -8,6 +8,7 @@ import downloadactionicon from "../../assets/Images/Expense/download-action-icon
 import downarrow from "../../assets/Images/Expense/downarrow.svg";
 import { useModal } from "../../context/ModalContext";
 import CustomDropDown from "../../components/CustomDropDown";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Expense = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -35,33 +36,6 @@ const Expense = () => {
     },
     {
       id: "02",
-      date: "24 Nov 2024",
-      expense: "Maintenance",
-      amount: "280.00",
-      vatAmount: "1.25",
-      totalAmount: "281.25",
-      status: "Paid",
-    },
-    {
-      id: "03",
-      date: "24 Nov 2024",
-      expense: "Maintenance",
-      amount: "280.00",
-      vatAmount: "1.25",
-      totalAmount: "281.25",
-      status: "Paid",
-    },
-    {
-      id: "04",
-      date: "24 Nov 2024",
-      expense: "Maintenance",
-      amount: "280.00",
-      vatAmount: "1.25",
-      totalAmount: "281.25",
-      status: "Paid",
-    },
-    {
-      id: "05",
       date: "24 Nov 2024",
       expense: "Maintenance",
       amount: "280.00",
@@ -104,6 +78,25 @@ const Expense = () => {
     }));
   };
 
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
+  };
+
   return (
     <div className="border border-[#E9E9E9] rounded-md expense-table">
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] expense-table-header">
@@ -118,13 +111,13 @@ const Expense = () => {
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 expense-search"
             />
             <div className="relative w-[40%] md:w-auto">
-             <CustomDropDown
-             options={dropdownOptions}
-             value={selectedOption}
-             onChange={setSelectedOption}
-             className="w-full md:w-[121px]"
-             dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 expense-selection"
-             />
+              <CustomDropDown
+                options={dropdownOptions}
+                value={selectedOption}
+                onChange={setSelectedOption}
+                className="w-full md:w-[121px]"
+                dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 expense-selection"
+              />
             </div>
           </div>
           <div className="flex gap-[10px] expense-action-buttons w-full md:w-auto justify-start">
@@ -275,80 +268,96 @@ const Expense = () => {
                     </div>
                   </td>
                 </tr>
-                {expandedRows[expense.id + index] && (
-                  <tr className="expense-mobile-with-border border-b border-[#E9E9E9]">
-                    <td colSpan={4} className="pl-3">
-                      <div className="expense-dropdown-content">
-                        <div className="expense-dropdown-grid">
-                          <div className="expense-dropdown-item expense-amount-column">
-                            <div className="expense-dropdown-label">AMOUNT</div>
-                            <div className="expense-dropdown-value">
-                              {expense.amount}
+                <AnimatePresence>
+                  {expandedRows[expense.id + index] && (
+                    <motion.tr
+                      className="expense-mobile-with-border border-b border-[#E9E9E9]"
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={dropdownVariants}
+                    >
+                      <td colSpan={4} className="pl-3">
+                        <div className="expense-dropdown-content">
+                          <div className="expense-dropdown-grid">
+                            <div className="expense-dropdown-item expense-amount-column">
+                              <div className="expense-dropdown-label">
+                                AMOUNT
+                              </div>
+                              <div className="expense-dropdown-value">
+                                {expense.amount}
+                              </div>
+                            </div>
+                            <div className="expense-dropdown-item expense-vat-amount-column">
+                              <div className="expense-dropdown-label">
+                                VAT AMOUNT
+                              </div>
+                              <div className="expense-dropdown-value">
+                                {expense.vatAmount}
+                              </div>
+                            </div>
+                            <div className="expense-dropdown-item expense-total-amount-column">
+                              <div className="expense-dropdown-label">
+                                TOTAL AMOUNT
+                              </div>
+                              <div className="expense-dropdown-value">
+                                {expense.totalAmount}
+                              </div>
                             </div>
                           </div>
-                          <div className="expense-dropdown-item expense-vat-amount-column">
-                            <div className="expense-dropdown-label">
-                              VAT AMOUNT
+                          <div className="expense-dropdown-grid">
+                            <div className="expense-dropdown-item expense-status-column">
+                              <div className="expense-dropdown-label">
+                                STATUS
+                              </div>
+                              <div className="expense-dropdown-value">
+                                <span
+                                  className={`expense-status ${
+                                    expense.status === "Paid"
+                                      ? "bg-[#28C76F29] text-[#28C76F]"
+                                      : "bg-[#FFE1E1] text-[#C72828]"
+                                  }`}
+                                >
+                                  {expense.status}
+                                </span>
+                              </div>
                             </div>
-                            <div className="expense-dropdown-value">
-                              {expense.vatAmount}
-                            </div>
-                          </div>
-                          <div className="expense-dropdown-item expense-total-amount-column">
-                            <div className="expense-dropdown-label">
-                              TOTAL AMOUNT
-                            </div>
-                            <div className="expense-dropdown-value">
-                              {expense.totalAmount}
+                            <div className="expense-dropdown-item expense-action-column">
+                              <div className="expense-dropdown-label">
+                                ACTION
+                              </div>
+                              <div className="expense-dropdown-value flex items-center gap-4 p-[5px]">
+                                <button
+                                  onClick={() => openUpdateModal(expense)}
+                                >
+                                  <img
+                                    src={editicon}
+                                    alt="Edit"
+                                    className="w-[18px] h-[18px] action-btn duration-200"
+                                  />
+                                </button>
+                                <button>
+                                  <img
+                                    src={downloadactionicon}
+                                    alt="Download"
+                                    className="w-[18px] h-[18px] action-btn duration-200"
+                                  />
+                                </button>
+                                <button>
+                                  <img
+                                    src={printericon}
+                                    alt="Print"
+                                    className="w-[18px] h-[18px] action-btn duration-200"
+                                  />
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                        <div className="expense-dropdown-grid">
-                          <div className="expense-dropdown-item expense-status-column">
-                            <div className="expense-dropdown-label">STATUS</div>
-                            <div className="expense-dropdown-value">
-                              <span
-                                className={`expense-status ${
-                                  expense.status === "Paid"
-                                    ? "bg-[#28C76F29] text-[#28C76F]"
-                                    : "bg-[#FFE1E1] text-[#C72828]"
-                                }`}
-                              >
-                                {expense.status}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="expense-dropdown-item expense-action-column">
-                            <div className="expense-dropdown-label">ACTION</div>
-                            <div className="expense-dropdown-value flex items-center gap-4 p-[5px]">
-                              <button onClick={() => openUpdateModal(expense)}>
-                                <img
-                                  src={editicon}
-                                  alt="Edit"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
-                                />
-                              </button>
-                              <button>
-                                <img
-                                  src={downloadactionicon}
-                                  alt="Download"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
-                                />
-                              </button>
-                              <button>
-                                <img
-                                  src={printericon}
-                                  alt="Print"
-                                  className="w-[18px] h-[18px] action-btn duration-200"
-                                />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
+                      </td>
+                    </motion.tr>
+                  )}
+                </AnimatePresence>
               </React.Fragment>
             ))}
           </tbody>

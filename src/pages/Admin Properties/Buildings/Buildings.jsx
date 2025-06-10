@@ -158,8 +158,7 @@ const Buildings = () => {
       opacity: 0,
       height: 0,
       transition: {
-        type: "spring",
-        duration: 0.3,
+        duration: 0.2,
         ease: "easeInOut",
       },
     },
@@ -167,7 +166,6 @@ const Buildings = () => {
       opacity: 1,
       height: "auto",
       transition: {
-        type: "spring",
         duration: 0.3,
         ease: "easeInOut",
       },
@@ -359,13 +357,7 @@ const Buildings = () => {
                       variants={dropdownVariants}
                     >
                       <td colSpan={3} className="px-5">
-                        <motion.div
-                          className="bldg-dropdown-content"
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.3, ease: "easeInOut" }}
-                        >
+                        <div>
                           <div className="bldg-grid">
                             <div className="bldg-grid-item w-[45%]">
                               <div className="bldg-dropdown-label">DATE</div>
@@ -441,7 +433,7 @@ const Buildings = () => {
                               </div>
                             </div>
                           </div>
-                        </motion.div>
+                        </div>
                       </td>
                     </motion.tr>
                   )}

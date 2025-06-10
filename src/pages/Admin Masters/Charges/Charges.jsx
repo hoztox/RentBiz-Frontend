@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "./Charges.css";
-import { ChevronDown } from "lucide-react";
 import plusicon from "../../../assets/Images/Admin Masters/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Masters/download-icon.svg";
 import editicon from "../../../assets/Images/Admin Masters/edit-icon.svg";
@@ -12,9 +11,9 @@ import DeleteChargesModal from "./DeleteChargesModal/DeleteChargesModal";
 import buildingimg from "../../../assets/Images/Admin Masters/charges-building.png";
 import { chargesApi } from "../MastersApi";
 import CustomDropDown from "../../../components/CustomDropDown";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Charges = () => {
-  const [isHeaderSelectOpen, setIsHeaderSelectOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
@@ -31,7 +30,7 @@ const Charges = () => {
     { value: "all", label: "All" },
   ];
 
-  const [selectedOption, setSelectedOption] = useState("showing")
+  const [selectedOption, setSelectedOption] = useState("showing");
 
   // Fetch charges data
   useEffect(() => {
@@ -130,6 +129,25 @@ const Charges = () => {
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
+  };
 
   return (
     <div className="border border-gray-200 rounded-md charges-table">
@@ -360,57 +378,65 @@ const Charges = () => {
                           </div>
                         </td>
                       </tr>
-                      {expandedRows[charge.id] && (
-                        <tr className="mobile-with-border border-b border-[#E9E9E9]">
-                          <td colSpan={3} className="px-5">
-                            <div className="charges-dropdown-content">
-                              <div className="charges-grid">
-                                <div className="charges-grid-items">
-                                  <div className="dropdown-label">DATE</div>
-                                  <div className="dropdown-value">
-                                    {formatDate(charge.created_at)}
+                      <AnimatePresence>
+                        {expandedRows[charge.id] && (
+                          <motion.tr
+                            className="mobile-with-border border-b border-[#E9E9E9]"
+                            initial="hidden"
+                            animate="visible"
+                            exit="hidden"
+                            variants={dropdownVariants}
+                          >
+                            <td colSpan={3} className="px-5">
+                              <div className="charges-dropdown-content">
+                                <div className="charges-grid">
+                                  <div className="charges-grid-items">
+                                    <div className="dropdown-label">DATE</div>
+                                    <div className="dropdown-value">
+                                      {formatDate(charge.created_at)}
+                                    </div>
+                                  </div>
+                                  <div className="charges-grid-items">
+                                    <div className="dropdown-label">
+                                      CHARGE CODE
+                                    </div>
+                                    <div className="dropdown-value">
+                                      {charge.charge_code?.title || "N/A"}
+                                    </div>
                                   </div>
                                 </div>
-                                <div className="charges-grid-items">
-                                  <div className="dropdown-label">
-                                    CHARGE CODE
-                                  </div>
-                                  <div className="dropdown-value">
-                                    {charge.charge_code?.title || "N/A"}
+                                <div className="charges-grid">
+                                  <div className="charges-grid-items">
+                                    <div className="dropdown-label">ACTION</div>
+                                    <div className="dropdown-value flex items-center gap-4 p-1">
+                                      <button
+                                        onClick={() => handleEditClick(charge)}
+                                        disabled={loading}
+                                      >
+                                        <img
+                                          src={editicon}
+                                          alt="Edit"
+                                          className="w-[18px] h-[18px] action-btn duration-200"
+                                        />
+                                      </button>
+                                      <button
+                                        onClick={() => handleDelete(charge.id)}
+                                        disabled={loading}
+                                      >
+                                        <img
+                                          src={deleteicon}
+                                          alt="Delete"
+                                          className="w-[18px] h-[18px] action-btn duration-200"
+                                        />
+                                      </button>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                              <div className="charges-grid">
-                                <div className="charges-grid-items">
-                                  <div className="dropdown-label">ACTION</div>
-                                  <div className="dropdown-value flex items-center gap-4 p-1">
-                                    <button
-                                      onClick={() => handleEditClick(charge)}
-                                      disabled={loading}
-                                    >
-                                      <img
-                                        src={editicon}
-                                        alt="Edit"
-                                        className="w-[18px] h-[18px] action-btn duration-200"
-                                      />
-                                    </button>
-                                    <button
-                                      onClick={() => handleDelete(charge.id)}
-                                      disabled={loading}
-                                    >
-                                      <img
-                                        src={deleteicon}
-                                        alt="Delete"
-                                        className="w-[18px] h-[18px] action-btn duration-200"
-                                      />
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
+                            </td>
+                          </motion.tr>
+                        )}
+                      </AnimatePresence>
                     </React.Fragment>
                   ))
                 )}
