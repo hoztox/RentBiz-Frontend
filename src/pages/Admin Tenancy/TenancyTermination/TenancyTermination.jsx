@@ -9,6 +9,7 @@ import TenancyTerminateModal from "./TenancyTerminateModal/TenancyTerminateModal
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 import CustomDropDown from "../../../components/CustomDropDown";
+import { motion, AnimatePresence } from "framer-motion";
 
 const TenancyTermination = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -117,6 +118,25 @@ const TenancyTermination = () => {
       ...prev,
       [tenancy_code]: !prev[tenancy_code],
     }));
+  };
+
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
   };
 
   const filteredData = tenancies.filter(
@@ -263,10 +283,10 @@ const TenancyTermination = () => {
           <thead>
             <tr className="tenancy-table-row-head">
               <th className="px-5 w-[53%] text-left tenancy-thead tterm-id-column">
-                Tenancy Code
+                ID
               </th>
               <th className="px-5 w-[47%] text-left tenancy-thead tterm-end-date-column">
-                Tenant Name
+                Name
               </th>
               <th className="px-5 text-right tenancy-thead"></th>
             </tr>
@@ -304,146 +324,74 @@ const TenancyTermination = () => {
                     </div>
                   </td>
                 </tr>
-                {expandedRows[tenancy.tenancy_code] && (
-                  <tr className="tterm-mobile-with-border border-b border-[#E9E9E9]">
-                    <td colSpan={3} className="px-5">
-                      <div className="tenancy-dropdown-content">
-                        <div className="tterm-grid">
-                          <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">
-                              BUILDING NAME
-                            </div>
-                            <div className="tterm-dropdown-value">
-                              {tenancy.building?.building_name || "N/A"}
-                            </div>
-                          </div>
-                          <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">
-                              UNIT NAME
-                            </div>
-                            <div className="tterm-dropdown-value">
-                              {tenancy.unit?.unit_name || "N/A"}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="tterm-grid">
-                          <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">
-                              START DATE
-                            </div>
-                            <div className="tterm-dropdown-value">
-                              {tenancy.start_date || "N/A"}
-                            </div>
-                          </div>
-                          <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">END DATE</div>
-                            <div className="tterm-dropdown-value">
-                              {tenancy.end_date || "N/A"}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="tterm-grid">
-                          <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">
-                              RENTAL MONTHS
-                            </div>
-                            <div className="tterm-dropdown-value">
-                              {tenancy.rental_months || "N/A"}
-                            </div>
-                          </div>
-                          <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">
-                              RENT PER FREQUENCY
-                            </div>
-                            <div className="tterm-dropdown-value">
-                              ${tenancy.rent_per_frequency || "N/A"}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="tterm-grid">
-                          <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">
-                              TOTAL RENT
-                            </div>
-                            <div className="tterm-dropdown-value">
-                              ${tenancy.total_rent_receivable || "N/A"}
-                            </div>
-                          </div>
-                          <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">DEPOSIT</div>
-                            <div className="tterm-dropdown-value">
-                              ${tenancy.deposit || "N/A"}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="tterm-grid">
-                          <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">
-                              COMMISSION
-                            </div>
-                            <div className="tterm-dropdown-value">
-                              ${tenancy.commision || "N/A"}
-                            </div>
-                          </div>
-                          <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">STATUS</div>
-                            <div className="tterm-dropdown-value">
-                              {tenancy.status || "N/A"}
-                            </div>
-                          </div>
-                        </div>
-                        {tenancy.additional_charges?.length > 0 && (
+                <AnimatePresence>
+                  {expandedRows[tenancy.tenancy_code] && (
+                    <motion.tr
+                      className="tterm-mobile-with-border border-b border-[#E9E9E9]"
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={dropdownVariants}
+                    >
+                      <td colSpan={3} className="px-5">
+                        <div className="tenancy-dropdown-content">
                           <div className="tterm-grid">
                             <div className="tterm-grid-item">
                               <div className="tterm-dropdown-label">
-                                ADDITIONAL CHARGES
+                                BUILDING NAME
                               </div>
                               <div className="tterm-dropdown-value">
-                                {tenancy.additional_charges.map(
-                                  (charge, index) => (
-                                    <div key={index} className="mb-2">
-                                      {charge.reason}: ${charge.amount} (Due:{" "}
-                                      {charge.due_date})
-                                    </div>
-                                  )
-                                )}
+                                {tenancy.building?.building_name || "N/A"}
+                              </div>
+                            </div>
+                            <div className="tterm-grid-item">
+                              <div className="tterm-dropdown-label">
+                                UNIT NAME
+                              </div>
+                              <div className="tterm-dropdown-value">
+                                {tenancy.unit?.unit_name || "N/A"}
                               </div>
                             </div>
                           </div>
-                        )}
-                        <div className="tterm-grid">
-                          <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">REMARKS</div>
-                            <div className="tterm-dropdown-value">
-                              {tenancy.remarks || "N/A"}
+
+                          <div className="tterm-grid">
+                            <div className="tterm-grid-item">
+                              <div className="tterm-dropdown-label">
+                                END DATE
+                              </div>
+                              <div className="tterm-dropdown-value">
+                                {tenancy.end_date || "N/A"}
+                              </div>
                             </div>
-                          </div>
-                          <div className="tterm-grid-item">
-                            <div className="tterm-dropdown-label">ACTION</div>
-                            <div className="tterm-dropdown-value tterm-flex tterm-items-center mt-[10px] ml-[5px]">
-                              <button onClick={() => handleEditClick(tenancy)}>
-                                <img
-                                  src={editicon}
-                                  alt="Edit"
-                                  className="w-[18px] h-[18px] tterm-action-btn duration-200"
-                                />
-                              </button>
-                              <button
-                                onClick={() => openTerminateModal(tenancy)}
-                              >
-                                <img
-                                  src={terminateicon}
-                                  alt="Terminate"
-                                  className="w-[32px] h-[20px] ml-[10px] tterm-terminate-btn duration-200"
-                                />
-                              </button>
+                            <div className="tterm-grid-item">
+                              <div className="tterm-dropdown-label">ACTION</div>
+                              <div className="tterm-dropdown-value tterm-flex tterm-items-center mt-[10px] ml-[5px]">
+                                <button
+                                  onClick={() => handleEditClick(tenancy)}
+                                >
+                                  <img
+                                    src={editicon}
+                                    alt="Edit"
+                                    className="w-[18px] h-[18px] tterm-action-btn duration-200"
+                                  />
+                                </button>
+                                <button
+                                  onClick={() => openTerminateModal(tenancy)}
+                                >
+                                  <img
+                                    src={terminateicon}
+                                    alt="Terminate"
+                                    className="w-[32px] h-[20px] ml-[10px] tterm-terminate-btn duration-200"
+                                  />
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                  </tr>
-                )}
+                      </td>
+                    </motion.tr>
+                  )}
+                </AnimatePresence>
               </React.Fragment>
             ))}
           </tbody>

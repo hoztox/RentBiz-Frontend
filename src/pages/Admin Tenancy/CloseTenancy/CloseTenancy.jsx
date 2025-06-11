@@ -10,6 +10,7 @@ import { BASE_URL } from "../../../utils/config";
 import CustomDropDown from "../../../components/CustomDropDown";
 import TenancyCloseModal from "./TenancyCloseModal/TenancyCloseModal";
 import DeleteTenancyModal from "../DeleteTenancyModal/DeleteTenancyModal";
+import { motion, AnimatePresence } from "framer-motion";
 
 const CloseTenancy = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -136,6 +137,25 @@ const CloseTenancy = () => {
       console.log("Expanded Rows:", newState); // Debug log
       return newState;
     });
+  };
+
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
   };
 
   const handleDelete = async (id) => {
@@ -389,102 +409,114 @@ const CloseTenancy = () => {
                       </div>
                     </td>
                   </tr>
-                  {expandedRows[tenancy.id] && (
-                    <tr className="tclose-mobile-with-border border-b border-[#E9E9E9]">
-                      <td colSpan={3} className="px-5">
-                        <div className="tenancy-dropdown-content">
-                          <div className="tclose-grid">
-                            <div className="tclose-grid-item">
-                              <div className="tclose-dropdown-label">
-                                BUILDING NAME
+                  <AnimatePresence>
+                    {expandedRows[tenancy.id] && (
+                      <motion.tr
+                        className="tclose-mobile-with-border border-b border-[#E9E9E9]"
+                        initial="hidden"
+                        animate="visible"
+                        exit="hidden"
+                        variants={dropdownVariants}
+                      >
+                        <td colSpan={3} className="px-5">
+                          <div className="tenancy-dropdown-content">
+                            <div className="tclose-grid">
+                              <div className="tclose-grid-item">
+                                <div className="tclose-dropdown-label">
+                                  BUILDING NAME
+                                </div>
+                                <div className="tclose-dropdown-value">
+                                  {tenancy.building}
+                                </div>
                               </div>
-                              <div className="tclose-dropdown-value">
-                                {tenancy.building}
+                              <div className="tclose-grid-item">
+                                <div className="tclose-dropdown-label">
+                                  UNIT NAME
+                                </div>
+                                <div className="tclose-dropdown-value">
+                                  {tenancy.unit}
+                                </div>
                               </div>
                             </div>
-                            <div className="tclose-grid-item">
-                              <div className="tclose-dropdown-label">
-                                UNIT NAME
+                            <div className="tclose-grid">
+                              <div className="tclose-grid-item">
+                                <div className="tclose-dropdown-label">
+                                  RENTAL MONTHS
+                                </div>
+                                <div className="tclose-dropdown-value">
+                                  {tenancy.months}
+                                </div>
                               </div>
-                              <div className="tclose-dropdown-value">
-                                {tenancy.unit}
+                              <div className="tclose-grid-item">
+                                <div className="tclose-dropdown-label">
+                                  END DATE
+                                </div>
+                                <div className="tclose-dropdown-value">
+                                  {tenancy.endDate}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="tclose-grid">
+                              <div className="tclose-grid-item">
+                                <div className="tclose-dropdown-label">
+                                  VIEW
+                                </div>
+                                <div className="tclose-dropdown-value">
+                                  <button
+                                    onClick={() => handleViewClick(tenancy)}
+                                  >
+                                    <img
+                                      src={tenancy.view}
+                                      alt="View"
+                                      className="w-[30px] h-[24px] tclose-action-btn duration-200"
+                                    />
+                                  </button>
+                                </div>
+                              </div>
+                              <div className="tclose-grid-item">
+                                <div className="tclose-dropdown-label">
+                                  CLOSE
+                                </div>
+                                <div className="tclose-dropdown-value">
+                                  <button
+                                    onClick={() => openCloseModal(tenancy.id)}
+                                    disabled={tenancy.isClose}
+                                    className={`py-2 rounded-md font-medium ${
+                                      tenancy.isClose
+                                        ? "text-gray-400 cursor-not-allowed"
+                                        : "text-blue-600 hover:text-blue-800"
+                                    } duration-200`}
+                                  >
+                                    {tenancy.isClose
+                                      ? "Closed"
+                                      : "Click to Close"}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="tclose-grid">
+                              <div className="tclose-grid-item">
+                                <div className="tclose-dropdown-label">
+                                  ACTION
+                                </div>
+                                <div className="tclose-dropdown-value tclose-flex-items-center-gap-2 mt-[10px] ml-[5px]">
+                                  <button
+                                    onClick={() => openDeleteModal(tenancy.id)}
+                                  >
+                                    <img
+                                      src={deleteicon}
+                                      alt="Delete"
+                                      className="w-[18px] h-[18px] ml-[10px] tclose-delete-btn duration-200"
+                                    />
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </div>
-                          <div className="tclose-grid">
-                            <div className="tclose-grid-item">
-                              <div className="tclose-dropdown-label">
-                                RENTAL MONTHS
-                              </div>
-                              <div className="tclose-dropdown-value">
-                                {tenancy.months}
-                              </div>
-                            </div>
-                            <div className="tclose-grid-item">
-                              <div className="tclose-dropdown-label">
-                                END DATE
-                              </div>
-                              <div className="tclose-dropdown-value">
-                                {tenancy.endDate}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="tclose-grid">
-                            <div className="tclose-grid-item">
-                              <div className="tclose-dropdown-label">VIEW</div>
-                              <div className="tclose-dropdown-value">
-                                <button
-                                  onClick={() => handleViewClick(tenancy)}
-                                >
-                                  <img
-                                    src={tenancy.view}
-                                    alt="View"
-                                    className="w-[30px] h-[24px] tclose-action-btn duration-200"
-                                  />
-                                </button>
-                              </div>
-                            </div>
-                            <div className="tclose-grid-item">
-                              <div className="tclose-dropdown-label">CLOSE</div>
-                              <div className="tclose-dropdown-value">
-                                <button
-                                  onClick={() => openCloseModal(tenancy.id)}
-                                  disabled={tenancy.isClose}
-                                  className={`py-2 rounded-md font-medium ${
-                                    tenancy.isClose
-                                      ? "text-gray-400 cursor-not-allowed"
-                                      : "text-blue-600 hover:text-blue-800"
-                                  } duration-200`}
-                                >
-                                  {tenancy.isClose
-                                    ? "Closed"
-                                    : "Click to Close"}
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="tclose-grid">
-                            <div className="tclose-grid-item">
-                              <div className="tclose-dropdown-label">
-                                ACTION
-                              </div>
-                              <div className="tclose-dropdown-value tclose-flex-items-center-gap-2 mt-[10px] ml-[5px]">
-                                <button
-                                  onClick={() => openDeleteModal(tenancy.id)}
-                                >
-                                  <img
-                                    src={deleteicon}
-                                    alt="Delete"
-                                    className="w-[18px] h-[18px] ml-[10px] tclose-delete-btn duration-200"
-                                  />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
+                        </td>
+                      </motion.tr>
+                    )}
+                  </AnimatePresence>
                 </React.Fragment>
               ))
             )}
