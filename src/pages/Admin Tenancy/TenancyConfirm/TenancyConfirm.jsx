@@ -13,6 +13,7 @@ import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 import CustomDropDown from "../../../components/CustomDropDown";
 import TenancyCancelModal from "./TenancyCancelModal/TenancyCancelModal";
+import { motion, AnimatePresence } from "framer-motion";
 
 const TenancyConfirm = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -94,7 +95,7 @@ const TenancyConfirm = () => {
   const cancelModalOpen = (tenancy) => {
     setSelectedTenancy(tenancy);
     setOpenCancelModal(true);
-  }
+  };
 
   const handleConfirmAction = async () => {
     try {
@@ -130,6 +131,25 @@ const TenancyConfirm = () => {
       ...prev,
       [id]: !prev[id],
     }));
+  };
+
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
   };
 
   const filteredData = tenancies.filter(
@@ -230,7 +250,9 @@ const TenancyConfirm = () => {
                   <th className="pl-12 pr-5 text-center tenancy-thead w-[8%]">
                     VIEW
                   </th>
-                  <th className="px-5 pr-11 text-right tenancy-thead">ACTION</th>
+                  <th className="px-5 pr-11 text-right tenancy-thead">
+                    ACTION
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -296,8 +318,12 @@ const TenancyConfirm = () => {
                           className="w-[26px] h-[26px] tconfirm-confirm-btn duration-200"
                         />
                       </button>
-                      <button onClick={()=>cancelModalOpen(tenancy)}>
-                        <img src={cancelicon} alt="Cancel" className="w-[26px] h-[26px] tconfirm-cancel-btn duration-200" />
+                      <button onClick={() => cancelModalOpen(tenancy)}>
+                        <img
+                          src={cancelicon}
+                          alt="Cancel"
+                          className="w-[26px] h-[26px] tconfirm-cancel-btn duration-200"
+                        />
                       </button>
                     </td>
                   </tr>
@@ -351,8 +377,15 @@ const TenancyConfirm = () => {
                         </div>
                       </td>
                     </tr>
+                    <AnimatePresence>
                     {expandedRows[tenancy.id] && (
-                      <tr className="tconfirm-mobile-with-border border-b border-[#E9E9E9]">
+                      <motion.tr
+                        className="tconfirm-mobile-with-border border-b border-[#E9E9E9]"
+                        initial="hidden"
+                        animate="visible"
+                        exit="hidden"
+                        variants={dropdownVariants}
+                      >
                         <td colSpan={3} className="px-5">
                           <div className="tenancy-dropdown-content">
                             <div className="tconfirm-grid">
@@ -442,16 +475,23 @@ const TenancyConfirm = () => {
                                       className="w-[24px] h-[20px] tconfirm-confirm-btn duration-200 ml-2"
                                     />
                                   </button>
-                                  <button onClick={()=>cancelModalOpen(tenancy)}>
-                                    <img src={cancelicon} alt="Cancel" className="w-[24px] h-[20px] tconfirm-cancel-btn duration-200 ml-2" />
+                                  <button
+                                    onClick={() => cancelModalOpen(tenancy)}
+                                  >
+                                    <img
+                                      src={cancelicon}
+                                      alt="Cancel"
+                                      className="w-[24px] h-[20px] tconfirm-cancel-btn duration-200 ml-2"
+                                    />
                                   </button>
                                 </div>
                               </div>
                             </div>
                           </div>
                         </td>
-                      </tr>
+                      </motion.tr>
                     )}
+                    </AnimatePresence>
                   </React.Fragment>
                 ))}
               </tbody>
@@ -527,9 +567,9 @@ const TenancyConfirm = () => {
             onConfirm={handleConfirmAction}
             tenancy={selectedTenancy}
           />
-          <TenancyCancelModal 
+          <TenancyCancelModal
             isOpen={openCancelModal}
-            onCancel={()=> setOpenCancelModal(false)}
+            onCancel={() => setOpenCancelModal(false)}
             tenancy={selectedTenancy}
           />
         </>
