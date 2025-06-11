@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./UpdateTenancyModal.css";
-import closeicon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/close-icon.svg";
-import deleteicon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/delete-icon.svg";
-import plusicon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/plus-icon.svg";
-import { ChevronDown, X } from "lucide-react";
+import { ChevronDown, X, Trash2, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
@@ -269,9 +266,9 @@ const UpdateTenancyModal = () => {
       }));
     }
 
-    if (formData.rent_per_frequency && formData.no_payments) {
+    if (formData.rent_per_frequency && formData.rental_months) {
       const total = (
-        parseFloat(formData.rent_per_frequency) * parseInt(formData.no_payments)
+        parseFloat(formData.rent_per_frequency) * parseInt(formData.rental_months)
       ).toFixed(2);
       setFormData((prev) => ({
         ...prev,
@@ -509,11 +506,11 @@ const UpdateTenancyModal = () => {
   const showTaxDetails = (chargeId, isAdditionalCharge = true) => {
     const charges = isAdditionalCharge ? additionalCharges : paymentSchedule;
     const charge = charges.find((c) => c.id === chargeId);
-    if (charge && charge.tax_details) {
+    if (charge) {
       setTaxModalData({
         isOpen: true,
         chargeId,
-        taxDetails: charge.tax_details,
+        taxDetails: charge.tax_details || [],
       });
     } else {
       setTaxModalData({
@@ -674,7 +671,7 @@ const UpdateTenancyModal = () => {
             aria-label="Close modal"
             disabled={loading}
           >
-            <img src={closeicon} alt="close-button" className="w-4 h-4" />
+            <X size={16} color="#201D1E" />
           </button>
         </div>
 
@@ -702,8 +699,7 @@ const UpdateTenancyModal = () => {
                 className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
                   selectOpenStates["tenant"] ? "rotate-180" : "rotate-0"
                 }`}
-                width={22}
-                height={22}
+                size={22}
                 color="#201D1E"
               />
             </div>
@@ -731,8 +727,7 @@ const UpdateTenancyModal = () => {
                 className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
                   selectOpenStates["building"] ? "rotate-180" : "rotate-0"
                 }`}
-                width={22}
-                height={22}
+                size={22}
                 color="#201D1E"
               />
             </div>
@@ -762,8 +757,7 @@ const UpdateTenancyModal = () => {
                   className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
                     selectOpenStates["unit-selection"] ? "rotate-180" : "rotate-0"
                   }`}
-                  width={22}
-                  height={22}
+                  size={22}
                   color="#201D1E"
                 />
               </div>
@@ -1003,6 +997,7 @@ const UpdateTenancyModal = () => {
                               ? "rotate-180"
                               : ""
                           }`}
+                          size={16}
                         />
                       </td>
                       <td className="px-[10px] py-[5px] w-[162px]">
@@ -1061,7 +1056,7 @@ const UpdateTenancyModal = () => {
                         <button
                           onClick={() => showTaxDetails(charge.id, true)}
                           className="text-[#2892CE] underline"
-                          disabled={charge.tax === "0.00"}
+                          disabled={parseFloat(charge.tax) === 0 && !charge.tax_details.length}
                         >
                           {charge.tax}
                         </button>
@@ -1075,11 +1070,7 @@ const UpdateTenancyModal = () => {
                           aria-label="Remove charge"
                           disabled={loading}
                         >
-                          <img
-                            src={deleteicon}
-                            alt="delete"
-                            className="w-[60px] h-[20px] mt-1"
-                          />
+                          <Trash2 size={20} color="#201D1E" />
                         </button>
                       </td>
                     </tr>
@@ -1136,6 +1127,7 @@ const UpdateTenancyModal = () => {
                             ? "rotate-180"
                             : ""
                         }`}
+                        size={16}
                       />
                     </div>
                     <div className="px-[10px] py-[13px] w-full">
@@ -1222,7 +1214,7 @@ const UpdateTenancyModal = () => {
                       <button
                         onClick={() => showTaxDetails(charge.id, true)}
                         className="text-[#2892CE] underline"
-                        disabled={charge.tax === "0.00"}
+                        disabled={parseFloat(charge.tax) === 0 && !charge.tax_details.length}
                       >
                         {charge.tax}
                       </button>
@@ -1232,11 +1224,7 @@ const UpdateTenancyModal = () => {
                     </div>
                     <div className="px-[10px] py-[3px] flex justify-center">
                       <button onClick={() => removeRow(charge.id)} disabled={loading}>
-                        <img
-                          src={deleteicon}
-                          alt="delete"
-                          className="w-[60px] h-[20px]"
-                        />
+                        <Trash2 size={20} color="#201D1E" />
                       </button>
                     </div>
                   </div>
@@ -1251,7 +1239,7 @@ const UpdateTenancyModal = () => {
             disabled={loading}
           >
             Add Row
-            <img src={plusicon} alt="add" className="w-[20px] h-[20px] ml-2" />
+            <Plus size={20} color="#ffffff" className="ml-2" />
           </button>
         </div>
 
@@ -1323,8 +1311,7 @@ const UpdateTenancyModal = () => {
                             className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-700 focus:border-gray-700 bg-white update-tenancy-modal-table-select cursor-not-allowed"
                             disabled
                           >
-                            <option value="">Choose
-                            </option>
+                            <option value="">Choose</option>
                             {chargeTypes.map((type) => (
                               <option key={type.id} value={type.id}>
                                 {type.name}
@@ -1388,7 +1375,7 @@ const UpdateTenancyModal = () => {
                           <button
                             onClick={() => showTaxDetails(item.id, false)}
                             className="text-[#2892CE] underline"
-                            disabled={item.tax || "0.00"}
+                            disabled={parseFloat(item.tax) === 0 && !item.tax_details.length}
                           >
                             {item.tax}
                           </button>
@@ -1506,7 +1493,7 @@ const UpdateTenancyModal = () => {
                             <button
                               onClick={() => showTaxDetails(item.id, false)}
                               className="text-[#2892CE] underline"
-                              disabled={item.tax === "0.00"}
+                              disabled={parseFloat(item.tax) === 0 && !item.tax_details.length}
                             >
                               {item.tax}
                             </button>
@@ -1558,13 +1545,13 @@ const UpdateTenancyModal = () => {
                   <table className="w-full border border-gray-300 text-sm">
                     <thead>
                       <tr className="bg-gray-100">
-                        <th className="border border-gray-300  py-200">
+                        <th className="border border-gray-300 py-2 text-left">
                           Charge Type
                         </th>
-                        <th className="border px-3 border-gray-300 py-2 text-left">
+                        <th className="border border-gray-300 px-3 py-2 text-left">
                           Tax %
                         </th>
-                        <th className="px-[10px] py-2 border  border-gray-300 text-left">
+                        <th className="border border-gray-300 px-3 py-2 text-left">
                           Amount
                         </th>
                       </tr>
@@ -1572,13 +1559,13 @@ const UpdateTenancyModal = () => {
                     <tbody>
                       {taxModalData.taxDetails.map((tax, index) => (
                         <tr key={index}>
-                          <td className="px-[10px] py-2 borderborder-b-gray-300">
+                          <td className="border border-gray-300 px-3 py-2">
                             {tax.tax_type}
                           </td>
-                          <td className="px-2 py-[3 border px-3] border-b-gray-300">
+                          <td className="border border-gray-300 px-3 py-2">
                             {tax.tax_percentage}%
                           </td>
-                          <td className="px-2 py-3 px-3] border-b-gray-300">
+                          <td className="border border-gray-300 px-3 py-2">
                             {tax.tax_amount}
                           </td>
                         </tr>
@@ -1586,11 +1573,11 @@ const UpdateTenancyModal = () => {
                       <tr className="font-semibold bg-gray-50">
                         <td
                           colSpan={2}
-                          className="px-2 py-[3 py-3 px-4 border text-right] border-b-gray-300 text-right"
+                          className="border border-gray-300 px-3 py-2 text-right"
                         >
                           Total
                         </td>
-                        <td className="px-2 py-3 px-3] border-b border-gray-300">
+                        <td className="border border-gray-300 px-3 py-2">
                           {taxModalData.taxDetails
                             .reduce(
                               (acc, curr) =>
