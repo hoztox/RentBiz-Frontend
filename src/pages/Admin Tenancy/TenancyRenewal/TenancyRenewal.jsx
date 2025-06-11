@@ -11,6 +11,7 @@ import { useModal } from "../../../context/ModalContext";
 import TenancyRenewalModal from "./TenancyRenewalModal/TenancyRenewalModal";
 import CustomDropDown from "../../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
+import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
 
 const TenancyRenewal = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,16 +20,16 @@ const TenancyRenewal = () => {
   const [tenancies, setTenancies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [tenancyToDelete, setTenancyToDelete] = useState(null);
   const { openModal, refreshCounter } = useModal();
   const itemsPerPage = 10;
 
-  // Dropdown options for CustomDropDown
   const dropdownOptions = [
     { value: "showing", label: "Showing" },
     { value: "all", label: "All" },
   ];
 
-  // State for selected dropdown value
   const [selectedOption, setSelectedOption] = useState("showing");
 
   const getUserCompanyId = () => {
@@ -77,7 +78,6 @@ const TenancyRenewal = () => {
     });
   };
 
-  // Fetch tenancy data using Axios
   const fetchTenancies = async () => {
     try {
       const companyId = getUserCompanyId();
@@ -99,46 +99,52 @@ const TenancyRenewal = () => {
     fetchTenancies();
   }, [refreshCounter]);
 
-  const handleDelete = async (tenancyId) => {
-    if (window.confirm("Are you sure you want to delete this tenancy?")) {
+  const handleDeleteClick = (tenancyId) => {
+    setTenancyToDelete(tenancyId);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (tenancyToDelete) {
       try {
-        await axios.delete(`${BASE_URL}/company/tenancies/${tenancyId}/`);
-        await fetchTenancies();
-        console.log(`Deleted tenancy with ID: ${tenancyId}`);
+        await axios.delete(`${BASE_URL}/company/tenancies/${tenancyToDelete}/`);
+        console.log(`Deleted tenancy with ID: ${tenancyToDelete}`);
+        setTenancies(
+          tenancies.filter((tenancy) => tenancy.id !== tenancyToDelete)
+        );
       } catch (error) {
         console.error("Error deleting tenancy:", error);
         alert("Failed to delete tenancy. Please try again.");
       }
     }
+    setShowDeleteModal(false);
+    setTenancyToDelete(null);
   };
 
-  // Filter and sort tenancies based on search term and end date
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false);
+    setTenancyToDelete(null);
+  };
+
   const filteredData = useMemo(() => {
     const filtered = tenancies.filter(
       (tenancy) =>
         tenancy.tenancy_code
           ?.toLowerCase()
           .includes(searchTerm.toLowerCase()) ||
-        "" ||
         tenancy.tenant?.tenant_name
           ?.toLowerCase()
           .includes(searchTerm.toLowerCase()) ||
-        "" ||
         tenancy.building?.building_name
           ?.toLowerCase()
           .includes(searchTerm.toLowerCase()) ||
-        "" ||
         tenancy.unit?.unit_name
           ?.toLowerCase()
           .includes(searchTerm.toLowerCase()) ||
-        "" ||
         tenancy.status?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        "" ||
-        tenancy.end_date?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ""
+        tenancy.end_date?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    // Sort by closest end date first (ascending order)
     return filtered.sort((a, b) => {
       const dateA = a.end_date ? new Date(a.end_date) : new Date("9999-12-31");
       const dateB = b.end_date ? new Date(b.end_date) : new Date("9999-12-31");
@@ -309,7 +315,7 @@ const TenancyRenewal = () => {
                       className="w-[18px] h-[18px] trenew-action-btn duration-200"
                     />
                   </button>
-                  <button onClick={() => handleDelete(tenancy.id)}>
+                  <button onClick={() => handleDeleteClick(tenancy.id)}>
                     <img
                       src={deletesicon}
                       alt="Delete"
@@ -456,7 +462,7 @@ const TenancyRenewal = () => {
                                   />
                                 </button>
                                 <button
-                                  onClick={() => handleDelete(tenancy.id)}
+                                  onClick={() => handleDeleteClick(tenancy.id)}
                                 >
                                   <img
                                     src={deletesicon}
@@ -535,6 +541,18 @@ const TenancyRenewal = () => {
         </div>
       </div>
       <TenancyRenewalModal />
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        type="delete"
+        title="Delete Tenancy"
+        message="Are you sure you want to delete this tenancy?"
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
     </div>
   );
 };
