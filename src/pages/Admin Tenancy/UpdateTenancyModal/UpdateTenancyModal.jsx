@@ -4,7 +4,7 @@ import "./UpdateTenancyModal.css";
 import closeicon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/close-icon.svg";
 import deleteicon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/delete-icon.svg";
 import plusicon from "../../../assets/Images/Admin Tenancy/Tenenacy Modal/plus-icon.svg";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
@@ -14,7 +14,7 @@ const UpdateTenancyModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
   const navigate = useNavigate();
   const [selectOpenStates, setSelectOpenStates] = useState({});
-  const [showPaymentSchedule, setShowPaymentSchedule] = useState(true);
+  const [showPaymentSchedule, setShowPaymentSchedule] = useState(false);
   const [tenants, setTenants] = useState([]);
   const [buildings, setBuildings] = useState([]);
   const [displayBuildings, setDisplayBuildings] = useState([]);
@@ -23,6 +23,13 @@ const UpdateTenancyModal = () => {
   const [chargeTypes, setChargeTypes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [taxModalData, setTaxModalData] = useState({
+    isOpen: false,
+    chargeId: null,
+    taxDetails: [],
+  });
+  const [expandedStates, setExpandedStates] = useState({});
+
   const [formData, setFormData] = useState({
     tenant: "",
     building: "",
@@ -35,14 +42,13 @@ const UpdateTenancyModal = () => {
     rent_per_frequency: "",
     total_rent_receivable: "",
     deposit: "",
-    commision: "",
+    commission: "",
     remarks: "",
     status: "pending",
   });
+
   const [additionalCharges, setAdditionalCharges] = useState([]);
   const [paymentSchedule, setPaymentSchedule] = useState([]);
-  const [expandedStates, setExpandedStates] = useState({});
-  const [vacantBuildings, setVacantBuildings] = useState({});
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -71,10 +77,12 @@ const UpdateTenancyModal = () => {
 
   // Initialize form data when modal opens
   useEffect(() => {
-    if (modalState.isOpen && modalState.type === "tenancy-update" && modalState.data) {
-      console.log("modalState:", modalState); // Log the entire modalState object
+    if (
+      modalState.isOpen &&
+      modalState.type === "tenancy-update" &&
+      modalState.data
+    ) {
       const tenancy = modalState.data;
-      console.log("tenancy:", tenancy); // Log the tenancy data
 
       const newFormData = {
         tenant: tenancy.tenant?.id?.toString() || "",
@@ -85,51 +93,62 @@ const UpdateTenancyModal = () => {
         end_date: tenancy.end_date || "",
         no_payments: tenancy.no_payments?.toString() || "",
         first_rent_due_on: tenancy.first_rent_due_on || "",
-        rent_per_frequency: tenancy.rent_per_frequency ? parseFloat(tenancy.rent_per_frequency).toFixed(2) : "",
-        total_rent_receivable: tenancy.total_rent_receivable ? parseFloat(tenancy.total_rent_receivable).toFixed(2) : "",
+        rent_per_frequency: tenancy.rent_per_frequency
+          ? parseFloat(tenancy.rent_per_frequency).toFixed(2)
+          : "",
+        total_rent_receivable: tenancy.total_rent_receivable
+          ? parseFloat(tenancy.total_rent_receivable).toFixed(2)
+          : "",
         deposit: tenancy.deposit ? parseFloat(tenancy.deposit).toFixed(2) : "",
-        commision: tenancy.commision ? parseFloat(tenancy.commision).toFixed(2) : "",
+        commission: tenancy.commision
+          ? parseFloat(tenancy.commision).toFixed(2)
+          : "",
         remarks: tenancy.remarks || "",
         status: tenancy.status || "pending",
       };
       setFormData(newFormData);
-      console.log("formData:", newFormData); // Log the new formData
 
-      const newAdditionalCharges = tenancy.additional_charges?.map((charge, index) => ({
-        id: (index + 1).toString().padStart(2, "0"),
-        charge_type: charge.charge_type?.id?.toString() || "",
-        reason: charge.reason || "",
-        due_date: charge.due_date || "",
-        status: charge.status || "pending",
-        amount: charge.amount ? parseFloat(charge.amount).toFixed(2) : "",
-        vat: charge.vat ? parseFloat(charge.vat).toFixed(2) : "0.00",
-        total: charge.total ? parseFloat(charge.total).toFixed(2) : "0.00",
-      })) || [];
+      const newAdditionalCharges = tenancy.additional_charges?.map(
+        (charge, index) => ({
+          id: (index + 1).toString().padStart(2, "0"),
+          charge_type: charge.charge_type?.id?.toString() || "",
+          reason: charge.reason || "",
+          due_date: charge.due_date || "",
+          status: charge.status || "pending",
+          amount: charge.amount ? parseFloat(charge.amount).toFixed(2) : "",
+          tax: charge.tax ? parseFloat(charge.tax).toFixed(2) : "0.00",
+          total: charge.total ? parseFloat(charge.total).toFixed(2) : "0.00",
+          tax_details: charge.tax_details || [],
+        })
+      ) || [];
       setAdditionalCharges(newAdditionalCharges);
-      console.log("additionalCharges:", newAdditionalCharges); // Log additional charges
 
-      const newPaymentSchedule = tenancy.payment_schedules?.map((item, index) => ({
-        id: (index + 1).toString().padStart(2, "0"),
-        charge_type: item.charge_type?.id?.toString() || "",
-        reason: item.reason || "",
-        due_date: item.due_date || "",
-        status: item.status || "pending",
-        amount: item.amount ? parseFloat(item.amount).toFixed(2) : "",
-        vat: item.vat ? parseFloat(item.vat).toFixed(2) : "0.00",
-        total: item.total ? parseFloat(item.total).toFixed(2) : "0.00",
-      })) || [];
+      const newPaymentSchedule = tenancy.payment_schedules?.map(
+        (item, index) => ({
+          id: (index + 1).toString().padStart(2, "0"),
+          charge_type: item.charge_type?.id?.toString() || "",
+          charge_type_name: item.charge_type?.name || "",
+          reason: item.reason || "",
+          due_date: item.due_date || "",
+          status: item.status || "pending",
+          amount: item.amount ? parseFloat(item.amount).toFixed(2) : "",
+          tax: item.tax ? parseFloat(item.tax).toFixed(2) : "0.00",
+          total: item.total ? parseFloat(item.total).toFixed(2) : "",
+          tax_details: item.tax_details || [],
+        })
+      ) || [];
       setPaymentSchedule(newPaymentSchedule);
-      console.log("paymentSchedule:", newPaymentSchedule); // Log payment schedule
 
-      const newExpandedStates = tenancy.payment_schedules?.reduce((acc, item, index) => ({
-        ...acc,
-        [(index + 1).toString().padStart(2, "0")]: false,
-      }), {}) || {};
+      const newExpandedStates = tenancy.payment_schedules?.reduce(
+        (acc, item, index) => ({
+          ...acc,
+          [(index + 1).toString().padStart(2, "0")]: false,
+        }),
+        {}
+      ) || {};
       setExpandedStates(newExpandedStates);
-      console.log("expandedStates:", newExpandedStates); // Log expanded states
 
       setError(null);
-      console.log("error set to null");
     }
   }, [modalState.isOpen, modalState.type, modalState.data]);
 
@@ -139,7 +158,7 @@ const UpdateTenancyModal = () => {
       const companyId = getUserCompanyId();
       if (!companyId) {
         setError("Company ID not found. Please log in again.");
-        toast.error("Company ID not found. Please log in again.");
+        toast.error("Company ID invalid.");
         return;
       }
 
@@ -147,17 +166,16 @@ const UpdateTenancyModal = () => {
         setLoading(true);
         setError(null);
 
-        const [tenantsRes, buildingsRes, buildingsVacant, chargeTypesRes] = await Promise.all([
-          axios.get(`${BASE_URL}/company/tenant/company/${companyId}/`),
-          axios.get(`${BASE_URL}/company/buildings/company/${companyId}/`),
-          axios.get(`${BASE_URL}/company/buildings/vacant/${companyId}/`),
-          axios.get(`${BASE_URL}/company/charges/company/${companyId}/`),
-        ]);
+        const [tenantsRes, buildingsRes, buildingsVacant, chargeTypesRes] =
+          await Promise.all([
+            axios.get(`${BASE_URL}/company/tenant/company/${companyId}/`),
+            axios.get(`${BASE_URL}/company/buildings/company/${companyId}/`),
+            axios.get(`${BASE_URL}/company/buildings/vacant/${companyId}/`),
+            axios.get(`${BASE_URL}/company/charges/company/${companyId}/`),
+          ]);
 
         setTenants(tenantsRes.data);
         setBuildings(buildingsRes.data);
-        setVacantBuildings(buildingsVacant.data);
-
         setChargeTypes(chargeTypesRes.data);
 
         // Combine vacant buildings with the current tenancy's building
@@ -177,10 +195,11 @@ const UpdateTenancyModal = () => {
         } else {
           setDisplayBuildings(buildingsVacant.data);
         }
-
       } catch (error) {
         console.error("Error fetching data:", error);
-        const errorMessage = error.response?.data?.message || "Failed to load tenancy data. Please try again.";
+        const errorMessage =
+          error.response?.data?.message ||
+          "Failed to load tenancy data. Please try again.";
         setError(errorMessage);
         toast.error(errorMessage);
       } finally {
@@ -193,7 +212,7 @@ const UpdateTenancyModal = () => {
     }
   }, [modalState.isOpen, modalState.type, modalState.data]);
 
-
+  // Fetch units when building changes
   useEffect(() => {
     const fetchUnits = async () => {
       if (formData.building) {
@@ -222,7 +241,6 @@ const UpdateTenancyModal = () => {
           } else {
             setDisplayUnits(vacantUnits);
           }
-
         } catch (error) {
           console.error("Error fetching units:", error);
           setUnits([]);
@@ -236,14 +254,6 @@ const UpdateTenancyModal = () => {
     };
     fetchUnits();
   }, [formData.building, modalState.data]);
-
-
-  // console.log("Current unit ID:", modalState.data?.unit?.id);
-  // console.log("formData.unit:", formData.unit);
-  // console.log("displayUnits:", displayUnits);
-
-
-
 
   // Update end_date and total_rent_receivable
   useEffect(() => {
@@ -276,109 +286,149 @@ const UpdateTenancyModal = () => {
     formData.first_rent_due_on,
   ]);
 
-  // Update payment schedule
+  // Reset payment schedule when relevant form fields change
   useEffect(() => {
-    if (
-      formData.no_payments &&
-      formData.rental_months &&
-      formData.first_rent_due_on &&
-      formData.rent_per_frequency &&
-      formData.deposit &&
-      formData.commision &&
-      chargeTypes.length > 0
-    ) {
-      const schedule = [];
-      const firstDueDate = new Date(formData.first_rent_due_on);
-      const depositChargeType = chargeTypes.find((ct) => ct.name === "Deposit")?.id || "";
-      const commisionChargeType = chargeTypes.find((ct) => ct.name === "Commission")?.id || "";
-      const rentChargeType = chargeTypes.find((ct) => ct.name === "Rent")?.id || "";
-
-      const rentalMonths = parseInt(formData.rental_months);
-      const noPayments = parseInt(formData.no_payments);
-      const paymentFrequencyMonths = Math.round(rentalMonths / noPayments);
-
-      // Add Deposit
-      const depositAmount = parseFloat(formData.deposit || 0);
-      const depositVatPercentage = parseFloat(
-        chargeTypes.find((ct) => ct.name === "Deposit")?.vat_percentage || 0
-      );
-      const depositVat = (depositAmount * (depositVatPercentage / 100)).toFixed(2);
-      schedule.push({
-        id: "01",
-        charge_type: depositChargeType,
-        reason: "Deposit",
-        due_date: firstDueDate.toISOString().split("T")[0],
-        status: "pending",
-        amount: depositAmount.toFixed(2),
-        vat: depositVat,
-        total: (depositAmount + parseFloat(depositVat)).toFixed(2),
-      });
-
-      // Add Commission
-      const commissionAmount = parseFloat(formData.commision || 0);
-      const commissionVatPercentage = parseFloat(
-        chargeTypes.find((ct) => ct.name === "Commission")?.vat_percentage || 0
-      );
-      const commissionVat = (commissionAmount * (commissionVatPercentage / 100)).toFixed(2);
-      schedule.push({
-        id: "02",
-        charge_type: commisionChargeType,
-        reason: "Commission",
-        due_date: firstDueDate.toISOString().split("T")[0],
-        status: "pending",
-        amount: commissionAmount.toFixed(2),
-        vat: commissionVat,
-        total: (commissionAmount + parseFloat(commissionVat)).toFixed(2),
-      });
-
-      // Add Rent payments
-      const rentAmount = parseFloat(formData.rent_per_frequency);
-      const rentVatPercentage = parseFloat(
-        chargeTypes.find((ct) => ct.name === "Rent")?.vat_percentage || 0
-      );
-      const rentVat = (rentAmount * (rentVatPercentage / 100)).toFixed(2);
-      for (let i = 0; i < noPayments; i++) {
-        const dueDate = new Date(firstDueDate);
-        dueDate.setMonth(firstDueDate.getMonth() + i * paymentFrequencyMonths);
-        schedule.push({
-          id: (i + 3).toString().padStart(2, "0"),
-          charge_type: rentChargeType,
-          reason:
-            paymentFrequencyMonths === 1
-              ? "Monthly Rent"
-              : paymentFrequencyMonths === 2
-                ? "Bi-Monthly Rent"
-                : paymentFrequencyMonths === 3
-                  ? "Quarterly Rent"
-                  : paymentFrequencyMonths === 6
-                    ? "Semi-Annual Rent"
-                    : paymentFrequencyMonths === 12
-                      ? "Annual Rent"
-                      : `${paymentFrequencyMonths}-Monthly Rent`,
-          due_date: dueDate.toISOString().split("T")[0],
-          status: "pending",
-          amount: rentAmount.toFixed(2),
-          vat: rentVat,
-          total: (rentAmount + parseFloat(rentVat)).toFixed(2),
-        });
-      }
-
-      setPaymentSchedule(schedule);
-      setExpandedStates(
-        schedule.reduce((acc, item) => ({ ...acc, [item.id]: false }), {})
-      );
-    }
+    setShowPaymentSchedule(false);
+    setPaymentSchedule([]);
   }, [
-    formData.no_payments,
     formData.rental_months,
+    formData.no_payments,
     formData.first_rent_due_on,
     formData.rent_per_frequency,
     formData.deposit,
-    formData.commision,
-    chargeTypes,
+    formData.commission,
+    formData.start_date,
   ]);
 
-  if (!modalState.isOpen || modalState.type !== "tenancy-update" || !modalState.data) {
+  // Fetch payment schedule preview when showPaymentSchedule is true
+  useEffect(() => {
+    const fetchPaymentSchedulePreview = async () => {
+      const companyId = getUserCompanyId();
+      if (
+        showPaymentSchedule &&
+        companyId &&
+        formData.rental_months &&
+        formData.no_payments &&
+        formData.first_rent_due_on &&
+        formData.start_date &&
+        (formData.rent_per_frequency || formData.deposit || formData.commission)
+      ) {
+        try {
+          setLoading(true);
+          const previewPayload = {
+            company: companyId,
+            rental_months: parseInt(formData.rental_months),
+            no_payments: parseInt(formData.no_payments),
+            first_rent_due_on: formData.first_rent_due_on,
+            rent_per_frequency: parseFloat(formData.rent_per_frequency || 0),
+            deposit: parseFloat(formData.deposit || 0),
+            commission: parseFloat(formData.commission || 0),
+            start_date: formData.start_date,
+          };
+
+          const response = await axios.post(
+            `${BASE_URL}/company/tenancies/preview-payment-schedule/`,
+            previewPayload
+          );
+          const schedules = response.data.payment_schedules.map((item, index) => ({
+            ...item,
+            id: (index + 1).toString().padStart(2, "0"),
+          }));
+          setPaymentSchedule(schedules);
+          setExpandedStates(
+            schedules.reduce((acc, item) => ({ ...acc, [item.id]: false }), {})
+          );
+        } catch (error) {
+          console.error("Error fetching payment schedule preview:", error);
+          setPaymentSchedule([]);
+          toast.error("Failed to load payment schedule preview.");
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchPaymentSchedulePreview();
+  }, [showPaymentSchedule]);
+
+  // Fetch tax preview for additional charges
+  useEffect(() => {
+    const fetchTaxPreview = async (charge) => {
+      const companyId = getUserCompanyId();
+      if (
+        companyId &&
+        charge.charge_type &&
+        charge.amount &&
+        charge.due_date &&
+        charge.reason
+      ) {
+        try {
+          const previewPayload = {
+            company: companyId,
+            charge_type: parseInt(charge.charge_type),
+            amount: parseFloat(charge.amount),
+            due_date: charge.due_date,
+            reason: charge.reason,
+          };
+
+          const response = await axios.post(
+            `${BASE_URL}/company/tenancies/preview-additional-charge-tax/`,
+            previewPayload
+          );
+          const { additional_charge } = response.data;
+
+          setAdditionalCharges((prev) =>
+            prev.map((c) =>
+              c.id === charge.id
+                ? {
+                    ...c,
+                    tax: additional_charge.tax.toFixed(2),
+                    total: additional_charge.total.toFixed(2),
+                    tax_details: additional_charge.tax_details,
+                  }
+                : c
+            )
+          );
+        } catch (error) {
+          console.error("Error fetching tax preview for additional charge:", error);
+          setAdditionalCharges((prev) =>
+            prev.map((c) =>
+              c.id === charge.id
+                ? { ...c, tax: "0.00", total: c.amount || "0.00", tax_details: [] }
+                : c
+            )
+          );
+        }
+      } else {
+        setAdditionalCharges((prev) =>
+          prev.map((c) =>
+            c.id === charge.id
+              ? { ...c, tax: "0.00", total: c.amount || "0.00", tax_details: [] }
+              : c
+          )
+        );
+      }
+    };
+
+    additionalCharges.forEach((charge) => {
+      fetchTaxPreview(charge);
+    });
+  }, [
+    JSON.stringify(
+      additionalCharges.map(({ charge_type, amount, due_date, reason }) => ({
+        charge_type,
+        amount,
+        due_date,
+        reason,
+      }))
+    ),
+  ]);
+
+  if (
+    !modalState.isOpen ||
+    modalState.type !== "tenancy-update" ||
+    !modalState.data
+  ) {
     return null;
   }
 
@@ -391,27 +441,18 @@ const UpdateTenancyModal = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+      ...(name === "building" ? { unit: "" } : {}),
+    }));
   };
 
   const handleAdditionalChargeChange = (id, field, value) => {
     setAdditionalCharges((prev) =>
-      prev.map((charge) => {
-        if (charge.id === id) {
-          const updatedCharge = { ...charge, [field]: value };
-          if (field === "charge_type" || field === "amount") {
-            const selectedChargeType = chargeTypes.find(
-              (type) => type.id === parseInt(updatedCharge.charge_type)
-            );
-            const vatPercentage = parseFloat(selectedChargeType?.vat_percentage || 0);
-            const amount = parseFloat(updatedCharge.amount || 0);
-            updatedCharge.vat = (amount * (vatPercentage / 100)).toFixed(2);
-            updatedCharge.total = (amount + parseFloat(updatedCharge.vat || 0)).toFixed(2);
-          }
-          return updatedCharge;
-        }
-        return charge;
-      })
+      prev.map((charge) =>
+        charge.id === id ? { ...charge, [field]: value } : charge
+      )
     );
   };
 
@@ -420,10 +461,10 @@ const UpdateTenancyModal = () => {
       prev.map((item) => {
         if (item.id === id) {
           const updatedItem = { ...item, [field]: value };
-          if (field === "amount" || field === "vat") {
+          if (field === "amount" || field === "tax") {
             const amount = parseFloat(updatedItem.amount || 0);
-            const vat = parseFloat(updatedItem.vat || 0);
-            updatedItem.total = (amount + vat).toFixed(2);
+            const tax = parseFloat(updatedItem.tax || 0);
+            updatedItem.total = (amount + tax).toFixed(2);
           }
           return updatedItem;
         }
@@ -443,16 +484,15 @@ const UpdateTenancyModal = () => {
         due_date: "",
         status: "pending",
         amount: "",
-        vat: "0.00",
+        tax: "0.00",
         total: "0.00",
+        tax_details: [],
       },
     ]);
   };
 
   const removeRow = (id) => {
-    setAdditionalCharges(
-      additionalCharges.filter((charge) => charge.id !== id)
-    );
+    setAdditionalCharges(additionalCharges.filter((charge) => charge.id !== id));
   };
 
   const togglePaymentSchedule = () => {
@@ -464,6 +504,28 @@ const UpdateTenancyModal = () => {
       ...prev,
       [id]: !prev[id],
     }));
+  };
+
+  const showTaxDetails = (chargeId, isAdditionalCharge = true) => {
+    const charges = isAdditionalCharge ? additionalCharges : paymentSchedule;
+    const charge = charges.find((c) => c.id === chargeId);
+    if (charge && charge.tax_details) {
+      setTaxModalData({
+        isOpen: true,
+        chargeId,
+        taxDetails: charge.tax_details,
+      });
+    } else {
+      setTaxModalData({
+        isOpen: true,
+        chargeId,
+        taxDetails: [],
+      });
+    }
+  };
+
+  const closeTaxModal = () => {
+    setTaxModalData({ isOpen: false, chargeId: null, taxDetails: [] });
   };
 
   const handleSubmit = async () => {
@@ -489,8 +551,7 @@ const UpdateTenancyModal = () => {
         !charge.charge_type ||
         !charge.reason ||
         !charge.due_date ||
-        !charge.amount ||
-        charge.vat === ""
+        !charge.amount
       ) {
         toast.error("Please fill all fields in Additional Charges");
         return;
@@ -502,7 +563,7 @@ const UpdateTenancyModal = () => {
         !item.reason ||
         !item.due_date ||
         !item.amount ||
-        item.vat === ""
+        item.tax === ""
       ) {
         toast.error("Please fill all fields in Payment Schedule");
         return;
@@ -512,7 +573,6 @@ const UpdateTenancyModal = () => {
     const companyId = getUserCompanyId();
     const userId = getRelevantUserId();
     const tenancyId = modalState.data?.id;
-    console.log('tenancy id', tenancyId);
 
     if (!companyId) {
       toast.error("Company ID is missing or invalid");
@@ -536,7 +596,7 @@ const UpdateTenancyModal = () => {
       first_rent_due_on: formData.first_rent_due_on,
       rent_per_frequency: parseFloat(formData.rent_per_frequency || 0).toFixed(2),
       deposit: parseFloat(formData.deposit || 0).toFixed(2),
-      commision: parseFloat(formData.commision || 0).toFixed(2),
+      commission: parseFloat(formData.commission || 0).toFixed(2),
       remarks: formData.remarks,
       status: formData.status,
       additional_charges: additionalCharges.map((charge) => ({
@@ -545,17 +605,19 @@ const UpdateTenancyModal = () => {
         due_date: charge.due_date,
         status: charge.status,
         amount: parseFloat(charge.amount).toFixed(2),
-        vat: parseFloat(charge.vat).toFixed(2),
+        tax: parseFloat(charge.tax).toFixed(2),
         total: parseFloat(charge.total).toFixed(2),
+        tax_details: charge.tax_details,
       })),
-      payment_schedule: paymentSchedule.map((item) => ({
+      payment_schedules: paymentSchedule.map((item) => ({
         charge_type: parseInt(item.charge_type),
         reason: item.reason,
         due_date: item.due_date,
         status: item.status,
         amount: parseFloat(item.amount).toFixed(2),
-        vat: parseFloat(item.vat).toFixed(2),
+        tax: parseFloat(item.tax).toFixed(2),
         total: parseFloat(item.total).toFixed(2),
+        tax_details: item.tax_details,
       })),
     };
 
@@ -577,9 +639,7 @@ const UpdateTenancyModal = () => {
         throw new Error("Failed to update tenancy");
       }
 
-      console.log("Tenancy updated successfully:", response.data);
       toast.success("Tenancy updated successfully");
-
       triggerRefresh();
       closeModal();
     } catch (error) {
@@ -595,13 +655,9 @@ const UpdateTenancyModal = () => {
     }
   };
 
-  // Loading state
-  if (loading) {
-    return (
-      <div className="text-lg"></div>
-    );
+  if (loading && !formData.tenant) {
+    return <div className="text-lg">Loading...</div>;
   }
-
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 update-tenancy-modal-overlay">
@@ -643,7 +699,9 @@ const UpdateTenancyModal = () => {
                 ))}
               </select>
               <ChevronDown
-                className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${selectOpenStates["tenant"] ? "rotate-180" : "rotate-0"}`}
+                className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
+                  selectOpenStates["tenant"] ? "rotate-180" : "rotate-0"
+                }`}
                 width={22}
                 height={22}
                 color="#201D1E"
@@ -670,7 +728,9 @@ const UpdateTenancyModal = () => {
                 ))}
               </select>
               <ChevronDown
-                className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${selectOpenStates["building"] ? "rotate-180" : "rotate-0"}`}
+                className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
+                  selectOpenStates["building"] ? "rotate-180" : "rotate-0"
+                }`}
                 width={22}
                 height={22}
                 color="#201D1E"
@@ -699,7 +759,9 @@ const UpdateTenancyModal = () => {
                   ))}
                 </select>
                 <ChevronDown
-                  className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${selectOpenStates["unit-selection"] ? "rotate-180" : "rotate-0"}`}
+                  className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
+                    selectOpenStates["unit-selection"] ? "rotate-180" : "rotate-0"
+                  }`}
                   width={22}
                   height={22}
                   color="#201D1E"
@@ -707,7 +769,9 @@ const UpdateTenancyModal = () => {
               </div>
             </div>
             <div className="w-1/2">
-              <label className="block update-tenancy-modal-label">Rental Months*</label>
+              <label className="block update-tenancy-modal-label">
+                Rental Months*
+              </label>
               <input
                 type="number"
                 name="rental_months"
@@ -722,7 +786,9 @@ const UpdateTenancyModal = () => {
           </div>
           <div className="md:flex update-tenancy-column gap-4">
             <div className="w-1/2">
-              <label className="block update-tenancy-modal-label">Start Date*</label>
+              <label className="block update-tenancy-modal-label">
+                Start Date*
+              </label>
               <div className="relative">
                 <input
                   type="date"
@@ -751,7 +817,9 @@ const UpdateTenancyModal = () => {
 
           <div className="md:flex update-tenancy-column gap-4">
             <div className="w-1/2">
-              <label className="block update-tenancy-modal-label">No. Of Payments*</label>
+              <label className="block update-tenancy-modal-label">
+                No. Of Payments*
+              </label>
               <input
                 type="number"
                 name="no_payments"
@@ -764,7 +832,9 @@ const UpdateTenancyModal = () => {
               />
             </div>
             <div className="w-1/2">
-              <label className="block update-tenancy-modal-label">First Rent Due On*</label>
+              <label className="block update-tenancy-modal-label">
+                First Rent Due On*
+              </label>
               <div className="relative">
                 <input
                   type="date"
@@ -778,7 +848,9 @@ const UpdateTenancyModal = () => {
             </div>
           </div>
           <div>
-            <label className="block update-tenancy-modal-label">Rent Per Frequency</label>
+            <label className="block update-tenancy-modal-label">
+              Rent Per Frequency
+            </label>
             <input
               type="number"
               name="rent_per_frequency"
@@ -793,7 +865,9 @@ const UpdateTenancyModal = () => {
           </div>
 
           <div>
-            <label className="block update-tenancy-modal-label">Total Rent Receivable</label>
+            <label className="block update-tenancy-modal-label">
+              Total Rent Receivable
+            </label>
             <input
               type="text"
               name="total_rent_receivable"
@@ -804,7 +878,9 @@ const UpdateTenancyModal = () => {
             />
           </div>
           <div>
-            <label className="block update-tenancy-modal-label">Deposit (If Any)</label>
+            <label className="block update-tenancy-modal-label">
+              Deposit (If Any)
+            </label>
             <input
               type="number"
               name="deposit"
@@ -819,11 +895,13 @@ const UpdateTenancyModal = () => {
           </div>
 
           <div>
-            <label className="block update-tenancy-modal-label">Commission (If Any)</label>
+            <label className="block update-tenancy-modal-label">
+              Commission (If Any)
+            </label>
             <input
               type="number"
-              name="commision"
-              value={formData.commision}
+              name="commission"
+              value={formData.commission}
               onChange={handleInputChange}
               placeholder="Enter Commission"
               className="w-full p-2 focus:outline-none focus:ring-gray-700 focus:border-gray-700 update-tenancy-input-box"
@@ -862,21 +940,41 @@ const UpdateTenancyModal = () => {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b border-[#E9E9E9] h-[57px]">
-                    <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[20px]">NO</th>
-                    <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[138px]">CHARGE TYPE</th>
-                    <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[162px]">REASON</th>
-                    <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[173px]">DUE DATE</th>
-                    <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[55px]">STATUS</th>
-                    <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[148px]">AMOUNT</th>
-                    <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[25px]">VAT</th>
-                    <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[43px]">TOTAL</th>
-                    <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[61px]">REMOVE</th>
+                    <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[20px]">
+                      NO
+                    </th>
+                    <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[138px]">
+                      CHARGE TYPE
+                    </th>
+                    <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[162px]">
+                      REASON
+                    </th>
+                    <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[173px]">
+                      DUE DATE
+                    </th>
+                    <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[55px]">
+                      STATUS
+                    </th>
+                    <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[148px]">
+                      AMOUNT
+                    </th>
+                    <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[70px]">
+                      TAX
+                    </th>
+                    <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[43px]">
+                      TOTAL
+                    </th>
+                    <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[61px]">
+                      REMOVE
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {additionalCharges.map((charge) => (
                     <tr key={charge.id} className="border-t border-[#E9E9E9]">
-                      <td className="px-[10px] py-[5px] w-[20px] text-[14px] text-[#201D1E]">{charge.id}</td>
+                      <td className="px-[10px] py-[5px] w-[20px] text-[14px] text-[#201D1E]">
+                        {charge.id}
+                      </td>
                       <td className="px-[10px] py-[5px] w-[138px] relative">
                         <select
                           value={charge.charge_type}
@@ -895,12 +993,16 @@ const UpdateTenancyModal = () => {
                           <option value="">Choose</option>
                           {chargeTypes.map((type) => (
                             <option key={type.id} value={type.id}>
-                              {type?.name}
+                              {type.name}
                             </option>
                           ))}
                         </select>
                         <ChevronDown
-                          className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${selectOpenStates[`charge-${charge.id}`] ? "rotate-180" : ""}`}
+                          className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
+                            selectOpenStates[`charge-${charge.id}`]
+                              ? "rotate-180"
+                              : ""
+                          }`}
                         />
                       </td>
                       <td className="px-[10px] py-[5px] w-[162px]">
@@ -934,7 +1036,9 @@ const UpdateTenancyModal = () => {
                           disabled={loading}
                         />
                       </td>
-                      <td className="px-[10px] py-[5px] w-[55px] text-[14px] text-[#201D1E]">{charge.status}</td>
+                      <td className="px-[10px] py-[5px] w-[55px] text-[14px] text-[#201D1E]">
+                        {charge.status}
+                      </td>
                       <td className="px-[10px] py-[5px] w-[148px]">
                         <input
                           type="number"
@@ -953,9 +1057,19 @@ const UpdateTenancyModal = () => {
                           disabled={loading}
                         />
                       </td>
-                      <td className="px-[10px] py-[5px] w-[25px] text-[14px] text-[#201D1E] text-center">{charge.vat}</td>
-                      <td className="px-[10px] py-[5px] w-[35px] text-[14px] text-[#201D1E]">{charge.total}</td>
-                      <td className="px-[10px] py-[5px] w-[30px]">
+                      <td className="px-[10px] py-[5px] w-[70px]">
+                        <button
+                          onClick={() => showTaxDetails(charge.id, true)}
+                          className="text-[#2892CE] underline"
+                          disabled={charge.tax === "0.00"}
+                        >
+                          {charge.tax}
+                        </button>
+                      </td>
+                      <td className="px-[10px] py-[5px] w-[43px] text-[14px] text-[#201D1E]">
+                        {charge.total}
+                      </td>
+                      <td className="px-[10px] py-[5px] w-[61px]">
                         <button
                           onClick={() => removeRow(charge.id)}
                           aria-label="Remove charge"
@@ -980,12 +1094,20 @@ const UpdateTenancyModal = () => {
                   className="border-b border-[#E9E9E9] last:border-b-0 update-tenancy-mobile-section-container"
                 >
                   <div className="flex justify-start border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
-                    <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase">NO</div>
-                    <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase w-[44%]">CHARGE TYPE</div>
-                    <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase">REASON</div>
+                    <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase">
+                      NO
+                    </div>
+                    <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase w-[44%]">
+                      CHARGE TYPE
+                    </div>
+                    <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase">
+                      REASON
+                    </div>
                   </div>
                   <div className="flex justify-start h-[67px] border-b border-[#E9E9E9]">
-                    <div className="px-[13px] py-[13px] text-[14px] text-[#201D1E]">{charge.id}</div>
+                    <div className="px-[13px] py-[13px] text-[14px] text-[#201D1E]">
+                      {charge.id}
+                    </div>
                     <div className="px-[10px] py-[13px] relative w-full">
                       <select
                         value={charge.charge_type}
@@ -1009,7 +1131,11 @@ const UpdateTenancyModal = () => {
                         ))}
                       </select>
                       <ChevronDown
-                        className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${selectOpenStates[`charge-${charge.id}`] ? "rotate-180" : ""}`}
+                        className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
+                          selectOpenStates[`charge-${charge.id}`]
+                            ? "rotate-180"
+                            : ""
+                        }`}
                       />
                     </div>
                     <div className="px-[10px] py-[13px] w-full">
@@ -1031,9 +1157,15 @@ const UpdateTenancyModal = () => {
                   </div>
 
                   <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
-                    <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase">DUE DATE</div>
-                    <div className="px-[10px] flex items-center update-tenancy-modal-thead w-[7%] uppercase">STATUS</div>
-                    <div className="px-[10px] flex items-center update-tenancy-modal-thead w-[41.5%] uppercase">AMOUNT</div>
+                    <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase">
+                      DUE DATE
+                    </div>
+                    <div className="px-[10px] flex items-center update-tenancy-modal-thead w-[7%] uppercase">
+                      STATUS
+                    </div>
+                    <div className="px-[10px] flex items-center update-tenancy-modal-thead w-[41.5%] uppercase">
+                      AMOUNT
+                    </div>
                   </div>
                   <div className="flex justify-start border-b border-[#E9E9E9] h-[67px]">
                     <div className="px-[9px] py-[13px] relative w-full">
@@ -1051,7 +1183,9 @@ const UpdateTenancyModal = () => {
                         disabled={loading}
                       />
                     </div>
-                    <div className="py-[10px] text-[14px] text-[#201D1E]">{charge.status}</div>
+                    <div className="py-[10px] text-[14px] text-[#201D1E]">
+                      {charge.status}
+                    </div>
                     <div className="px-[10px] py-[13px] w-full">
                       <input
                         type="number"
@@ -1073,13 +1207,29 @@ const UpdateTenancyModal = () => {
                   </div>
 
                   <div className="flex justify-between bg-[#F2F2F2] h-[57px] border-b border-[#E9E9E9]">
-                    <div className="px-[10px] flex items-center update-tenancy-modal-thead w-[20%] uppercase">VAT</div>
-                    <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase">TOTAL</div>
-                    <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase">REMOVE</div>
+                    <div className="px-[10px] flex items-center update-tenancy-modal-thead w-[20%] uppercase">
+                      TAX
+                    </div>
+                    <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase">
+                      TOTAL
+                    </div>
+                    <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase">
+                      REMOVE
+                    </div>
                   </div>
                   <div className="flex justify-between h-[57px]">
-                    <div className="px-[13px] py-[13px] text-[14px] text-[#201D1E] text-center">{charge.vat}</div>
-                    <div className="px-[13px] py-[13px] text-[14px] text-[#201D1E]">{charge.total}</div>
+                    <div className="px-[13px] py-[13px] text-[14px] text-[#201D1E] text-center">
+                      <button
+                        onClick={() => showTaxDetails(charge.id, true)}
+                        className="text-[#2892CE] underline"
+                        disabled={charge.tax === "0.00"}
+                      >
+                        {charge.tax}
+                      </button>
+                    </div>
+                    <div className="px-[13px] py-[13px] text-[14px] text-[#201D1E]">
+                      {charge.total}
+                    </div>
                     <div className="px-[10px] py-[3px] flex justify-center">
                       <button onClick={() => removeRow(charge.id)} disabled={loading}>
                         <img
@@ -1101,19 +1251,19 @@ const UpdateTenancyModal = () => {
             disabled={loading}
           >
             Add Row
-            <img
-              src={plusicon}
-              alt="add"
-              className="w-[20px] h-[20px] ml-2"
-            />
+            <img src={plusicon} alt="add" className="w-[20px] h-[20px] ml-2" />
           </button>
         </div>
 
         <div className="mt-6">
           <button
             onClick={togglePaymentSchedule}
-            className="bg-white text-[#2892CE] px-4 py-2 border border-[#E9E9E9] rounded update-tenancy-hidepayement-btn"
-            aria-label={showPaymentSchedule ? "Hide payment schedule" : "Show payment schedule"}
+            className="bg-white text-[#2892CE] px-4 py-2 border border-[#E9E9E9] rounded update-tenancy-btn"
+            aria-label={
+              showPaymentSchedule
+                ? "Hide payment schedule"
+                : "Show payment schedule"
+            }
             disabled={loading}
           >
             {showPaymentSchedule ? "Hide Payment Schedule" : "Show Payment Schedule"}
@@ -1125,14 +1275,30 @@ const UpdateTenancyModal = () => {
                 <table className="w-full border-collapse">
                   <thead>
                     <tr className="border-b border-[#E9E9E9] h-[57px]">
-                      <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[20px]">NO</th>
-                      <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[138px]">CHARGE TYPE</th>
-                      <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[162px]">REASON</th>
-                      <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[173px]">DUE DATE</th>
-                      <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[55px]">STATUS</th>
-                      <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[148px]">AMOUNT</th>
-                      <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[25px]">VAT</th>
-                      <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[43px]">TOTAL</th>
+                      <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[53px]">
+                        NO
+                      </th>
+                      <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[138px]">
+                        CHARGE TYPE
+                      </th>
+                      <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[162px]">
+                        REASON
+                      </th>
+                      <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[173px]">
+                        DUE DATE
+                      </th>
+                      <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[55px]">
+                        STATUS
+                      </th>
+                      <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[148px]">
+                        AMOUNT
+                      </th>
+                      <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[70px]">
+                        TAX
+                      </th>
+                      <th className="px-[10px] text-left update-tenancy-modal-thead uppercase w-[43px]">
+                        TOTAL
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1141,7 +1307,9 @@ const UpdateTenancyModal = () => {
                         key={item.id}
                         className="border-t border-[#E9E9E9] h-[57px]"
                       >
-                        <td className="px-[10px] py-[5px] w-[20px] text-[14px] text-[#201D1E]">{item.id}</td>
+                        <td className="px-[10px] py-[5px] w-[53px] text-[14px] text-[#201D1E]">
+                          {item.id}
+                        </td>
                         <td className="px-[10px] py-[5px] w-[138px] relative">
                           <select
                             value={item.charge_type}
@@ -1155,7 +1323,8 @@ const UpdateTenancyModal = () => {
                             className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-700 focus:border-gray-700 bg-white update-tenancy-modal-table-select cursor-not-allowed"
                             disabled
                           >
-                            <option value="">Choose</option>
+                            <option value="">Choose
+                            </option>
                             {chargeTypes.map((type) => (
                               <option key={type.id} value={type.id}>
                                 {type.name}
@@ -1194,7 +1363,9 @@ const UpdateTenancyModal = () => {
                             disabled={loading}
                           />
                         </td>
-                        <td className="px-[10px] py-[5px] w-[55px] text-[14px] text-[#201D1E]">{item.status}</td>
+                        <td className="px-[10px] py-[5px] w-[55px] text-[14px] text-[#201D1E]">
+                          {item.status}
+                        </td>
                         <td className="px-[10px] py-[5px] w-[148px]">
                           <input
                             type="number"
@@ -1213,8 +1384,18 @@ const UpdateTenancyModal = () => {
                             disabled={loading}
                           />
                         </td>
-                        <td className="px-[10px] py-[5px] w-[25px] text-[14px] text-[#201D1E] text-center">{item.vat}</td>
-                        <td className="px-[10px] py-[5px] w-[35px] text-[14px] text-[#201D1E]">{item.total}</td>
+                        <td className="px-[10px] py-[5px] w-[70px]">
+                          <button
+                            onClick={() => showTaxDetails(item.id, false)}
+                            className="text-[#2892CE] underline"
+                            disabled={item.tax || "0.00"}
+                          >
+                            {item.tax}
+                          </button>
+                        </td>
+                        <td className="px-[10px] py-[5px] w-[43px] text-[14px] text-[#201D1E]">
+                          {item.total}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -1227,29 +1408,51 @@ const UpdateTenancyModal = () => {
                     className="update-tenancy-mobile-payment-section"
                   >
                     <div
-                      className={`flex justify-between border-b border-[#E9E9E9] h-[57px] rounded-t ${expandedStates[item.id] ? "bg-[#F2F2F2]" : "bg-white"}`}
+                      className={`flex justify-between border-b border-[#E9E9E9] h-[57px] rounded-t ${
+                        expandedStates[item.id] ? "bg-[#F2F2F2]" : "bg-white"
+                      }`}
                     >
-                      <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase">NO</div>
-                      <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase">CHARGE TYPE</div>
-                      <div className="px-[10px] w-[30%] flex items-center update-tenancy-modal-thead uppercase">REASON</div>
+                      <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase">
+                        NO
+                      </div>
+                      <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase">
+                        CHARGE TYPE
+                      </div>
+                      <div className="px-[10px] w-[30%] flex items-center update-tenancy-modal-thead uppercase">
+                        REASON
+                      </div>
                     </div>
                     <div
-                      className={`flex justify-between h-[67px] cursor-pointer ${expandedStates[item.id] ? "border-b border-[#E9E9E9]" : ""}`}
+                      className={`flex justify-between h-[67px] cursor-pointer ${
+                        expandedStates[item.id] ? "border-b border-[#E9E9E9]" : ""
+                      }`}
                       onClick={() => toggleExpand(item.id)}
                     >
-                      <div className="px-[13px] py-[13px] text-[14px] text-[#201D1E]">{item.id}</div>
-                      <div className="px-[10px] py-[13px] w-[35%] text-[14px] text-[#201D1E]">
-                        {chargeTypes.find((type) => type.id === parseInt(item.charge_type))?.name || ""}
+                      <div className="px-[13px] py-[13px] text-[14px] text-[#201D1E]">
+                        {item.id}
                       </div>
-                      <div className="px-[10px] py-[13px] w-[30%] text-[14px] text-[#201D1E]">{item.reason}</div>
+                      <div className="px-[10px] py-[13px] w-[35%] text-[14px] text-[#201D1E]">
+                        {chargeTypes.find(
+                          (type) => type.id === parseInt(item.charge_type)
+                        )?.name || item.charge_type_name}
+                      </div>
+                      <div className="px-[10px] py-[13px] w-[30%] text-[14px] text-[#201D1E]">
+                        {item.reason}
+                      </div>
                     </div>
 
                     {expandedStates[item.id] && (
                       <>
                         <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
-                          <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase">DUE DATE</div>
-                          <div className="px-[10px] flex items-center w-[7%] update-tenancy-modal-thead uppercase">STATUS</div>
-                          <div className="px-[10px] flex items-center w-[41.5%] update-tenancy-modal-thead uppercase">AMOUNT</div>
+                          <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase">
+                            DUE DATE
+                          </div>
+                          <div className="px-[10px] flex items-center w-[7%] update-tenancy-modal-thead uppercase">
+                            STATUS
+                          </div>
+                          <div className="px-[10px] flex items-center w-[41.5%] update-tenancy-modal-thead uppercase">
+                            AMOUNT
+                          </div>
                         </div>
                         <div className="flex justify-start border-b border-[#E9E9E9] h-[67px]">
                           <div className="px-[9px] py-[13px] relative w-full">
@@ -1267,7 +1470,9 @@ const UpdateTenancyModal = () => {
                               disabled={loading}
                             />
                           </div>
-                          <div className="py-[10px] text-[14px] text-[#201D1E]">{item.status}</div>
+                          <div className="py-[10px] text-[14px] text-[#201D1E]">
+                            {item.status}
+                          </div>
                           <div className="px-[10px] py-[13px] w-full">
                             <input
                               type="number"
@@ -1289,12 +1494,26 @@ const UpdateTenancyModal = () => {
                         </div>
 
                         <div className="flex justify-between bg-[#F2F2F2] h-[57px] border-b border-[#E9E9E9]">
-                          <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase w-[50%]">VAT</div>
-                          <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase w-[50%]">TOTAL</div>
+                          <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase w-[50%]">
+                            TAX
+                          </div>
+                          <div className="px-[10px] flex items-center update-tenancy-modal-thead uppercase w-[50%]">
+                            TOTAL
+                          </div>
                         </div>
                         <div className="flex justify-between h-[57px]">
-                          <div className="px-[13px] py-[13px] text-[14px] text-[#201D1E] text-center">{item.vat}</div>
-                          <div className="px-[13px] py-[13px] text-[14px] text-[#201D1E] w-[51%]">{item.total}</div>
+                          <div className="px-[13px] py-[13px] text-[14px] text-[#201D1E] text-center">
+                            <button
+                              onClick={() => showTaxDetails(item.id, false)}
+                              className="text-[#2892CE] underline"
+                              disabled={item.tax === "0.00"}
+                            >
+                              {item.tax}
+                            </button>
+                          </div>
+                          <div className="px-[13px] py-[13px] text-[14px] text-[#201D1E] w-[51%]">
+                            {item.total}
+                          </div>
                         </div>
                       </>
                     )}
@@ -1308,13 +1527,88 @@ const UpdateTenancyModal = () => {
         <div className="flex justify-end mt-6 mb-4">
           <button
             onClick={handleSubmit}
-            className={`text-white rounded w-[150px] h-[38px] update-tenancy-save-btn duration-200 ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#2892CE] hover:bg-[#2276a7]"}`}
+            className={`text-white rounded w-[150px] h-[38px] update-tenancy-save-btn duration-200 ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-[#2892CE] hover:bg-[#2276a7]"
+            }`}
             aria-label="Save tenancy"
             disabled={loading}
           >
             {loading ? "Saving..." : "Save"}
           </button>
         </div>
+
+        {taxModalData.isOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold">Tax Details</h3>
+                <button
+                  onClick={closeTaxModal}
+                  className="text-gray-500 hover:text-gray-700"
+                  aria-label="Close tax details modal"
+                >
+                  <X size={24} color="#201D1E" />
+                </button>
+              </div>
+
+              <div className="overflow-x-auto">
+                {taxModalData.taxDetails.length > 0 ? (
+                  <table className="w-full border border-gray-300 text-sm">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border border-gray-300  py-200">
+                          Charge Type
+                        </th>
+                        <th className="border px-3 border-gray-300 py-2 text-left">
+                          Tax %
+                        </th>
+                        <th className="px-[10px] py-2 border  border-gray-300 text-left">
+                          Amount
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {taxModalData.taxDetails.map((tax, index) => (
+                        <tr key={index}>
+                          <td className="px-[10px] py-2 borderborder-b-gray-300">
+                            {tax.tax_type}
+                          </td>
+                          <td className="px-2 py-[3 border px-3] border-b-gray-300">
+                            {tax.tax_percentage}%
+                          </td>
+                          <td className="px-2 py-3 px-3] border-b-gray-300">
+                            {tax.tax_amount}
+                          </td>
+                        </tr>
+                      ))}
+                      <tr className="font-semibold bg-gray-50">
+                        <td
+                          colSpan={2}
+                          className="px-2 py-[3 py-3 px-4 border text-right] border-b-gray-300 text-right"
+                        >
+                          Total
+                        </td>
+                        <td className="px-2 py-3 px-3] border-b border-gray-300">
+                          {taxModalData.taxDetails
+                            .reduce(
+                              (acc, curr) =>
+                                acc + parseFloat(curr.tax_amount || 0),
+                              0
+                            )
+                            .toFixed(2)}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                ) : (
+                  <p>No tax details available.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

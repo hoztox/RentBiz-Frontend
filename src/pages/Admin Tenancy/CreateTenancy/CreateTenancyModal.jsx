@@ -38,6 +38,7 @@ const CreateTenancyModal = () => {
     deposit: "",
     commission: "",
     remarks: "",
+    total_receivable: "0.00",
   });
 
   const [additionalCharges, setAdditionalCharges] = useState([
@@ -118,7 +119,7 @@ const CreateTenancyModal = () => {
     fetchUnits();
   }, [formData.building]);
 
-  // Update end_date and first_rent_due_on
+  // Update end_date, first_rent_due_on, and total_receivable
   useEffect(() => {
     if (formData.start_date && formData.rental_months) {
       const startDate = new Date(formData.start_date);
@@ -138,7 +139,22 @@ const CreateTenancyModal = () => {
         first_rent_due_on: formData.start_date,
       }));
     }
-  }, [formData.start_date, formData.rental_months]);
+
+    if (formData.rental_months && formData.rent_per_frequency) {
+      const total = (
+        parseInt(formData.rental_months) * parseFloat(formData.rent_per_frequency || 0)
+      ).toFixed(2);
+      setFormData((prev) => ({
+        ...prev,
+        total_receivable: total,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        total_receivable: "0.00",
+      }));
+    }
+  }, [formData.start_date, formData.rental_months, formData.rent_per_frequency]);
 
   // Reset payment schedule when relevant form fields change
   useEffect(() => {
@@ -382,6 +398,7 @@ const CreateTenancyModal = () => {
       deposit: parseFloat(formData.deposit || 0).toFixed(2),
       commission: parseFloat(formData.commission || 0).toFixed(2),
       remarks: formData.remarks,
+      total_receivable: parseFloat(formData.total_receivable || 0).toFixed(2),
       additional_charges: additionalCharges.map((charge) => ({
         charge_type: parseInt(charge.charge_type),
         reason: charge.reason,
@@ -605,6 +622,18 @@ const CreateTenancyModal = () => {
                 className="w-full p-2 focus:outline-none focus:border-gray-700 focus:ring-gray-700 tenancy-input-box"
                 step="0.01"
                 min="0"
+              />
+            </div>
+            <div>
+              <label className="block tenancy-modal-label">
+                Total Receivable
+              </label>
+              <input
+                type="text"
+                name="total_receivable"
+                value={formData.total_receivable}
+                readOnly
+                className="w-full p-2 bg-gray-100 tenancy-input-box"
               />
             </div>
             <div>
