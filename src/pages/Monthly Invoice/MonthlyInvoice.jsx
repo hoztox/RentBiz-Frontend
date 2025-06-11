@@ -8,12 +8,16 @@ import downarrow from "../../assets/Images/Monthly Invoice/downarrow.svg";
 import { useModal } from "../../context/ModalContext";
 import CustomDropDown from "../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
+import ConfirmationModal from "../../components/ConfirmationModal/ConfirmationModal";
 
 const MonthlyInvoice = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
   const { openModal } = useModal();
+  const [selectedOption, setSelectedOption] = useState("showing");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State for modal visibility
+  const [itemToDelete, setItemToDelete] = useState(null); // State for item to delete
   const itemsPerPage = 10;
 
   // Dropdown options for CustomDropDown
@@ -21,9 +25,6 @@ const MonthlyInvoice = () => {
     { value: "showing", label: "Showing" },
     { value: "all", label: "All" },
   ];
-
-  // State for selected dropdown value
-  const [selectedOption, setSelectedOption] = useState("showing");
 
   const demoData = [
     {
@@ -35,7 +36,7 @@ const MonthlyInvoice = () => {
       view: viewicon,
     },
     {
-      id: "INV2412001",
+      id: "INV2412002", 
       date: "24 Nov 2024",
       tenancyId: "TC0013-1",
       tenantName: "Pharmacy",
@@ -62,6 +63,26 @@ const MonthlyInvoice = () => {
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+  const handleDeleteClick = (invoice) => {
+    setItemToDelete(invoice);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (itemToDelete) {
+      console.log("Deleting invoice:", itemToDelete); // Replace with actual delete logic
+      // Example: Call an API to delete the invoice
+      // Update demoData or state accordingly
+    }
+    setIsDeleteModalOpen(false);
+    setItemToDelete(null);
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteModalOpen(false);
+    setItemToDelete(null);
+  };
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -155,7 +176,7 @@ const MonthlyInvoice = () => {
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
                 <td className="px-5 text-left mi-data">{invoice.id}</td>
-                <td className="px-5 text-left mi-data">{invoice.date}</td>
+                <td className="px-5 text=left mi-data">{invoice.date}</td>
                 <td className="pl-5 text-left mi-data">{invoice.tenancyId}</td>
                 <td className="pl-5 text-left mi-data">{invoice.tenantName}</td>
                 <td className="px-5 text-left mi-data">{invoice.amountDue}</td>
@@ -169,7 +190,7 @@ const MonthlyInvoice = () => {
                   </button>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button>
+                  <button onClick={() => handleDeleteClick(invoice)}>
                     <img
                       src={deleteicon}
                       alt="Delete"
@@ -187,9 +208,7 @@ const MonthlyInvoice = () => {
           <thead>
             <tr className="mi-table-row-head">
               <th className="px-5 text-left mi-thead mi-id-column">ID</th>
-              <th className="px-5 text-left mi-thead mi-date-column">
-                TENANT NAME
-              </th>
+              <th className="px-5 text-left mi-thead mi-date-column">TENANT NAME</th>
               <th className="px-5 text-right mi-thead"></th>
             </tr>
           </thead>
@@ -203,12 +222,8 @@ const MonthlyInvoice = () => {
                       : "mi-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left mi-data mi-id-column">
-                    {invoice.id}
-                  </td>
-                  <td className="px-5 text-left mi-data mi-date-column">
-                    {invoice.tenantName}
-                  </td>
+                  <td className="px-5 text-left mi-data mi-id-column">{invoice.id}</td>
+                  <td className="px-5 text-left mi-data mi-date-column">{invoice.tenantName}</td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`mi-dropdown-field ${
@@ -239,37 +254,23 @@ const MonthlyInvoice = () => {
                         <div className="mi-dropdown-content">
                           <div className="mi-dropdown-content-grid">
                             <div className="mi-dropdown-content-item w-[50%]">
-                              <div className="mi-dropdown-label">
-                                TENANCY ID
-                              </div>
-                              <div className="mi-dropdown-value">
-                                {invoice.tenancyId}
-                              </div>
+                              <div className="mi-dropdown-label">TENANCY ID</div>
+                              <div className="mi-dropdown-value">{invoice.tenancyId}</div>
                             </div>
                             <div className="mi-dropdown-content-item w-[50%]">
                               <div className="mi-dropdown-label">DATE</div>
-                              <div className="mi-dropdown-value">
-                                {invoice.date}
-                              </div>
+                              <div className="mi-dropdown-value">{invoice.date}</div>
                             </div>
                           </div>
                           <div className="mi-dropdown-content-grid">
                             <div className="mi-dropdown-content-item w-[50%]">
-                              <div className="mi-dropdown-label">
-                                AMOUNT DUE
-                              </div>
-                              <div className="mi-dropdown-value">
-                                {invoice.amountDue}
-                              </div>
+                              <div className="mi-dropdown-label">AMOUNT DUE</div>
+                              <div className="mi-dropdown-value">{invoice.amountDue}</div>
                             </div>
                             <div className="mi-dropdown-content-item w-[25%]">
                               <div className="mi-dropdown-label">VIEW</div>
                               <div className="mi-dropdown-value">
-                                <button
-                                  onClick={() =>
-                                    openModal("view-monthly-invoice")
-                                  }
-                                >
+                                <button onClick={() => openModal("view-monthly-invoice")}>
                                   <img
                                     src={invoice.view}
                                     alt="View"
@@ -281,7 +282,7 @@ const MonthlyInvoice = () => {
                             <div className="mi-dropdown-content-item w-[25%]">
                               <div className="mi-dropdown-label">ACTION</div>
                               <div className="mi-dropdown-value flex items-center gap-4">
-                                <button>
+                                <button onClick={() => handleDeleteClick(invoice)}>
                                   <img
                                     src={deleteicon}
                                     alt="Delete"
@@ -360,6 +361,18 @@ const MonthlyInvoice = () => {
           </button>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        type="delete"
+        title="Delete Invoice"
+        message={`Are you sure you want to delete the invoice with ID ${itemToDelete?.id}?`}
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </div>
   );
 };

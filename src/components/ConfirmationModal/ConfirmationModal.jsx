@@ -54,10 +54,10 @@ const ConfirmationModal = ({
             </div>
           </div>
           <div className="text-center mb-6 confirmation-modal-content">
-            <h2 className={`text-2xl font-semibold ${titleColors[type]}`}>
+            <h2 className={`${titleColors[type]}`}>
               {title}
             </h2>
-            <p className="text-gray-600 text-sm">{message}</p>
+            <p className="text-[#7D7D7D] text-sm">{message}</p>
           </div>
           <div className="flex gap-3 confirmation-modal-gap">
             <button

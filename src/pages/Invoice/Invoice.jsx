@@ -8,12 +8,16 @@ import downarrow from "../../assets/Images/Invoice/downarrow.svg";
 import { useModal } from "../../context/ModalContext";
 import CustomDropDown from "../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
+import ConfirmationModal from "../../components/ConfirmationModal/ConfirmationModal";
 
 const Invoice = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
   const { openModal } = useModal();
+  const [selectedOption, setSelectedOption] = useState("showing");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State for modal visibility
+  const [itemToDelete, setItemToDelete] = useState(null); // State for item to delete
   const itemsPerPage = 10;
 
   // Dropdown options for CustomDropDown
@@ -21,9 +25,6 @@ const Invoice = () => {
     { value: "showing", label: "Showing" },
     { value: "all", label: "All" },
   ];
-
-  // State for selected dropdown value
-  const [selectedOption, setSelectedOption] = useState("showing");
 
   const demoData = [
     {
@@ -35,7 +36,7 @@ const Invoice = () => {
       view: viewicon,
     },
     {
-      id: "INV2412001",
+      id: "INV2412002", // Changed ID to avoid duplicates
       date: "24 Nov 2024",
       tenancyId: "TC0013-1",
       tenantName: "Pharmacy",
@@ -43,7 +44,7 @@ const Invoice = () => {
       view: viewicon,
     },
     {
-      id: "INV2412001",
+      id: "INV2412003", // Changed ID to avoid duplicates
       date: "24 Nov 2024",
       tenancyId: "TC0013-1",
       tenantName: "Pharmacy",
@@ -70,6 +71,26 @@ const Invoice = () => {
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+
+  const handleDeleteClick = (invoice) => {
+    setItemToDelete(invoice);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (itemToDelete) {
+      console.log("Deleting invoice:", itemToDelete); // Replace with actual delete logic
+      // Example: Call an API to delete the invoice
+      // Update demoData or state accordingly
+    }
+    setIsDeleteModalOpen(false);
+    setItemToDelete(null);
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteModalOpen(false);
+    setItemToDelete(null);
+  };
 
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
@@ -165,9 +186,7 @@ const Invoice = () => {
                 <td className="px-5 text-left inv-data">{invoice.id}</td>
                 <td className="px-5 text-left inv-data">{invoice.date}</td>
                 <td className="pl-5 text-left inv-data">{invoice.tenancyId}</td>
-                <td className="pl-5 text-left inv-data">
-                  {invoice.tenantName}
-                </td>
+                <td className="pl-5 text-left inv-data">{invoice.tenantName}</td>
                 <td className="px-5 text-left inv-data">{invoice.amountDue}</td>
                 <td className="pl-14 text-center pr-5 pt-2">
                   <button onClick={() => openModal("view-invoice")}>
@@ -179,7 +198,7 @@ const Invoice = () => {
                   </button>
                 </td>
                 <td className="px-5 flex items-center justify-end h-[57px]">
-                  <button>
+                  <button onClick={() => handleDeleteClick(invoice)}>
                     <img
                       src={deleteicon}
                       alt="Delete"
@@ -197,9 +216,7 @@ const Invoice = () => {
           <thead>
             <tr className="inv-table-row-head">
               <th className="px-5 text-left inv-thead inv-id-column">ID</th>
-              <th className="px-5 text-left inv-thead inv-date-column">
-                TENANT NAME
-              </th>
+              <th className="px-5 text-left inv-thead inv-date-column">TENANT NAME</th>
               <th className="px-5 text-right inv-thead"></th>
             </tr>
           </thead>
@@ -213,12 +230,8 @@ const Invoice = () => {
                       : "inv-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left inv-data inv-id-column">
-                    {invoice.id}
-                  </td>
-                  <td className="px-5 text-left inv-data inv-date-column">
-                    {invoice.tenantName}
-                  </td>
+                  <td className="px-5 text-left inv-data inv-id-column">{invoice.id}</td>
+                  <td className="px-5 text-left inv-data inv-date-column">{invoice.tenantName}</td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`inv-dropdown-field ${
@@ -249,35 +262,23 @@ const Invoice = () => {
                         <div className="inv-dropdown-content">
                           <div className="inv-dropdown-content-grid">
                             <div className="inv-dropdown-content-item w-[50%]">
-                              <div className="inv-dropdown-label">
-                                TENANCY ID
-                              </div>
-                              <div className="inv-dropdown-value">
-                                {invoice.tenancyId}
-                              </div>
+                              <div className="inv-dropdown-label">TENANCY ID</div>
+                              <div className="inv-dropdown-value">{invoice.tenancyId}</div>
                             </div>
                             <div className="inv-dropdown-content-item w-[50%]">
                               <div className="inv-dropdown-label">DATE</div>
-                              <div className="inv-dropdown-value">
-                                {invoice.date}
-                              </div>
+                              <div className="inv-dropdown-value">{invoice.date}</div>
                             </div>
                           </div>
                           <div className="inv-dropdown-content-grid">
                             <div className="inv-dropdown-content-item w-[50%]">
-                              <div className="inv-dropdown-label">
-                                AMOUNT DUE
-                              </div>
-                              <div className="inv-dropdown-value">
-                                {invoice.amountDue}
-                              </div>
+                              <div className="inv-dropdown-label">AMOUNT DUE</div>
+                              <div className="inv-dropdown-value">{invoice.amountDue}</div>
                             </div>
                             <div className="inv-dropdown-content-item w-[25%]">
                               <div className="inv-dropdown-label">VIEW</div>
                               <div className="inv-dropdown-value">
-                                <button
-                                  onClick={() => openModal("view-invoice")}
-                                >
+                                <button onClick={() => openModal("view-invoice")}>
                                   <img
                                     src={invoice.view}
                                     alt="View"
@@ -289,7 +290,7 @@ const Invoice = () => {
                             <div className="inv-dropdown-content-item w-[25%]">
                               <div className="inv-dropdown-label">ACTION</div>
                               <div className="inv-dropdown-value flex items-center gap-4">
-                                <button>
+                                <button onClick={() => handleDeleteClick(invoice)}>
                                   <img
                                     src={deleteicon}
                                     alt="Delete"
@@ -368,6 +369,18 @@ const Invoice = () => {
           </button>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        type="delete"
+        title="Delete Invoice"
+        message={`Are you sure you want to delete the invoice with ID ${itemToDelete?.id}?`}
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </div>
   );
 };
