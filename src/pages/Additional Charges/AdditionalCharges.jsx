@@ -8,13 +8,16 @@ import downarrow from "../../assets/Images/Additional Charges/downarrow.svg";
 import { useModal } from "../../context/ModalContext";
 import CustomDropDown from "../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
+import ConfirmationModal from "../../components/ConfirmationModal/ConfirmationModal";
 
 const AdminAdditionalCharges = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
   const { openModal } = useModal();
-  const [selectedOption, setSelectedOption] = useState("showing"); // State for dropdown
+  const [selectedOption, setSelectedOption] = useState("showing");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State for modal visibility
+  const [itemToDelete, setItemToDelete] = useState(null); // State for item to delete
   const itemsPerPage = 10;
 
   // Dropdown options
@@ -67,11 +70,27 @@ const AdminAdditionalCharges = () => {
 
   const handleEditClick = (charges) => {
     console.log("ID Types: Selected IdType:", charges);
-    openModal(
-      "update-additional-charges",
-      "Update Additional Charges",
-      charges
-    );
+    openModal("update-additional-charges", "Update Additional Charges", charges);
+  };
+
+  const handleDeleteClick = (charges) => {
+    setItemToDelete(charges);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (itemToDelete) {
+      console.log("Deleting item:", itemToDelete); // Replace with actual delete logic
+      // Example: Call an API to delete the item
+      // Then update the demoData or state accordingly
+    }
+    setIsDeleteModalOpen(false);
+    setItemToDelete(null);
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteModalOpen(false);
+    setItemToDelete(null);
   };
 
   const toggleRowExpand = (id) => {
@@ -151,17 +170,11 @@ const AdminAdditionalCharges = () => {
           <thead>
             <tr className="border-b border-[#E9E9E9] h-[57px]">
               <th className="px-5 text-left admin-add-charges-thead">ID</th>
-              <th className="px-5 text-left admin-add-charges-thead">
-                CHARGE ID
-              </th>
+              <th className="px-5 text-left admin-add-charges-thead">CHARGE ID</th>
               <th className="pl-5 text-left admin-add-charges-thead">DATE</th>
-              <th className="pl-5 text-left admin-add-charges-thead">
-                AMOUNT DUE
-              </th>
+              <th className="pl-5 text-left admin-add-charges-thead">AMOUNT DUE</th>
               <th className="px-5 text-left admin-add-charges-thead">REASON</th>
-              <th className="px-5 text-left admin-add-charges-thead">
-                DUE DATE
-              </th>
+              <th className="px-5 text-left admin-add-charges-thead">DUE DATE</th>
               <th className="px-5 text-left admin-add-charges-thead w-[68px]">
                 STATUS
               </th>
@@ -176,24 +189,12 @@ const AdminAdditionalCharges = () => {
                 key={index}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-5 text-left admin-add-charges-data">
-                  {charges.id}
-                </td>
-                <td className="px-5 text-left admin-add-charges-data">
-                  {charges.chargeId}
-                </td>
-                <td className="pl-5 text-left admin-add-charges-data">
-                  {charges.date}
-                </td>
-                <td className="pl-5 text-left admin-add-charges-data">
-                  {charges.amountDue}
-                </td>
-                <td className="px-5 text-left admin-add-charges-data">
-                  {charges.reason}
-                </td>
-                <td className="px-5 text-left admin-add-charges-data">
-                  {charges.dueDate}
-                </td>
+                <td className="px-5 text-left admin-add-charges-data">{charges.id}</td>
+                <td className="px-5 text-left admin-add-charges-data">{charges.chargeId}</td>
+                <td className="pl-5 text-left admin-add-charges-data">{charges.date}</td>
+                <td className="pl-5 text-left admin-add-charges-data">{charges.amountDue}</td>
+                <td className="px-5 text-left admin-add-charges-data">{charges.reason}</td>
+                <td className="px-5 text-left admin-add-charges-data">{charges.dueDate}</td>
                 <td className="px-5 text-left admin-add-charges-data">
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
@@ -213,7 +214,7 @@ const AdminAdditionalCharges = () => {
                       className="w-[18px] h-[18px] admin-add-charges-action-btn duration-200"
                     />
                   </button>
-                  <button>
+                  <button onClick={() => handleDeleteClick(charges)}>
                     <img
                       src={deleteicon}
                       alt="Delete"
@@ -337,16 +338,14 @@ const AdminAdditionalCharges = () => {
                                 ACTION
                               </div>
                               <div className="admin-add-charges-dropdown-value flex items-center gap-4 mt-[10px]">
-                                <button
-                                  onClick={() => handleEditClick(charges)}
-                                >
+                                <button onClick={() => handleEditClick(charges)}>
                                   <img
                                     src={editicon}
                                     alt="Edit"
                                     className="w-[18px] h-[18px] admin-add-charges-action-btn duration-200"
                                   />
                                 </button>
-                                <button>
+                                <button onClick={() => handleDeleteClick(charges)}>
                                   <img
                                     src={deleteicon}
                                     alt="Delete"
@@ -423,6 +422,18 @@ const AdminAdditionalCharges = () => {
           </button>
         </div>
       </div>
+
+      {/* Render Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        type="delete"
+        title="Delete Charge"
+        message={`Are you sure you want to delete the charge with ID ${itemToDelete?.id}?`}
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
     </div>
   );
 };
