@@ -16,7 +16,9 @@ import { motion, AnimatePresence } from "framer-motion";
 const AdminUsers = () => {
   const [selectedOption, setSelectedOption] = useState("showing");
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [users, setUsers] = useState([]);
   const [expandedRows, setExpandedRows] = useState({});
   const [loading, setLoading] = useState(true);
@@ -25,11 +27,15 @@ const AdminUsers = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userIdToDelete, setUserIdToDelete] = useState(null);
   const itemsPerPage = 10;
+  const filteredData = users;
 
-  const options = [
-    { value: "showing", label: "Showing" },
-    { value: "all", label: "All" },
+ // Dropdown options for status filter
+  const statusFilterOptions = [
+    { label: "All", value: "" },
+    { label: "Active", value: "active" },
+    { label: "Blocked", value: "blocked" },
   ];
+
 
   const getUserCompanyId = () => {
     const storedCompanyId = localStorage.getItem("company_id");
@@ -52,6 +58,10 @@ const AdminUsers = () => {
   const companyId = getUserCompanyId();
 
   useEffect(() => {
+      setCurrentPage(1);
+    }, [searchTerm, selectedStatus]);
+
+  useEffect(() => {
     const fetchUsers = async () => {
       if (!companyId) {
         setError("Company ID not found. Please log in again.");
@@ -62,21 +72,22 @@ const AdminUsers = () => {
       setError(null);
       try {
         const response = await axios.get(
-          `${BASE_URL}/company/users/company/${companyId}/`
-        );
-        const userData = Array.isArray(response.data)
-          ? response.data
-          : response.data.results || [];
-        setUsers(userData);
+          `${BASE_URL}/company/users/company/${companyId}/`,{
+        params:  { search: searchTerm, status:selectedStatus,page:currentPage,pageSize:itemsPerPage } 
+      });
+      const userData = response.data.results || [];
+      console.log(response.data)
+      setUsers(userData);
+      setTotalCount(response.data.count); 
       } catch (error) {
         console.error("Error fetching users:", error);
-        setError("Failed to load users. Please try again later.");
+        // setError("Failed to load users. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
     fetchUsers();
-  }, [companyId, refreshCounter]);
+  }, [companyId, refreshCounter,currentPage,itemsPerPage,searchTerm,selectedStatus]);
 
   const handleEditUser = (user) => {
     console.log("User data passed to modal:", user);
@@ -196,22 +207,10 @@ const AdminUsers = () => {
   const isBlocked = (id) =>
     users.find((u) => u.id === id)?.status === "blocked";
 
-  const filteredData = Array.isArray(users)
-    ? users.filter(
-        (user) =>
-          user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.id.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.user_role?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.status?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    : [];
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const totalPages = Math.ceil(totalCount/ itemsPerPage)
+  const paginatedData = users;
+   
 
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
@@ -228,9 +227,9 @@ const AdminUsers = () => {
     );
   };
 
-  if (loading) {
-    return <div className="p-5">Loading users...</div>;
-  }
+  // if (loading) {
+  //   return <div className="p-5">Loading users...</div>;
+  // }
 
   if (error) {
     return <div className="p-5 text-red-500">{error}</div>;
@@ -251,13 +250,12 @@ const AdminUsers = () => {
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 user-search"
             />
             <CustomDropDown
-              options={options}
-              value={selectedOption}
-              onChange={setSelectedOption}
-              placeholder="Showing"
-              className="w-[40%] md:w-[121px]"
-              dropdownClassName="user-selection px-[14px] py-[7px] border-[#201D1E20]"
-              enableFilter={false}
+               options={statusFilterOptions}
+                value={selectedStatus}
+                onChange={setSelectedStatus}
+                placeholder="Select Status"
+                dropdownClassName="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 bldg-selection"
+              
             />
           </div>
           <div className="flex gap-[10px] user-action-buttons-container w-full md:w-auto justify-start">
@@ -301,16 +299,16 @@ const AdminUsers = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedData.length === 0 ? (
+            {users.length === 0 ? (
               <tr>
                 <td colSpan={8} className="px-5 py-8 text-center text-gray-500">
                   No users found
                 </td>
               </tr>
             ) : (
-              paginatedData.map((user, index) => (
+              users.map((user, index) => (
                 <tr
-                  key={index}
+                  key={user.id}
                   className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
                 >
                   <td className="px-5 text-left user-data">
@@ -388,15 +386,15 @@ const AdminUsers = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedData.length === 0 ? (
+            {users.length === 0 ? (
               <tr>
                 <td colSpan={3} className="px-5 py-4 text-center">
                   No users found.
                 </td>
               </tr>
             ) : (
-              paginatedData.map((user, index) => (
-                <React.Fragment key={index}>
+              users.map((user, index) => (
+                <React.Fragment key={user.id}>
                   <tr
                     className={`${
                       expandedRows[user.id]
@@ -531,9 +529,9 @@ const AdminUsers = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
         <span className="pagination collection-list-pagination">
           Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-          {filteredData.length} entries
+          {Math.min((currentPage - 1) * itemsPerPage + 1, totalCount)}{" "}
+          to {Math.min(currentPage * itemsPerPage, totalCount)} of{" "}
+          {totalCount} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
           <button
