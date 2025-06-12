@@ -9,7 +9,8 @@ import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
-import CurrencyDeleteModal from "./CurrencyDeleteModal/CurrencyDeleteModal";
+// import CurrencyDeleteModal from "./CurrencyDeleteModal/CurrencyDeleteModal";
+import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
 import CustomDropDown from "../../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -563,11 +564,15 @@ const Currency = () => {
           </div>
         </div>
       )}
-
-      <CurrencyDeleteModal
+      <ConfirmationModal
         isOpen={isDeleteModalOpen}
+        type="delete"
+        title="Delete Currency"
+        message="Are you sure you want to delete this currency?"
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+        onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
-        onDelete={handleConfirmDelete}
       />
     </div>
   );

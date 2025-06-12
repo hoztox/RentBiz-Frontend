@@ -8,8 +8,8 @@ import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
 import unitimg from "../../../assets/Images/Admin Masters/units-img.svg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
-import UnitTypeDeleteModal from "./UnitTypeDeleteModal/UnitTypeDeleteModal";
 import { unitTypesApi } from "../MastersApi";
+import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
 import CustomDropDown from "../../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -137,7 +137,6 @@ const UnitType = () => {
   }, [refreshCounter]);
 
   const handleEditClick = (unit) => {
-    console.log("ID Types: Selected IdType:", unit);
     openModal("update-unit-type-master", "Update Unit Type Master", unit);
   };
 
@@ -545,10 +544,15 @@ const UnitType = () => {
           </div>
         </div>
       )}
-      <UnitTypeDeleteModal
+      <ConfirmationModal
         isOpen={isDeleteModalOpen}
+        type="delete"
+        title="Delete Unit Type"
+        message="Are you sure you want to delete this unit type?"
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+        onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
-        onDelete={handleConfirmDelete}
       />
     </div>
   );

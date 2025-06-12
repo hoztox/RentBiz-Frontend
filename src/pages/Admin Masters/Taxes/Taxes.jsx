@@ -7,7 +7,7 @@ import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import DeleteTaxModal from "./DeleteTaxModal/DeleteTaxModal";
+import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
 import CustomDropDown from "../../../components/CustomDropDown";
 import { taxesApi } from "../MastersApi";
 import { motion, AnimatePresence } from "framer-motion";
@@ -549,10 +549,15 @@ const Taxes = () => {
           )}
         </>
       )}
-      <DeleteTaxModal
+      <ConfirmationModal
         isOpen={isDeleteModalOpen}
+        type="delete"
+        title="Delete Tax"
+        message="Are you sure you want to delete this tax?"
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+        onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
-        onDelete={handleConfirmDelete}
       />
     </div>
   );
