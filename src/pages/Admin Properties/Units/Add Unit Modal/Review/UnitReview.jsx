@@ -8,6 +8,7 @@ const UnitReview = ({ formData, onNext, onBack }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [buildings, setBuildings] = useState([]);
+  const [docTypes, setDocTypes] = useState([]);
 
   const building = formData?.building || {};
   const unit = formData?.unit || {};
@@ -46,6 +47,27 @@ const UnitReview = ({ formData, onNext, onBack }) => {
     fetchBuildings();
   }, []);
 
+  useEffect(() => {
+    const fetchDocTypes = async () => {
+      try {
+        const companyId = getUserCompanyId();
+        const response = await axios.get(
+          `${BASE_URL}/company/doc_type/company/${companyId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        setDocTypes(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error("Error fetching document types:", error);
+        setError("Failed to load document types.");
+      }
+    };
+    fetchDocTypes();
+  }, []);
+
   const getBuildingName = (buildingId) => {
     if (!buildingId) return "N/A";
     const building = buildings.find((b) => b.id === parseInt(buildingId));
@@ -68,23 +90,26 @@ const UnitReview = ({ formData, onNext, onBack }) => {
       setLoading(false);
       return;
     }
-    if (documents.length > 0) {
-      const invalidDocs = documents.filter(
-        (doc) =>
-          !doc.doc_type ||
-          !doc.number ||
-          !doc.issued_date ||
-          !doc.expiry_date ||
-          !doc.upload_file?.length
+
+    const invalidDocs = documents.filter((doc) => {
+      if (!doc.doc_type) return true;
+      const docType = docTypes.find((type) => type.id === parseInt(doc.doc_type));
+      if (!docType) return true;
+
+      return (
+        (docType.number && !doc.number) ||
+        (docType.issue_date && !doc.issued_date) ||
+        (docType.expiry_date && !doc.expiry_date) ||
+        (docType.upload_file && !doc.upload_file)
       );
-      if (invalidDocs.length > 0) {
-        setError(
-          "All documents must have doc_type, number, dates, and at least one file."
-        );
-        setLoading(false);
-        return;
-      }
+    });
+
+    if (documents.length > 0 && invalidDocs.length > 0) {
+      setError("Some documents are missing required fields based on their document type.");
+      setLoading(false);
+      return;
     }
+
     try {
       const formDataWithFiles = new FormData();
       formDataWithFiles.append("company", parseInt(getUserCompanyId()));
@@ -104,31 +129,51 @@ const UnitReview = ({ formData, onNext, onBack }) => {
       );
       formDataWithFiles.append("premise_no", unit.premise_no || "");
       formDataWithFiles.append("unit_status", unit.unit_status || "");
-      const unitCompData = documents.map((doc, index) => ({
-        doc_type: parseInt(doc.doc_type),
-        number: doc.number || "",
-        issued_date: doc.issued_date || "",
-        expiry_date: doc.expiry_date || "",
-        file_index: index,
-      }));
-      formDataWithFiles.append("unit_comp_json", JSON.stringify(unitCompData));
-      documents.forEach((doc, index) => {
-        if (doc.upload_file && doc.upload_file[0]) {
-          formDataWithFiles.append(
-            `document_file_${index}`,
-            doc.upload_file[0]
-          );
-        }
-      });
+
+      await Promise.all(
+        documents.map(async (doc, index) => {
+          const docType = docTypes.find((type) => type.id === parseInt(doc.doc_type));
+          if (docType) {
+            formDataWithFiles.append(`unit_comp[${index}][doc_type]`, doc.doc_type || "");
+            formDataWithFiles.append(`unit_comp[${index}][id]`, doc.id || "");
+            if (docType.number) {
+              formDataWithFiles.append(`unit_comp[${index}][number]`, doc.number || "");
+            }
+            if (docType.issue_date) {
+              formDataWithFiles.append(`unit_comp[${index}][issued_date]`, doc.issued_date || "");
+            }
+            if (docType.expiry_date) {
+              formDataWithFiles.append(`unit_comp[${index}][expiry_date]`, doc.expiry_date || "");
+            }
+            if (docType.upload_file && doc.upload_file) {
+              const file = Array.isArray(doc.upload_file) ? doc.upload_file[0] : doc.upload_file;
+              const { blob, name, url } = await convertToBlob(file);
+              if (blob) {
+                formDataWithFiles.append(
+                  `unit_comp[${index}][upload_file]`,
+                  blob,
+                  name || `file-${index}`
+                );
+              } else if (url) {
+                formDataWithFiles.append(`unit_comp[${index}][existing_file]`, url);
+                formDataWithFiles.append(`unit_comp[${index}][file_name]`, name);
+              }
+            }
+          }
+        })
+      );
+
       console.log("FormData contents:");
       for (const [key, value] of formDataWithFiles.entries()) {
-        console.log(`${key}:`, value);
+        console.log(`${key}:`, value instanceof File ? `File: ${value.name}` : value);
       }
+
       const response = await axios.post(
         `${BASE_URL}/company/units/create/`,
         formDataWithFiles,
         {
           headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "multipart/form-data",
           },
         }
@@ -143,6 +188,27 @@ const UnitReview = ({ formData, onNext, onBack }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const convertToBlob = async (fileData) => {
+    if (!fileData) {
+      console.warn("No file data provided");
+      return { blob: null, name: null };
+    }
+    if (fileData instanceof File || fileData instanceof Blob) {
+      return { blob: fileData, name: fileData.name || "unknown_file" };
+    }
+    if (typeof fileData === "string") {
+      return { blob: null, name: getFileNameFromUrl(fileData), url: fileData };
+    }
+    console.warn("Invalid file data type:", typeof fileData, fileData);
+    return { blob: null, name: null };
+  };
+
+  const getFileNameFromUrl = (url) => {
+    if (!url || typeof url !== "string") return "unknown_file";
+    const parts = url.split("/");
+    return parts[parts.length - 1] || "unknown_file";
   };
 
   const handleBack = () => {
@@ -250,7 +316,7 @@ const UnitReview = ({ formData, onNext, onBack }) => {
         </div>
       </div>
       <div className="py-5">
-        <DocumentsView documents={documents} />
+        <DocumentsView documents={documents} docTypes={docTypes} />
       </div>
       <div className="flex justify-end gap-4 pt-5 mt-auto">
         <button
