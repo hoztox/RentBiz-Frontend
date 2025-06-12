@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./TenancyMaster.css";
-import { ChevronDown } from "lucide-react";
 import plusicon from "../../../assets/Images/Admin Tenancy/plus-icon.svg";
 import downloadicon from "../../../assets/Images/Admin Tenancy/download-icon.svg";
 import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
@@ -12,19 +11,20 @@ import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 import CustomDropDown from "../../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
+import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
 
 const TenancyMaster = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  // State for selected dropdown value
   const [selectedOption, setSelectedOption] = useState("showing");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
   const [tenancies, setTenancies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [tenancyToDelete, setTenancyToDelete] = useState(null);
   const itemsPerPage = 10;
   const { openModal, refreshCounter } = useModal();
 
-  // Dropdown options for CustomDropDown
   const dropdownOptions = [
     { value: "showing", label: "Showing" },
     { value: "all", label: "All" },
@@ -48,7 +48,6 @@ const TenancyMaster = () => {
     return null;
   };
 
-  // Reusable function to fetch tenancies
   useEffect(() => {
     const fetchAndSortTenancies = async () => {
       try {
@@ -57,7 +56,6 @@ const TenancyMaster = () => {
         const response = await axios.get(
           `${BASE_URL}/company/tenancies/company/${companyId}/`
         );
-        // Sort tenancies by id in ascending order
         const sortedTenancies = response.data.sort((a, b) => a.id - b.id);
         setTenancies(sortedTenancies);
         console.log("Fetched and sorted tenancies:", sortedTenancies);
@@ -71,17 +69,31 @@ const TenancyMaster = () => {
     fetchAndSortTenancies();
   }, [refreshCounter]);
 
-  // Handle delete action
-  const handleDelete = async (tenancyId) => {
-    if (window.confirm("Are you sure you want to delete this tenancy?")) {
+  const handleDeleteClick = (tenancyId) => {
+    setTenancyToDelete(tenancyId);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (tenancyToDelete) {
       try {
-        await axios.delete(`${BASE_URL}/company/tenancies/${tenancyId}/`);
-        console.log(`Deleted tenancy with ID: ${tenancyId}`);
+        await axios.delete(`${BASE_URL}/company/tenancies/${tenancyToDelete}/`);
+        console.log(`Deleted tenancy with ID: ${tenancyToDelete}`);
+        setTenancies(
+          tenancies.filter((tenancy) => tenancy.id !== tenancyToDelete)
+        );
       } catch (error) {
         console.error("Error deleting tenancy:", error);
         alert("Failed to delete tenancy. Please try again.");
       }
     }
+    setShowDeleteModal(false);
+    setTenancyToDelete(null);
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false);
+    setTenancyToDelete(null);
   };
 
   const toggleRowExpand = (id) => {
@@ -120,7 +132,6 @@ const TenancyMaster = () => {
     openModal("tenancy-update", "Update Tenancy", tenancy);
   };
 
-  // Filter tenancies based on search term
   const filteredData = tenancies.filter(
     (tenancy) =>
       tenancy.tenancy_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -276,7 +287,7 @@ const TenancyMaster = () => {
                       className="w-[18px] h-[18px] tenancy-action-btn duration-200"
                     />
                   </button>
-                  <button onClick={() => handleDelete(tenancy.id)}>
+                  <button onClick={() => handleDeleteClick(tenancy.id)}>
                     <img
                       src={deletesicon}
                       alt="Delete"
@@ -427,7 +438,7 @@ const TenancyMaster = () => {
                                   />
                                 </button>
                                 <button
-                                  onClick={() => handleDelete(tenancy.id)}
+                                  onClick={() => handleDeleteClick(tenancy.id)}
                                 >
                                   <img
                                     src={deletesicon}
@@ -505,6 +516,17 @@ const TenancyMaster = () => {
           </button>
         </div>
       </div>
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        type="delete"
+        title="Delete Tenancy"
+        message="Are you sure you want to delete this tenancy?"
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
     </div>
   );
 };

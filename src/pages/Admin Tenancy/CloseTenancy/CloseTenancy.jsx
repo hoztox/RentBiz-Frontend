@@ -8,18 +8,17 @@ import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 import CustomDropDown from "../../../components/CustomDropDown";
-import TenancyCloseModal from "./TenancyCloseModal/TenancyCloseModal";
-import DeleteTenancyModal from "../DeleteTenancyModal/DeleteTenancyModal";
 import { motion, AnimatePresence } from "framer-motion";
+import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
 
 const CloseTenancy = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
   const [tenancies, setTenancies] = useState([]);
-  const [showCloseModal, setShowCloseModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedTenancyId, setSelectedTenancyId] = useState(null);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [confirmationAction, setConfirmationAction] = useState(null);
   const { openModal } = useModal();
   const itemsPerPage = 10;
 
@@ -158,13 +157,20 @@ const CloseTenancy = () => {
     },
   };
 
+  const openConfirmationModal = (id, action) => {
+    setSelectedTenancyId(id);
+    setConfirmationAction(action); // 'delete' or 'close'
+    setShowConfirmationModal(true);
+  };
+
   const handleDelete = async (id) => {
     try {
       await axios.delete(`${BASE_URL}/company/tenancies/${id}/`);
       setTenancies(tenancies.filter((tenancy) => tenancy.id !== id));
       console.log("Deleted Tenancy ID:", id);
-      setShowDeleteModal(false); // Close modal after deletion
+      setShowConfirmationModal(false); // Close modal
       setSelectedTenancyId(null); // Clear selected tenancy ID
+      setConfirmationAction(null); // Clear action
     } catch (error) {
       console.error("Error deleting tenancy:", error);
     }
@@ -201,32 +207,12 @@ const CloseTenancy = () => {
             : tenancy
         )
       );
-      setShowCloseModal(false);
+      setShowConfirmationModal(false); // Close modal
+      setSelectedTenancyId(null); // Clear selected tenancy ID
+      setConfirmationAction(null); // Clear action
     } catch (error) {
       console.error("Error closing tenancy:", error);
     }
-  };
-
-  const openCloseModal = (id) => {
-    setSelectedTenancyId(id);
-    setShowCloseModal(true);
-  };
-
-  const cancelClose = () => {
-    setShowCloseModal(false);
-    setSelectedTenancyId(null);
-  };
-
-  // Function to open DeleteModal
-  const openDeleteModal = (id) => {
-    setSelectedTenancyId(id);
-    setShowDeleteModal(true);
-  };
-
-  // Function to cancel DeleteModal
-  const cancelDelete = () => {
-    setShowDeleteModal(false);
-    setSelectedTenancyId(null);
   };
 
   return (
@@ -330,7 +316,7 @@ const CloseTenancy = () => {
                   </td>
                   <td className="px-5 text-center">
                     <button
-                      onClick={() => openCloseModal(tenancy.id)}
+                      onClick={() => openConfirmationModal(tenancy.id, "close")}
                       disabled={tenancy.isClose}
                       className={`px-4 py-2 rounded-md tenancy-data ${
                         tenancy.isClose
@@ -342,7 +328,11 @@ const CloseTenancy = () => {
                     </button>
                   </td>
                   <td className="px-5 tclose-flex-gap-23 h-[57px] ml-[23px] flex !justify-center">
-                    <button onClick={() => openDeleteModal(tenancy.id)}>
+                    <button
+                      onClick={() =>
+                        openConfirmationModal(tenancy.id, "delete")
+                      }
+                    >
                       <img
                         src={deleteicon}
                         alt="Delete"
@@ -479,7 +469,9 @@ const CloseTenancy = () => {
                                 </div>
                                 <div className="tclose-dropdown-value">
                                   <button
-                                    onClick={() => openCloseModal(tenancy.id)}
+                                    onClick={() =>
+                                      openConfirmationModal(tenancy.id, "close")
+                                    }
                                     disabled={tenancy.isClose}
                                     className={`py-2 rounded-md font-medium ${
                                       tenancy.isClose
@@ -501,7 +493,12 @@ const CloseTenancy = () => {
                                 </div>
                                 <div className="tclose-dropdown-value tclose-flex-items-center-gap-2 mt-[10px] ml-[5px]">
                                   <button
-                                    onClick={() => openDeleteModal(tenancy.id)}
+                                    onClick={() =>
+                                      openConfirmationModal(
+                                        tenancy.id,
+                                        "delete"
+                                      )
+                                    }
                                   >
                                     <img
                                       src={deleteicon}
@@ -580,19 +577,29 @@ const CloseTenancy = () => {
           </button>
         </div>
       </div>
-      <TenancyCloseModal
-        isOpen={showCloseModal}
-        onCancel={cancelClose}
-        onConfirm={() => handleCloseTenancy(selectedTenancyId)}
-      />
-      <DeleteTenancyModal
-        isOpen={showDeleteModal}
-        onCancel={cancelDelete}
-        onDelete={() => handleDelete(selectedTenancyId)}
-        title="Are You Sure?"
-        message="Are you sure you want to delete this tenancy?"
-        deleteButtonText="Delete"
+      <ConfirmationModal
+        isOpen={showConfirmationModal}
+        type={confirmationAction === "delete" ? "delete" : "close"}
+        title={
+          confirmationAction === "delete" ? "Delete Tenancy" : "Close Tenancy"
+        }
+        message={
+          confirmationAction === "delete"
+            ? "Are you sure you want to delete this tenancy?"
+            : "Are you sure you want to close this tenancy?"
+        }
+        confirmButtonText={confirmationAction === "delete" ? "Delete" : "Close"}
         cancelButtonText="Cancel"
+        onConfirm={() =>
+          confirmationAction === "delete"
+            ? handleDelete(selectedTenancyId)
+            : handleCloseTenancy(selectedTenancyId)
+        }
+        onCancel={() => {
+          setShowConfirmationModal(false);
+          setSelectedTenancyId(null);
+          setConfirmationAction(null);
+        }}
       />
     </div>
   );
