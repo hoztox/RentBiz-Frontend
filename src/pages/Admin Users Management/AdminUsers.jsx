@@ -255,13 +255,15 @@ const AdminUsers = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 user-search"
             />
+            <div className="relative w-[40%] md:w-auto">
             <CustomDropDown
               options={statusFilterOptions}
               value={selectedStatus}
               onChange={setSelectedStatus}
               placeholder="Select Status"
-              dropdownClassName="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 bldg-selection"
+              dropdownClassName="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 user-selection"
             />
+            </div>
           </div>
           <div className="flex gap-[10px] user-action-buttons-container w-full md:w-auto justify-start">
             <button
