@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import "./AddChargesModal.css";
 import { ChevronDown } from "lucide-react";
 import closeicon from "../../../assets/Images/Additional Charges/close-icon.svg";
-import calendaricon from "../../../assets/Images/Additional Charges/calendar-icon.svg";
 import plusicon from "../../../assets/Images/Additional Charges/input-plus-icon.svg";
 import { useModal } from "../../../context/ModalContext";
+import axios from "axios";
+import { BASE_URL } from "../../../utils/config";
 
 const AddChargesModal = () => {
   const { modalState, closeModal } = useModal();
@@ -14,68 +15,163 @@ const AddChargesModal = () => {
   const [chargeCode, setChargeCode] = useState("");
   const [reason, setReason] = useState("");
   const [amountDue, setAmountDue] = useState("");
-  const [vatAmount, setVatAmount] = useState("");
+  const [taxAmount, setTaxAmount] = useState("");
   const [totalAmount, setTotalAmount] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [status, setStatus] = useState("");
   const [remarks, setRemarks] = useState("");
+  const [tenancies, setTenancies] = useState([]);
+  const [chargeTypes, setChargeTypes] = useState([]);
   const [isSelectOpenTenancy, setIsSelectOpenTenancy] = useState(false);
   const [isSelectOpenChargeCode, setIsSelectOpenChargeCode] = useState(false);
   const [isSelectOpenStatus, setIsSelectOpenStatus] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Reset form state when modal opens
   useEffect(() => {
-    if (modalState.isOpen) {
+    if (modalState.isOpen && modalState.type === "create-additional-charges") {
       setTenancyContract("");
       setId("");
       setDate("");
       setChargeCode("");
       setReason("");
       setAmountDue("");
-      setVatAmount("");
+      setTaxAmount("");
       setTotalAmount("");
       setDueDate("");
       setStatus("");
       setRemarks("");
+      setError("");
+      fetchOptions();
     }
-  }, [modalState.isOpen]);
+  }, [modalState.isOpen, modalState.type]);
 
-  // Only render for "create-unit-type-master" type
+  const getUserCompanyId = () => {
+    const role = localStorage.getItem("role")?.toLowerCase();
+    if (role === "company") {
+      return localStorage.getItem("company_id");
+    } else if (role === "user" || role === "admin") {
+      try {
+        const userCompanyId = localStorage.getItem("company_id");
+        return userCompanyId ? JSON.parse(userCompanyId) : null;
+      } catch (e) {
+        console.error("Error parsing user company ID:", e);
+        return null;
+      }
+    }
+    return null;
+  };
+
+  const fetchOptions = async () => {
+    const companyId = getUserCompanyId();
+    if (!companyId) {
+      setError("Company ID not found. Please ensure you are logged in.");
+      return;
+    }
+
+    try {
+      const [tenanciesResponse, chargesResponse] = await Promise.all([
+        axios.get(`${BASE_URL}/company/tenancies/occupied/${companyId}/`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }),
+        axios.get(`${BASE_URL}/company/charges/company/${companyId}/`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }),
+      ]);
+
+      setTenancies(tenanciesResponse.data.data || tenanciesResponse.data || []);
+      setChargeTypes(chargesResponse.data.data || chargesResponse.data || []);
+    } catch (err) {
+      setError("Failed to fetch options: " + err.message);
+    }
+  };
+
+  useEffect(() => {
+    const fetchTaxPreview = async () => {
+      const companyId = getUserCompanyId();
+      if (!companyId || !chargeCode || !amountDue || !dueDate) {
+        setTaxAmount("");
+        setTotalAmount("");
+        return;
+      }
+
+      try {
+        const response = await axios.post(
+          `${BASE_URL}/company/tenancies/preview-additional-charge-tax/`,
+          {
+            company: companyId,
+            charge_type: chargeCode,
+            amount: amountDue,
+            due_date: dueDate,
+            reason: reason || "Additional Charge",
+          },
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          }
+        );
+
+        if (response.data.success) {
+          setTaxAmount(response.data.additional_charge.tax || "0.00");
+          setTotalAmount(response.data.additional_charge.total || "0.00");
+          setError("");
+        } else {
+          setTaxAmount("");
+          setTotalAmount("");
+          setError(response.data.message || "Failed to fetch tax preview");
+        }
+      } catch (err) {
+        setTaxAmount("");
+        setTotalAmount("");
+        setError("Error fetching tax preview: " + err.message);
+      }
+    };
+
+    fetchTaxPreview();
+  }, [chargeCode, amountDue, dueDate, reason]);
+
+  const handleSave = async () => {
+    if (!tenancyContract || !chargeCode || !reason || !dueDate || !amountDue || !status) {
+      setError("Please fill all required fields (Tenancy Contract, Charge Code, Reason, Due Date, Amount Due, Status)");
+      return;
+    }
+
+    const formData = {
+      tenancy: tenancyContract,
+      charge_type: chargeCode,
+      reason,
+      due_date: dueDate,
+      amount: amountDue,
+      tax: taxAmount || "0.00",
+      status,
+    };
+
+    try {
+      setLoading(true);
+      const response = await axios.post(`${BASE_URL}/company/additional-charges/create/`, formData, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+
+      if (response.data.success) {
+        closeModal();
+      } else {
+        setError(response.data.message || "Failed to create additional charge");
+      }
+    } catch (err) {
+      setError("Error creating additional charge: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!modalState.isOpen || modalState.type !== "create-additional-charges") {
     return null;
   }
-
-  const handleSave = () => {
-    // Validate required fields (marked with *)
-    if (id && date && chargeCode && reason && vatAmount && status) {
-      const formData = {
-        tenancyContract,
-        id,
-        date,
-        chargeCode,
-        reason,
-        amountDue,
-        vatAmount,
-        totalAmount,
-        dueDate,
-        status,
-        remarks,
-      };
-      console.log("New Charge Added: ", formData);
-    } else {
-      console.log("Please fill all required fields");
-      // Optionally, show an error message to the user
-    }
-    closeModal();
-  };
 
   return (
     <div className="additional-charges-modal-overlay">
       <div className="add-charges-modal-container bg-white rounded-md w-[1006px] shadow-lg p-1">
         <div className="flex justify-between items-center md:p-6 mt-2">
-          <h2 className="text-[#201D1E] add-charges-head">
-            Create New Additional Charge
-          </h2>
+          <h2 className="text-[#201D1E] add-charges-head">Create New Additional Charge</h2>
           <button
             onClick={closeModal}
             className="add-charges-close-btn hover:bg-gray-100 duration-200"
@@ -84,35 +180,31 @@ const AddChargesModal = () => {
           </button>
         </div>
 
+        {error && <div className="text-red-500 text-center mb-4">{error}</div>}
+
         <div className="md:p-6 mt-[-15px]">
           <div className="grid ac-grid-cols-2 gap-6">
-            {/* First row */}
             <div className="space-y-2">
-              <label className="block add-charges-label">
-                Tenancy Contract
-              </label>
+              <label className="block add-charges-label">Tenancy Contract*</label>
               <div className="relative">
                 <select
                   value={tenancyContract}
                   onChange={(e) => {
                     setTenancyContract(e.target.value);
-                    if (e.target.value === "") {
-                      e.target.classList.add("add-charges-selected");
-                    } else {
-                      e.target.classList.remove("add-charges-selected");
-                    }
+                    setError("");
                   }}
                   onFocus={() => setIsSelectOpenTenancy(true)}
                   onBlur={() => setIsSelectOpenTenancy(false)}
                   className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-selection ${
-                    tenancyContract === "" ? "add-charges-selected" : ""
+                    !tenancyContract ? "add-charges-selected" : ""
                   }`}
                 >
-                  <option value="" disabled hidden>
-                    Choose
-                  </option>
-                  <option value="contract1">Contract 1</option>
-                  <option value="contract2">Contract 2</option>
+                  <option value="" disabled hidden>Choose</option>
+                  {tenancies.map((tenancy) => (
+                    <option key={tenancy.id} value={tenancy.id}>
+                      {tenancy.tenancy_code} - {tenancy.tenant.tenant_name || "N/A"}
+                    </option>
+                  ))}
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                   <ChevronDown
@@ -126,31 +218,29 @@ const AddChargesModal = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="block add-charges-label">ID*</label>
+              <label className="block add-charges-label">Date*</label>
               <input
-                type="text"
-                value={id}
-                onChange={(e) => setId(e.target.value)}
-                placeholder="Enter ID"
+                type="date"
+                value={date}
+                onChange={(e) => {
+                  setDate(e.target.value);
+                  setError("");
+                }}
                 className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-input"
               />
             </div>
 
-            {/* Second row */}
             <div className="space-y-2">
-              <label className="block add-charges-label">Date*</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  placeholder="dd/mm/yyyy"
-                  className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-input"
-                />
-                <div className="absolute inset-y-0 right-1 flex items-center px-2">
-                  <img src={calendaricon} alt="calendar" className="w-5 h-5" />
-                </div>
-              </div>
+              <label className="block add-charges-label">Due Date*</label>
+              <input
+                type="date"
+                value={dueDate}
+                onChange={(e) => {
+                  setDueDate(e.target.value);
+                  setError("");
+                }}
+                className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-input"
+              />
             </div>
 
             <div className="space-y-2">
@@ -160,68 +250,63 @@ const AddChargesModal = () => {
                   value={chargeCode}
                   onChange={(e) => {
                     setChargeCode(e.target.value);
-                    if (e.target.value === "") {
-                      e.target.classList.add("add-charges-selected");
-                    } else {
-                      e.target.classList.remove("add-charges-selected");
-                    }
+                    setError("");
                   }}
                   onFocus={() => setIsSelectOpenChargeCode(true)}
                   onBlur={() => setIsSelectOpenChargeCode(false)}
                   className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-selection ${
-                    chargeCode === "" ? "add-charges-selected" : ""
+                    !chargeCode ? "add-charges-selected" : ""
                   }`}
                 >
-                  <option value="" disabled hidden>
-                    Choose
-                  </option>
-                  <option value="rent">Rent</option>
-                  <option value="maintenance">Maintenance</option>
+                  <option value="" disabled hidden>Choose</option>
+                  {chargeTypes.map((charge) => (
+                    <option key={charge.id} value={charge.id}>{charge.name}</option>
+                  ))}
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                  <ChevronDown
-                    size={16}
-                    className={`text-[#201D1E] transition-transform duration-300 ${
-                      isSelectOpenChargeCode ? "rotate-180" : "rotate-0"
-                    }`}
-                  />
+                  <img src={plusicon} alt="plus-icon" className="w-6 h-6" />
                 </div>
               </div>
             </div>
 
-            {/* Third row */}
             <div className="space-y-2">
               <label className="block add-charges-label">Reason*</label>
               <input
                 type="text"
                 value={reason}
-                onChange={(e) => setReason(e.target.value)}
+                onChange={(e) => {
+                  setReason(e.target.value);
+                  setError("");
+                }}
                 placeholder="Enter The Reason"
                 className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-input"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="block add-charges-label">Amount Due</label>
+              <label className="block add-charges-label">Amount Due*</label>
               <input
-                type="text"
+                type="number"
                 value={amountDue}
-                onChange={(e) => setAmountDue(e.target.value)}
+                onChange={(e) => {
+                  setAmountDue(e.target.value);
+                  setError("");
+                }}
                 placeholder="Enter Amount Due"
                 className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-input"
+                min="0"
+                step="0.01"
               />
             </div>
 
-            {/* Fourth row */}
             <div className="space-y-2">
-              <label className="block add-charges-label">Vat Amount*</label>
+              <label className="block add-charges-label">Tax Amount</label>
               <div className="relative">
                 <input
                   type="text"
-                  value={vatAmount}
-                  onChange={(e) => setVatAmount(e.target.value)}
-                  placeholder="Enter Vat Amount"
-                  className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-input"
+                  value={taxAmount}
+                  readOnly
+                  className="block w-full px-3 py-2 border border-gray-200 bg-gray-100 add-charges-input"
                 />
                 <div className="absolute inset-y-0 right-1 flex items-center px-2">
                   <img src={plusicon} alt="plus-icon" className="w-6 h-6" />
@@ -234,27 +319,9 @@ const AddChargesModal = () => {
               <input
                 type="text"
                 value={totalAmount}
-                onChange={(e) => setTotalAmount(e.target.value)}
-                placeholder="Enter Total Amount"
-                className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-input"
+                readOnly
+                className="block w-full px-3 py-2 border border-gray-200 bg-gray-100 add-charges-input"
               />
-            </div>
-
-            {/* Fifth row */}
-            <div className="space-y-2">
-              <label className="block add-charges-label">Due Date</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  placeholder="dd/mm/yyyy"
-                  className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-input"
-                />
-                <div className="absolute inset-y-0 right-1 flex items-center px-2">
-                  <img src={calendaricon} alt="calendar" className="w-5 h-5" />
-                </div>
-              </div>
             </div>
 
             <div className="space-y-2">
@@ -264,21 +331,15 @@ const AddChargesModal = () => {
                   value={status}
                   onChange={(e) => {
                     setStatus(e.target.value);
-                    if (e.target.value === "") {
-                      e.target.classList.add("add-charges-selected");
-                    } else {
-                      e.target.classList.remove("add-charges-selected");
-                    }
+                    setError("");
                   }}
                   onFocus={() => setIsSelectOpenStatus(true)}
                   onBlur={() => setIsSelectOpenStatus(false)}
                   className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-selection ${
-                    status === "" ? "add-charges-selected" : ""
+                    !status ? "add-charges-selected" : ""
                   }`}
                 >
-                  <option value="" disabled hidden>
-                    Choose
-                  </option>
+                  <option value="" disabled hidden>Choose</option>
                   <option value="paid">Paid</option>
                   <option value="pending">Pending</option>
                 </select>
@@ -293,7 +354,6 @@ const AddChargesModal = () => {
               </div>
             </div>
 
-            {/* Sixth row - Remarks and Save button on same row */}
             <div className="space-y-2 mb-1">
               <label className="block add-charges-label">Remarks</label>
               <input
@@ -309,9 +369,10 @@ const AddChargesModal = () => {
               <button
                 type="button"
                 onClick={handleSave}
-                className="bg-[#2892CE] text-white add-charges-save-btn duration-200"
+                className={`bg-[#2892CE] text-white add-charges-save-btn duration-200 ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
+                disabled={loading}
               >
-                Save
+                {loading ? "Saving..." : "Save"}
               </button>
             </div>
           </div>
