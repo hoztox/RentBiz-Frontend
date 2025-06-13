@@ -7,9 +7,9 @@ import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import DeleteChargesModal from "./DeleteChargesModal/DeleteChargesModal";
 import buildingimg from "../../../assets/Images/Admin Masters/charges-building.png";
 import { chargesApi } from "../MastersApi";
+import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
 import CustomDropDown from "../../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -514,10 +514,15 @@ const Charges = () => {
           )}
         </>
       )}
-      <DeleteChargesModal
+      <ConfirmationModal
         isOpen={isDeleteModalOpen}
+        type="delete"
+        title="Delete Charge"
+        message="Are you sure you want to delete this charge?"
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+        onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
-        onDelete={handleConfirmDelete}
       />
     </div>
   );

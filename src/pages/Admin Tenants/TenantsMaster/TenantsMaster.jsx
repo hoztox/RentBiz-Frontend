@@ -6,10 +6,11 @@ import downloadicon from "../../../assets/Images/Admin Tenants/download-icon.svg
 import editicon from "../../../assets/Images/Admin Tenants/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Tenants/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenants/downarrow.svg";
-import DeleteTenantModal from "../DeleteTenantModal/DeleteTenantModal";
 import { BASE_URL } from "../../../utils/config";
 import { useModal } from "../../../context/ModalContext";
 import CustomDropDown from "../../../components/CustomDropDown";
+import { toast, Toaster } from "react-hot-toast";
+import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
 import { motion, AnimatePresence } from "framer-motion";
 
 const TenantsMaster = () => {
@@ -99,6 +100,7 @@ const TenantsMaster = () => {
       );
       if (response.status === 204) {
         setTenants(tenants.filter((tenant) => tenant.id !== tenantToDelete));
+        toast.success("Tenant deleted successfully.");
         console.log("Tenants: Successfully deleted tenant", tenantToDelete);
       }
       setDeleteModalOpen(false);
@@ -175,6 +177,7 @@ const TenantsMaster = () => {
 
   return (
     <div className="border border-[#E9E9E9] rounded-md tenant-table">
+      <Toaster />
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] tenant-table-header">
         <h1 className="tenant-head">Tenants</h1>
         <div className="flex flex-col md:flex-row gap-[10px] tenant-inputs-container">
@@ -501,13 +504,18 @@ const TenantsMaster = () => {
           </button>
         </div>
       </div>
-      <DeleteTenantModal
+      <ConfirmationModal
         isOpen={deleteModalOpen}
+        type="delete"
+        title="Delete Tenant"
+        message="Are you sure you want to delete this tenant?"
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+        onConfirm={handleDeleteTenant}
         onCancel={() => {
           setDeleteModalOpen(false);
           setTenantToDelete(null);
         }}
-        onDelete={handleDeleteTenant}
       />
     </div>
   );

@@ -8,7 +8,8 @@ import deleteicon from "../../../assets/Images/Admin Masters/delete-icon.svg";
 import buildingimg from "../../../assets/Images/Admin Masters/building-img.svg";
 import downarrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
-import DeleteDocumentTypeModal from "./DeleteDocumentTypeModal/DeleteDocumentTypeModal";
+// import DeleteDocumentTypeModal from "./DeleteDocumentTypeModal/DeleteDocumentTypeModal";
+import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
 import { documentTypesApi } from "../MastersApi";
 import CustomDropDown from "../../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
@@ -512,11 +513,15 @@ const DocumentType = () => {
           </div>
         </div>
       )}
-
-      <DeleteDocumentTypeModal
+      <ConfirmationModal
         isOpen={isDeleteModalOpen}
+        type="delete"
+        title="Delete Document Type"
+        message="Are you sure you want to delete this document type?"
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+        onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
-        onDelete={handleConfirmDelete}
       />
     </div>
   );
