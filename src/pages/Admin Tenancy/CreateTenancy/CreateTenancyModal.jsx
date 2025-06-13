@@ -142,7 +142,8 @@ const CreateTenancyModal = () => {
 
     if (formData.rental_months && formData.rent_per_frequency) {
       const total = (
-        parseInt(formData.rental_months) * parseFloat(formData.rent_per_frequency || 0)
+        parseInt(formData.rental_months) *
+        parseFloat(formData.rent_per_frequency || 0)
       ).toFixed(2);
       setFormData((prev) => ({
         ...prev,
@@ -154,7 +155,11 @@ const CreateTenancyModal = () => {
         total_receivable: "0.00",
       }));
     }
-  }, [formData.start_date, formData.rental_months, formData.rent_per_frequency]);
+  }, [
+    formData.start_date,
+    formData.rental_months,
+    formData.rent_per_frequency,
+  ]);
 
   // Reset payment schedule when relevant form fields change
   useEffect(() => {
@@ -249,11 +254,19 @@ const CreateTenancyModal = () => {
             )
           );
         } catch (error) {
-          console.error("Error fetching tax preview for additional charge:", error);
+          console.error(
+            "Error fetching tax preview for additional charge:",
+            error
+          );
           setAdditionalCharges((prev) =>
             prev.map((c) =>
               c.id === charge.id
-                ? { ...c, tax: "0.00", total: c.amount || "0.00", tax_details: [] }
+                ? {
+                    ...c,
+                    tax: "0.00",
+                    total: c.amount || "0.00",
+                    tax_details: [],
+                  }
                 : c
             )
           );
@@ -262,7 +275,12 @@ const CreateTenancyModal = () => {
         setAdditionalCharges((prev) =>
           prev.map((c) =>
             c.id === charge.id
-              ? { ...c, tax: "0.00", total: c.amount || "0.00", tax_details: [] }
+              ? {
+                  ...c,
+                  tax: "0.00",
+                  total: c.amount || "0.00",
+                  tax_details: [],
+                }
               : c
           )
         );
@@ -336,7 +354,9 @@ const CreateTenancyModal = () => {
   };
 
   const removeRow = (id) => {
-    setAdditionalCharges(additionalCharges.filter((charge) => charge.id !== id));
+    setAdditionalCharges(
+      additionalCharges.filter((charge) => charge.id !== id)
+    );
   };
 
   const toggleSelectOpen = (field) => {
@@ -394,7 +414,9 @@ const CreateTenancyModal = () => {
       end_date: formData.end_date,
       no_payments: parseInt(formData.no_payments),
       first_rent_due_on: formData.first_rent_due_on,
-      rent_per_frequency: parseFloat(formData.rent_per_frequency || 0).toFixed(2),
+      rent_per_frequency: parseFloat(formData.rent_per_frequency || 0).toFixed(
+        2
+      ),
       deposit: parseFloat(formData.deposit || 0).toFixed(2),
       commission: parseFloat(formData.commission || 0).toFixed(2),
       remarks: formData.remarks,
@@ -971,9 +993,11 @@ const CreateTenancyModal = () => {
                   </div>
                 ))}
               </div>
+            </div>
+            <div>
               <button
                 onClick={addRow}
-                className="mt-6 bg-[#2892CE] hover:bg-[#1f6c99] duration-200 text-white px-4 pl-2 mb-10 flex items-center tenancy-addrow-btn"
+                className="mt-6 bg-[#2892CE] hover:bg-[#1f6c99] duration-200 text-white px-5  mb-10 flex items-center tenancy-addrow-btn"
               >
                 Add Row
                 <Plus size={20} color="#ffffff" className="ml-2" />
