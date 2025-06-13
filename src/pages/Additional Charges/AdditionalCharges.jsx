@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./AdditionalCharges.css";
 import plusicon from "../../assets/Images/Additional Charges/plus-icon.svg";
 import downloadicon from "../../assets/Images/Additional Charges/download-icon.svg";
@@ -9,6 +9,8 @@ import { useModal } from "../../context/ModalContext";
 import CustomDropDown from "../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
 import ConfirmationModal from "../../components/ConfirmationModal/ConfirmationModal";
+import axios from "axios";
+import { BASE_URL } from "../../utils/config";
 
 const AdminAdditionalCharges = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,47 +18,82 @@ const AdminAdditionalCharges = () => {
   const [expandedRows, setExpandedRows] = useState({});
   const { openModal } = useModal();
   const [selectedOption, setSelectedOption] = useState("showing");
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State for modal visibility
-  const [itemToDelete, setItemToDelete] = useState(null); // State for item to delete
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const [charges, setCharges] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const itemsPerPage = 10;
 
-  // Dropdown options
   const dropdownOptions = [
     { label: "Showing", value: "showing" },
     { label: "All", value: "all" },
   ];
 
-  const demoData = [
-    {
-      id: "#834",
-      chargeId: "Rent",
-      date: "24 Nov 2024",
-      amountDue: "300.00",
-      reason: "Monthly Rent",
-      dueDate: "24 Nov 2024",
-      status: "Paid",
-    },
-    {
-      id: "#835",
-      chargeId: "Rent",
-      date: "24 Nov 2024",
-      amountDue: "300.00",
-      reason: "Monthly Rent",
-      dueDate: "24 Nov 2024",
-      status: "Paid",
-    },
-  ];
+  const fetchAdditionalCharges = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${BASE_URL}/company/additional-charges/`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        params: { search_term: searchTerm },
+      });
+      if (response.data.success) {
+        setCharges(response.data.data);
+      } else {
+        setError(response.data.message || "Failed to fetch additional charges");
+      }
+      setLoading(false);
+    } catch (err) {
+      setError("Error fetching additional charges: " + err.message);
+      setLoading(false);
+    }
+  };
 
-  const filteredData = demoData.filter(
-    (charges) =>
-      charges.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      charges.chargeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      charges.date.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      charges.amountDue.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      charges.reason.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      charges.dueDate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      charges.status.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    fetchAdditionalCharges();
+  }, [searchTerm]);
+
+  const handleDeleteClick = (charge) => {
+    setItemToDelete(charge);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return;
+
+    try {
+      const response = await axios.delete(`${BASE_URL}/company/additional-charges/${itemToDelete.id}/delete/`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      if (response.status === 204 || response.data.success) {
+        setCharges(charges.filter((charge) => charge.id !== itemToDelete.id));
+      }
+      setIsDeleteModalOpen(false);
+      setItemToDelete(null);
+    } catch (err) {
+      setError("Error deleting charge: " + err.message);
+      setIsDeleteModalOpen(false);
+      setItemToDelete(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteModalOpen(false);
+    setItemToDelete(null);
+  };
+
+  const handleEditClick = (charge) => {
+    openModal("update-additional-charges", "Update Additional Charges", charge);
+  };
+
+  const toggleRowExpand = (id) => {
+    setExpandedRows((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+  const filteredData = selectedOption === "all" ? charges : charges;
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const paginatedData = filteredData.slice(
@@ -68,56 +105,13 @@ const AdminAdditionalCharges = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const handleEditClick = (charges) => {
-    console.log("ID Types: Selected IdType:", charges);
-    openModal("update-additional-charges", "Update Additional Charges", charges);
-  };
-
-  const handleDeleteClick = (charges) => {
-    setItemToDelete(charges);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleConfirmDelete = () => {
-    if (itemToDelete) {
-      console.log("Deleting item:", itemToDelete); // Replace with actual delete logic
-      // Example: Call an API to delete the item
-      // Then update the demoData or state accordingly
-    }
-    setIsDeleteModalOpen(false);
-    setItemToDelete(null);
-  };
-
-  const handleCancelDelete = () => {
-    setIsDeleteModalOpen(false);
-    setItemToDelete(null);
-  };
-
-  const toggleRowExpand = (id) => {
-    setExpandedRows((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
-
   const dropdownVariants = {
-    hidden: {
-      opacity: 0,
-      height: 0,
-      transition: {
-        duration: 0.2,
-        ease: "easeInOut",
-      },
-    },
-    visible: {
-      opacity: 1,
-      height: "auto",
-      transition: {
-        duration: 0.3,
-        ease: "easeInOut",
-      },
-    },
+    hidden: { opacity: 0, height: 0, transition: { duration: 0.2, ease: "easeInOut" } },
+    visible: { opacity: 1, height: "auto", transition: { duration: 0.3, ease: "easeInOut" } },
   };
+
+  if (loading) return <div className="p-5">Loading...</div>;
+  if (error) return <div className="text-red-500 p-5">{error}</div>;
 
   return (
     <div className="border border-[#E9E9E9] rounded-md admin-add-charges-table">
@@ -175,46 +169,58 @@ const AdminAdditionalCharges = () => {
               <th className="pl-5 text-left admin-add-charges-thead">AMOUNT DUE</th>
               <th className="px-5 text-left admin-add-charges-thead">REASON</th>
               <th className="px-5 text-left admin-add-charges-thead">DUE DATE</th>
-              <th className="px-5 text-left admin-add-charges-thead w-[68px]">
-                STATUS
-              </th>
-              <th className="px-5 pr-6 text-right admin-add-charges-thead">
-                ACTION
-              </th>
+              <th className="px-5 text-left admin-add-charges-thead w-[68px]">STATUS</th>
+              <th className="px-5 pr-6 text-right admin-add-charges-thead">ACTION</th>
             </tr>
           </thead>
           <tbody>
-            {paginatedData.map((charges, index) => (
+            {paginatedData.map((charge, index) => (
               <tr
                 key={index}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
-                <td className="px-5 text-left admin-add-charges-data">{charges.id}</td>
-                <td className="px-5 text-left admin-add-charges-data">{charges.chargeId}</td>
-                <td className="pl-5 text-left admin-add-charges-data">{charges.date}</td>
-                <td className="pl-5 text-left admin-add-charges-data">{charges.amountDue}</td>
-                <td className="px-5 text-left admin-add-charges-data">{charges.reason}</td>
-                <td className="px-5 text-left admin-add-charges-data">{charges.dueDate}</td>
+                <td className="px-5 text-left admin-add-charges-data">{charge.id}</td>
+                <td className="px-5 text-left admin-add-charges-data">{charge.charge_type?.name || "N/A"}</td>
+                <td className="pl-5 text-left admin-add-charges-data">
+                  {charge.created_at
+                    ? new Date(charge.created_at).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })
+                    : "N/A"}
+                </td>
+                <td className="pl-5 text-left admin-add-charges-data">{charge.amount ? parseFloat(charge.amount).toFixed(2) : "0.00"}</td>
+                <td className="px-5 text-left admin-add-charges-data">{charge.reason || "N/A"}</td>
+                <td className="px-5 text-left admin-add-charges-data">
+                  {charge.due_date
+                    ? new Date(charge.due_date).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })
+                    : "N/A"}
+                </td>
                 <td className="px-5 text-left admin-add-charges-data">
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
-                      charges.status === "Paid"
+                      charge.status === "paid"
                         ? "bg-[#28C76F29] text-[#28C76F]"
                         : "bg-[#FFE1E1] text-[#C72828]"
                     }`}
                   >
-                    {charges.status}
+                    {charge.status.charAt(0).toUpperCase() + charge.status.slice(1)}
                   </span>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={() => handleEditClick(charges)}>
+                  <button onClick={() => handleEditClick(charge)}>
                     <img
                       src={editicon}
                       alt="Edit"
                       className="w-[18px] h-[18px] admin-add-charges-action-btn duration-200"
                     />
                   </button>
-                  <button onClick={() => handleDeleteClick(charges)}>
+                  <button onClick={() => handleDeleteClick(charge)}>
                     <img
                       src={deleteicon}
                       alt="Delete"
@@ -231,56 +237,52 @@ const AdminAdditionalCharges = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="admin-add-charges-table-row-head">
-              <th className="px-5 w-[35%] text-left admin-add-charges-thead admin-add-charges-id-column">
-                ID
-              </th>
-              <th className="px-[10px] w-[30%] text-left admin-add-charges-thead admin-add-charges-charge-id-column">
-                CHARGE ID
-              </th>
-              <th className="px-[10px] w-[20%] text-left admin-add-charges-thead admin-add-charges-date-column">
-                DATE
-              </th>
+              <th className="px-5 w-[35%] text-left admin-add-charges-thead admin-add-charges-id-column">ID</th>
+              <th className="px-[10px] w-[30%] text-left admin-add-charges-thead admin-add-charges-charge-id-column">CHARGE ID</th>
+              <th className="px-[10px] w-[20%] text-left admin-add-charges-thead admin-add-charges-date-column">DATE</th>
               <th className="px-5 w-[15%] text-right admin-add-charges-thead"></th>
             </tr>
           </thead>
           <tbody>
-            {paginatedData.map((charges, index) => (
+            {paginatedData.map((charge, index) => (
               <React.Fragment key={index}>
                 <tr
                   className={`${
-                    expandedRows[charges.id + index]
+                    expandedRows[charge.id + index]
                       ? "admin-add-charges-mobile-no-border"
                       : "admin-add-charges-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left admin-add-charges-data admin-add-charges-id-column">
-                    {charges.id}
-                  </td>
-                  <td className="px-[10px] text-left admin-add-charges-data admin-add-charges-charge-id-column">
-                    {charges.chargeId}
-                  </td>
+                  <td className="px-5 text-left admin-add-charges-data admin-add-charges-id-column">{charge.id}</td>
+                  <td className="px-[10px] text-left admin-add-charges-data admin-add-charges-charge-id-column">{charge.charge_type?.name || "N/A"}</td>
                   <td className="px-[10px] text-left admin-add-charges-data admin-add-charges-date-column">
-                    {charges.date}
+                    {charge.created_at
+                      ? new Date(charge.created_at).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "N/A"}
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`admin-add-charges-dropdown-field ${
-                        expandedRows[charges.id + index] ? "active" : ""
+                        expandedRows[charge.id + index] ? "active" : ""
                       }`}
-                      onClick={() => toggleRowExpand(charges.id + index)}
+                      onClick={() => toggleRowExpand(charge.id + index)}
                     >
                       <img
                         src={downarrow}
                         alt="drop-down-arrow"
                         className={`admin-add-charges-dropdown-img ${
-                          expandedRows[charges.id + index] ? "text-white" : ""
+                          expandedRows[charge.id + index] ? "text-white" : ""
                         }`}
                       />
                     </div>
                   </td>
                 </tr>
                 <AnimatePresence>
-                  {expandedRows[charges.id + index] && (
+                  {expandedRows[charge.id + index] && (
                     <motion.tr
                       className="admin-add-charges-mobile-with-border border-b border-[#E9E9E9]"
                       initial="hidden"
@@ -292,60 +294,54 @@ const AdminAdditionalCharges = () => {
                         <div className="admin-add-charges-dropdown-content">
                           <div className="admin-add-charges-dropdown-grid">
                             <div className="admin-add-charges-dropdown-item w-[30%]">
-                              <div className="admin-add-charges-dropdown-label">
-                                AMOUNT DUE
-                              </div>
+                              <div className="admin-add-charges-dropdown-label">AMOUNT DUE</div>
                               <div className="admin-add-charges-dropdown-value">
-                                {charges.amountDue}
+                                {charge.amount ? parseFloat(charge.amount).toFixed(2) : "0.00"}
                               </div>
                             </div>
                             <div className="admin-add-charges-dropdown-item label-reason w-[30%]">
-                              <div className="admin-add-charges-dropdown-label">
-                                REASON
-                              </div>
-                              <div className="admin-add-charges-dropdown-value">
-                                {charges.reason}
-                              </div>
+                              <div className="admin-add-charges-dropdown-label">REASON</div>
+                              <div className="admin-add-charges-dropdown-value">{charge.reason || "N/A"}</div>
                             </div>
                             <div className="admin-add-charges-dropdown-item label-due w-[35%]">
-                              <div className="admin-add-charges-dropdown-label">
-                                DUE DATE
-                              </div>
+                              <div className="admin-add-charges-dropdown-label">DUE DATE</div>
                               <div className="admin-add-charges-dropdown-value">
-                                {charges.dueDate}
+                                {charge.due_date
+                                  ? new Date(charge.due_date).toLocaleDateString("en-GB", {
+                                      day: "2-digit",
+                                      month: "short",
+                                      year: "numeric",
+                                    })
+                                  : "N/A"}
                               </div>
                             </div>
                           </div>
                           <div className="admin-add-charges-dropdown-grid">
                             <div className="admin-add-charges-dropdown-item w-[30%]">
-                              <div className="admin-add-charges-dropdown-label">
-                                STATUS
-                              </div>
+                              <div className="admin-add-charges-dropdown-label">STATUS</div>
                               <div className="admin-add-charges-dropdown-value">
                                 <span
                                   className={`admin-add-charges-status ${
-                                    charges.status === "Paid"
+                                    charge.status === "paid"
                                       ? "bg-[#28C76F29] text-[#28C76F]"
                                       : "bg-[#FFE1E1] text-[#C72828]"
                                   }`}
                                 >
-                                  {charges.status}
+                                  {charge.status.charAt(0).toUpperCase() + charge.status.slice(1)}
                                 </span>
                               </div>
                             </div>
                             <div className="admin-add-charges-dropdown-item w-[67%] label-action">
-                              <div className="admin-add-charges-dropdown-label">
-                                ACTION
-                              </div>
+                              <div className="admin-add-charges-dropdown-label">ACTION</div>
                               <div className="admin-add-charges-dropdown-value flex items-center gap-4 mt-[10px]">
-                                <button onClick={() => handleEditClick(charges)}>
+                                <button onClick={() => handleEditClick(charge)}>
                                   <img
                                     src={editicon}
                                     alt="Edit"
                                     className="w-[18px] h-[18px] admin-add-charges-action-btn duration-200"
                                   />
                                 </button>
-                                <button onClick={() => handleDeleteClick(charges)}>
+                                <button onClick={() => handleDeleteClick(charge)}>
                                   <img
                                     src={deleteicon}
                                     alt="Delete"
@@ -367,10 +363,8 @@ const AdminAdditionalCharges = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
         <span className="collection-list-pagination">
-          Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-          {filteredData.length} entries
+          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)} to{" "}
+          {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
           <button
@@ -402,9 +396,7 @@ const AdminAdditionalCharges = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && (
-            <span className="px-2 flex items-center">...</span>
-          )}
+          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
@@ -422,8 +414,6 @@ const AdminAdditionalCharges = () => {
           </button>
         </div>
       </div>
-
-      {/* Render Confirmation Modal */}
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
         type="delete"
