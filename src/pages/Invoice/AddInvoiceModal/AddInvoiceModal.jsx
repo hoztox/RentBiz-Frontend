@@ -1,57 +1,190 @@
 import React, { useEffect, useState } from "react";
 import "./AddInvoiceModal.css";
 import { ChevronDown } from "lucide-react";
-import calendaricon from "../../../assets/Images/Invoice/calendar-icon.svg";
 import closeicon from "../../../assets/Images/Invoice/close-icon.svg";
 import { useModal } from "../../../context/ModalContext";
+import { BASE_URL } from "../../../utils/config";
+import axios from "axios";
 
 const AddInvoiceModal = () => {
   const { modalState, closeModal } = useModal();
   const [formData, setFormData] = useState({
     tenancy: "",
     inDate: "",
-    buildingName: "",
-    unitName: "",
+    building_name: "",
+    unit_name: "",
     endDate: "",
-    invoiceItems: [
-      {
-        charge: "",
-        description: "",
-        date: "",
-        amount: "",
-        select: "",
-        total: "0.0000",
-      },
-    ],
   });
 
   const [openDropdowns, setOpenDropdowns] = useState({
     tenancy: false,
-    charge: false,
-    select: false,
   });
 
-  useEffect(() => {
-    if (modalState.isOpen) {
-      setFormData({
-        tenancy: "",
-        inDate: "",
-        buildingName: "",
-        unitName: "",
-        endDate: "",
-        invoiceItems: [
-          {
-            charge: "",
-            description: "",
-            date: "",
-            amount: "",
-            select: "",
-            total: "0.0000",
-          },
-        ],
-      });
+  const [tenancies, setTenancies] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [tenancyDetails, setTenancyDetails] = useState(null);
+  const [error, setError] = useState(null);
+  const [selectedPaymentSchedules, setSelectedPaymentSchedules] = useState([]);
+  const [selectedAdditionalCharges, setSelectedAdditionalCharges] = useState([]);
+
+  const getUserCompanyId = () => {
+    try {
+      const role = localStorage.getItem("role")?.toLowerCase();
+
+      if (role === "company") {
+        return localStorage.getItem("company_id");
+      } else if (role === "user" || role === "admin") {
+        const userCompanyId = localStorage.getItem("company_id");
+        return userCompanyId ? JSON.parse(userCompanyId) : null;
+      }
+
+      return null;
+    } catch (e) {
+      console.error("Error getting user company ID:", e);
+      return null;
     }
-  }, [modalState.isOpen]);
+  };
+
+  const fetchTenancies = async () => {
+    try {
+      const companyId = getUserCompanyId();
+      if (!companyId) {
+        setError("No company ID found");
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+
+      const response = await axios.get(
+        `${BASE_URL}/company/tenancies/company/${companyId}/`
+      );
+
+      if (response.data && Array.isArray(response.data)) {
+        const sortedTenancies = response.data.sort((a, b) => a.id - b.id);
+        setTenancies(sortedTenancies);
+        console.log("Fetched and sorted tenancies:", response.data);
+      } else {
+        setTenancies([]);
+        console.log("No tenancies found or invalid response format");
+      }
+    } catch (error) {
+      console.error("Error fetching tenancies:", error);
+      setError("Failed to fetch tenancies");
+      setTenancies([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTenancyDetails = async (tenancyId) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await axios.get(`${BASE_URL}/company/tenancies/${tenancyId}/`);
+
+      if (response.data && response.data.success) {
+        const tenancy = response.data.tenancy;
+        setTenancyDetails(tenancy);
+
+        // Auto-fill building name and unit name
+        setFormData(prev => ({
+          ...prev,
+          building_name: tenancy.building?.building_name || tenancy.unit?.building?.building_name || "",
+          unit_name: tenancy.unit?.unit_name || "",
+        }));
+
+        // Initialize selected items with all pending items
+        initializeSelectedItems(tenancy);
+
+        console.log("Fetched tenancy details:", tenancy);
+      } else {
+        console.error("Failed to fetch tenancy details:", response.data?.message || "Unknown error");
+        setError("Failed to fetch tenancy details");
+      }
+    } catch (error) {
+      console.error("Error fetching tenancy details:", error);
+      setError("Error fetching tenancy details");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initialize selected items from payment schedules and additional charges
+  const initializeSelectedItems = (tenancy) => {
+    try {
+      const paymentSchedules = [];
+      const additionalCharges = [];
+
+      // Process payment schedules
+      if (tenancy.payment_schedules && Array.isArray(tenancy.payment_schedules)) {
+        tenancy.payment_schedules.forEach((schedule) => {
+          if (schedule.status === "pending") {
+            paymentSchedules.push({
+              id: schedule.id,
+              charge_type: schedule.charge_type?.name || "Unknown",
+              description: schedule.reason || `Payment - Due ${schedule.due_date}`,
+              due_date: schedule.due_date || "",
+              amount: schedule.amount ? parseFloat(schedule.amount).toFixed(2) : "0.00",
+              tax: schedule.tax ? parseFloat(schedule.tax).toFixed(2) : "0.00",
+              total: schedule.total ? parseFloat(schedule.total).toFixed(2) : "0.00",
+              selected: true,
+            });
+          }
+        });
+      }
+
+      // Process additional charges
+      if (tenancy.additional_charges && Array.isArray(tenancy.additional_charges)) {
+        tenancy.additional_charges.forEach((charge) => {
+          if (charge.status === "pending") {
+            additionalCharges.push({
+              id: charge.id,
+              charge_type: charge.charge_type?.name || "Unknown",
+              description: charge.reason || `Additional charge - Due ${charge.due_date}`,
+              due_date: charge.due_date || "",
+              amount: charge.amount ? parseFloat(charge.amount).toFixed(2) : "0.00",
+              tax: charge.tax ? parseFloat(charge.tax).toFixed(2) : "0.00",
+              total: charge.total ? parseFloat(charge.total).toFixed(2) : "0.00",
+              selected: true,
+            });
+          }
+        });
+      }
+
+      setSelectedPaymentSchedules(paymentSchedules);
+      setSelectedAdditionalCharges(additionalCharges);
+    } catch (error) {
+      console.error("Error initializing selected items:", error);
+    }
+  };
+
+  // Reset form when modal opens
+  const resetForm = () => {
+    setFormData({
+      tenancy: "",
+      inDate: "",
+      building_name: "",
+      unit_name: "",
+      endDate: "",
+    });
+    setTenancyDetails(null);
+    setSelectedPaymentSchedules([]);
+    setSelectedAdditionalCharges([]);
+    setError(null);
+    setOpenDropdowns({
+      tenancy: false,
+    });
+  };
+
+  // Fetch tenancies when modal opens
+  useEffect(() => {
+    if (modalState.isOpen && modalState.type === "create-invoice") {
+      resetForm();
+      fetchTenancies();
+    }
+  }, [modalState.isOpen, modalState.type]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -59,15 +192,22 @@ const AddInvoiceModal = () => {
       ...prev,
       [name]: value,
     }));
+
+    if (name === "tenancy" && value) {
+      fetchTenancyDetails(value);
+    }
   };
 
-  const handleItemChange = (index, field, value) => {
-    const updatedItems = [...formData.invoiceItems];
-    updatedItems[index][field] = value;
-    setFormData((prev) => ({
-      ...prev,
-      invoiceItems: updatedItems,
-    }));
+  const handlePaymentScheduleToggle = (index) => {
+    const updatedSchedules = [...selectedPaymentSchedules];
+    updatedSchedules[index].selected = !updatedSchedules[index].selected;
+    setSelectedPaymentSchedules(updatedSchedules);
+  };
+
+  const handleAdditionalChargeToggle = (index) => {
+    const updatedCharges = [...selectedAdditionalCharges];
+    updatedCharges[index].selected = !updatedCharges[index].selected;
+    setSelectedAdditionalCharges(updatedCharges);
   };
 
   const toggleDropdown = (name) => {
@@ -77,23 +217,106 @@ const AddInvoiceModal = () => {
     }));
   };
 
-  const handleSave = () => {
-    console.log("Invoice Data Saved: ", formData);
-    closeModal();
+  const calculateGrandTotal = () => {
+    try {
+      const paymentTotal = selectedPaymentSchedules
+        .filter(item => item.selected)
+        .reduce((total, item) => total + (parseFloat(item.total) || 0), 0);
+
+      const chargeTotal = selectedAdditionalCharges
+        .filter(item => item.selected)
+        .reduce((total, item) => total + (parseFloat(item.total) || 0), 0);
+
+      return (paymentTotal + chargeTotal).toFixed(2);
+    } catch (error) {
+      console.error("Error calculating grand total:", error);
+      return "0.00";
+    }
   };
 
-  // Only render for "create-invoice" type
-  if (!modalState.isOpen || modalState.type !== "create-invoice") {
-    return null;
-  }
 
+ 
+
+const getRelevantUserId = () => {
+  const role = localStorage.getItem("role")?.toLowerCase();
+  if (role === "user" || role === "admin") {
+    const userId = localStorage.getItem("user_id");
+    // Ensure userId is a number
+    return userId ? parseInt(userId) : null;
+  }
+  return null;
+};
+
+const handleSave = async () => {
+  try {
+    const companyId = getUserCompanyId();
+    const userId = getRelevantUserId();
+
+    if (!companyId) {
+      setError("Company ID is required to create an invoice.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    const selectedItems = [
+      ...selectedPaymentSchedules.filter(item => item.selected).map(item => ({
+        charge_type: item.charge_type,
+        description: item.description,
+        due_date: item.due_date,
+        amount: parseFloat(item.amount) || 0,
+        tax: parseFloat(item.tax) || 0,
+        type: "payment_schedule",
+        total: parseFloat(item.total) || 0,
+        schedule_id: item.id,
+      })),
+      ...selectedAdditionalCharges.filter(item => item.selected).map(item => ({
+        charge_type: item.charge_type,
+        description: item.description,
+        due_date: item.due_date,
+        amount: parseFloat(item.amount) || 0,
+        tax: parseFloat(item.tax) || 0,
+        type: "additional_charge",
+        total: parseFloat(item.total) || 0,
+        charge_id: item.id,
+      }))
+    ];
+
+    const invoiceData = {
+      company: companyId,
+      user: userId, // May be null, which is now allowed by the serializer
+      tenancy: formData.tenancy,
+      invoice_date: formData.inDate,
+      end_date: formData.endDate,
+      building_name: formData.building_name,
+      unit_name: formData.unit_name,
+      items: selectedItems,
+      total_amount: parseFloat(calculateGrandTotal()),
+    };
+
+    const response = await axios.post(`${BASE_URL}/company/invoice/create/`, invoiceData);
+
+    if (response.data && response.data.success) {
+      console.log("Invoice Created Successfully:", response.data);
+      closeModal();
+    } else {
+      console.error("Failed to create invoice:", response.data?.message || "Unknown error");
+      setError(response.data?.message || "Failed to create invoice");
+    }
+  } catch (error) {
+    console.error("Error creating invoice:", error.response?.data?.errors || error.message);
+    setError(error.response?.data?.errors || "Error creating invoice");
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="modal-overlay">
-      <div className="invoice-modal-container bg-white rounded-md w-[1006px] p-6">
-        <div className="flex justify-between items-center md:mb-6">
-          <h2 className="text-[#201D1E] invoice-modal-head">
-            Create New Invoice
-          </h2>
+      <div className="invoice-modal-container bg-white rounded-md w-[1006px] max-h-[90vh] flex flex-col">
+        {/* Fixed Header */}
+        <div className="flex justify-between items-center p-6 border-b border-gray-200 flex-shrink-0">
+          <h2 className="text-[#201D1E] invoice-modal-head">Create New Invoice</h2>
           <button
             onClick={closeModal}
             className="invoice-modal-close-btn hover:bg-gray-100 duration-200"
@@ -102,346 +325,194 @@ const AddInvoiceModal = () => {
           </button>
         </div>
 
-        <div className="invoice-modal-grid gap-6">
-          <div>
-            <label className="block mb-3 invoice-modal-label">
-              Select Tenancy
-            </label>
-            <div className="relative">
-              <select
-                name="tenancy"
-                value={formData.tenancy}
-                onChange={(e) => {
-                  handleChange(e);
-                  if (e.target.value === "") {
-                    e.target.classList.add("invoice-modal-selected");
-                  } else {
-                    e.target.classList.remove("invoice-modal-selected");
-                  }
-                }}
-                onFocus={() => toggleDropdown("tenancy")}
-                onBlur={() => toggleDropdown("tenancy")}
-                className={`block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 appearance-none invoice-modal-select ${
-                  formData.tenancy === "" ? "invoice-modal-selected" : ""
-                }`}
-              >
-                <option value="" disabled hidden>
-                  Choose
-                </option>
-                <option value="option1">Option 1</option>
-                <option value="option2">Option 2</option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-1 flex items-center px-2 text-gray-700">
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto p-6">
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+              {error}
+            </div>
+          )}
+
+          {loading && (
+            <div className="text-center py-4">
+              <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              <span className="ml-2">Loading...</span>
+            </div>
+          )}
+
+          <div className="invoice-modal-grid gap-6">
+            <div>
+              <label className="block mb-3 invoice-modal-label">Select Tenancy</label>
+              <div className="relative">
+                <select
+                  name="tenancy"
+                  value={formData.tenancy}
+                  onChange={handleChange}
+                  onFocus={() => toggleDropdown("tenancy")}
+                  onBlur={() => setTimeout(() => toggleDropdown("tenancy"), 150)}
+                  className={`block w-full border py-2 px-3 pr-8 focus:outline-none focus:ring-gray-500 focus:border-gray-500 appearance-none invoice-modal-select ${formData.tenancy === "" ? "invoice-modal-selected" : ""
+                    }`}
+                  disabled={loading}
+                >
+                  <option value="" disabled>
+                    Choose Tenancy
+                  </option>
+                  {tenancies.map((tenancy) => (
+                    <option key={tenancy.id} value={tenancy.id}>
+                      {tenancy.tenancy_code} - {tenancy.tenant?.tenant_name}
+                    </option>
+                  ))}
+                </select>
                 <ChevronDown
-                  className={`h-4 w-4 text-[#201D1E] transition-transform duration-200 ${
-                    openDropdowns.tenancy ? "transform rotate-180" : ""
-                  }`}
+                  className={`absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#201D1E] pointer-events-none transition-transform duration-200 ${openDropdowns.tenancy ? "rotate-180" : ""
+                    }`}
                 />
               </div>
             </div>
-          </div>
 
-          <div>
-            <label className="block mb-3 invoice-modal-label">In Date*</label>
-            <div className="relative">
+            <div>
+              <label className="block mb-3 invoice-modal-label">In Date*</label>
               <input
-                type="text"
+                type="date"
                 name="inDate"
-                placeholder="dd/mm/yyyy"
                 value={formData.inDate}
                 onChange={handleChange}
                 className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-input"
               />
-              <div className="absolute inset-y-0 right-1 flex items-center pr-3 pointer-events-none">
-                <img src={calendaricon} alt="Calendar" className="w-5 h-5" />
-              </div>
             </div>
-          </div>
 
-          <div>
-            <label className="block mb-3 invoice-modal-label">
-              Building Name*
-            </label>
-            <input
-              type="text"
-              name="buildingName"
-              placeholder="Enter Building Name"
-              value={formData.buildingName}
-              onChange={handleChange}
-              className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-input"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-3 invoice-modal-label">Unit Name*</label>
-            <input
-              type="text"
-              name="unitName"
-              placeholder="Enter Unit Name"
-              value={formData.unitName}
-              onChange={handleChange}
-              className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-input"
-            />
-          </div>
-
-          <div>
-            <label className="block mb-3 invoice-modal-label">End Date</label>
-            <div className="relative">
+            <div>
+              <label className="block mb-3 invoice-modal-label">Building Name*</label>
               <input
                 type="text"
+                name="building_name"
+                value={formData.building_name}
+                className="block w-full border py-2 px-3 bg-gray-100 invoice-modal-input"
+                readOnly
+              />
+            </div>
+
+            <div>
+              <label className="block mb-3 invoice-modal-label">Unit Name*</label>
+              <input
+                type="text"
+                name="unit_name"
+                value={formData.unit_name}
+                className="block w-full border py-2 px-3 bg-gray-100 invoice-modal-input"
+                readOnly
+              />
+            </div>
+
+            <div>
+              <label className="block mb-3 invoice-modal-label">End Date</label>
+              <input
+                type="date"
                 name="endDate"
-                placeholder="dd/mm/yyyy"
                 value={formData.endDate}
                 onChange={handleChange}
-                className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-input"
+                className="block w-full border py-2 px-3 invoice-modal-input"
               />
-              <div className="absolute inset-y-0 right-1 flex items-center pr-3 pointer-events-none">
-                <img src={calendaricon} alt="Calendar" className="w-5 h-5" />
-              </div>
             </div>
           </div>
-        </div>
 
-        {/* Table Section */}
-        <div className="mt-6 invoice-modal-overflow-x-auto border border-[#E9E9E9] rounded-md">
-          <div className="invoice-modal-desktop-table">
-            <table className="invoice-modal-table border-collapse">
-              <thead>
-                <tr className="border-b border-[#E9E9E9] h-[50px]">
-                  <th className="px-[10px] text-left invoice-modal-thead uppercase w-[110px]">
-                    Charge
-                  </th>
-                  <th className="px-[10px] text-left invoice-modal-thead uppercase w-[160px]">
-                    Description
-                  </th>
-                  <th className="px-[10px] text-left invoice-modal-thead uppercase w-[120px]">
-                    Date
-                  </th>
-                  <th className="px-[10px] text-left invoice-modal-thead uppercase w-[120px]">
-                    Amount
-                  </th>
-                  <th className="px-[10px] text-left invoice-modal-thead uppercase w-[110px]">
-                    Select
-                  </th>
-                  <th className="px-[10px] text-left invoice-modal-thead uppercase w-[60px]">
-                    Total
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {formData.invoiceItems.map((item, index) => (
-                  <tr key={index}>
-                    <td className="px-[10px] py-[5px] w-[110px] h-[57px] relative">
-                      <select
-                        value={item.charge}
-                        onChange={(e) =>
-                          handleItemChange(index, "charge", e.target.value)
-                        }
-                        onFocus={() => toggleDropdown("charge")}
-                        onBlur={() => toggleDropdown("charge")}
-                        className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white invoice-modal-table-select"
-                      >
-                        <option value="">Choose</option>
-                      </select>
-                      <ChevronDown
-                        className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
-                          openDropdowns.charge ? "rotate-180" : ""
-                        }`}
-                      />
-                    </td>
-                    <td className="px-[10px] py-[5px] w-[160px]">
-                      <input
-                        type="text"
-                        placeholder="Enter Reason"
-                        value={item.description}
-                        onChange={(e) =>
-                          handleItemChange(index, "description", e.target.value)
-                        }
-                        className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
-                      />
-                    </td>
-                    <td className="px-[10px] py-[5px] w-[120px] relative">
-                      <input
-                        type="text"
-                        placeholder="mm/dd/yyyy"
-                        value={item.date}
-                        onChange={(e) =>
-                          handleItemChange(index, "date", e.target.value)
-                        }
-                        className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
-                      />
-                      <img
-                        src={calendaricon}
-                        alt="Calendar"
-                        className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                      />
-                    </td>
-                    <td className="px-[10px] py-[5px] w-[120px]">
-                      <input
-                        type="text"
-                        placeholder="Enter Amount"
-                        value={item.amount}
-                        onChange={(e) =>
-                          handleItemChange(index, "amount", e.target.value)
-                        }
-                        className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
-                      />
-                    </td>
-                    <td className="px-[10px] py-[5px] w-[110px] relative">
-                      <select
-                        value={item.select}
-                        onChange={(e) =>
-                          handleItemChange(index, "select", e.target.value)
-                        }
-                        onFocus={() => toggleDropdown("select")}
-                        onBlur={() => toggleDropdown("select")}
-                        className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white invoice-modal-table-select"
-                      >
-                        <option value="">Choose</option>
-                      </select>
-                      <ChevronDown
-                        className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
-                          openDropdowns.select ? "rotate-180" : ""
-                        }`}
-                      />
-                    </td>
-                    <td className="px-[10px] py-[5px] w-[60px] text-left text-[14px] font-normal text-[#201D1E]">
-                      {Number(item.total).toFixed(4)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Mobile Table */}
-          <div className="invoice-modal-mobile-table">
-            {formData.invoiceItems.map((item, index) => (
-              <div key={index} className="invoice-modal-mobile-section">
-                {/* First Header: Charge and Description */}
-                <div className="invoice-modal-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-2">
-                  <div className="px-[10px] flex items-center invoice-modal-thead uppercase">
-                    Charge
-                  </div>
-                  <div className="px-[10px] flex items-center invoice-modal-thead uppercase">
-                    Description
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 border-b border-[#E9E9E9]">
-                  <div className="px-[10px] py-[10px] h-[57px] relative">
-                    <select
-                      value={item.charge}
-                      onChange={(e) =>
-                        handleItemChange(index, "charge", e.target.value)
-                      }
-                      onFocus={() => toggleDropdown("charge")}
-                      onBlur={() => toggleDropdown("charge")}
-                      className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white invoice-modal-table-select"
-                    >
-                      <option value="">Choose</option>
-                    </select>
-                    <ChevronDown
-                      className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
-                        openDropdowns.charge ? "rotate-180" : ""
-                      }`}
-                    />
-                  </div>
-                  <div className="px-[10px] py-[10px]">
-                    <input
-                      type="text"
-                      placeholder="Enter Reason"
-                      value={item.description}
-                      onChange={(e) =>
-                        handleItemChange(index, "description", e.target.value)
-                      }
-                      className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
-                    />
-                  </div>
-                </div>
-
-                {/* Second Header: Date and Amount */}
-                <div className="invoice-modal-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-2">
-                  <div className="px-[10px] flex items-center invoice-modal-thead uppercase">
-                    Date
-                  </div>
-                  <div className="px-[10px] flex items-center invoice-modal-thead uppercase">
-                    Amount
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 border-b border-[#E9E9E9]">
-                  <div className="px-[10px] py-[10px] relative">
-                    <input
-                      type="text"
-                      placeholder="mm/dd/yyyy"
-                      value={item.date}
-                      onChange={(e) =>
-                        handleItemChange(index, "date", e.target.value)
-                      }
-                      className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
-                    />
-                    <img
-                      src={calendaricon}
-                      alt="Calendar"
-                      className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                    />
-                  </div>
-                  <div className="px-[10px] py-[10px]">
-                    <input
-                      type="text"
-                      placeholder="Enter Amount"
-                      value={item.amount}
-                      onChange={(e) =>
-                        handleItemChange(index, "amount", e.target.value)
-                      }
-                      className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-table-input"
-                    />
-                  </div>
-                </div>
-
-                {/* Third Header: Select and Total */}
-                <div className="invoice-modal-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-2">
-                  <div className="px-[10px] flex items-center invoice-modal-thead uppercase">
-                    Select
-                  </div>
-                  <div className="px-[10px] flex items-center invoice-modal-thead uppercase ml-[70px]">
-                    Total
-                  </div>
-                </div>
-                <div className="grid grid-cols-2">
-                  <div className="px-[10px] py-[10px] relative">
-                    <select
-                      value={item.select}
-                      onChange={(e) =>
-                        handleItemChange(index, "select", e.target.value)
-                      }
-                      onFocus={() => toggleDropdown("select")}
-                      onBlur={() => toggleDropdown("select")}
-                      className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white invoice-modal-table-select"
-                    >
-                      <option value="">Choose</option>
-                    </select>
-                    <ChevronDown
-                      className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
-                        openDropdowns.select ? "rotate-180" : ""
-                      }`}
-                    />
-                  </div>
-                  <div className="px-[10px] py-[5px] text-left text-[14px] font-normal text-[#201D1E] ml-[70px]">
-                    {Number(item.total).toFixed(4)}
-                  </div>
-                </div>
+          {/* Payment Schedules Table */}
+          {selectedPaymentSchedules.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-lg font-medium mb-3">Payment Schedules</h3>
+              <div className="invoice-modal-overflow-x-auto border border-[#E9E9E9] rounded-md max-h-64 overflow-y-auto">
+                <table className="invoice-modal-table border-collapse w-full">
+                  <thead className="sticky top-0 bg-white">
+                    <tr className="border-b border-[#E9E9E9] h-[50px]">
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[50px]">Select</th>
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[120px]">Charge Type</th>
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[180px]">Description</th>
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[120px]">Due Date</th>
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">Amount</th>
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">Tax</th>
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedPaymentSchedules.map((item, index) => (
+                      <tr key={index}>
+                        <td className="px-[10px] py-[5px] w-[50px]">
+                          <input
+                            type="checkbox"
+                            checked={item.selected}
+                            onChange={() => handlePaymentScheduleToggle(index)}
+                            className="w-4 h-4"
+                          />
+                        </td>
+                        <td className="px-[10px] py-[5px] w-[120px] text-[14px]">{item.charge_type}</td>
+                        <td className="px-[10px] py-[5px] w-[180px] text-[14px]">{item.description}</td>
+                        <td className="px-[10px] py-[5px] w-[120px] text-[14px]">{item.due_date}</td>
+                        <td className="px-[10px] py-[5px] w-[100px] text-[14px]">{item.amount}</td>
+                        <td className="px-[10px] py-[5px] w-[100px] text-[14px]">{item.tax}</td>
+                        <td className="px-[10px] py-[5px] w-[100px] text-[14px]">{item.total}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            ))}
+            </div>
+          )}
+
+          {/* Additional Charges Table */}
+          {selectedAdditionalCharges.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-lg font-medium mb-3">Additional Charges</h3>
+              <div className="invoice-modal-overflow-x-auto border border-[#E9E9E9] rounded-md max-h-64 overflow-y-auto">
+                <table className="invoice-modal-table border-collapse w-full">
+                  <thead className="sticky top-0 bg-white">
+                    <tr className="border-b border-[#E9E9E9] h-[50px]">
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[50px]">Select</th>
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[120px]">Charge Type</th>
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[180px]">Description</th>
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[120px]">Due Date</th>
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">Amount</th>
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">Tax</th>
+                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedAdditionalCharges.map((item, index) => (
+                      <tr key={index}>
+                        <td className="px-[10px] py-[5px] w-[50px]">
+                          <input
+                            type="checkbox"
+                            checked={item.selected}
+                            onChange={() => handleAdditionalChargeToggle(index)}
+                            className="w-4 h-4"
+                          />
+                        </td>
+                        <td className="px-[10px] py-[5px] w-[120px] text-[14px]">{item.charge_type}</td>
+                        <td className="px-[10px] py-[5px] w-[180px] text-[14px]">{item.description}</td>
+                        <td className="px-[10px] py-[5px] w-[120px] text-[14px]">{item.due_date}</td>
+                        <td className="px-[10px] py-[5px] w-[100px] text-[14px]">{item.amount}</td>
+                        <td className="px-[10px] py-[5px] w-[100px] text-[14px]">{item.tax}</td>
+                        <td className="px-[10px] py-[5px] w-[100px] text-[14px]">{item.total}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-4 flex justify-end">
+            <div className="text-lg font-medium">Grand Total: {calculateGrandTotal()}</div>
           </div>
         </div>
 
-        <div className="mt-8 flex justify-end">
+        {/* Fixed Footer */}
+        <div className="p-6 border-t border-gray-200 flex justify-end flex-shrink-0">
           <button
             type="button"
             onClick={handleSave}
-            className="bg-[#2892CE] hover:bg-[#076094] duration-200 text-white py-2 px-6 invoice-modal-save-btn"
+            className="bg-[#2892CE] hover:bg-[#076094] text-white py-2 px-6 invoice-modal-save-btn"
+            disabled={loading}
           >
-            Save
+            {loading ? "Generate..." : "Generate "}
           </button>
         </div>
       </div>
