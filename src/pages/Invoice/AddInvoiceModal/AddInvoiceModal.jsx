@@ -315,7 +315,7 @@ const handleSave = async () => {
     <div className="modal-overlay">
       <div className="invoice-modal-container bg-white rounded-md w-[1006px] max-h-[90vh] flex flex-col">
         {/* Fixed Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-200 flex-shrink-0">
+        <div className="flex justify-between items-center p-6 border-gray-200 flex-shrink-0">
           <h2 className="text-[#201D1E] invoice-modal-head">Create New Invoice</h2>
           <button
             onClick={closeModal}
@@ -418,7 +418,7 @@ const handleSave = async () => {
           {/* Payment Schedules Table */}
           {selectedPaymentSchedules.length > 0 && (
             <div className="mt-6">
-              <h3 className="text-lg font-medium mb-3">Payment Schedules</h3>
+              <h3 className="text-lg mb-3 payment-heading">Payment Schedules</h3>
               <div className="invoice-modal-overflow-x-auto border border-[#E9E9E9] rounded-md max-h-64 overflow-y-auto">
                 <table className="invoice-modal-table border-collapse w-full">
                   <thead className="sticky top-0 bg-white">
@@ -500,16 +500,16 @@ const handleSave = async () => {
           )}
 
           <div className="mt-4 flex justify-end">
-            <div className="text-lg font-medium">Grand Total: {calculateGrandTotal()}</div>
+            <div className="text-lg grand-total-text">Grand Total: {calculateGrandTotal()}</div>
           </div>
         </div>
 
         {/* Fixed Footer */}
-        <div className="p-6 border-t border-gray-200 flex justify-end flex-shrink-0">
+        <div className="p-4 border-gray-200 flex justify-end flex-shrink-0 mr-2">
           <button
             type="button"
             onClick={handleSave}
-            className="bg-[#2892CE] hover:bg-[#076094] text-white py-2 px-6 invoice-modal-save-btn"
+            className="bg-[#2892CE] hover:bg-[#076094] text-white py-2 px-6 mb-3 invoice-modal-save-btn"
             disabled={loading}
           >
             {loading ? "Generate..." : "Generate "}

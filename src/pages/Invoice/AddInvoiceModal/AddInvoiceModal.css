@@ -88,6 +88,18 @@
   letter-spacing: 0px;
 }
 
+.payment-heading {
+  font-family: "Public Sans";
+  color: #2892CE;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.grand-total-text {
+  font-family: "Inter Tight";
+  font-weight: 400;
+}
+
 .invoice-modal-save-btn {
   width: 150px;
   height: 38px;
