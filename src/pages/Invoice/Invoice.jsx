@@ -203,7 +203,7 @@ const handleViewClick = (invoice) => {
           <div className="flex gap-[10px] inv-action-buttons-container w-full md:w-auto justify-start">
             <button
               className="flex items-center justify-center gap-2 h-[38px] rounded-md inv-add-invoice duration-200 w-[176px]"
-              onClick={() => openModal("create-invoice", { onSuccess: fetchInvoices })}
+              onClick={() => openModal("create-invoice", "Create New Invoice", { onSuccess: fetchInvoices })}
             >
               Add New Invoice
               <img
