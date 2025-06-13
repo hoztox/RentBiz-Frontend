@@ -3,7 +3,7 @@ import "./AdminCreateUserModal.css";
 import cancelIcon from "../../assets/Images/Admin Create Modal/cancelIcon.svg";
 import addImageIcon from "../../assets/Images/Admin Create Modal/addImageIcon.svg";
 import { ChevronDown } from "lucide-react";
-import { IoEye, IoEyeOff } from "react-icons/io5"; // Import eye icons
+import { IoEye, IoEyeOff } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../../context/ModalContext";
 import { BASE_URL } from "../../utils/config";
@@ -16,8 +16,8 @@ const AdminCreateUserModal = () => {
   const [isRoleSelectOpen, setIsRoleSelectOpen] = useState(false);
   const [profileImage, setProfileImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [passwordVisible, setPasswordVisible] = useState(false); // State for Password visibility
-  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false); // State for Confirm Password visibility
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const fileInputRef = useRef(null);
 
   const navigate = useNavigate();
@@ -38,7 +38,6 @@ const AdminCreateUserModal = () => {
     return null;
   };
 
-  // Form state
   const [formData, setFormData] = useState({
     name: "",
     username: "",
@@ -48,7 +47,6 @@ const AdminCreateUserModal = () => {
     confirm_password: "",
   });
 
-  // Field errors state
   const [fieldErrors, setFieldErrors] = useState({
     name: "",
     username: "",
@@ -81,20 +79,34 @@ const AdminCreateUserModal = () => {
       } else {
         setFieldErrors((prev) => ({ ...prev, username: "" }));
       }
+    } else if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({ ...prev, [name]: "" }));
     }
-    // Real-time email validation
-    else if (name === "email" && value.trim()) {
-      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      if (!emailRegex.test(value)) {
+  };
+
+  const handleEmailBlur = () => {
+    if (formData.email.trim()) {
+      const emailRegex =
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|mil|biz|info|io|co|us|ca|uk|au|de|fr|jp|cn|in)$/;
+      if (!emailRegex.test(formData.email)) {
         setFieldErrors((prev) => ({
           ...prev,
-          email: "Please enter a valid email address (e.g., user@domain.com)",
+          email:
+            "Please enter a valid email address with a recognized domain (e.g., user@domain.com)",
+        }));
+      } else if (formData.email.length > 254) {
+        setFieldErrors((prev) => ({
+          ...prev,
+          email: "Email address is too long (max 254 characters)",
+        }));
+      } else if (/\.\./.test(formData.email)) {
+        setFieldErrors((prev) => ({
+          ...prev,
+          email: "Email cannot contain consecutive dots",
         }));
       } else {
         setFieldErrors((prev) => ({ ...prev, email: "" }));
       }
-    } else if (fieldErrors[name]) {
-      setFieldErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
@@ -163,10 +175,11 @@ const AdminCreateUserModal = () => {
       errors.email = "Email is required";
       isValid = false;
     } else {
-      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      const emailRegex =
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|mil|biz|info|io|co|us|ca|uk|au|de|fr|jp|cn|in)$/;
       if (!emailRegex.test(formData.email)) {
         errors.email =
-          "Please enter a valid email address (e.g., user@domain.com)";
+          "Please enter a valid email address with a recognized domain (e.g., user@domain.com)";
         isValid = false;
       } else if (formData.email.length > 254) {
         errors.email = "Email address is too long (max 254 characters)";
@@ -332,7 +345,6 @@ const AdminCreateUserModal = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
       <div className="modal-container relative bg-white rounded-[6px] overflow-hidden shadow-lg w-full max-w-[830px] h-auto md:h-[600px] flex flex-col">
-        {/* Header */}
         <div className="h-[100px] md:h-[133px] md:bg-[#F8F9FA] rounded-t-[6px] flex justify-between items-start px-4 md:px-6 pt-6">
           <h2 className="absolute top-[30px] md:top-[40px] left-4 md:left-[30px] heading-text">
             Create User
@@ -346,7 +358,6 @@ const AdminCreateUserModal = () => {
           </button>
         </div>
 
-        {/* Profile Image Section */}
         <div className="absolute top-[50px] md:top-[71px] left-1/2 transform -translate-x-1/2 flex justify-center">
           <div className="relative top-[-30px] w-[100px] md:w-[123px] h-[100px] md:h-[123px] bg-[#F3F3F3] rounded-full border overflow-hidden">
             {imagePreview && (
@@ -377,9 +388,7 @@ const AdminCreateUserModal = () => {
           </div>
         </div>
 
-        {/* Form */}
         <div className="px-4 md:px-6 pt-4 md:pt-0 grid grid-cols-1 md:grid-cols-2 gap-x-3 gap-y-4 md:gap-y-5 mt-[40px] md:mt-[68px] overflow-y-auto flex-1">
-          {/* Name */}
           <div>
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
               Name *
@@ -402,7 +411,6 @@ const AdminCreateUserModal = () => {
             )}
           </div>
 
-          {/* Username */}
           <div>
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
               Username *
@@ -427,7 +435,6 @@ const AdminCreateUserModal = () => {
             )}
           </div>
 
-          {/* Email */}
           <div>
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
               Email *
@@ -437,6 +444,7 @@ const AdminCreateUserModal = () => {
               name="email"
               value={formData.email}
               onChange={handleInputChange}
+              onBlur={handleEmailBlur}
               placeholder="Enter Email"
               className={`input-style ${
                 fieldErrors.email
@@ -453,7 +461,6 @@ const AdminCreateUserModal = () => {
             )}
           </div>
 
-          {/* Role */}
           <div className="relative">
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mt-[-5px]">
               Role *
@@ -490,7 +497,6 @@ const AdminCreateUserModal = () => {
             )}
           </div>
 
-          {/* Password */}
           <div className="relative">
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
               Password *
@@ -506,7 +512,7 @@ const AdminCreateUserModal = () => {
                   fieldErrors.password
                     ? "border-red-500 focus:border-red-500"
                     : "focus:border-gray-700"
-                } pr-10`} // Added padding-right for eye icon
+                } pr-10`}
                 required
                 aria-describedby="password-error"
               />
@@ -529,7 +535,6 @@ const AdminCreateUserModal = () => {
             )}
           </div>
 
-          {/* Confirm Password */}
           <div className="relative">
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
               Confirm Password *
@@ -540,17 +545,17 @@ const AdminCreateUserModal = () => {
                 name="confirm_password"
                 value={formData.confirm_password}
                 onChange={handleInputChange}
-                placeholder="Confirm Password"
+                placeholder="Enter Confirm Password"
                 className={`input-style ${
                   fieldErrors.confirm_password
                     ? "border-red-500 focus:border-red-500"
                     : "focus:border-gray-700"
-                } pr-10`} // Added padding-right for eye icon
+                } pr-10`}
                 required
                 aria-describedby="confirm-password-error"
               />
               <span
-                className="absolute inset-y-0 right-4 t flex items-center text-gray-400 cursor-pointer"
+                className="absolute inset-y-0 right-4 flex items-center text-gray-400 cursor-pointer"
                 onClick={toggleConfirmPasswordVisibility}
               >
                 {confirmPasswordVisible ? (
@@ -571,7 +576,6 @@ const AdminCreateUserModal = () => {
           </div>
         </div>
 
-        {/* Button */}
         <div className="px-4 md:px-6 mt-6 md:mt-1 mb-10 flex justify-end">
           <button
             className={`create-user-button duration-200 ${
