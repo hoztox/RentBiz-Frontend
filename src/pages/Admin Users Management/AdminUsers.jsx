@@ -107,6 +107,7 @@ const AdminUsers = () => {
       id: user.id,
       name: user.name,
       username: user.username,
+      email: user.email,
       user_role: user.user_role,
       profile_image: user.company_logo || null,
     });
