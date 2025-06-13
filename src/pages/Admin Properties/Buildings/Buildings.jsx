@@ -7,10 +7,10 @@ import downarrow from "../../../assets/Images/Admin Buildings/downarrow.svg";
 import editicon from "../../../assets/Images/Admin Buildings/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Buildings/delete-icon.svg";
 import { BASE_URL } from "../../../utils/config";
-import DeleteBuildingModal from "./DeleteBuildingModal/DeleteBuildingModal";
 import { useModal } from "../../../context/ModalContext";
-import CustomDropDown from "../../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
+import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
+import CustomDropDown from "../../../components/CustomDropDown";
 
 const Buildings = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,7 +19,6 @@ const Buildings = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
   const [buildings, setBuildings] = useState([]);
-  // const [loading, setLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const { openModal, refreshCounter } = useModal();
   const [buildingToDelete, setBuildingToDelete] = useState(null);
@@ -57,7 +56,6 @@ const Buildings = () => {
       [id]: !prev[id],
     }));
   };
-
   // const fetchBuildings = async () => {
   //   try {
   //     const companyId = getUserCompanyId();
@@ -172,7 +170,6 @@ const Buildings = () => {
     },
   };
 
-  // if (loading) return <div>Loading...</div>;
   if (error) return <div className="text-red-500 p-5">{error}</div>;
 
   return (
@@ -472,7 +469,7 @@ const Buildings = () => {
               className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
                 currentPage === startPage + i
                   ? "bg-[#1458A2] text-white"
-                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
               }`}
               onClick={() => setCurrentPage(startPage + i)}
             >
@@ -499,13 +496,18 @@ const Buildings = () => {
           </button>
         </div>
       </div>
-      <DeleteBuildingModal
+      <ConfirmationModal
         isOpen={deleteModalOpen}
+        type="delete"
+        title="Delete Building"
+        message="Are you sure you want to delete this building?"
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+        onConfirm={deleteBuilding}
         onCancel={() => {
           setDeleteModalOpen(false);
           setBuildingToDelete(null);
         }}
-        onDelete={deleteBuilding}
       />
     </div>
   );
