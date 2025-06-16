@@ -10,8 +10,7 @@ import { BASE_URL } from "../../../utils/config";
 const AddChargesModal = () => {
   const { modalState, closeModal } = useModal();
   const [tenancyContract, setTenancyContract] = useState("");
-  const [id, setId] = useState("");
-  const [date, setDate] = useState("");
+  const [inDate, setInDate] = useState("");
   const [chargeCode, setChargeCode] = useState("");
   const [reason, setReason] = useState("");
   const [amountDue, setAmountDue] = useState("");
@@ -31,8 +30,7 @@ const AddChargesModal = () => {
   useEffect(() => {
     if (modalState.isOpen && modalState.type === "create-additional-charges") {
       setTenancyContract("");
-      setId("");
-      setDate("");
+      setInDate("");
       setChargeCode("");
       setReason("");
       setAmountDue("");
@@ -89,7 +87,7 @@ const AddChargesModal = () => {
   useEffect(() => {
     const fetchTaxPreview = async () => {
       const companyId = getUserCompanyId();
-      if (!companyId || !chargeCode || !amountDue || !dueDate) {
+      if (!companyId || !chargeCode || !amountDue || !dueDate || !inDate) {
         setTaxAmount("");
         setTotalAmount("");
         return;
@@ -103,6 +101,7 @@ const AddChargesModal = () => {
             charge_type: chargeCode,
             amount: amountDue,
             due_date: dueDate,
+            in_date: inDate,
             reason: reason || "Additional Charge",
           },
           {
@@ -127,11 +126,11 @@ const AddChargesModal = () => {
     };
 
     fetchTaxPreview();
-  }, [chargeCode, amountDue, dueDate, reason]);
+  }, [chargeCode, amountDue, dueDate, inDate, reason]);
 
   const handleSave = async () => {
-    if (!tenancyContract || !chargeCode || !reason || !dueDate || !amountDue || !status) {
-      setError("Please fill all required fields (Tenancy Contract, Charge Code, Reason, Due Date, Amount Due, Status)");
+    if (!tenancyContract || !chargeCode || !reason || !dueDate || !amountDue || !status || !inDate) {
+      setError("Please fill all required fields (Tenancy Contract, Charge Code, Reason, In Date, Due Date, Amount Due, Status)");
       return;
     }
 
@@ -139,6 +138,7 @@ const AddChargesModal = () => {
       tenancy: tenancyContract,
       charge_type: chargeCode,
       reason,
+      in_date: inDate,
       due_date: dueDate,
       amount: amountDue,
       tax: taxAmount || "0.00",
@@ -218,12 +218,12 @@ const AddChargesModal = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="block add-charges-label">Date*</label>
+              <label className="block add-charges-label">In Date*</label>
               <input
                 type="date"
-                value={date}
+                value={inDate}
                 onChange={(e) => {
-                  setDate(e.target.value);
+                  setInDate(e.target.value);
                   setError("");
                 }}
                 className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-input"
