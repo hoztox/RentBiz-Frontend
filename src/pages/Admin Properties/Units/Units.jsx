@@ -15,6 +15,8 @@ import { motion, AnimatePresence } from "framer-motion";
 const Units = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [selectedStatus, setSelectedStatus] = useState("");
   const [expandedRows, setExpandedRows] = useState({});
   const [units, setUnits] = useState([]);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -25,8 +27,14 @@ const Units = () => {
 
   // Dropdown options
   const dropdownOptions = [
-    { label: "Showing", value: "showing" },
-    { label: "All", value: "all" },
+    { label: "All", value: "" },
+    {label: "Occupied",value: "occupied"},
+    {label: "Renovation",value: "renovation"},
+    {label: "Vacant",value: "vacant"},
+    {label: "Disputed",value: "Disputed"},
+
+
+
   ];
 
   const getUserCompanyId = () => {
@@ -47,14 +55,19 @@ const Units = () => {
   };
 
   const companyId = getUserCompanyId();
-
+  useEffect(() => {
+        setCurrentPage(1);
+      }, [searchTerm, selectedStatus]);
+      
   const fetchUnits = async () => {
     try {
-      const companyId = getUserCompanyId();
       const response = await axios.get(
-        `${BASE_URL}/company/units/company/${companyId}/`
-      );
-      setUnits(response.data);
+          `${BASE_URL}/company/units/company/${companyId}/`,{
+        params:  { search: searchTerm, status:selectedStatus,page:currentPage,pageSize:itemsPerPage } 
+      });
+      
+      setUnits(response.data.results);
+      setTotalCount(response.data.count)
       console.log("Units fetched:", response.data);
     } catch (error) {
       console.error("Error fetching units:", error);
@@ -63,7 +76,8 @@ const Units = () => {
 
   useEffect(() => {
     fetchUnits();
-  }, [companyId, refreshCounter]);
+  }, 
+  [companyId , refreshCounter,searchTerm,selectedStatus,currentPage,itemsPerPage]);
 
   const handleEditUnitClick = (unitId) => {
     console.log("Units: Selected unitId:", unitId);
@@ -100,20 +114,10 @@ const Units = () => {
     }));
   };
 
-  const filteredData = units.filter(
-    (unit) =>
-      unit.unit_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      unit.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      unit.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      unit.unit_type?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      unit.unit_status?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredData = units;
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  const paginatedData = filteredData;
 
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
@@ -154,8 +158,8 @@ const Units = () => {
             <div className="relative w-[40%] md:w-auto">
               <CustomDropDown
                 options={dropdownOptions}
-                value={selectedOption}
-                onChange={setSelectedOption}
+                value={selectedStatus}
+                onChange={setSelectedStatus}
                 placeholder="Select"
                 dropdownClassName="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 unit-selection"
               />
@@ -409,9 +413,9 @@ const Units = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 unit-pagination-container">
         <span className="unit-pagination collection-list-pagination">
           Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-          {filteredData.length} entries
+          {Math.min((currentPage - 1) * itemsPerPage + 1, totalCount)}{" "}
+          to {Math.min(currentPage * itemsPerPage, totalCount)} of{" "}
+          {totalCount} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto unit-pagination-buttons">
           <button
