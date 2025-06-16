@@ -52,6 +52,7 @@ const AdminAdditionalCharges = () => {
       if (response.data.results.success && response.data.results.data) {
         setCharges(response.data.results.data);
         setTotalItems(response.data.count || 0);
+        console.log(response, "Response from fetchAdditionalCharges");
       } else {
         setError(
           response.data.results.message || "Failed to fetch additional charges"
@@ -239,6 +240,7 @@ const AdminAdditionalCharges = () => {
               <th className="px-5 text-left admin-add-charges-thead">CHARGE ID</th>
               <th className="pl-5 text-left admin-add-charges-thead">AMOUNT DUE</th>
               <th className="px-5 text-left admin-add-charges-thead">REASON</th>
+              <th className="px-5 text-left admin-add-charges-thead">IN DATE</th>
               <th className="px-5 text-left admin-add-charges-thead">DUE DATE</th>
               <th className="px-5 text-left admin-add-charges-thead w-[68px]">
                 STATUS
@@ -265,6 +267,15 @@ const AdminAdditionalCharges = () => {
                 </td>
                 <td className="px-5 text-left admin-add-charges-data">
                   {charge.reason || "N/A"}
+                </td>
+                <td className="px-5 text-left admin-add-charges-data">
+                  {charge.in_date
+                    ? new Date(charge.in_date).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })
+                    : "N/A"}
                 </td>
                 <td className="px-5 text-left admin-add-charges-data">
                   {charge.due_date
@@ -385,7 +396,24 @@ const AdminAdditionalCharges = () => {
                                 {charge.reason || "N/A"}
                               </div>
                             </div>
-                            <div className="admin-add-charges-dropdown-item label-due w-[35%]">
+                            <div className="admin-add-charges-dropdown-item label-in-date w-[30%]">
+                              <div className="admin-add-charges-dropdown-label">
+                                IN DATE
+                              </div>
+                              <div className="admin-add-charges-dropdown-value">
+                                {charge.in_date
+                                  ? new Date(charge.in_date).toLocaleDateString(
+                                      "en-GB",
+                                      {
+                                        day: "2-digit",
+                                        month: "short",
+                                        year: "numeric",
+                                      }
+                                    )
+                                  : "N/A"}
+                              </div>
+                            </div>
+                            <div className="admin-add-charges-dropdown-item label-due w-[30%]">
                               <div className="admin-add-charges-dropdown-label">
                                 DUE DATE
                               </div>

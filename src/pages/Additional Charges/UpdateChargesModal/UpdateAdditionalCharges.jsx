@@ -10,8 +10,7 @@ import { BASE_URL } from "../../../utils/config";
 const UpdateAdditionalCharges = () => {
   const { modalState, closeModal } = useModal();
   const [tenancyContract, setTenancyContract] = useState("");
-  const [id, setId] = useState("");
-  const [date, setDate] = useState("");
+  const [inDate, setInDate] = useState("");
   const [chargeCode, setChargeCode] = useState("");
   const [reason, setReason] = useState("");
   const [amountDue, setAmountDue] = useState("");
@@ -30,16 +29,15 @@ const UpdateAdditionalCharges = () => {
 
   useEffect(() => {
     if (modalState.isOpen && modalState.type === "update-additional-charges" && modalState.data) {
-      console.log("Modal State:", modalState); // Debug: Log modal state
-      setId(modalState.data.id || "");
-      setTenancyContract(modalState.data.tenancy?.id || "");
-      setDate(modalState.data.created_at ? new Date(modalState.data.created_at).toISOString().split("T")[0] : "");
+      console.log("Modal State:", modalState);
+      setTenancyContract(String(modalState.data.tenancy || ""));
+      setInDate(modalState.data.in_date ? new Date(modalState.data.in_date).toISOString().split("T")[0] : "");
       setChargeCode(modalState.data.charge_type?.id || "");
       setReason(modalState.data.reason || "");
       setAmountDue(modalState.data.amount ? parseFloat(modalState.data.amount).toFixed(2) : "");
       setTaxAmount(modalState.data.tax ? parseFloat(modalState.data.tax).toFixed(2) : "");
       setTotalAmount(modalState.data.total ? parseFloat(modalState.data.total).toFixed(2) : "");
-      setDueDate(modalState.data.due_date || "");
+      setDueDate(modalState.data.due_date ? new Date(modalState.data.due_date).toISOString().split("T")[0] : "");
       setStatus(modalState.data.status || "");
       setRemarks(modalState.data.remarks || "");
       setError("");
@@ -49,16 +47,16 @@ const UpdateAdditionalCharges = () => {
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
-    console.log("Role:", role); // Debug: Log role
+    console.log("Role:", role);
     if (role === "company") {
       const companyId = localStorage.getItem("company_id");
-      console.log("Company ID (company role):", companyId); // Debug: Log company ID
+      console.log("Company ID (company role):", companyId);
       return companyId;
     } else if (role === "user" || role === "admin") {
       try {
         const userCompanyId = localStorage.getItem("company_id");
         const parsedId = userCompanyId ? JSON.parse(userCompanyId) : null;
-        console.log("Company ID (user/admin role):", parsedId); // Debug: Log parsed company ID
+        console.log("Company ID (user/admin role):", parsedId);
         return parsedId;
       } catch (e) {
         console.error("Error parsing user company ID:", e);
@@ -72,7 +70,7 @@ const UpdateAdditionalCharges = () => {
     const companyId = getUserCompanyId();
     if (!companyId) {
       setError("Company ID not found. Please ensure you are logged in.");
-      console.log("Error: No company ID found"); // Debug: Log missing company ID
+      console.log("Error: No company ID found");
       return;
     }
 
@@ -86,27 +84,27 @@ const UpdateAdditionalCharges = () => {
         }),
       ]);
 
-      console.log("Tenancies Response:", tenanciesResponse.data); // Debug: Log tenancies response
-      console.log("Charges Response:", chargesResponse.data); // Debug: Log charges response
+      console.log("Tenancies Response:", tenanciesResponse.data);
+      console.log("Charges Response:", chargesResponse.data);
 
       setTenancies(tenanciesResponse.data.data || tenanciesResponse.data || []);
       setChargeTypes(chargesResponse.data.data || chargesResponse.data || []);
 
-      console.log("Tenancies State:", tenanciesResponse.data.data || tenanciesResponse.data); // Debug: Log tenancies state
-      console.log("Charge Types State:", chargesResponse.data.data || chargesResponse.data); // Debug: Log charge types state
+      console.log("Tenancies State:", tenanciesResponse.data.data || tenanciesResponse.data);
+      console.log("Charge Types State:", chargesResponse.data.data || chargesResponse.data);
     } catch (err) {
       setError("Failed to fetch options: " + err.message);
-      console.error("Fetch Options Error:", err); // Debug: Log fetch error
+      console.error("Fetch Options Error:", err);
     }
   };
 
   useEffect(() => {
     const fetchTaxPreview = async () => {
       const companyId = getUserCompanyId();
-      if (!companyId || !chargeCode || !amountDue || !dueDate) {
+      if (!companyId || !chargeCode || !amountDue || !dueDate || !inDate) {
         setTaxAmount("");
         setTotalAmount("");
-        console.log("Tax Preview Skipped: Missing required fields", { companyId, chargeCode, amountDue, dueDate }); // Debug: Log skip reason
+        console.log("Tax Preview Skipped: Missing required fields", { companyId, chargeCode, amountDue, dueDate, inDate });
         return;
       }
 
@@ -118,6 +116,7 @@ const UpdateAdditionalCharges = () => {
             charge_type: chargeCode,
             amount: amountDue,
             due_date: dueDate,
+            in_date: inDate,
             reason: reason || "Additional Charge",
           },
           {
@@ -125,7 +124,7 @@ const UpdateAdditionalCharges = () => {
           }
         );
 
-        console.log("Tax Preview Response:", response.data); // Debug: Log tax preview response
+        console.log("Tax Preview Response:", response.data);
 
         if (response.data.success) {
           setTaxAmount(response.data.additional_charge.tax || "0.00");
@@ -140,17 +139,17 @@ const UpdateAdditionalCharges = () => {
         setTaxAmount("");
         setTotalAmount("");
         setError("Error fetching tax preview: " + err.message);
-        console.error("Tax Preview Error:", err); // Debug: Log tax preview error
+        console.error("Tax Preview Error:", err);
       }
     };
 
     fetchTaxPreview();
-  }, [chargeCode, amountDue, dueDate, reason]);
+  }, [chargeCode, amountDue, dueDate, inDate, reason]);
 
   const handleUpdate = async () => {
-    if (!tenancyContract || !chargeCode || !reason || !dueDate || !amountDue || !status) {
-      setError("Please fill all required fields (Tenancy Contract, Charge Code, Reason, Due Date, Amount Due, Status)");
-      console.log("Validation Failed: Missing fields", { tenancyContract, chargeCode, reason, dueDate, amountDue, status }); // Debug: Log validation failure
+    if (!tenancyContract || !chargeCode || !reason || !dueDate || !amountDue || !status || !inDate) {
+      setError("Please fill all required fields (Tenancy Contract, Charge Code, Reason, In Date, Due Date, Amount Due, Status)");
+      console.log("Validation Failed: Missing fields", { tenancyContract, chargeCode, reason, inDate, dueDate, amountDue, status });
       return;
     }
 
@@ -158,6 +157,7 @@ const UpdateAdditionalCharges = () => {
       tenancy: tenancyContract,
       charge_type: chargeCode,
       reason,
+      in_date: inDate,
       due_date: dueDate,
       amount: amountDue,
       tax: taxAmount || "0.00",
@@ -165,15 +165,15 @@ const UpdateAdditionalCharges = () => {
       remarks,
     };
 
-    console.log("Form Data for Update:", formData); // Debug: Log form data before update
+    console.log("Form Data for Update:", formData);
 
     try {
       setLoading(true);
-      const response = await axios.put(`${BASE_URL}/company/additional-charges/${id}/`, formData, {
+      const response = await axios.put(`${BASE_URL}/company/additional-charges/${modalState.data.id}/`, formData, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
 
-      console.log("Update Response:", response.data); // Debug: Log update response
+      console.log("Update Response:", response.data);
 
       if (response.data.success) {
         closeModal();
@@ -182,7 +182,7 @@ const UpdateAdditionalCharges = () => {
       }
     } catch (err) {
       setError("Error updating additional charge: " + err.message);
-      console.error("Update Error:", err); // Debug: Log update error
+      console.error("Update Error:", err);
     } finally {
       setLoading(false);
     }
@@ -214,10 +214,11 @@ const UpdateAdditionalCharges = () => {
               <div className="relative">
                 <select
                   value={tenancyContract}
+                  disabled={true}
                   onChange={(e) => {
                     setTenancyContract(e.target.value);
                     setError("");
-                    console.log("Selected Tenancy:", e.target.value); // Debug: Log tenancy selection
+                    console.log("Selected Tenancy:", e.target.value);
                   }}
                   onFocus={() => setIsSelectOpenTenancy(true)}
                   onBlur={() => setIsSelectOpenTenancy(false)}
@@ -244,14 +245,14 @@ const UpdateAdditionalCharges = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="block update-charges-label">Date*</label>
+              <label className="block update-charges-label">In Date*</label>
               <input
                 type="date"
-                value={date}
+                value={inDate}
                 onChange={(e) => {
-                  setDate(e.target.value);
+                  setInDate(e.target.value);
                   setError("");
-                  console.log("Selected Date:", e.target.value); // Debug: Log date selection
+                  console.log("Selected In Date:", e.target.value);
                 }}
                 className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-charges-input"
               />
@@ -265,19 +266,9 @@ const UpdateAdditionalCharges = () => {
                 onChange={(e) => {
                   setDueDate(e.target.value);
                   setError("");
-                  console.log("Selected Due Date:", e.target.value); // Debug: Log due date selection
+                  console.log("Selected Due Date:", e.target.value);
                 }}
                 className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-charges-input"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="block update-charges-label">ID</label>
-              <input
-                type="text"
-                value={id}
-                readOnly
-                className="block w-full px-3 py-2 border border-gray-200 bg-gray-100 update-charges-input"
               />
             </div>
 
@@ -289,7 +280,7 @@ const UpdateAdditionalCharges = () => {
                   onChange={(e) => {
                     setChargeCode(e.target.value);
                     setError("");
-                    console.log("Selected Charge Code:", e.target.value); // Debug: Log charge code selection
+                    console.log("Selected Charge Code:", e.target.value);
                   }}
                   onFocus={() => setIsSelectOpenChargeCode(true)}
                   onBlur={() => setIsSelectOpenChargeCode(false)}
@@ -316,7 +307,7 @@ const UpdateAdditionalCharges = () => {
                 onChange={(e) => {
                   setReason(e.target.value);
                   setError("");
-                  console.log("Reason:", e.target.value); // Debug: Log reason input
+                  console.log("Reason:", e.target.value);
                 }}
                 placeholder="Enter The Reason"
                 className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-charges-input"
@@ -331,7 +322,7 @@ const UpdateAdditionalCharges = () => {
                 onChange={(e) => {
                   setAmountDue(e.target.value);
                   setError("");
-                  console.log("Amount Due:", e.target.value); // Debug: Log amount due input
+                  console.log("Amount Due:", e.target.value);
                 }}
                 placeholder="Enter Amount Due"
                 className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-charges-input"
@@ -349,7 +340,7 @@ const UpdateAdditionalCharges = () => {
                   onChange={(e) => {
                     setTaxAmount(e.target.value);
                     setError("");
-                    console.log("Tax Amount:", e.target.value); // Debug: Log tax amount input
+                    console.log("Tax Amount:", e.target.value);
                   }}
                   placeholder="Enter Tax Amount"
                   className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-charges-input"
@@ -380,7 +371,7 @@ const UpdateAdditionalCharges = () => {
                   onChange={(e) => {
                     setStatus(e.target.value);
                     setError("");
-                    console.log("Selected Status:", e.target.value); // Debug: Log status selection
+                    console.log("Selected Status:", e.target.value);
                   }}
                   onFocus={() => setIsSelectOpenStatus(true)}
                   onBlur={() => setIsSelectOpenStatus(false)}
@@ -410,7 +401,7 @@ const UpdateAdditionalCharges = () => {
                 value={remarks}
                 onChange={(e) => {
                   setRemarks(e.target.value);
-                  console.log("Remarks:", e.target.value); // Debug: Log remarks input
+                  console.log("Remarks:", e.target.value);
                 }}
                 placeholder="Enter Remarks"
                 className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-charges-input"
