@@ -82,25 +82,31 @@ const AddInvoiceModal = () => {
       setLoading(true);
       setError(null);
 
-      const response = await axios.get(`${BASE_URL}/company/tenancies/${tenancyId}/`);
+      const response = await axios.get(
+        `${BASE_URL}/company/tenancies/${tenancyId}/`
+      );
 
       if (response.data && response.data.success) {
         const tenancy = response.data.tenancy;
         setTenancyDetails(tenancy);
 
-        // Auto-fill building name and unit name
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
-          building_name: tenancy.building?.building_name || tenancy.unit?.building?.building_name || "",
+          building_name:
+            tenancy.building?.building_name ||
+            tenancy.unit?.building?.building_name ||
+            "",
           unit_name: tenancy.unit?.unit_name || "",
         }));
 
-        // Initialize selected items with all pending items
         initializeSelectedItems(tenancy);
 
         console.log("Fetched tenancy details:", tenancy);
       } else {
-        console.error("Failed to fetch tenancy details:", response.data?.message || "Unknown error");
+        console.error(
+          "Failed to fetch tenancy details:",
+          response.data?.message || "Unknown error"
+        );
         setError("Failed to fetch tenancy details");
       }
     } catch (error) {
@@ -111,43 +117,56 @@ const AddInvoiceModal = () => {
     }
   };
 
-  // Initialize selected items from payment schedules and additional charges
   const initializeSelectedItems = (tenancy) => {
     try {
       const paymentSchedules = [];
       const additionalCharges = [];
 
-      // Process payment schedules
-      if (tenancy.payment_schedules && Array.isArray(tenancy.payment_schedules)) {
+      if (
+        tenancy.payment_schedules &&
+        Array.isArray(tenancy.payment_schedules)
+      ) {
         tenancy.payment_schedules.forEach((schedule) => {
           if (schedule.status === "pending") {
             paymentSchedules.push({
               id: schedule.id,
               charge_type: schedule.charge_type?.name || "Unknown",
-              description: schedule.reason || `Payment - Due ${schedule.due_date}`,
+              description:
+                schedule.reason || `Payment - Due ${schedule.due_date}`,
               due_date: schedule.due_date || "",
-              amount: schedule.amount ? parseFloat(schedule.amount).toFixed(2) : "0.00",
+              amount: schedule.amount
+                ? parseFloat(schedule.amount).toFixed(2)
+                : "0.00",
               tax: schedule.tax ? parseFloat(schedule.tax).toFixed(2) : "0.00",
-              total: schedule.total ? parseFloat(schedule.total).toFixed(2) : "0.00",
-              selected: true,
+              total: schedule.total
+                ? parseFloat(schedule.total).toFixed(2)
+                : "0.00",
+              selected: false,
             });
           }
         });
       }
 
-      // Process additional charges
-      if (tenancy.additional_charges && Array.isArray(tenancy.additional_charges)) {
+      if (
+        tenancy.additional_charges &&
+        Array.isArray(tenancy.additional_charges)
+      ) {
         tenancy.additional_charges.forEach((charge) => {
           if (charge.status === "pending") {
             additionalCharges.push({
               id: charge.id,
               charge_type: charge.charge_type?.name || "Unknown",
-              description: charge.reason || `Additional charge - Due ${charge.due_date}`,
+              description:
+                charge.reason || `Additional charge - Due ${charge.due_date}`,
               due_date: charge.due_date || "",
-              amount: charge.amount ? parseFloat(charge.amount).toFixed(2) : "0.00",
+              amount: charge.amount
+                ? parseFloat(charge.amount).toFixed(2)
+                : "0.00",
               tax: charge.tax ? parseFloat(charge.tax).toFixed(2) : "0.00",
-              total: charge.total ? parseFloat(charge.total).toFixed(2) : "0.00",
-              selected: true,
+              total: charge.total
+                ? parseFloat(charge.total).toFixed(2)
+                : "0.00",
+              selected: false,
             });
           }
         });
@@ -160,7 +179,6 @@ const AddInvoiceModal = () => {
     }
   };
 
-  // Reset form when modal opens
   const resetForm = () => {
     setFormData({
       tenancy: "",
@@ -178,7 +196,6 @@ const AddInvoiceModal = () => {
     });
   };
 
-  // Fetch tenancies when modal opens
   useEffect(() => {
     if (modalState.isOpen && modalState.type === "create-invoice") {
       resetForm();
@@ -220,11 +237,11 @@ const AddInvoiceModal = () => {
   const calculateGrandTotal = () => {
     try {
       const paymentTotal = selectedPaymentSchedules
-        .filter(item => item.selected)
+        .filter((item) => item.selected)
         .reduce((total, item) => total + (parseFloat(item.total) || 0), 0);
 
       const chargeTotal = selectedAdditionalCharges
-        .filter(item => item.selected)
+        .filter((item) => item.selected)
         .reduce((total, item) => total + (parseFloat(item.total) || 0), 0);
 
       return (paymentTotal + chargeTotal).toFixed(2);
@@ -234,99 +251,111 @@ const AddInvoiceModal = () => {
     }
   };
 
-
- 
-
-const getRelevantUserId = () => {
-  const role = localStorage.getItem("role")?.toLowerCase();
-  if (role === "user" || role === "admin") {
-    const userId = localStorage.getItem("user_id");
-    // Ensure userId is a number
-    return userId ? parseInt(userId) : null;
-  }
-  return null;
-};
-
-const handleSave = async () => {
-  try {
-    const companyId = getUserCompanyId();
-    const userId = getRelevantUserId();
-
-    if (!companyId) {
-      setError("Company ID is required to create an invoice.");
-      return;
+  const getRelevantUserId = () => {
+    const role = localStorage.getItem("role")?.toLowerCase();
+    if (role === "user" || role === "admin") {
+      const userId = localStorage.getItem("user_id");
+      return userId ? parseInt(userId) : null;
     }
+    return null;
+  };
 
-    setLoading(true);
-    setError(null);
+  const handleSave = async () => {
+    try {
+      const companyId = getUserCompanyId();
+      const userId = getRelevantUserId();
 
-    const selectedItems = [
-      ...selectedPaymentSchedules.filter(item => item.selected).map(item => ({
-        charge_type: item.charge_type,
-        description: item.description,
-        due_date: item.due_date,
-        amount: parseFloat(item.amount) || 0,
-        tax: parseFloat(item.tax) || 0,
-        type: "payment_schedule",
-        total: parseFloat(item.total) || 0,
-        schedule_id: item.id,
-      })),
-      ...selectedAdditionalCharges.filter(item => item.selected).map(item => ({
-        charge_type: item.charge_type,
-        description: item.description,
-        due_date: item.due_date,
-        amount: parseFloat(item.amount) || 0,
-        tax: parseFloat(item.tax) || 0,
-        type: "additional_charge",
-        total: parseFloat(item.total) || 0,
-        charge_id: item.id,
-      }))
-    ];
+      if (!companyId) {
+        setError("Company ID is required to create an invoice.");
+        return;
+      }
 
-    const invoiceData = {
-      company: companyId,
-      user: userId, // May be null, which is now allowed by the serializer
-      tenancy: formData.tenancy,
-      invoice_date: formData.inDate,
-      end_date: formData.endDate,
-      building_name: formData.building_name,
-      unit_name: formData.unit_name,
-      items: selectedItems,
-      total_amount: parseFloat(calculateGrandTotal()),
-    };
+      setLoading(true);
+      setError(null);
 
-    const response = await axios.post(`${BASE_URL}/company/invoice/create/`, invoiceData);
+      const selectedItems = [
+        ...selectedPaymentSchedules
+          .filter((item) => item.selected)
+          .map((item) => ({
+            charge_type: item.charge_type,
+            description: item.description,
+            due_date: item.due_date,
+            amount: parseFloat(item.amount) || 0,
+            tax: parseFloat(item.tax) || 0,
+            type: "payment_schedule",
+            total: parseFloat(item.total) || 0,
+            schedule_id: item.id,
+          })),
+        ...selectedAdditionalCharges
+          .filter((item) => item.selected)
+          .map((item) => ({
+            charge_type: item.charge_type,
+            description: item.description,
+            due_date: item.due_date,
+            amount: parseFloat(item.amount) || 0,
+            tax: parseFloat(item.tax) || 0,
+            type: "additional_charge",
+            total: parseFloat(item.total) || 0,
+            charge_id: item.id,
+          })),
+      ];
 
-    if (response.data && response.data.success) {
-      console.log("Invoice Created Successfully:", response.data);
-      closeModal();
-    } else {
-      console.error("Failed to create invoice:", response.data?.message || "Unknown error");
-      setError(response.data?.message || "Failed to create invoice");
+      const invoiceData = {
+        company: companyId,
+        user: userId,
+        tenancy: formData.tenancy,
+        invoice_date: formData.inDate,
+        end_date: formData.endDate,
+        building_name: formData.building_name,
+        unit_name: formData.unit_name,
+        items: selectedItems,
+        total_amount: parseFloat(calculateGrandTotal()),
+      };
+
+      const response = await axios.post(
+        `${BASE_URL}/company/invoice/create/`,
+        invoiceData
+      );
+
+      if (response.data && response.data.success) {
+        console.log("Invoice Created Successfully:", response.data);
+        closeModal();
+      } else {
+        console.error(
+          "Failed to create invoice:",
+          response.data?.message || "Unknown error"
+        );
+        setError(response.data?.message || "Failed to create invoice");
+      }
+    } catch (error) {
+      console.error(
+        "Error creating invoice:",
+        error.response?.data?.errors || error.message
+      );
+      setError(error.response?.data?.errors || "Error creating invoice");
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("Error creating invoice:", error.response?.data?.errors || error.message);
-    setError(error.response?.data?.errors || "Error creating invoice");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
+
   return (
     <div className="modal-overlay">
       <div className="invoice-modal-container bg-white rounded-md w-[1006px] max-h-[90vh] flex flex-col">
         {/* Fixed Header */}
-        <div className="flex justify-between items-center p-6 border-gray-200 flex-shrink-0">
-          <h2 className="text-[#201D1E] invoice-modal-head">Create New Invoice</h2>
+        <div className="flex justify-between items-center md:p-6 border-gray-200 flex-shrink-0">
+          <h2 className="text-[#201D1E] invoice-modal-head">
+            Create New Invoice
+          </h2>
           <button
             onClick={closeModal}
             className="invoice-modal-close-btn hover:bg-gray-100 duration-200"
           >
-            <img src={closeicon} alt="close" className="w-[15px] h-[15px]" />
+            <img src={closeicon} alt="close" />
           </button>
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 md:overflow-y-auto md:p-6">
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
               {error}
@@ -342,16 +371,21 @@ const handleSave = async () => {
 
           <div className="invoice-modal-grid gap-6">
             <div>
-              <label className="block mb-3 invoice-modal-label">Select Tenancy</label>
+              <label className="block mb-3 invoice-modal-label">
+                Select Tenancy
+              </label>
               <div className="relative">
                 <select
                   name="tenancy"
                   value={formData.tenancy}
                   onChange={handleChange}
                   onFocus={() => toggleDropdown("tenancy")}
-                  onBlur={() => setTimeout(() => toggleDropdown("tenancy"), 150)}
-                  className={`block w-full border py-2 px-3 pr-8 focus:outline-none focus:ring-gray-500 focus:border-gray-500 appearance-none invoice-modal-select ${formData.tenancy === "" ? "invoice-modal-selected" : ""
-                    }`}
+                  onBlur={() =>
+                    setTimeout(() => toggleDropdown("tenancy"), 150)
+                  }
+                  className={`block w-full border py-2 px-3 pr-8 focus:outline-none focus:ring-gray-500 focus:border-gray-500 appearance-none invoice-modal-select ${
+                    formData.tenancy === "" ? "invoice-modal-selected" : ""
+                  }`}
                   disabled={loading}
                 >
                   <option value="" disabled>
@@ -364,8 +398,9 @@ const handleSave = async () => {
                   ))}
                 </select>
                 <ChevronDown
-                  className={`absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#201D1E] pointer-events-none transition-transform duration-200 ${openDropdowns.tenancy ? "rotate-180" : ""
-                    }`}
+                  className={`absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#201D1E] pointer-events-none transition-transform duration-200 ${
+                    openDropdowns.tenancy ? "rotate-180" : ""
+                  }`}
                 />
               </div>
             </div>
@@ -382,7 +417,9 @@ const handleSave = async () => {
             </div>
 
             <div>
-              <label className="block mb-3 invoice-modal-label">Building Name*</label>
+              <label className="block mb-3 invoice-modal-label">
+                Building Name*
+              </label>
               <input
                 type="text"
                 name="building_name"
@@ -393,7 +430,9 @@ const handleSave = async () => {
             </div>
 
             <div>
-              <label className="block mb-3 invoice-modal-label">Unit Name*</label>
+              <label className="block mb-3 invoice-modal-label">
+                Unit Name*
+              </label>
               <input
                 type="text"
                 name="unit_name"
@@ -418,41 +457,158 @@ const handleSave = async () => {
           {/* Payment Schedules Table */}
           {selectedPaymentSchedules.length > 0 && (
             <div className="mt-6">
-              <h3 className="text-lg mb-3 payment-heading">Payment Schedules</h3>
-              <div className="invoice-modal-overflow-x-auto border border-[#E9E9E9] rounded-md max-h-64 overflow-y-auto">
-                <table className="invoice-modal-table border-collapse w-full">
-                  <thead className="sticky top-0 bg-white">
-                    <tr className="border-b border-[#E9E9E9] h-[50px]">
-                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[50px]">Select</th>
-                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[120px]">Charge Type</th>
-                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[180px]">Description</th>
-                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[120px]">Due Date</th>
-                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">Amount</th>
-                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">Tax</th>
-                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedPaymentSchedules.map((item, index) => (
-                      <tr key={index}>
-                        <td className="px-[10px] py-[5px] w-[50px]">
+              <h3 className="text-lg mb-3 payment-heading">
+                Payment Schedules
+              </h3>
+              <div className="border border-[#E9E9E9] rounded-md invoice-mobile-section-container">
+                {/* Desktop Table */}
+                <div className="invoice-desktop-table">
+                  {/* Fixed Header */}
+                  <div className="invoice-modal-overflow-x-auto">
+                    <table className="invoice-modal-table border-collapse w-full">
+                      <thead className="bg-white">
+                        <tr className="border-b border-[#E9E9E9] h-[57px]">
+                          <th className="px-[10px] text-left invoice-modal-thead uppercase w-[50px]">
+                            Select
+                          </th>
+                          <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">
+                            Charge Type
+                          </th>
+                          <th className="px-[10px] text-left invoice-modal-thead uppercase w-[180px]">
+                            Description
+                          </th>
+                          <th className="px-[10px] text-left invoice-modal-thead uppercase w-[120px]">
+                            Due Date
+                          </th>
+                          <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">
+                            Amount
+                          </th>
+                          <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">
+                            Tax
+                          </th>
+                          <th className="px-[10px] text-left invoice-modal-thead uppercase w-[80px]">
+                            Total
+                          </th>
+                        </tr>
+                      </thead>
+                    </table>
+                  </div>
+
+                  {/* Scrollable Body */}
+                  <div className="max-h-64 overflow-y-auto invoice-modal-overflow-x-auto">
+                    <table className="invoice-modal-table border-collapse w-full">
+                      <tbody>
+                        {selectedPaymentSchedules.map((item, index) => (
+                          <tr
+                            key={index}
+                            className="border-b border-[#E9E9E9] last:border-b-0"
+                          >
+                            <td className="px-[10px] py-[5px] w-[50px]">
+                              <input
+                                type="checkbox"
+                                checked={item.selected}
+                                onChange={() =>
+                                  handlePaymentScheduleToggle(index)
+                                }
+                                className="w-4 h-4"
+                              />
+                            </td>
+                            <td className="px-[10px] py-[5px] w-[100px] invoice-modal-tdata">
+                              {item.charge_type}
+                            </td>
+                            <td className="px-[10px] py-[5px] w-[180px] invoice-modal-tdata">
+                              {item.description}
+                            </td>
+                            <td className="px-[10px] py-[5px] w-[120px] invoice-modal-tdata">
+                              {item.due_date}
+                            </td>
+                            <td className="px-[10px] py-[5px] w-[100px] invoice-modal-tdata">
+                              {item.amount}
+                            </td>
+                            <td className="px-[10px] py-[5px] w-[100px] invoice-modal-tdata">
+                              {item.tax}
+                            </td>
+                            <td className="px-[10px] py-[5px] w-[80px] invoice-modal-tdata">
+                              {item.total}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Mobile Table */}
+                <div className="invoice-mobile-table">
+                  {selectedPaymentSchedules.map((item, index) => (
+                    <div
+                      key={index}
+                      className="border-b border-[#E9E9E9] last:border-b-0 invoice-mobile-section"
+                    >
+                      <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
+                        <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[25%]">
+                          Select
+                        </div>
+                        <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[40%]">
+                          Charge Type
+                        </div>
+                        <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[35%]">
+                          Description
+                        </div>
+                      </div>
+                      <div className="flex justify-between h-[67px] border-b border-[#E9E9E9]">
+                        <div className="px-[10px] py-[13px] w-[25%]">
                           <input
                             type="checkbox"
                             checked={item.selected}
-                            onChange={() => handlePaymentScheduleToggle(index)}
+                            onChange={() =>
+                              handlePaymentScheduleToggle(index)
+                            }
                             className="w-4 h-4"
                           />
-                        </td>
-                        <td className="px-[10px] py-[5px] w-[120px] text-[14px]">{item.charge_type}</td>
-                        <td className="px-[10px] py-[5px] w-[180px] text-[14px]">{item.description}</td>
-                        <td className="px-[10px] py-[5px] w-[120px] text-[14px]">{item.due_date}</td>
-                        <td className="px-[10px] py-[5px] w-[100px] text-[14px]">{item.amount}</td>
-                        <td className="px-[10px] py-[5px] w-[100px] text-[14px]">{item.tax}</td>
-                        <td className="px-[10px] py-[5px] w-[100px] text-[14px]">{item.total}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        </div>
+                        <div className="px-[10px] py-[13px] w-[40%] invoice-modal-tdata">
+                          {item.charge_type}
+                        </div>
+                        <div className="px-[10px] py-[13px] w-[35%] invoice-modal-tdata">
+                          {item.description}
+                        </div>
+                      </div>
+                      <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
+                        <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[50%]">
+                          Due Date
+                        </div>
+                        <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[50%]">
+                          Amount
+                        </div>
+                      </div>
+                      <div className="flex justify-start border-b border-[#E9E9E9] h-[67px]">
+                        <div className="px-[10px] py-[13px] w-[50%] invoice-modal-tdata">
+                          {item.due_date}
+                        </div>
+                        <div className="px-[10px] py-[13px] w-[50%] invoice-modal-tdata">
+                          {item.amount}
+                        </div>
+                      </div>
+                      <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
+                        <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[50%]">
+                          Tax
+                        </div>
+                        <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[50%]">
+                          Total
+                        </div>
+                      </div>
+                      <div className="flex justify-start h-[67px]">
+                        <div className="px-[10px] py-[13px] w-full invoice-modal-tdata">
+                          {item.tax}
+                        </div>
+                        <div className="px-[10px] py-[13px] w-full invoice-modal-tdata">
+                          {item.total}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
@@ -460,52 +616,171 @@ const handleSave = async () => {
           {/* Additional Charges Table */}
           {selectedAdditionalCharges.length > 0 && (
             <div className="mt-6">
-              <h3 className="text-lg font-medium mb-3">Additional Charges</h3>
-              <div className="invoice-modal-overflow-x-auto border border-[#E9E9E9] rounded-md max-h-64 overflow-y-auto">
-                <table className="invoice-modal-table border-collapse w-full">
-                  <thead className="sticky top-0 bg-white">
-                    <tr className="border-b border-[#E9E9E9] h-[50px]">
-                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[50px]">Select</th>
-                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[120px]">Charge Type</th>
-                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[180px]">Description</th>
-                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[120px]">Due Date</th>
-                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">Amount</th>
-                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">Tax</th>
-                      <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedAdditionalCharges.map((item, index) => (
-                      <tr key={index}>
-                        <td className="px-[10px] py-[5px] w-[50px]">
+              <h3 className="text-lg mb-3 additional-charges-heading">
+                Additional Charges
+              </h3>
+              <div className="border border-[#E9E9E9] rounded-md invoice-mobile-section-container">
+                {/* Desktop Table */}
+                <div className="invoice-desktop-table">
+                  {/* Fixed Header */}
+                  <div className="invoice-modal-overflow-x-auto">
+                    <table className="invoice-modal-table border-collapse w-full">
+                      <thead className="bg-white">
+                        <tr className="border-b border-[#E9E9E9] h-[57px]">
+                          <th className="px-[10px] text-left invoice-modal-thead uppercase w-[50px]">
+                            Select
+                          </th>
+                          <th className="px-[10px] text-left invoice-modal-thead uppercase w-[120px]">
+                            Charge Type
+                          </th>
+                          <th className="px-[10px] text-left invoice-modal-thead uppercase w-[180px]">
+                            Description
+                          </th>
+                          <th className="px-[10px] text-left invoice-modal-thead uppercase w-[120px]">
+                            Due Date
+                          </th>
+                          <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">
+                            Amount
+                          </th>
+                          <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">
+                            Tax
+                          </th>
+                          <th className="px-[10px] text-left invoice-modal-thead uppercase w-[80px]">
+                            Total
+                          </th>
+                        </tr>
+                      </thead>
+                    </table>
+                  </div>
+
+                  {/* Scrollable Body */}
+                  <div className="max-h-64 overflow-y-auto invoice-modal-overflow-x-auto">
+                    <table className="invoice-modal-table border-collapse w-full">
+                      <tbody>
+                        {selectedAdditionalCharges.map((item, index) => (
+                          <tr
+                            key={index}
+                            className="border-b border-[#E9E9E9] last:border-b-0"
+                          >
+                            <td className="px-[10px] py-[5px] w-[50px]">
+                              <input
+                                type="checkbox"
+                                checked={item.selected}
+                                onChange={() =>
+                                  handleAdditionalChargeToggle(index)
+                                }
+                                className="w-4 h-4"
+                              />
+                            </td>
+                            <td className="px-[10px] py-[5px] w-[120px] invoice-modal-tdata">
+                              {item.charge_type}
+                            </td>
+                            <td className="px-[10px] py-[5px] w-[180px] invoice-modal-tdata">
+                              {item.description}
+                            </td>
+                            <td className="px-[10px] py-[5px] w-[120px] invoice-modal-tdata">
+                              {item.due_date}
+                            </td>
+                            <td className="px-[10px] py-[5px] w-[100px] invoice-modal-tdata">
+                              {item.amount}
+                            </td>
+                            <td className="px-[10px] py-[5px] w-[100px] invoice-modal-tdata">
+                              {item.tax}
+                            </td>
+                            <td className="px-[10px] py-[5px] w-[80px] invoice-modal-tdata">
+                              {item.total}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Mobile Table */}
+                <div className="invoice-mobile-table">
+                  {selectedAdditionalCharges.map((item, index) => (
+                    <div
+                      key={index}
+                      className="border-b border-[#E9E9E9] last:border-b-0 invoice-mobile-section"
+                    >
+                      <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
+                        <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[25%]">
+                          Select
+                        </div>
+                        <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[40%]">
+                          Charge Type
+                        </div>
+                        <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[35%]">
+                          Description
+                        </div>
+                      </div>
+                      <div className="flex justify-between h-[67px] border-b border-[#E9E9E9]">
+                        <div className="px-[10px] py-[13px] w-[25%]">
                           <input
                             type="checkbox"
                             checked={item.selected}
-                            onChange={() => handleAdditionalChargeToggle(index)}
+                            onChange={() =>
+                              handleAdditionalChargeToggle(index)
+                            }
                             className="w-4 h-4"
                           />
-                        </td>
-                        <td className="px-[10px] py-[5px] w-[120px] text-[14px]">{item.charge_type}</td>
-                        <td className="px-[10px] py-[5px] w-[180px] text-[14px]">{item.description}</td>
-                        <td className="px-[10px] py-[5px] w-[120px] text-[14px]">{item.due_date}</td>
-                        <td className="px-[10px] py-[5px] w-[100px] text-[14px]">{item.amount}</td>
-                        <td className="px-[10px] py-[5px] w-[100px] text-[14px]">{item.tax}</td>
-                        <td className="px-[10px] py-[5px] w-[100px] text-[14px]">{item.total}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        </div>
+                        <div className="px-[10px] py-[13px] w-[40%] invoice-modal-tdata">
+                          {item.charge_type}
+                        </div>
+                        <div className="px-[10px] py-[13px] w-[35%] invoice-modal-tdata">
+                          {item.description}
+                        </div>
+                      </div>
+                      <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
+                        <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[50%]">
+                          Due Date
+                        </div>
+                        <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[50%]">
+                          Amount
+                        </div>
+                      </div>
+                      <div className="flex justify-between border-b border-[#E9E9E9] h-[67px]">
+                        <div className="px-[10px] py-[13px] w-[50%] invoice-modal-tdata">
+                          {item.due_date}
+                        </div>
+                        <div className="px-[10px] py-[13px] w-[50%] invoice-modal-tdata">
+                          {item.amount}
+                        </div>
+                      </div>
+                      <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
+                        <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[50%]">
+                          Tax
+                        </div>
+                        <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[50%]">
+                          Total
+                        </div>
+                      </div>
+                      <div className="flex justify-between h-[67px]">
+                        <div className="px-[10px] py-[13px] w-[50%] invoice-modal-tdata">
+                          {item.tax}
+                        </div>
+                        <div className="px-[10px] py-[13px] w-[50%] invoice-modal-tdata">
+                          {item.total}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
           <div className="mt-4 flex justify-end">
-            <div className="text-lg grand-total-text">Grand Total: {calculateGrandTotal()}</div>
+            <div className="text-lg grand-total-text">
+              Grand Total: {calculateGrandTotal()}
+            </div>
           </div>
         </div>
 
         {/* Fixed Footer */}
-        <div className="p-4 border-gray-200 flex justify-end flex-shrink-0 mr-2">
+        <div className="md:p-4 mt-4 border-gray-200 flex justify-end flex-shrink-0 md:mr-2">
           <button
             type="button"
             onClick={handleSave}
