@@ -8,8 +8,8 @@ import deleteIcon from "../../../assets/Images/Admin Masters/delete-icon.svg";
 import buildingImg from "../../../assets/Images/Admin Masters/building-img2.svg";
 import downArrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
-import IdTypeDeleteModal from "./IdTypeDeleteModal/IdTypeDeleteModal";
 import { idTypesApi } from "../MastersApi"; // Updated import
+import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
 import CustomDropDown from "../../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -501,11 +501,15 @@ const IdType = () => {
           </div>
         </div>
       )}
-
-      <IdTypeDeleteModal
+      <ConfirmationModal
         isOpen={isDeleteModalOpen}
+        type="delete"
+        title="Delete ID Type"
+        message="Are you sure you want to delete this ID type?"
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+        onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
-        onDelete={handleConfirmDelete}
       />
     </div>
   );

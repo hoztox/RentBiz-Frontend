@@ -57,7 +57,6 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
           throw new Error("Company ID not found.");
         }
 
-        // Fetch ID types
         const idTypeResponse = await axios.get(
           `${BASE_URL}/company/id_type/company/${companyId}`,
           {
@@ -68,7 +67,6 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
         );
         setIdTypes(Array.isArray(idTypeResponse.data) ? idTypeResponse.data : []);
 
-        // Fetch document types
         const docTypeResponse = await axios.get(
           `${BASE_URL}/company/doc_type/company/${companyId}`,
           {
@@ -86,11 +84,21 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
     fetchData();
   }, []);
 
-  // Helper function to get ID type title by ID
   const getIdTypeTitle = (idTypeId) => {
     if (!idTypeId) return "N/A";
     const idType = idTypes.find((type) => type.id === parseInt(idTypeId));
     return idType ? idType.title : "N/A";
+  };
+
+  const convertToBlob = async (fileData) => {
+    if (!fileData) return null;
+    if (fileData instanceof File || fileData instanceof Blob) {
+      return fileData;
+    }
+    if (typeof fileData === "string") {
+      return fileData; // Send URL as existing_file_url
+    }
+    return null;
   };
 
   const handleNext = async () => {
@@ -124,18 +132,16 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
       return;
     }
 
-    // Validate documents based on docType properties
+    // Validate documents
     const invalidDocs = documents.filter((doc) => {
-      if (!doc.doc_type) return true; // Document must have a doc_type
+      if (!doc.doc_type) return true;
       const docType = docTypes.find((type) => type.id === parseInt(doc.doc_type));
-      if (!docType) return true; // Invalid doc_type
-
-      // Check only the fields required by the doc_type
+      if (!docType) return true;
       return (
         (docType.number && !doc.number) ||
         (docType.issue_date && !doc.issued_date) ||
         (docType.expiry_date && !doc.expiry_date) ||
-        (docType.upload_file && !doc.upload_file?.length)
+        (docType.upload_file && !doc.upload_file)
       );
     });
 
@@ -146,42 +152,34 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
     }
 
     try {
-      const convertToBlob = async (fileData) => {
-        if (!fileData) {
-          console.warn("No file data provided");
-          return null;
-        }
-        if (fileData instanceof File || fileData instanceof Blob) {
-          return fileData;
-        }
-        if (typeof fileData === "string") {
-          try {
-            const response = await fetch(fileData);
-            if (!response.ok) {
-              throw new Error(`Failed to fetch file from ${fileData}: ${response.statusText}`);
-            }
-            const blob = await response.blob();
-            return new Blob([blob], { type: blob.type || "application/octet-stream" });
-          } catch (err) {
-            console.error(`Error converting string to blob: ${err.message}`);
-            return null;
-          }
-        }
-        console.warn("Invalid file data type:", typeof fileData, fileData);
-        return null;
-      };
-
       const formDataWithFiles = new FormData();
       // Add tenant fields
       Object.entries(tenant).forEach(([key, value]) => {
-        formDataWithFiles.append(key, value ?? "");
+        if (key === "user") {
+          const userId = value && typeof value === "object" ? value.id : value;
+          formDataWithFiles.append(key, userId ?? "");
+        } else {
+          formDataWithFiles.append(key, value ?? "");
+        }
       });
 
-      // Add documents data, including only required fields
+      // Add company ID
+      const companyId = getUserCompanyId();
+      if (companyId) {
+        formDataWithFiles.append("company", companyId);
+      } else {
+        setError("Company ID is required.");
+        setLoading(false);
+        return;
+      }
+
+      // Add documents data
+      console.log("Documents to send:", documents);
       await Promise.all(
         documents.map(async (doc, index) => {
           const docType = docTypes.find((type) => type.id === parseInt(doc.doc_type));
           if (docType) {
+            formDataWithFiles.append(`tenant_comp[${index}][id]`, doc.id || "");
             formDataWithFiles.append(`tenant_comp[${index}][doc_type]`, doc.doc_type || "");
             if (docType.number) {
               formDataWithFiles.append(`tenant_comp[${index}][number]`, doc.number || "");
@@ -192,17 +190,32 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
             if (docType.expiry_date) {
               formDataWithFiles.append(`tenant_comp[${index}][expiry_date]`, doc.expiry_date || "");
             }
-            if (docType.upload_file && doc.upload_file && doc.upload_file.length > 0) {
-              const file = Array.isArray(doc.upload_file) ? doc.upload_file[0] : doc.upload_file;
-              const fileBlob = await convertToBlob(file);
-              if (fileBlob) {
-                formDataWithFiles.append(
-                  `tenant_comp[${index}][upload_file]`,
-                  fileBlob,
-                  fileBlob.name || `file-${index}`
-                );
-              }
-            }
+         if (docType.upload_file) {
+  if (doc.upload_file) {
+    const fileData = await convertToBlob(doc.upload_file);
+    if (fileData) {
+      if (typeof fileData === "string") {
+        // ✅ Ensure consistent /media/ path, strip any double media
+        let cleaned = fileData.replace(/^\/?media\/?/, "");
+        formDataWithFiles.append(
+          `tenant_comp[${index}][existing_file_url]`,
+          `/media/${cleaned}`
+        );
+      } else {
+        // Normal file upload
+        formDataWithFiles.append(
+          `tenant_comp[${index}][upload_file]`,
+          fileData,
+          fileData.name || `file-${index}`
+        );
+      }
+    }
+  } else {
+    // If no file, send empty to avoid double media
+    formDataWithFiles.append(`tenant_comp[${index}][existing_file_url]`, "");
+  }
+}
+
           }
         })
       );
@@ -227,9 +240,17 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
       onNext({ formData, response: response.data });
     } catch (err) {
       console.error("Error updating tenant:", err);
-      setError(
-        `Failed to update tenant: ${err.response?.data?.message || err.message}`
-      );
+      let errorMessage = "Failed to update tenant.";
+      if (err.response?.data) {
+        if (typeof err.response.data === "object") {
+          errorMessage = Object.entries(err.response.data)
+            .map(([field, errors]) => `${field}: ${errors.join(", ")}`)
+            .join("; ");
+        } else {
+          errorMessage = err.response.data.message || err.message;
+        }
+      }
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -238,11 +259,12 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
   const handleBack = () => {
     const backData = {
       documents: documents.map((doc) => ({
+        id: doc.id || null,
         doc_type: parseInt(doc.doc_type) || null,
         number: doc.number || null,
         issued_date: doc.issued_date || null,
         expiry_date: doc.expiry_date || null,
-        upload_file: doc.upload_file || [],
+        upload_file: doc.upload_file || null,
       })),
     };
     console.log("ReviewPage passing back:", backData);

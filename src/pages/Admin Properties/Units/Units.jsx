@@ -7,10 +7,10 @@ import editicon from "../../../assets/Images/Admin Units/edit-icon.svg";
 import deletesicon from "../../../assets/Images/Admin Units/delete-icon.svg";
 import downarrow from "../../../assets/Images/Admin Units/downarrow.svg";
 import { BASE_URL } from "../../../utils/config";
-import DeleteUnitModal from "./DeleteUnitModal/DeleteUnitModal";
 import { useModal } from "../../../context/ModalContext";
 import CustomDropDown from "../../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
+import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
 
 const Units = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -305,7 +305,8 @@ const Units = () => {
                 </tr>
                 <AnimatePresence>
                   {expandedRows[unit.code] && (
-                    <motion.tr className="unit-mobile-with-border border-b border-[#E9E9E9]"
+                    <motion.tr
+                      className="unit-mobile-with-border border-b border-[#E9E9E9]"
                       initial="hidden"
                       animate="visible"
                       exit="hidden"
@@ -448,7 +449,7 @@ const Units = () => {
           )}
           {endPage < totalPages && (
             <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677Fs487]"
               onClick={() => setCurrentPage(totalPages)}
             >
               {totalPages}
@@ -463,10 +464,15 @@ const Units = () => {
           </button>
         </div>
       </div>
-      <DeleteUnitModal
+      <ConfirmationModal
         isOpen={deleteModalOpen}
+        type="delete"
+        title="Delete Unit"
+        message="Are you sure you want to delete this unit?"
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+        onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
-        onDelete={handleConfirmDelete}
       />
     </div>
   );

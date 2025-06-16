@@ -8,7 +8,7 @@ import buildingImg from "../../../assets/Images/Admin Masters/building2.jpg";
 import downArrow from "../../../assets/Images/Admin Masters/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
-import ChargeCodeDeleteModal from "./ChargeCodeDeleteModal/ChargeCodeDeleteModal";
+import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
 import { chargeCodesApi } from "../MastersApi";
 import CustomDropDown from "../../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
@@ -511,10 +511,15 @@ const ChargeCodeType = () => {
           )}
         </>
       )}
-      <ChargeCodeDeleteModal
+      <ConfirmationModal
         isOpen={isDeleteModalOpen}
+        type="delete"
+        title="Delete Charge Code"
+        message="Are you sure you want to delete this charge code?"
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+        onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
-        onDelete={handleConfirmDelete}
       />
     </div>
   );

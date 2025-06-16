@@ -10,27 +10,28 @@ import { BASE_URL } from "../../../../utils/config";
 const DocumentsForm = ({ onNext, onBack, initialData, tenantId }) => {
   // Normalize initialData.documents to ensure it's an array
   const normalizeDocuments = (docs) => {
-    if (!Array.isArray(docs)) {
-      return [
-        {
-          id: 1,
-          doc_type: "",
-          number: "",
-          issued_date: "",
-          expiry_date: "",
-          upload_file: [],
-        },
-      ];
-    }
-    return docs.map((doc, index) => ({
-      id: doc.id || index + 1,
-      doc_type: doc.doc_type || "",
-      number: doc.number || "",
-      issued_date: doc.issued_date || "",
-      expiry_date: doc.expiry_date || "",
-      upload_file: Array.isArray(doc.upload_file) ? doc.upload_file : doc.upload_file ? [doc.upload_file] : [],
-    }));
-  };
+  console.log("Normalizing documents:", docs);
+  if (!Array.isArray(docs)) {
+    return [
+      {
+        id: 1,
+        doc_type: "",
+        number: "",
+        issued_date: "",
+        expiry_date: "",
+        upload_file: null,
+      },
+    ];
+  }
+  return docs.map((doc, index) => ({
+    id: doc.id || index + 1,
+    doc_type: doc.doc_type || "",
+    number: doc.number || "",
+    issued_date: doc.issued_date || "",
+    expiry_date: doc.expiry_date || "",
+    upload_file: Array.isArray(doc.upload_file) ? doc.upload_file[0] || null : doc.upload_file || null, // Extract string from array
+  }));
+};
 
   const [documents, setDocuments] = useState(normalizeDocuments(initialData?.documents));
   const [docTypes, setDocTypes] = useState([]);
@@ -43,36 +44,14 @@ const DocumentsForm = ({ onNext, onBack, initialData, tenantId }) => {
   }, [initialData]);
 
   // Helper function to display file names
-  const getFileDisplayText = (files) => {
-    if (!files || files.length === 0) {
-      return "Attach Files";
+  const getFileDisplayText = (file) => {
+    if (!file) return "Attach Files";
+    if (file instanceof File) return file.name;
+    if (typeof file === "string") {
+      const parts = file.split("/");
+      return parts[parts.length - 1] || file;
     }
-
-    const getFileName = (file) => {
-      if (file && file.name) {
-        return file.name; // New uploaded file
-      } else if (typeof file === "string") {
-        const parts = file.split("/");
-        return parts[parts.length - 1] || file; // Existing file URL/path
-      } else if (file && file.upload_file) {
-        const fileName = file.upload_file;
-        if (typeof fileName === "string") {
-          const parts = fileName.split("/");
-          return parts[parts.length - 1] || fileName;
-        }
-      }
-      return "Unknown file";
-    };
-
-    if (files.length === 1) {
-      return getFileName(files[0]);
-    }
-
-    if (files.length === 2) {
-      return `${getFileName(files[0])}, ${getFileName(files[1])}`;
-    }
-
-    return `${getFileName(files[0])} and ${files.length - 1} more`;
+    return "Unknown file";
   };
 
   // Fetch document types
@@ -109,16 +88,14 @@ const DocumentsForm = ({ onNext, onBack, initialData, tenantId }) => {
     e.preventDefault();
     // Validate documents based on docType properties
     const validDocuments = documents.filter((doc) => {
-      if (!doc.doc_type) return false; // Document must have a type
+      if (!doc.doc_type) return false;
       const docType = docTypes.find((type) => type.id === parseInt(doc.doc_type));
-      if (!docType) return false; // Invalid doc_type
-
-      // Check if required fields are filled based on docType properties
+      if (!docType) return false;
       return (
         (!docType.number || doc.number) &&
         (!docType.issue_date || doc.issued_date) &&
         (!docType.expiry_date || doc.expiry_date) &&
-        (!docType.upload_file || doc.upload_file?.length > 0)
+        (!docType.upload_file || doc.upload_file) // Ensure upload_file is present if required
       );
     });
 
@@ -129,11 +106,12 @@ const DocumentsForm = ({ onNext, onBack, initialData, tenantId }) => {
 
     const tempData = {
       documents: validDocuments.map((doc) => ({
+        id: doc.id || null,
         doc_type: parseInt(doc.doc_type) || null,
         number: doc.number || null,
         issued_date: doc.issued_date || null,
         expiry_date: doc.expiry_date || null,
-        upload_file: doc.upload_file || [],
+        upload_file: doc.upload_file || null,
       })),
     };
     console.log("DocumentsForm submitted:", tempData);
@@ -143,11 +121,12 @@ const DocumentsForm = ({ onNext, onBack, initialData, tenantId }) => {
   const handleBack = () => {
     const tempData = {
       documents: documents.map((doc) => ({
+        id: doc.id || null,
         doc_type: parseInt(doc.doc_type) || null,
         number: doc.number || null,
         issued_date: doc.issued_date || null,
         expiry_date: doc.expiry_date || null,
-        upload_file: doc.upload_file || [],
+        upload_file: doc.upload_file || null,
       })),
     };
     console.log("DocumentsForm passing back:", tempData);
@@ -161,7 +140,7 @@ const DocumentsForm = ({ onNext, onBack, initialData, tenantId }) => {
       number: "",
       issued_date: "",
       expiry_date: "",
-      upload_file: [],
+      upload_file: null,
     };
     setDocuments([...documents, newDoc]);
   };
@@ -270,35 +249,14 @@ const DocumentsForm = ({ onNext, onBack, initialData, tenantId }) => {
                               type="file"
                               className="hidden documents-inputs"
                               id={`fileInput-${doc.id}`}
-                              multiple
                               onChange={(e) =>
-                                handleChange(doc.id, "upload_file", Array.from(e.target.files))
+                                handleChange(doc.id, "upload_file", e.target.files[0] || null)
                               }
                             />
                             <label
                               htmlFor={`fileInput-${doc.id}`}
                               className="flex items-center justify-between documents-inputs cursor-pointer w-[161px] !py-2"
-                              title={
-                                doc.upload_file.length > 0
-                                  ? doc.upload_file
-                                      .map((file) => {
-                                        if (file && file.name) return file.name;
-                                        if (typeof file === "string") {
-                                          const parts = file.split("/");
-                                          return parts[parts.length - 1] || file;
-                                        }
-                                        if (file && file.upload_file) {
-                                          const fileName = file.upload_file;
-                                          if (typeof fileName === "string") {
-                                            const parts = fileName.split("/");
-                                            return parts[parts.length - 1] || fileName;
-                                          }
-                                        }
-                                        return "Unknown file";
-                                      })
-                                      .join(", ")
-                                  : ""
-                              }
+                              title={doc.upload_file ? getFileDisplayText(doc.upload_file) : ""}
                             >
                               <span className="text-[#4B465C60] text-sm truncate">
                                 {getFileDisplayText(doc.upload_file)}

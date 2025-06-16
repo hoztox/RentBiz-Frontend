@@ -99,140 +99,163 @@ const ReviewPage = ({ formData, onBack, onNext, buildingId }) => {
     fetchDocTypes();
   }, []);
 
-  const handleNext = async () => {
-    setLoading(true);
-    setError(null);
+  // Fixed handleNext function in ReviewPage component
 
-    // Validate building required fields
-    const requiredFields = [
-      "building_no",
-      "plot_no",
-      "building_name",
-      "company",
-      "status",
-    ];
-    const missingFields = requiredFields.filter((field) => !building[field]);
-    if (missingFields.length > 0) {
-      setError(`Please fill required fields: ${missingFields.join(", ")}`);
-      setLoading(false);
-      return;
-    }
+const handleNext = async () => {
+  setLoading(true);
+  setError(null);
 
-    // Validate documents based on docType properties
-    const invalidDocs = documents.filter((doc) => {
-      if (!doc.doc_type) return true;
-      const docType = docTypes.find((type) => type.id === parseInt(doc.doc_type));
-      if (!docType) return true;
+  // Validate building required fields
+  const requiredFields = [
+    "building_no",
+    "plot_no",
+    "building_name",
+    "company",
+    "status",
+  ];
+  const missingFields = requiredFields.filter((field) => !building[field]);
+  if (missingFields.length > 0) {
+    setError(`Please fill required fields: ${missingFields.join(", ")}`);
+    setLoading(false);
+    return;
+  }
 
-      return (
-        (docType.number && !doc.number) ||
-        (docType.issue_date && !doc.issued_date) ||
-        (docType.expiry_date && !doc.expiry_date) ||
-        (docType.upload_file && !doc.upload_file)
-      );
+  // Validate documents based on docType properties
+  const invalidDocs = documents.filter((doc) => {
+    if (!doc.doc_type) return true;
+    const docType = docTypes.find((type) => type.id === parseInt(doc.doc_type));
+    if (!docType) return true;
+
+    return (
+      (docType.number && !doc.number) ||
+      (docType.issue_date && !doc.issued_date) ||
+      (docType.expiry_date && !doc.expiry_date) ||
+      (docType.upload_file && !doc.upload_file)
+    );
+  });
+
+  if (documents.length > 0 && invalidDocs.length > 0) {
+    setError("Some documents are missing required fields based on their document type.");
+    setLoading(false);
+    return;
+  }
+
+  try {
+    // Helper function to fetch existing file as blob
+    const fetchExistingFileAsBlob = async (fileUrl) => {
+      try {
+        const response = await fetch(fileUrl);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch file: ${response.statusText}`);
+        }
+        const blob = await response.blob();
+        const fileName = fileUrl.split('/').pop() || 'unknown_file';
+        return { blob, name: fileName };
+      } catch (error) {
+        console.error('Error fetching existing file:', error);
+        return { blob: null, name: null };
+      }
+    };
+
+    const convertToBlob = async (fileData) => {
+      if (!fileData) {
+        console.warn("No file data provided");
+        return { blob: null, name: null };
+      }
+      
+      // Handle File/Blob objects (new uploads)
+      if (fileData instanceof File || fileData instanceof Blob) {
+        return { blob: fileData, name: fileData.name || "unknown_file" };
+      }
+      
+      // Handle existing file URLs/paths
+      if (typeof fileData === "string") {
+        // Check if it's a full URL or a relative path
+        const fileUrl = fileData.startsWith('http') ? fileData : `${BASE_URL}${fileData}`;
+        return await fetchExistingFileAsBlob(fileUrl);
+      }
+      
+      console.warn("Invalid file data type:", typeof fileData, fileData);
+      return { blob: null, name: null };
+    };
+
+    const formDataWithFiles = new FormData();
+    
+    // Add building fields
+    Object.entries(building).forEach(([key, value]) => {
+      formDataWithFiles.append(key, value ?? "");
     });
 
-    if (documents.length > 0 && invalidDocs.length > 0) {
-      setError("Some documents are missing required fields based on their document type.");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const getFileNameFromUrl = (url) => {
-        if (!url || typeof url !== "string") return "unknown_file";
-        const parts = url.split("/");
-        return parts[parts.length - 1] || "unknown_file";
-      };
-
-      const convertToBlob = async (fileData) => {
-        if (!fileData) {
-          console.warn("No file data provided");
-          return { blob: null, name: null };
-        }
-        if (fileData instanceof File || fileData instanceof Blob) {
-          return { blob: fileData, name: fileData.name || "unknown_file" };
-        }
-        if (typeof fileData === "string") {
-          return { blob: null, name: getFileNameFromUrl(fileData), url: fileData };
-        }
-        console.warn("Invalid file data type:", typeof fileData, fileData);
-        return { blob: null, name: null };
-      };
-
-      const formDataWithFiles = new FormData();
-      // Add building fields
-      Object.entries(building).forEach(([key, value]) => {
-        formDataWithFiles.append(key, value ?? "");
-      });
-
-      // Add documents data
-      await Promise.all(
-        documents.map(async (doc, index) => {
-          const docType = docTypes.find((type) => type.id === parseInt(doc.doc_type));
-          if (docType) {
-            formDataWithFiles.append(`build_comp[${index}][doc_type]`, doc.doc_type || "");
-            formDataWithFiles.append(`build_comp[${index}][id]`, doc.id || "");
-            if (docType.number) {
-              formDataWithFiles.append(`build_comp[${index}][number]`, doc.number || "");
-            }
-            if (docType.issue_date) {
-              formDataWithFiles.append(`build_comp[${index}][issued_date]`, doc.issued_date || "");
-            }
-            if (docType.expiry_date) {
-              formDataWithFiles.append(`build_comp[${index}][expiry_date]`, doc.expiry_date || "");
-            }
-            if (docType.upload_file && doc.upload_file) {
-              const file = Array.isArray(doc.upload_file) ? doc.upload_file[0] : doc.upload_file;
-              const { blob, name, url } = await convertToBlob(file);
-              if (blob) {
-                formDataWithFiles.append(
-                  `build_comp[${index}][upload_file]`,
-                  blob,
-                  name || `file-${index}`
-                );
-              } else if (url) {
-                formDataWithFiles.append(`build_comp[${index}][existing_file]`, url);
-                formDataWithFiles.append(`build_comp[${index}][file_name]`, name);
-              }
+    // Add documents data
+    await Promise.all(
+      documents.map(async (doc, index) => {
+        const docType = docTypes.find((type) => type.id === parseInt(doc.doc_type));
+        if (docType) {
+          formDataWithFiles.append(`build_comp[${index}][doc_type]`, doc.doc_type || "");
+          formDataWithFiles.append(`build_comp[${index}][id]`, doc.id || "");
+          
+          if (docType.number) {
+            formDataWithFiles.append(`build_comp[${index}][number]`, doc.number || "");
+          }
+          if (docType.issue_date) {
+            formDataWithFiles.append(`build_comp[${index}][issued_date]`, doc.issued_date || "");
+          }
+          if (docType.expiry_date) {
+            formDataWithFiles.append(`build_comp[${index}][expiry_date]`, doc.expiry_date || "");
+          }
+          
+          // Handle file upload - convert existing files to blobs
+          if (docType.upload_file && doc.upload_file) {
+            const file = Array.isArray(doc.upload_file) ? doc.upload_file[0] : doc.upload_file;
+            const { blob, name } = await convertToBlob(file);
+            
+            if (blob) {
+              formDataWithFiles.append(
+                `build_comp[${index}][upload_file]`,
+                blob,
+                name || `file-${index}`
+              );
+            } else {
+              console.warn(`Failed to process file for document ${index}`);
             }
           }
-        })
-      );
-
-      console.log("FormData contents:");
-      for (const [key, value] of formDataWithFiles.entries()) {
-        console.log(`${key}:`, value instanceof File ? `File: ${value.name}` : value);
-      }
-
-      const response = await axios.put(
-        `${BASE_URL}/company/buildings/${buildingId}/`,
-        formDataWithFiles,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "multipart/form-data",
-          },
         }
-      );
+      })
+    );
 
-      console.log("Successfully updated building:", response.data);
-      onNext({
-        formData: {
-          ...formData,
-          documents: response.data.documents || formData.documents,
-        },
-        response: response.data,
-      });
-    } catch (err) {
-      console.error("Error updating building:", err);
-      setError(
-        `Failed to update building: ${err.response?.data?.message || err.message}`
-      );
-    } finally {
-      setLoading(false);
+    console.log("FormData contents:");
+    for (const [key, value] of formDataWithFiles.entries()) {
+      console.log(`${key}:`, value instanceof File || value instanceof Blob ? `File: ${value.name || 'blob'}` : value);
     }
-  };
+
+    const response = await axios.put(
+      `${BASE_URL}/company/buildings/${buildingId}/`,
+      formDataWithFiles,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    console.log("Successfully updated building:", response.data);
+    onNext({
+      formData: {
+        ...formData,
+        documents: response.data.documents || formData.documents,
+      },
+      response: response.data,
+    });
+  } catch (err) {
+    console.error("Error updating building:", err);
+    setError(
+      `Failed to update building: ${err.response?.data?.message || err.message}`
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleBack = () => {
     const backData = {

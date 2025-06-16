@@ -40,7 +40,7 @@ const ConfirmationModal = ({
     confirm: "bg-[#2892CE] text-white hover:bg-[#1f709e]",
     cancel: "bg-[#E44747] text-white hover:bg-[#d12f2f]",
     delete: "bg-[#E44747] text-white hover:bg-[#d12f2f]",
-    close: "bg-[#FF5B5B] text-white hover:bg-[#e04a4a]",
+    close: "bg-[#E44747] text-white hover:bg-[#d12f2f]",
     terminate: "bg-[#E44747] text-white hover:bg-[#d12f2f]",
   };
 

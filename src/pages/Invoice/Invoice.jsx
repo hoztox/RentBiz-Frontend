@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Invoice.css";
 import plusicon from "../../assets/Images/Invoice/plus-icon.svg";
 import downloadicon from "../../assets/Images/Invoice/download-icon.svg";
@@ -9,6 +9,8 @@ import { useModal } from "../../context/ModalContext";
 import CustomDropDown from "../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
 import ConfirmationModal from "../../components/ConfirmationModal/ConfirmationModal";
+import axios from "axios";
+import { BASE_URL } from "../../utils/config";
 
 const Invoice = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,8 +18,11 @@ const Invoice = () => {
   const [expandedRows, setExpandedRows] = useState({});
   const { openModal } = useModal();
   const [selectedOption, setSelectedOption] = useState("showing");
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // State for modal visibility
-  const [itemToDelete, setItemToDelete] = useState(null); // State for item to delete
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const [invoices, setInvoices] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const itemsPerPage = 10;
 
   // Dropdown options for CustomDropDown
@@ -26,34 +31,95 @@ const Invoice = () => {
     { value: "all", label: "All" },
   ];
 
-  const demoData = [
-    {
-      id: "INV2412001",
-      date: "24 Nov 2024",
-      tenancyId: "TC0013-1",
-      tenantName: "Pharmacy",
-      amountDue: "300.00",
-      view: viewicon,
-    },
-    {
-      id: "INV2412002", // Changed ID to avoid duplicates
-      date: "24 Nov 2024",
-      tenancyId: "TC0013-1",
-      tenantName: "Pharmacy",
-      amountDue: "300.00",
-      view: viewicon,
-    },
-    {
-      id: "INV2412003", // Changed ID to avoid duplicates
-      date: "24 Nov 2024",
-      tenancyId: "TC0013-1",
-      tenantName: "Pharmacy",
-      amountDue: "300.00",
-      view: viewicon,
-    },
-  ];
+  const getUserCompanyId = () => {
+    try {
+      const role = localStorage.getItem("role")?.toLowerCase();
+      let companyId = null;
 
-  const filteredData = demoData.filter(
+      if (role === "company") {
+        companyId = localStorage.getItem("company_id");
+      } else if (role === "user" || role === "admin") {
+        companyId = localStorage.getItem("company_id");
+      }
+
+      return companyId ? parseInt(companyId) : null;
+    } catch (e) {
+      console.error("Error getting user company ID:", e);
+      return null;
+    }
+  };
+
+
+  const fetchInvoices = async () => {
+    try {
+      const companyId = getUserCompanyId();
+      if (!companyId) {
+        setError("No company ID found");
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+
+      const response = await axios.get(`${BASE_URL}/company/invoices/company/${companyId}/`);
+      if (response.data && response.data.success) {
+
+        const mappedInvoices = response.data.data.map((invoice) => ({
+          dbId: invoice.id, // Store database ID
+          id: invoice.invoice_number || `INV${new Date().getFullYear()}${Math.floor(Math.random() * 1000)}`,
+          date: invoice.in_date || "",
+          tenancyId: invoice.tenancy?.tenancy_code || "N/A",
+          tenantName: invoice.tenancy?.tenant?.tenant_name || "Unknown",
+          amountDue: invoice.total_amount ? parseFloat(invoice.total_amount).toFixed(2) : "0.00",
+          view: viewicon,
+        }));
+        setInvoices(mappedInvoices);
+        console.log("Fetched invoices:", mappedInvoices);
+      } else {
+        setError(response.data?.message || "Failed to fetch invoices");
+        setInvoices([]);
+      }
+    } catch (error) {
+      console.error("Error fetching invoices:", error);
+      setError(error.response?.data?.message || "Error fetching invoices");
+      setInvoices([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  const handleConfirmDelete = async () => {
+    if (!itemToDelete) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await axios.delete(`${BASE_URL}/company/invoice/delete/${itemToDelete.dbId}/`);
+      if (response.data && response.data.success) {
+        setInvoices((prev) => prev.filter((invoice) => invoice.dbId !== itemToDelete.dbId));
+        alert(`Invoice ${itemToDelete.id} deleted successfully`); // Replace with toast if desired
+        console.log("Deleted invoice:", itemToDelete.dbId);
+      } else {
+        throw new Error(response.data?.message || "Failed to delete invoice");
+      }
+    } catch (error) {
+      console.error("Error deleting invoice:", error);
+      setError(error.response?.data?.message || error.message || "Error deleting invoice");
+    } finally {
+      setLoading(false);
+      setIsDeleteModalOpen(false);
+      setItemToDelete(null);
+    }
+  };
+
+  // Fetch invoices on component mount
+  useEffect(() => {
+    fetchInvoices();
+  }, []);
+
+  const filteredData = invoices.filter(
     (invoice) =>
       invoice.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       invoice.date.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -77,25 +143,15 @@ const Invoice = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    if (itemToDelete) {
-      console.log("Deleting invoice:", itemToDelete); // Replace with actual delete logic
-      // Example: Call an API to delete the invoice
-      // Update demoData or state accordingly
-    }
-    setIsDeleteModalOpen(false);
-    setItemToDelete(null);
-  };
-
   const handleCancelDelete = () => {
     setIsDeleteModalOpen(false);
     setItemToDelete(null);
   };
 
-  const toggleRowExpand = (id) => {
+  const toggleRowExpand = (dbId) => {
     setExpandedRows((prev) => ({
       ...prev,
-      [id]: !prev[id],
+      [dbId]: !prev[dbId],
     }));
   };
 
@@ -117,7 +173,10 @@ const Invoice = () => {
       },
     },
   };
-
+const handleViewClick = (invoice) => {
+  console.log("Selected invoice for view:", invoice);
+  openModal("view-invoice", "View Invoice", invoice);  
+};
   return (
     <div className="border border-[#E9E9E9] rounded-md inv-table">
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] inv-table-header">
@@ -144,7 +203,7 @@ const Invoice = () => {
           <div className="flex gap-[10px] inv-action-buttons-container w-full md:w-auto justify-start">
             <button
               className="flex items-center justify-center gap-2 h-[38px] rounded-md inv-add-invoice duration-200 w-[176px]"
-              onClick={() => openModal("create-invoice")}
+              onClick={() => openModal("create-invoice", "Create New Invoice", { onSuccess: fetchInvoices })}
             >
               Add New Invoice
               <img
@@ -164,152 +223,167 @@ const Invoice = () => {
           </div>
         </div>
       </div>
-      <div className="inv-desktop-only">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b border-[#E9E9E9] h-[57px]">
-              <th className="px-5 text-left inv-thead">ID</th>
-              <th className="px-5 text-left inv-thead">DATE</th>
-              <th className="pl-5 text-left inv-thead">TENANCY ID</th>
-              <th className="pl-5 text-left inv-thead">TENANT NAME</th>
-              <th className="px-5 text-left inv-thead w-[10%]">AMOUNT DUE</th>
-              <th className="pl-12 pr-5 text-center inv-thead">VIEW</th>
-              <th className="px-5 pr-6 text-right inv-thead">ACTION</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedData.map((invoice, index) => (
-              <tr
-                key={index}
-                className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
-              >
-                <td className="px-5 text-left inv-data">{invoice.id}</td>
-                <td className="px-5 text-left inv-data">{invoice.date}</td>
-                <td className="pl-5 text-left inv-data">{invoice.tenancyId}</td>
-                <td className="pl-5 text-left inv-data">{invoice.tenantName}</td>
-                <td className="px-5 text-left inv-data">{invoice.amountDue}</td>
-                <td className="pl-14 text-center pr-5 pt-2">
-                  <button onClick={() => openModal("view-invoice")}>
-                    <img
-                      src={invoice.view}
-                      alt="View"
-                      className="w-[30px] h-[24px] inv-action-btn duration-200"
-                    />
-                  </button>
-                </td>
-                <td className="px-5 flex items-center justify-end h-[57px]">
-                  <button onClick={() => handleDeleteClick(invoice)}>
-                    <img
-                      src={deleteicon}
-                      alt="Delete"
-                      className="w-[18px] h-[18px] inv-action-btn duration-200 mr-[24px]"
-                    />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="block md:hidden">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="inv-table-row-head">
-              <th className="px-5 text-left inv-thead inv-id-column">ID</th>
-              <th className="px-5 text-left inv-thead inv-date-column">TENANT NAME</th>
-              <th className="px-5 text-right inv-thead"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedData.map((invoice, index) => (
-              <React.Fragment key={index}>
-                <tr
-                  className={`${
-                    expandedRows[invoice.id + index]
-                      ? "inv-mobile-no-border"
-                      : "inv-mobile-with-border"
-                  } border-b border-[#E9E9E9] h-[57px]`}
-                >
-                  <td className="px-5 text-left inv-data inv-id-column">{invoice.id}</td>
-                  <td className="px-5 text-left inv-data inv-date-column">{invoice.tenantName}</td>
-                  <td className="py-4 flex items-center justify-end h-[57px]">
-                    <div
-                      className={`inv-dropdown-field ${
-                        expandedRows[invoice.id + index] ? "active" : ""
-                      }`}
-                      onClick={() => toggleRowExpand(invoice.id + index)}
-                    >
-                      <img
-                        src={downarrow}
-                        alt="drop-down-arrow"
-                        className={`inv-dropdown-img ${
-                          expandedRows[invoice.id + index] ? "text-white" : ""
-                        }`}
-                      />
-                    </div>
-                  </td>
+
+      {loading && (
+        <div className="text-center py-4">
+          <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+          <span className="ml-2">Loading...</span>
+        </div>
+      )}
+
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
+
+      {!loading && !error && (
+        <>
+          <div className="inv-desktop-only">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b border-[#E9E9E9] h-[57px]">
+                  <th className="px-5 text-left inv-thead">ID</th>
+                  <th className="px-5 text-left inv-thead">DATE</th>
+                  <th className="pl-5 text-left inv-thead">TENANCY ID</th>
+                  <th className="pl-5 text-left inv-thead">TENANT NAME</th>
+                  <th className="px-5 text-left inv-thead w-[10%]">AMOUNT DUE</th>
+                  <th className="pl-12 pr-5 text-center inv-thead">VIEW</th>
+                  <th className="px-5 pr-6 text-right inv-thead">ACTION</th>
                 </tr>
-                <AnimatePresence>
-                  {expandedRows[invoice.id + index] && (
-                    <motion.tr
-                      className="inv-mobile-with-border border-b border-[#E9E9E9]"
-                      initial="hidden"
-                      animate="visible"
-                      exit="hidden"
-                      variants={dropdownVariants}
+              </thead>
+              <tbody>
+                {paginatedData.map((invoice) => (
+                  <tr
+                    key={invoice.dbId}
+                    className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
+                  >
+                    <td className="px-5 text-left inv-data">{invoice.id}</td>
+                    <td className="px-5 text-left inv-data">{invoice.date}</td>
+                    <td className="pl-5 text-left inv-data">{invoice.tenancyId}</td>
+                    <td className="pl-5 text-left inv-data">{invoice.tenantName}</td>
+                    <td className="px-5 text-left inv-data">{invoice.amountDue}</td>
+                    <td className="pl-14 text-center pr-5 pt-2">
+                      <button onClick={() => handleViewClick(invoice)}>
+                        <img
+                          src={invoice.view}
+                          alt="View"
+                          className="w-[30px] h-[24px] inv-action-btn duration-200"
+                        />
+                      </button>
+                    </td>
+                    <td className="px-5 flex items-center justify-end h-[57px]">
+                      <button onClick={() => handleDeleteClick(invoice)}>
+                        <img
+                          src={deleteicon}
+                          alt="Delete"
+                          className="w-[18px] h-[18px] inv-action-btn duration-200 mr-[24px]"
+                        />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="block md:hidden">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="inv-table-row-head">
+                  <th className="px-5 text-left inv-thead inv-id-column">ID</th>
+                  <th className="px-5 text-left inv-thead inv-date-column">TENANT NAME</th>
+                  <th className="px-5 text-right inv-thead"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedData.map((invoice) => (
+                  <React.Fragment key={invoice.dbId}>
+                    <tr
+                      className={`${expandedRows[invoice.dbId]
+                        ? "inv-mobile-no-border"
+                        : "inv-mobile-with-border"
+                        } border-b border-[#E9E9E9] h-[57px]`}
                     >
-                      <td colSpan={3} className="px-5">
-                        <div className="inv-dropdown-content">
-                          <div className="inv-dropdown-content-grid">
-                            <div className="inv-dropdown-content-item w-[50%]">
-                              <div className="inv-dropdown-label">TENANCY ID</div>
-                              <div className="inv-dropdown-value">{invoice.tenancyId}</div>
-                            </div>
-                            <div className="inv-dropdown-content-item w-[50%]">
-                              <div className="inv-dropdown-label">DATE</div>
-                              <div className="inv-dropdown-value">{invoice.date}</div>
-                            </div>
-                          </div>
-                          <div className="inv-dropdown-content-grid">
-                            <div className="inv-dropdown-content-item w-[50%]">
-                              <div className="inv-dropdown-label">AMOUNT DUE</div>
-                              <div className="inv-dropdown-value">{invoice.amountDue}</div>
-                            </div>
-                            <div className="inv-dropdown-content-item w-[25%]">
-                              <div className="inv-dropdown-label">VIEW</div>
-                              <div className="inv-dropdown-value">
-                                <button onClick={() => openModal("view-invoice")}>
-                                  <img
-                                    src={invoice.view}
-                                    alt="View"
-                                    className="w-[30px] h-[24px] inv-action-btn duration-200"
-                                  />
-                                </button>
-                              </div>
-                            </div>
-                            <div className="inv-dropdown-content-item w-[25%]">
-                              <div className="inv-dropdown-label">ACTION</div>
-                              <div className="inv-dropdown-value flex items-center gap-4">
-                                <button onClick={() => handleDeleteClick(invoice)}>
-                                  <img
-                                    src={deleteicon}
-                                    alt="Delete"
-                                    className="w-[18px] h-[18px] inv-action-btn duration-200"
-                                  />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
+                      <td className="px-5 text-left inv-data inv-id-column">{invoice.id}</td>
+                      <td className="px-5 text-left inv-data inv-date-column">{invoice.tenantName}</td>
+                      <td className="py-4 flex items-center justify-end h-[57px]">
+                        <div
+                          className={`inv-dropdown-field ${expandedRows[invoice.dbId] ? "active" : ""
+                            }`}
+                          onClick={() => toggleRowExpand(invoice.dbId)}
+                        >
+                          <img
+                            src={downarrow}
+                            alt="drop-down-arrow"
+                            className={`inv-dropdown-img ${expandedRows[invoice.dbId] ? "text-white" : ""
+                              }`}
+                          />
                         </div>
                       </td>
-                    </motion.tr>
-                  )}
-                </AnimatePresence>
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                    </tr>
+                    <AnimatePresence>
+                      {expandedRows[invoice.dbId] && (
+                        <motion.tr
+                          className="inv-mobile-with-border border-b border-[#E9E9E9]"
+                          initial="hidden"
+                          animate="visible"
+                          exit="hidden"
+                          variants={dropdownVariants}
+                        >
+                          <td colSpan={3} className="px-5">
+                            <div className="inv-dropdown-content">
+                              <div className="inv-dropdown-content-grid">
+                                <div className="inv-dropdown-content-item w-[50%]">
+                                  <div className="inv-dropdown-label">TENANCY ID</div>
+                                  <div className="inv-dropdown-value">{invoice.tenancyId}</div>
+                                </div>
+                                <div className="inv-dropdown-content-item w-[50%]">
+                                  <div className="inv-dropdown-label">DATE</div>
+                                  <div className="inv-dropdown-value">{invoice.date}</div>
+                                </div>
+                              </div>
+                              <div className="inv-dropdown-content-grid">
+                                <div className="inv-dropdown-content-item w-[50%]">
+                                  <div className="inv-dropdown-label">AMOUNT DUE</div>
+                                  <div className="inv-dropdown-value">{invoice.amountDue}</div>
+                                </div>
+                                <div className="inv-dropdown-content-item w-[25%]">
+                                  <div className="inv-dropdown-label">VIEW</div>
+                                  <div className="inv-dropdown-value">
+                                    <button onClick={() => handleViewClick(invoice)}>
+                                      <img
+                                        src={viewicon}
+                                        alt="View"
+                                        className="w-[30px] h-[24px] tenancy-action-btn duration-200"
+                                      />
+                                    </button>
+                                  </div>
+                                </div>
+                                <div className="inv-dropdown-content-item w-[25%]">
+                                  <div className="inv-dropdown-label">ACTION</div>
+                                  <div className="inv-dropdown-value flex items-center gap-4">
+                                    <button onClick={() => handleDeleteClick(invoice)}>
+                                      <img
+                                        src={deleteicon}
+                                        alt="Delete"
+                                        className="w-[18px] h-[18px] inv-action-btn duration-200"
+                                      />
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </motion.tr>
+                      )}
+                    </AnimatePresence>
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
 
       {/* Pagination Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
@@ -339,11 +413,10 @@ const Invoice = () => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
-                currentPage === startPage + i
-                  ? "bg-[#1458A2] text-white"
-                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-              }`}
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${currentPage === startPage + i
+                ? "bg-[#1458A2] text-white"
+                : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+                }`}
               onClick={() => setCurrentPage(startPage + i)}
             >
               {startPage + i}

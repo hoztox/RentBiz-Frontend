@@ -1,24 +1,23 @@
-.edit-modal-container {
+.modal-container {
   width: 100%;
-  max-width: 100vw; /* Ensure modal doesn't exceed viewport width */
+  max-width: 100vw;
   height: 100vh;
   border-radius: 0;
-  background-color: #F8F9FA; /* Single background for mobile */
-  box-sizing: border-box; /* Include padding/borders in width */
+  box-sizing: border-box;
 }
 
 @media (min-width: 768px) {
-  .edit-modal-container {
+  .modal-container {
     width: 830px;
-    max-width: 830px; /* Fixed width for desktop */
-    height: 464px;
+    max-width: 830px;
+    height: 530px;
     border-radius: 6px;
-    background-color: #ffffff; /* White background for desktop */
+    background-color: #ffffff;
   }
 }
 
 @media (max-width: 480px) {
-  .edit-modal-container {
+  .modal-container {
     position: absolute;
     top: 90px;
     left: 0;
@@ -26,7 +25,8 @@
     width: 100vw;
     margin: 0;
     height: 100vh;
-    background-color: #ffffff;
+    max-height: calc(100vh - 90px);
+    overflow-y: auto;
     padding: 10px;
     z-index: 100;
   }
@@ -38,7 +38,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+  background-color: rgba(0, 0, 0, 0.3) !important;
 }
 
 @media (max-width: 480px) {
@@ -129,9 +130,9 @@
   color: #201d1e;
 }
 
-@media (max-width: 480px) {
+@media(max-width: 480px) {
   .drop-down-icon {
-    top: 38px;
+    top: 31px;
     right: 15px;
   }
 }
@@ -165,7 +166,7 @@
   vertical-align: middle;
 }
 
-.edit-user-button {
+.create-user-button {
   width: 100%;
   height: 38px;
   border-radius: 6px;
@@ -182,14 +183,30 @@
 }
 
 @media (min-width: 768px) {
-  .edit-user-button {
-    width: 375px;
+  .create-user-button {
+    width: 385px;
   }
 }
 
 @media (max-width: 480px) {
-  .edit-user-button {
-    max-width: calc(100vw - 35px);
+  .create-user-button {
+    width: 100%;
+    max-width: none
+  }
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+@media (max-width: 480px) {
+  .button-container {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
   }
 }
 
@@ -198,7 +215,6 @@
   height: 38px;
   border-radius: 6px;
   border: 1px solid #1458A2;
-  margin-top: 30px;
   font-family: 'Inter Tight';
   font-size: 15px;
   font-weight: 400;
@@ -209,16 +225,25 @@
 
 @media (min-width: 768px) {
   .reset-button {
-    width: 375px;
+    width: 385px;
   }
 }
 
 @media (max-width: 480px) {
   .reset-button {
-    max-width: calc(100vw - 35px);
+        width: 100%;
+    max-width: none;
   }
-
-  .close-button{
+  .close-button {
     display: none;
   }
+}
+
+/* Error state for inputs */
+.input-style.border-red-500 {
+  border-color: #dc2626 !important;
+}
+
+.input-style.focus\:border-red-500:focus {
+  border-color: #dc2626 !important;
 }

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import "./EditUserModal.css";
 import closeicon from "../../../assets/Images/Admin Users Management/close-icon.svg";
@@ -12,36 +12,121 @@ import { BASE_URL } from "../../../utils/config";
 const EditUserModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
   const [isSelectOpen, setIsSelectOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [profileImage, setProfileImage] = useState(null); // For new uploads
-  const [imagePreview, setImagePreview] = useState(
-    modalState.data?.profile_image
-      ? modalState.data.profile_image.startsWith("http")
-        ? modalState.data.profile_image
-        : `${BASE_URL}${modalState.data.profile_image}`
-      : null
-  ); // Initialize with existing image, handle relative URLs
+  const [isLoading, setIsLoading] = useState(false);
+  const [profileImage, setProfileImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
-  // Initialize form with user data
-  const userData = modalState.data || {};
+  // Initialize form with empty defaults
   const [formData, setFormData] = useState({
-    name: userData.name || "",
-    email: userData.username || "",
-    role: userData.user_role || "",
+    name: "",
+    username: "",
+    email: "",
+    user_role: "",
   });
 
-  // Debug modalState.data
-  console.log("modalState.data:", modalState.data);
+  const [fieldErrors, setFieldErrors] = useState({
+    name: "",
+    username: "",
+    email: "",
+    user_role: "",
+  });
+
+  // Debug modalState
+  console.log("modalState:", modalState);
+
+  // Update form data and image preview when modalState.data or modalState.isOpen changes
+  useEffect(() => {
+    console.log("modalState.data in useEffect:", modalState.data);
+    if (modalState.isOpen && modalState.data) {
+      const userData = modalState.data;
+      if (!userData.email) {
+        console.warn("Warning: modalState.data.email is missing:", userData); // Debug log
+      }
+      setFormData({
+        name: userData.name || "",
+        username: userData.username || "",
+        email: userData.email || "", // Use email if available, else empty string
+        user_role: userData.user_role || "",
+      });
+      console.log("Setting formData:", {
+        name: userData.name || "",
+        username: userData.username || "",
+        email: userData.email || "",
+        user_role: userData.user_role || "",
+      });
+      setImagePreview(
+        userData.company_logo || userData.profile_image
+          ? (userData.company_logo || userData.profile_image).startsWith("http")
+            ? userData.company_logo || userData.profile_image
+            : `${BASE_URL}${userData.company_logo || userData.profile_image}`
+          : null
+      );
+    }
+  }, [modalState.data, modalState.isOpen]);
+
+  // Log formData changes
+  useEffect(() => {
+    console.log("Current formData:", formData);
+  }, [formData]);
 
   // Only render for "user-update" type
-  if (!modalState.isOpen || modalState.type !== "user-update") return null;
+  if (!modalState.isOpen || modalState.type !== "user-update") {
+    console.log("Modal not rendering:", { isOpen: modalState.isOpen, type: modalState.type });
+    return null;
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const processedValue = name === "username" ? value.toLowerCase() : value;
+    setFormData((prev) => ({ ...prev, [name]: processedValue }));
+
+    // Real-time username validation
+    if (name === "username" && value.trim()) {
+      if (/\s/.test(value)) {
+        setFieldErrors((prev) => ({
+          ...prev,
+          username: "Username cannot contain spaces",
+        }));
+      } else if (!/^(?=.*[a-z])[a-z0-9._-]*$/.test(value.toLowerCase())) {
+        setFieldErrors((prev) => ({
+          ...prev,
+          username:
+            "Username must contain at least one letter and only letters, numbers, underscores, hyphens, or dots",
+        }));
+      } else {
+        setFieldErrors((prev) => ({ ...prev, username: "" }));
+      }
+    } else if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const handleEmailBlur = () => {
+    if (formData.email.trim()) {
+      const emailRegex =
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|mil|biz|info|io|co|us|ca|uk|au|de|fr|jp|cn|in)$/;
+      if (!emailRegex.test(formData.email)) {
+        setFieldErrors((prev) => ({
+          ...prev,
+          email:
+            "Please enter a valid email address with a recognized domain (e.g., user@domain.com)",
+        }));
+      } else if (formData.email.length > 254) {
+        setFieldErrors((prev) => ({
+          ...prev,
+          email: "Email address is too long (max 254 characters)",
+        }));
+      } else if (/\.\./.test(formData.email)) {
+        setFieldErrors((prev) => ({
+          ...prev,
+          email: "Email cannot contain consecutive dots",
+        }));
+      } else {
+        setFieldErrors((prev) => ({ ...prev, email: "" }));
+      }
+    }
   };
 
   const handleImageClick = () => {
@@ -51,22 +136,16 @@ const EditUserModal = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith("image/")) {
         toast.error("Please select a valid image file");
         return;
       }
-
-      // Validate file size (e.g., max 5MB)
-      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      const maxSize = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSize) {
         toast.error("File size should be less than 5MB");
         return;
       }
-
       setProfileImage(file);
-
-      // Create preview URL
       const reader = new FileReader();
       reader.onload = (event) => {
         setImagePreview(event.target.result);
@@ -75,28 +154,86 @@ const EditUserModal = () => {
     }
   };
 
+  const validateFields = () => {
+    const errors = {};
+    let isValid = true;
+
+    // Name validation
+    if (!formData.name.trim()) {
+      errors.name = "Name is required";
+      isValid = false;
+    }
+
+    // Username validation
+    if (!formData.username.trim()) {
+      errors.username = "Username is required";
+      isValid = false;
+    } else if (/\s/.test(formData.username)) {
+      errors.username = "Username cannot contain spaces";
+      isValid = false;
+    } else if (!/^(?=.*[a-z])[a-z0-9._-]*$/.test(formData.username)) {
+      errors.username =
+        "Username must contain at least one letter and only letters, numbers, underscores, hyphens, or dots";
+      isValid = false;
+    }
+
+    // Email validation
+    if (!formData.email.trim()) {
+      errors.email = "Email is required";
+      isValid = false;
+    } else {
+      const emailRegex =
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|mil|biz|info|io|co|us|ca|uk|au|de|fr|jp|cn|in)$/;
+      if (!emailRegex.test(formData.email)) {
+        errors.email =
+          "Please enter a valid email address with a recognized domain (e.g., user@domain.com)";
+        isValid = false;
+      } else if (formData.email.length > 254) {
+        errors.email = "Email address is too long (max 254 characters)";
+        isValid = false;
+      } else if (/\.\./.test(formData.email)) {
+        errors.email = "Email cannot contain consecutive dots";
+        isValid = false;
+      }
+    }
+
+    // Role validation
+    if (!formData.user_role) {
+      errors.user_role = "Role is required";
+      isValid = false;
+    }
+
+    setFieldErrors(errors);
+    return isValid;
+  };
+
   const handleSubmit = async () => {
-    if (!formData.name || !formData.email || !formData.role) {
-      setError("Please fill all required fields");
-      toast.error("Please fill all required fields");
+    if (!validateFields()) {
+      if (fieldErrors.username) {
+        toast.error(fieldErrors.username);
+      } else if (fieldErrors.email) {
+        toast.error(fieldErrors.email);
+      } else if (fieldErrors.user_role) {
+        toast.error(fieldErrors.user_role);
+      }
       return;
     }
 
-    setLoading(true);
-    setError(null);
+    setIsLoading(true);
+    const toastId = toast.loading("Updating user...");
 
     try {
-      // Create FormData for file upload
       const formDataToSend = new FormData();
       formDataToSend.append("name", formData.name);
-      formDataToSend.append("username", formData.email); // Mapping email to username
-      formDataToSend.append("user_role", formData.role); // Mapping role to user_role
+      formDataToSend.append("username", formData.username);
+      formDataToSend.append("email", formData.email);
+      formDataToSend.append("user_role", formData.user_role);
       if (profileImage) {
-        formDataToSend.append("company_logo", profileImage); // Backend expects 'company_logo'
+        formDataToSend.append("company_logo", profileImage);
       }
 
       const response = await axios.put(
-        `${BASE_URL}/company/users/${userData.id}/`,
+        `${BASE_URL}/company/users/${modalState.data.id}/`,
         formDataToSend,
         {
           headers: {
@@ -106,27 +243,71 @@ const EditUserModal = () => {
       );
 
       if (response.status === 200) {
-        toast.success("User updated successfully");
-        triggerRefresh(); // Trigger the refresh
+        toast.success("User updated successfully!", { id: toastId });
+        triggerRefresh();
         closeModal();
         navigate("/admin/users-manage");
       } else {
         throw new Error("Unexpected response from server");
       }
-    } catch (err) {
-      console.error("Error updating user:", err);
-      const errorMessage =
-        err.response?.data?.message || "Failed to update user. Please try again.";
-      setError(errorMessage);
-      toast.error(errorMessage);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      let errorMessage = "An error occurred while updating the user.";
+      if (error.response) {
+        const errorData = error.response.data;
+        if (error.response.status === 400) {
+          if (errorData.username) {
+            setFieldErrors((prev) => ({
+              ...prev,
+              username:
+                errorData.username[0] || "This username is already taken.",
+            }));
+            errorMessage = "This username is already taken.";
+          } else if (errorData.email) {
+            setFieldErrors((prev) => ({
+              ...prev,
+              email: errorData.email[0] || "This email is already in use.",
+            }));
+            errorMessage = "This email is already in use.";
+          } else {
+            errorMessage =
+              errorData.message ||
+              errorData.error ||
+              `Error: ${error.response.status}`;
+          }
+        } else {
+          errorMessage =
+            errorData.message ||
+            errorData.error ||
+            `Error: ${error.response.status}`;
+        }
+        toast.error(errorMessage, { id: toastId });
+      } else if (error.request) {
+        toast.error(
+          "Network error. Please check your connection and try again.",
+          {
+            id: toastId,
+          }
+        );
+      } else {
+        toast.error("An unexpected error occurred. Please try again.", {
+          id: toastId,
+        });
+      }
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
+  const handleChangePassword = () => {
+    toast("Change Password functionality is not implemented yet.", {
+      icon: "ℹ️",
+    });
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 modal-overlay">
-      <div className="edit-modal-container relative bg-white rounded-[6px] overflow-hidden shadow-lg w-full max-w-[830px] h-auto md:h-[464px] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
+      <div className="modal-container relative bg-white rounded-[6px] overflow-hidden shadow-lg w-full max-w-[830px] h-auto flex flex-col">
         {/* Header */}
         <div className="h-[100px] md:h-[133px] md:bg-[#F8F9FA] rounded-t-[6px] flex justify-between items-start px-4 md:px-6 pt-6">
           <h2 className="absolute top-[30px] md:top-[40px] left-4 md:left-[30px] heading-text">
@@ -136,16 +317,15 @@ const EditUserModal = () => {
             className="close-button hover:bg-gray-200 duration-200"
             onClick={closeModal}
             aria-label="Close modal"
-            disabled={loading}
+            disabled={isLoading}
           >
-            <img src={closeicon} alt="Close" className="w-4 h-4" />
+            <img src={closeicon} alt="Close" />
           </button>
         </div>
 
         {/* Profile Image Section */}
         <div className="absolute top-[50px] md:top-[71px] left-1/2 transform -translate-x-1/2 flex justify-center">
-          <div className="relative top-[-30px] w-[100px] md:w-[123px] h-[100px] md:h-[123px] bg-gray-100 rounded-full border overflow-hidden">
-            {/* Display uploaded or existing image preview */}
+          <div className="relative md:top-[-30px] w-[100px] md:w-[123px] h-[100px] md:h-[123px] bg-[#F3F3F3] rounded-full border overflow-hidden">
             {imagePreview && (
               <img
                 src={imagePreview}
@@ -175,11 +355,11 @@ const EditUserModal = () => {
         </div>
 
         {/* Form */}
-        <div className="px-4 md:px-6 pt-4 md:pt-6 grid grid-cols-1 md:grid-cols-2 gap-x-3 gap-y-4 md:gap-y-5 mt-[60px] md:mt-[68px]">
+        <div className="px-4 md:px-6 pt-4 md:pt-[15px] grid grid-cols-1 md:grid-cols-2 gap-x-3 gap-y-4 md:gap-y-5 mt-[40px] md:mt-[30px] overflow-y-auto flex-1">
           {/* Name */}
-          <div>
+          <div className="mt-[50px]">
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
-              Name
+              Name *
             </label>
             <input
               type="text"
@@ -187,95 +367,134 @@ const EditUserModal = () => {
               value={formData.name}
               onChange={handleInputChange}
               placeholder="Enter Name"
-              className="input-style focus:border-gray-700"
-              disabled={loading}
+              className={`input-style ${
+                fieldErrors.name
+                  ? "border-red-500 focus:border-red-500"
+                  : "focus:border-gray-700"
+              }`}
+              disabled={isLoading}
+              required
             />
+            {fieldErrors.name && (
+              <p className="text-red-600 text-xs mt-1">{fieldErrors.name}</p>
+            )}
+          </div>
+
+          {/* Username */}
+          <div className="md:mt-[50px]">
+            <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
+              Username *
+            </label>
+            <input
+              type="text"
+              name="username"
+              value={formData.username}
+              onChange={handleInputChange}
+              placeholder="Enter Username"
+              className={`input-style ${
+                fieldErrors.username
+                  ? "border-red-500 focus:border-red-500"
+                  : "focus:border-gray-700"
+              }`}
+              disabled={isLoading}
+              required
+            />
+            {fieldErrors.username && (
+              <p className="text-red-600 text-xs mt-1">{fieldErrors.username}</p>
+            )}
           </div>
 
           {/* Email */}
           <div>
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
-              Email
+              Email *
             </label>
             <input
+              // key={formData.email} // Force re-render when email changes
               type="email"
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              placeholder="Enter Your Email"
-              className="input-style focus:border-gray-700"
-              disabled={loading}
+              onBlur={handleEmailBlur}
+              onFocus={() => console.log("Email input value:", formData.email)} // Debug log
+              placeholder="Enter Email"
+              className={`input-style ${
+                fieldErrors.email
+                  ? "border-red-500 focus:border-red-500"
+                  : "focus:border-gray-700"
+              }`}
+              disabled={isLoading}
+              required
+              aria-describedby="email-error"
             />
+            {fieldErrors.email && (
+              <p id="email-error" className="text-red-600 text-xs mt-1">
+                {fieldErrors.email}
+              </p>
+            )}
           </div>
 
           {/* Role */}
           <div className="relative">
-            <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px]">
-              Role*
+            <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
+              Role *
             </label>
             <select
-              name="role"
-              value={formData.role}
+              name="user_role"
+              value={formData.user_role}
               onChange={handleInputChange}
-              className="input-style select custom-select focus:border-gray-700"
+              className={`input-style select custom-select ${
+                fieldErrors.user_role
+                  ? "border-red-500 focus:border-red-500"
+                  : "focus:border-gray-700"
+              }`}
               onFocus={() => setIsSelectOpen(true)}
               onBlur={() => setIsSelectOpen(false)}
-              disabled={loading}
+              disabled={isLoading}
             >
-              <option
-                value=""
-                disabled
-                style={{
-                  color: "#CFCFCF",
-                  fontSize: "15px",
-                  fontWeight: "400",
-                  fontFamily: "Inter Tight",
-                }}
-              >
-                Choose
-              </option>
+              <option value="">Select Role</option>
               <option value="Admin">Admin</option>
               <option value="Sales">Sales</option>
               <option value="Store">Store</option>
             </select>
             <ChevronDown
-              className={`absolute right-[20px] md:right-[25px] top-[36px] md:top-[40px] text-gray-400 pointer-events-none transition-transform duration-300 drop-down-icon ${
+              className={`absolute right-[20px] md:right-[15px] top-[36px] md:top-[33px] text-gray-400 pointer-events-none transition-transform duration-300 drop-down-icon ${
                 isSelectOpen ? "rotate-180" : "rotate-0"
               }`}
               width={20}
               height={20}
               color="#201D1E"
             />
-          </div>
-
-          {/* Change Password Button */}
-          <div>
-            <button
-              className="reset-button hover:bg-[#1458A2] hover:text-white duration-200"
-              disabled={loading}
-            >
-              Change Password
-            </button>
+            {fieldErrors.user_role && (
+              <p className="text-red-600 text-xs mt-1">{fieldErrors.user_role}</p>
+            )}
           </div>
         </div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="px-4 md:px-6 mt-4 text-red-500 text-sm">
-            {error}
-          </div>
-        )}
-
-        {/* Edit User Button */}
-        <div className="px-4 md:px-6 mt-6 md:mt-8 md:mr-[8px] mb-6 md:mb-6 flex justify-end">
+        {/* Button Row - Change Password and Edit User aligned */}
+         <div className="px-4 md:px-6 mt-6 mb-10 button-container">
           <button
-            className={`bg-[#2892CE] hover:bg-[#076094] duration-200 edit-user-button ${
-              loading ? "opacity-50 cursor-not-allowed" : ""
+            className={`reset-button duration-200 ${
+              isLoading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "hover:bg-[#1458A2] hover:text-white"
+            }`}
+            onClick={handleChangePassword}
+            disabled={isLoading}
+          >
+            Change Password
+          </button>
+          
+          <button
+            className={`create-user-button duration-200 ${
+              isLoading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-[#2892CE] hover:bg-[#076094]"
             }`}
             onClick={handleSubmit}
-            disabled={loading}
+            disabled={isLoading}
           >
-            {loading ? "Updating..." : "Edit User"}
+            {isLoading ? "Updating..." : "Edit User"}
           </button>
         </div>
       </div>

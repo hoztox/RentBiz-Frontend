@@ -9,12 +9,11 @@ import "./AdminUsers.css";
 import downarrow from "../../assets/Images/Admin Users Management/downarrow.svg";
 import { useModal } from "../../context/ModalContext";
 import { BASE_URL } from "../../utils/config";
-import UserDeleteModal from "./UserDeleteModal/UserDeleteModal";
+import ConfirmationModal from "../../components/ConfirmationModal/ConfirmationModal";
 import CustomDropDown from "../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
 
 const AdminUsers = () => {
-  const [selectedOption, setSelectedOption] = useState("showing");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -29,13 +28,12 @@ const AdminUsers = () => {
   const itemsPerPage = 10;
   const filteredData = users;
 
- // Dropdown options for status filter
+  // Dropdown options for status filter
   const statusFilterOptions = [
     { label: "All", value: "" },
     { label: "Active", value: "active" },
     { label: "Blocked", value: "blocked" },
   ];
-
 
   const getUserCompanyId = () => {
     const storedCompanyId = localStorage.getItem("company_id");
@@ -58,8 +56,8 @@ const AdminUsers = () => {
   const companyId = getUserCompanyId();
 
   useEffect(() => {
-      setCurrentPage(1);
-    }, [searchTerm, selectedStatus]);
+    setCurrentPage(1);
+  }, [searchTerm, selectedStatus]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -72,13 +70,20 @@ const AdminUsers = () => {
       setError(null);
       try {
         const response = await axios.get(
-          `${BASE_URL}/company/users/company/${companyId}/`,{
-        params:  { search: searchTerm, status:selectedStatus,page:currentPage,pageSize:itemsPerPage } 
-      });
-      const userData = response.data.results || [];
-      console.log(response.data)
-      setUsers(userData);
-      setTotalCount(response.data.count); 
+          `${BASE_URL}/company/users/company/${companyId}/`,
+          {
+            params: {
+              search: searchTerm,
+              status: selectedStatus,
+              page: currentPage,
+              pageSize: itemsPerPage,
+            },
+          }
+        );
+        const userData = response.data.results || [];
+        console.log(response.data);
+        setUsers(userData);
+        setTotalCount(response.data.count);
       } catch (error) {
         console.error("Error fetching users:", error);
         // setError("Failed to load users. Please try again later.");
@@ -87,7 +92,14 @@ const AdminUsers = () => {
       }
     };
     fetchUsers();
-  }, [companyId, refreshCounter,currentPage,itemsPerPage,searchTerm,selectedStatus]);
+  }, [
+    companyId,
+    refreshCounter,
+    currentPage,
+    itemsPerPage,
+    searchTerm,
+    selectedStatus,
+  ]);
 
   const handleEditUser = (user) => {
     console.log("User data passed to modal:", user);
@@ -95,6 +107,7 @@ const AdminUsers = () => {
       id: user.id,
       name: user.name,
       username: user.username,
+      email: user.email,
       user_role: user.user_role,
       profile_image: user.company_logo || null,
     });
@@ -207,10 +220,8 @@ const AdminUsers = () => {
   const isBlocked = (id) =>
     users.find((u) => u.id === id)?.status === "blocked";
 
-
-  const totalPages = Math.ceil(totalCount/ itemsPerPage)
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
   const paginatedData = users;
-   
 
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
@@ -226,10 +237,6 @@ const AdminUsers = () => {
       </div>
     );
   };
-
-  // if (loading) {
-  //   return <div className="p-5">Loading users...</div>;
-  // }
 
   if (error) {
     return <div className="p-5 text-red-500">{error}</div>;
@@ -249,14 +256,15 @@ const AdminUsers = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 user-search"
             />
+            <div className="relative w-[40%] md:w-auto">
             <CustomDropDown
-               options={statusFilterOptions}
-                value={selectedStatus}
-                onChange={setSelectedStatus}
-                placeholder="Select Status"
-                dropdownClassName="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 bldg-selection"
-              
+              options={statusFilterOptions}
+              value={selectedStatus}
+              onChange={setSelectedStatus}
+              placeholder="Select Status"
+              dropdownClassName="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 user-selection"
             />
+            </div>
           </div>
           <div className="flex gap-[10px] user-action-buttons-container w-full md:w-auto justify-start">
             <button
@@ -528,10 +536,9 @@ const AdminUsers = () => {
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
         <span className="pagination collection-list-pagination">
-          Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, totalCount)}{" "}
-          to {Math.min(currentPage * itemsPerPage, totalCount)} of{" "}
-          {totalCount} entries
+          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, totalCount)}{" "}
+          to {Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount}{" "}
+          entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
           <button
@@ -583,11 +590,15 @@ const AdminUsers = () => {
           </button>
         </div>
       </div>
-
-      <UserDeleteModal
+      <ConfirmationModal
         isOpen={isDeleteModalOpen}
+        type="delete"
+        title="Delete User"
+        message="Are you sure you want to delete this user?"
+        confirmButtonText="Delete"
+        cancelButtonText="Cancel"
+        onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
-        onDelete={handleConfirmDelete}
       />
     </div>
   );
