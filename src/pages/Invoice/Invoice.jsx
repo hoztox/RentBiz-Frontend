@@ -17,18 +17,20 @@ const Invoice = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
   const { openModal } = useModal();
-  const [selectedOption, setSelectedOption] = useState("showing");
+  const [selectedOption, setSelectedOption] = useState("all");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
 
   // Dropdown options for CustomDropDown
   const dropdownOptions = [
-    { value: "showing", label: "Showing" },
     { value: "all", label: "All" },
+    { value: "paid", label: "Paid" },
+    { value: "unpaid", label: "Unpaid" },
   ];
 
   const getUserCompanyId = () => {
@@ -49,7 +51,6 @@ const Invoice = () => {
     }
   };
 
-
   const fetchInvoices = async () => {
     try {
       const companyId = getUserCompanyId();
@@ -61,19 +62,28 @@ const Invoice = () => {
       setLoading(true);
       setError(null);
 
-      const response = await axios.get(`${BASE_URL}/company/invoices/company/${companyId}/`);
-      if (response.data && response.data.success) {
+      const params = {
+        search: searchTerm,
+        status: selectedOption === "all" ? "" : selectedOption,
+        page: currentPage,
+        page_size: itemsPerPage,
+      };
 
-        const mappedInvoices = response.data.data.map((invoice) => ({
-          dbId: invoice.id, // Store database ID
+      const response = await axios.get(`${BASE_URL}/company/invoices/company/${companyId}/`, { params });
+      console.log("API Response:", response.data);
+
+      if (response.data && response.data.results) {
+        const mappedInvoices = response.data.results.map((invoice) => ({
+          dbId: invoice.id,
           id: invoice.invoice_number || `INV${new Date().getFullYear()}${Math.floor(Math.random() * 1000)}`,
           date: invoice.in_date || "",
-          tenancyId: invoice.tenancy?.tenancy_code || "N/A",
           tenantName: invoice.tenancy?.tenant?.tenant_name || "Unknown",
           amountDue: invoice.total_amount ? parseFloat(invoice.total_amount).toFixed(2) : "0.00",
+          status: invoice.status || "unpaid",
           view: viewicon,
         }));
         setInvoices(mappedInvoices);
+        setTotalPages(Math.ceil(response.data.count / itemsPerPage));
         console.log("Fetched invoices:", mappedInvoices);
       } else {
         setError(response.data?.message || "Failed to fetch invoices");
@@ -88,6 +98,45 @@ const Invoice = () => {
     }
   };
 
+  const handleDownloadCSV = async () => {
+    try {
+      const companyId = getUserCompanyId();
+      if (!companyId) {
+        setError("No company ID found");
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+
+      const params = {
+        search: searchTerm,
+        status: selectedOption === "all" ? "" : selectedOption,
+      };
+
+      const response = await axios.get(`${BASE_URL}/company/invoices/company/${companyId}/export-csv/`, {
+        params,
+        responseType: 'blob', // Important for handling binary data
+      });
+
+      // Create a URL for the blob and trigger download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `invoices_company_${companyId}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+
+      console.log("CSV downloaded successfully");
+    } catch (error) {
+      console.error("Error downloading CSV:", error);
+      setError(error.response?.data?.message || "Error downloading CSV");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleConfirmDelete = async () => {
     if (!itemToDelete) return;
@@ -99,7 +148,7 @@ const Invoice = () => {
       const response = await axios.delete(`${BASE_URL}/company/invoice/delete/${itemToDelete.dbId}/`);
       if (response.data && response.data.success) {
         setInvoices((prev) => prev.filter((invoice) => invoice.dbId !== itemToDelete.dbId));
-        alert(`Invoice ${itemToDelete.id} deleted successfully`); // Replace with toast if desired
+        alert(`Invoice ${itemToDelete.id} deleted successfully`);
         console.log("Deleted invoice:", itemToDelete.dbId);
       } else {
         throw new Error(response.data?.message || "Failed to delete invoice");
@@ -114,25 +163,9 @@ const Invoice = () => {
     }
   };
 
-  // Fetch invoices on component mount
   useEffect(() => {
     fetchInvoices();
-  }, []);
-
-  const filteredData = invoices.filter(
-    (invoice) =>
-      invoice.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      invoice.date.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      invoice.tenancyId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      invoice.tenantName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      invoice.amountDue.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  }, [searchTerm, selectedOption, currentPage]);
 
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
@@ -173,10 +206,21 @@ const Invoice = () => {
       },
     },
   };
-const handleViewClick = (invoice) => {
-  console.log("Selected invoice for view:", invoice);
-  openModal("view-invoice", "View Invoice", invoice);  
-};
+
+  const handleViewClick = (invoice) => {
+    console.log("Selected invoice for view:", invoice);
+    openModal("view-invoice", "View Invoice", invoice);
+  };
+
+  const getStatusBadge = (status) => {
+    const badgeClass = status === "paid" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${badgeClass} capitalize`}>
+        {status}
+      </span>
+    );
+  };
+
   return (
     <div className="border border-[#E9E9E9] rounded-md inv-table">
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] inv-table-header">
@@ -212,7 +256,10 @@ const handleViewClick = (invoice) => {
                 className="relative right-[5px] md:right-0 w-[15px] h-[15px]"
               />
             </button>
-            <button className="flex items-center justify-center gap-2 h-[38px] rounded-md duration-200 inv-download-btn w-[122px]">
+            <button
+              className="flex items-center justify-center gap-2 h-[38px] rounded-md duration-200 inv-download-btn w-[122px]"
+              onClick={handleDownloadCSV}
+            >
               Download
               <img
                 src={downloadicon}
@@ -245,24 +292,24 @@ const handleViewClick = (invoice) => {
                 <tr className="border-b border-[#E9E9E9] h-[57px]">
                   <th className="px-5 text-left inv-thead">ID</th>
                   <th className="px-5 text-left inv-thead">DATE</th>
-                  <th className="pl-5 text-left inv-thead">TENANCY ID</th>
                   <th className="pl-5 text-left inv-thead">TENANT NAME</th>
                   <th className="px-5 text-left inv-thead w-[10%]">AMOUNT DUE</th>
+                  <th className="px-5 text-left inv-thead">STATUS</th>
                   <th className="pl-12 pr-5 text-center inv-thead">VIEW</th>
                   <th className="px-5 pr-6 text-right inv-thead">ACTION</th>
                 </tr>
               </thead>
               <tbody>
-                {paginatedData.map((invoice) => (
+                {invoices.map((invoice) => (
                   <tr
                     key={invoice.dbId}
                     className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
                   >
                     <td className="px-5 text-left inv-data">{invoice.id}</td>
                     <td className="px-5 text-left inv-data">{invoice.date}</td>
-                    <td className="pl-5 text-left inv-data">{invoice.tenancyId}</td>
                     <td className="pl-5 text-left inv-data">{invoice.tenantName}</td>
                     <td className="px-5 text-left inv-data">{invoice.amountDue}</td>
+                    <td className="px-5 text-left inv-data">{getStatusBadge(invoice.status)}</td>
                     <td className="pl-14 text-center pr-5 pt-2">
                       <button onClick={() => handleViewClick(invoice)}>
                         <img
@@ -296,7 +343,7 @@ const handleViewClick = (invoice) => {
                 </tr>
               </thead>
               <tbody>
-                {paginatedData.map((invoice) => (
+                {invoices.map((invoice) => (
                   <React.Fragment key={invoice.dbId}>
                     <tr
                       className={`${expandedRows[invoice.dbId]
@@ -308,15 +355,13 @@ const handleViewClick = (invoice) => {
                       <td className="px-5 text-left inv-data inv-date-column">{invoice.tenantName}</td>
                       <td className="py-4 flex items-center justify-end h-[57px]">
                         <div
-                          className={`inv-dropdown-field ${expandedRows[invoice.dbId] ? "active" : ""
-                            }`}
+                          className={`inv-dropdown-field ${expandedRows[invoice.dbId] ? "active" : ""}`}
                           onClick={() => toggleRowExpand(invoice.dbId)}
                         >
                           <img
                             src={downarrow}
                             alt="drop-down-arrow"
-                            className={`inv-dropdown-img ${expandedRows[invoice.dbId] ? "text-white" : ""
-                              }`}
+                            className={`inv-dropdown-img ${expandedRows[invoice.dbId] ? "text-white" : ""}`}
                           />
                         </div>
                       </td>
@@ -334,20 +379,20 @@ const handleViewClick = (invoice) => {
                             <div className="inv-dropdown-content">
                               <div className="inv-dropdown-content-grid">
                                 <div className="inv-dropdown-content-item w-[50%]">
-                                  <div className="inv-dropdown-label">TENANCY ID</div>
-                                  <div className="inv-dropdown-value">{invoice.tenancyId}</div>
-                                </div>
-                                <div className="inv-dropdown-content-item w-[50%]">
                                   <div className="inv-dropdown-label">DATE</div>
                                   <div className="inv-dropdown-value">{invoice.date}</div>
                                 </div>
-                              </div>
-                              <div className="inv-dropdown-content-grid">
                                 <div className="inv-dropdown-content-item w-[50%]">
                                   <div className="inv-dropdown-label">AMOUNT DUE</div>
                                   <div className="inv-dropdown-value">{invoice.amountDue}</div>
                                 </div>
-                                <div className="inv-dropdown-content-item w-[25%]">
+                              </div>
+                              <div className="inv-dropdown-content-grid">
+                                <div className="inv-dropdown-content-item w-[50%]">
+                                  <div className="inv-dropdown-label">STATUS</div>
+                                  <div className="inv-dropdown-value">{getStatusBadge(invoice.status)}</div>
+                                </div>
+                                <div className="inv-dropdown-content-item w-[50%]">
                                   <div className="inv-dropdown-label">VIEW</div>
                                   <div className="inv-dropdown-value">
                                     <button onClick={() => handleViewClick(invoice)}>
@@ -359,7 +404,9 @@ const handleViewClick = (invoice) => {
                                     </button>
                                   </div>
                                 </div>
-                                <div className="inv-dropdown-content-item w-[25%]">
+                              </div>
+                              <div className="inv-dropdown-content-grid">
+                                <div className="inv-dropdown-content-item w-[50%]">
                                   <div className="inv-dropdown-label">ACTION</div>
                                   <div className="inv-dropdown-value flex items-center gap-4">
                                     <button onClick={() => handleDeleteClick(invoice)}>
@@ -388,10 +435,8 @@ const handleViewClick = (invoice) => {
       {/* Pagination Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
         <span className="collection-list-pagination">
-          Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-          {filteredData.length} entries
+          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, invoices.length)} to{" "}
+          {Math.min(currentPage * itemsPerPage, invoices.length)} of {invoices.length} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
           <button
@@ -413,18 +458,17 @@ const handleViewClick = (invoice) => {
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${currentPage === startPage + i
-                ? "bg-[#1458A2] text-white"
-                : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-                }`}
+              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+                currentPage === startPage + i
+                  ? "bg-[#1458A2] text-white"
+                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+              }`}
               onClick={() => setCurrentPage(startPage + i)}
             >
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && (
-            <span className="px-2 flex items-center">...</span>
-          )}
+          {endPage < totalPages - 1 && <span className="px-2 flex items-center">...</span>}
           {endPage < totalPages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
