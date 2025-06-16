@@ -103,6 +103,13 @@ const ViewInvoiceModal = () => {
     }));
   };
 
+  // Helper function to check if additional charges exist and have data
+  const hasAdditionalCharges = () => {
+    return invoice?.additional_charges && 
+           Array.isArray(invoice.additional_charges) && 
+           invoice.additional_charges.length > 0;
+  };
+
   if (loading) {
     return (
       <div className="modal-overlay">
@@ -135,7 +142,7 @@ const ViewInvoiceModal = () => {
 
   const renderTable = (items, type, title) => (
     <div className="mb-6">
-      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+      <h3 className="text-lg mb-2 table-title">{title}</h3>
       <div className="view-invoice-modal-desktop-table border border-[#E9E9E9] rounded-md">
         <table className="w-full border-collapse view-invoice-modal-table">
           <thead>
@@ -161,15 +168,12 @@ const ViewInvoiceModal = () => {
           <tbody>
             {items && items.length > 0 ? (
               items.map((item, index) => (
-                <tr key={`${type}-${item.id || index}`} className="h-[57px] hover:bg-gray-100">
+                <tr key={`${type}-${item.id || index}`} className="h-[57px] border-b border-[#E9E9E9] last:border-b-0">
                   <td className="px-[10px] py-[5px] w-[140px] view-invoice-charges-tdata">
-                    <button onClick={() => toggleItemExpand(item.id, type)}>
-                      {expandedStates[type][item.id] }
-                    </button>{" "}
                     {item.charge_type?.name || "N/A"}
                   </td>
                   <td className="px-[10px] py-[5px] w-[160px] view-invoice-charges-tdata">
-                     {item.reason || "N/A"}
+                    {item.reason || "N/A"}
                   </td>
                   <td className="px-[10px] py-[5px] w-[120px] view-invoice-charges-tdata">{item.due_date || "N/A"}</td>
                   <td className="px-[10px] py-[5px] w-[100px] view-invoice-charges-tdata">{item.amount || "0.00"}</td>
@@ -192,20 +196,17 @@ const ViewInvoiceModal = () => {
       <div className="view-invoice-modal-mobile-table">
         {items && items.length > 0 ? (
           items.map((item, index) => (
-            <div key={`${type}-${item.id || index}`} className="view-invoice-modal-mobile-section">
+            <div key={`${type}-${item.id || index}`} className="view-invoice-modal-mobile-section border border-[#E9E9E9] rounded-md mt-3">
               <div className="view-invoice-modal-mobile-header border-b border-[#E9E9E9] h-[57px] grid grid-cols-2">
                 <div className="px-[10px] flex items-center view-invoice-charges-thead uppercase">Charge Type</div>
                 <div className="px-[10px] flex items-center view-invoice-charges-thead uppercase">Reason</div>
               </div>
-              <div className="grid grid-cols-2 border-b border-[#E9E9E9]">
+              <div className="grid grid-cols-2 border-b border-[#E9E9E9] h-[70px]">
                 <div className="px-[10px] py-[10px] view-invoice-charges-tdata">
-                  <button onClick={() => toggleItemExpand(item.id, type)}>
-                    {expandedStates[type][item.id] }
-                  </button>{" "}
                   {item.charge_type?.name || "N/A"}
                 </div>
                 <div className="px-[10px] py-[10px] view-invoice-charges-tdata">
-                   {item.reason || "N/A"}
+                  {item.reason || "N/A"}
                 </div>
               </div>
               <div className="view-invoice-modal-mobile-header border-b border-[#E9E9E9] h-[57px] grid grid-cols-2">
@@ -235,7 +236,7 @@ const ViewInvoiceModal = () => {
 
   return (
     <div className="modal-overlay">
-      <div className="bg-white rounded-md w-[1006px] !h-[800px] p-6 view-invoice-modal-container">
+      <div className="bg-white rounded-md w-[1006px] overflow-y-auto p-6 view-invoice-modal-container">
         <div className="flex justify-between items-center md:mb-6">
           <h2 className="view-invoice-modal-head">{modalState.title || "Invoice View"}</h2>
           <button
@@ -271,8 +272,10 @@ const ViewInvoiceModal = () => {
         {/* Payment Schedules Table */}
         {renderTable(invoice.payment_schedules, "payment_schedules", "Payment Schedules")}
 
-        {/* Additional Charges Table */}
-        {renderTable(invoice.additional_charges, "additional_charges", "Additional Charges")}
+        {/* Additional Charges Table - Only render if there are additional charges */}
+        {hasAdditionalCharges() && 
+          renderTable(invoice.additional_charges, "additional_charges", "Additional Charges")
+        }
       </div>
     </div>
   );

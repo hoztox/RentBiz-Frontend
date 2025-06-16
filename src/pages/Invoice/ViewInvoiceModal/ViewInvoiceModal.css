@@ -43,13 +43,22 @@
   color: #4b465c;
 }
 
+.table-title {
+  font-family: "Public Sans";
+  color: #2892ce;
+  font-size: 15px;
+  font-weight: 600;
+}
+
 .view-invoice-charges-thead {
   font-family: "Inter Tight";
-  font-weight: 500;
   font-size: 13px;
-  line-height: 24px;
-  letter-spacing: 0px;
-  color: #7f8898;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #677487;
 }
 
 .view-invoice-charges-tdata {
@@ -58,7 +67,7 @@
   font-size: 14px;
   line-height: 22px;
   letter-spacing: 0px;
-  color: #201D1E;
+  color: #201d1e;
 }
 
 /* Base table styles (applied to desktop) */
@@ -89,7 +98,7 @@
 
 .view-invoice-modal-table th:nth-child(2),
 .view-invoice-modal-table td:nth-child(2) {
-  width: 160px;
+  width: 120px;
 }
 
 .view-invoice-modal-table th:nth-child(3),
@@ -126,7 +135,6 @@
   max-width: 100vw;
   height: 100vh;
   border-radius: 0;
-  background-color: #f8f9fa;
   box-sizing: border-box;
 }
 
@@ -139,7 +147,7 @@
   .view-invoice-modal-container {
     width: 1006px;
     max-width: 1006px;
-    height: 460px;
+    height: 488px;
     border-radius: 6px;
     background-color: #ffffff;
   }
@@ -177,7 +185,6 @@
     margin: 0;
     height: 100vh;
     border-radius: 0;
-    background-color: #f8f9fa;
     padding: 20px;
     max-height: calc(100vh - 90px);
     overflow-y: auto;
@@ -218,7 +225,7 @@
   }
 
   .view-invoice-modal-mobile-header {
-    background-color: #F2F2F2;
+    background-color: #f2f2f2;
   }
 
   .view-invoice-modal-mobile-table .view-invoice-charges-tdata {
