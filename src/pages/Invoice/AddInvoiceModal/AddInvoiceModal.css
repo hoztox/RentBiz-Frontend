@@ -51,7 +51,6 @@
 }
 
 .invoice-modal-selected {
-  color: #9ca3af;
   font-family: "Inter Tight";
 }
 
@@ -244,7 +243,6 @@
     margin: 0;
     height: 100vh;
     border-radius: 0;
-    background-color: #f8f9fa;
     padding: 20px;
     max-height: calc(100vh - 90px);
     overflow-y: auto;
@@ -266,10 +264,8 @@
     display: none !important;
   }
 
-  .invoice-modal-input,
   .invoice-modal-select {
     max-width: calc(100vw - 40px);
-    background-color: #f8f9fa;
   }
 
   .invoice-modal-save-btn {
