@@ -151,7 +151,7 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const requiredFields = ["buildingId", "building_name", "description", "building_address", "building_no", "plot_no"];
+    const requiredFields = ["buildingId", "building_name", "building_address", "building_no", "plot_no"];
     const missingFields = requiredFields.filter(
       (field) => !formState[field] || formState[field].toString().trim() === ""
     );
@@ -221,14 +221,13 @@ const BuildingInfoForm = ({ onNext, initialData, unitId }) => {
           </div>
         </div>
         <div className="col-span-1">
-          <label className="block building-info-form-label">Description*</label>
+          <label className="block building-info-form-label">Description</label>
           <textarea
             name="description"
             value={formState.description}
             onChange={handleInputChange}
             placeholder="Enter building description"
             className="w-full building-info-form-inputs focus:border-gray-300 resize-none duration-200 cursor-not-allowed"
-            required
             disabled={loading}
             readOnly
           />

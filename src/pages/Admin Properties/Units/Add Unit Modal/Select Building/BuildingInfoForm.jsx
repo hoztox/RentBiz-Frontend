@@ -54,9 +54,12 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
       if (!companyId && !url) {
         throw new Error("Company ID not found.");
       }
-      const apiUrl = url || `${BASE_URL}/company/buildings/company/${companyId}`;
+      const apiUrl =
+        url || `${BASE_URL}/company/buildings/company/${companyId}`;
       const response = await axios.get(apiUrl);
-      const newBuildings = Array.isArray(response.data.results) ? response.data.results : [];
+      const newBuildings = Array.isArray(response.data.results)
+        ? response.data.results
+        : [];
       setBuildings((prev) => (url ? [...prev, ...newBuildings] : newBuildings));
       setNextPageUrl(response.data.next);
       setError(null);
@@ -92,7 +95,9 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
 
       setLoading(true);
       try {
-        const response = await axios.get(`${BASE_URL}/company/buildings/${formState.buildingId}`);
+        const response = await axios.get(
+          `${BASE_URL}/company/buildings/${formState.buildingId}`
+        );
         const building = response.data;
         setFormState((prev) => ({
           ...prev,
@@ -160,7 +165,13 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-    const requiredFields = ["buildingId", "building_name", "description", "building_address", "building_no", "plot_no"];
+    const requiredFields = [
+      "buildingId",
+      "building_name",
+      "building_address",
+      "building_no",
+      "plot_no",
+    ];
     const missingFields = requiredFields.filter((field) => !formState[field]);
     if (missingFields.length > 0) {
       setError(`Please fill required fields: ${missingFields.join(", ")}`);
@@ -185,7 +196,9 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         {/* Building Name */}
         <div className="col-span-1">
-          <label className="block building-info-form-label">Building Name*</label>
+          <label className="block building-info-form-label">
+            Building Name*
+          </label>
           <div className="relative">
             <select
               name="buildingId"
@@ -212,7 +225,9 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
-                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${isSelectFocused ? "rotate-180" : ""}`}
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
+                  isSelectFocused ? "rotate-180" : ""
+                }`}
               />
             </div>
           </div>
@@ -220,14 +235,13 @@ const BuildingInfoForm = ({ onNext, initialData }) => {
 
         {/* Description */}
         <div className="col-span-1">
-          <label className="block building-info-form-label">Description*</label>
+          <label className="block building-info-form-label">Description</label>
           <textarea
             name="description"
             value={formState.description}
             onChange={handleInputChange}
             placeholder="Enter building description"
             className="w-full building-info-form-inputs focus:border-gray-300 resize-none duration-200 cursor-not-allowed"
-            required
             disabled={loading}
             readOnly
           />
