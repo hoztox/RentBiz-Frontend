@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Plus, Download, Eye, Edit, Trash2, ChevronDown } from "lucide-react";
+import { Plus, Download, Eye, Edit, Trash2, ChevronDown, Settings } from "lucide-react";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 import CustomDropDown from "../../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
 import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
 import UpdatePaymentScheduleModal from "../UpdateTenancyModal/UpdatePaymentSchedule";
+import InvoiceConfig from "../UpdateTenancyModal/InvoiceConfig";
 
 const TenancyMaster = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -18,6 +19,7 @@ const TenancyMaster = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [tenancyToDelete, setTenancyToDelete] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showInvoiceConfigModal, setShowInvoiceConfigModal] = useState(false);
   const [selectedTenancy, setSelectedTenancy] = useState(null);
   const [paymentSchedules, setPaymentSchedules] = useState([]);
   const itemsPerPage = 10;
@@ -108,6 +110,11 @@ const TenancyMaster = () => {
     setSelectedTenancy(tenancy);
     await fetchPaymentSchedules(tenancy.id);
     setShowPaymentModal(true);
+  };
+
+  const handleInvoiceConfigClick = (tenancy) => {
+    setSelectedTenancy(tenancy);
+    setShowInvoiceConfigModal(true);
   };
 
   const toggleRowExpand = (id) => {
@@ -262,9 +269,14 @@ const TenancyMaster = () => {
                 </td>
                 <td className="px-6 flex gap-3 items-center justify-end h-14">
                   {tenancy.status === "active" ? (
-                    <button onClick={() => handlePaymentScheduleClick(tenancy)} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
-                      <Edit size={18} className="text-blue-600" />
-                    </button>
+                    <>
+                      <button onClick={() => handlePaymentScheduleClick(tenancy)} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
+                        <Edit size={18} className="text-blue-600" />
+                      </button>
+                      <button onClick={() => handleInvoiceConfigClick(tenancy)} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
+                        <Settings size={18} className="text-gray-600" />
+                      </button>
+                    </>
                   ) : (
                     <>
                       <button onClick={() => handleEditClick(tenancy)} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
@@ -361,9 +373,14 @@ const TenancyMaster = () => {
                               <div className="text-sm font-medium text-gray-500">ACTION</div>
                               <div className="flex gap-2">
                                 {tenancy.status === "active" ? (
-                                  <button onClick={() => handlePaymentScheduleClick(tenancy)} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
-                                    <Edit size={18} className="text-blue-600" />
-                                  </button>
+                                  <>
+                                    <button onClick={() => handlePaymentScheduleClick(tenancy)} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
+                                      <Edit size={18} className="text-blue-600" />
+                                    </button>
+                                    <button onClick={() => handleInvoiceConfigClick(tenancy)} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
+                                      <Settings size={18} className="text-gray-600" />
+                                    </button>
+                                  </>
                                 ) : (
                                   <>
                                     <button onClick={() => handleEditClick(tenancy)} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
@@ -458,6 +475,12 @@ const TenancyMaster = () => {
           paymentSchedules={paymentSchedules}
           onClose={() => setShowPaymentModal(false)}
           refreshSchedules={() => fetchPaymentSchedules(selectedTenancy.id)}
+        />
+      )}
+      {showInvoiceConfigModal && (
+        <InvoiceConfig
+          tenancy={selectedTenancy}
+          onClose={() => setShowInvoiceConfigModal(false)}
         />
       )}
     </div>
