@@ -99,7 +99,7 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
 
       // Check if required fields are filled based on docType properties
       return (
-        (!docType.number || doc.number) &&
+        (!docType.number || (doc.number && doc.number.trim() !== "")) && // Updated validation
         (!docType.issue_date || doc.issued_date) &&
         (!docType.expiry_date || doc.expiry_date) &&
         (!docType.upload_file || doc.upload_file?.length > 0)
@@ -164,6 +164,13 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
     );
   };
 
+  // const handleNumberInput = (e) => {
+  //   // Allow only numbers
+  //   if (!/^[0-9]*$/.test(e.key)) {
+  //     e.preventDefault();
+  //   }
+  // };
+
   return (
     <div className="w-full flex flex-col h-full">
       <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
@@ -210,7 +217,7 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
                               Number
                             </label>
                             <input
-                              type="text"
+                              type="text" // Changed from "number" to "text"
                               className="documents-inputs w-[168px] outline-none"
                               value={doc.number}
                               onChange={(e) =>

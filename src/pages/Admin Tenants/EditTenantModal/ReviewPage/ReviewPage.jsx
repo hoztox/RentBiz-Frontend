@@ -3,6 +3,7 @@ import "./reviewpage.css";
 import DocumentView from "./DocumentView";
 import { BASE_URL } from "../../../../utils/config";
 import { Component, useState, useEffect } from "react";
+import toast, { Toaster } from "react-hot-toast"; // Import react-hot-toast
 
 class ErrorBoundary extends Component {
   state = { hasError: false, error: null };
@@ -78,7 +79,7 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
         setDocTypes(Array.isArray(docTypeResponse.data) ? docTypeResponse.data : []);
       } catch (error) {
         console.error("Error fetching types:", error);
-        setError("Failed to load types.");
+        toast.error("Failed to load types."); // Use toast for error
       }
     };
     fetchData();
@@ -127,7 +128,7 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
     }
     const missingFields = requiredFields.filter((field) => !tenant[field]);
     if (missingFields.length > 0) {
-      setError(`Please fill required fields: ${missingFields.join(", ")}`);
+      toast.error(`Please fill required fields: ${missingFields.join(", ")}`); // Use toast for error
       setLoading(false);
       return;
     }
@@ -146,7 +147,7 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
     });
 
     if (documents.length > 0 && invalidDocs.length > 0) {
-      setError("Some documents are missing required fields based on their document type.");
+      toast.error("Some documents are missing required fields based on their document type."); // Use toast for error
       setLoading(false);
       return;
     }
@@ -168,7 +169,7 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
       if (companyId) {
         formDataWithFiles.append("company", companyId);
       } else {
-        setError("Company ID is required.");
+        toast.error("Company ID is required."); // Use toast for error
         setLoading(false);
         return;
       }
@@ -190,32 +191,28 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
             if (docType.expiry_date) {
               formDataWithFiles.append(`tenant_comp[${index}][expiry_date]`, doc.expiry_date || "");
             }
-         if (docType.upload_file) {
-  if (doc.upload_file) {
-    const fileData = await convertToBlob(doc.upload_file);
-    if (fileData) {
-      if (typeof fileData === "string") {
-        // ✅ Ensure consistent /media/ path, strip any double media
-        let cleaned = fileData.replace(/^\/?media\/?/, "");
-        formDataWithFiles.append(
-          `tenant_comp[${index}][existing_file_url]`,
-          `/media/${cleaned}`
-        );
-      } else {
-        // Normal file upload
-        formDataWithFiles.append(
-          `tenant_comp[${index}][upload_file]`,
-          fileData,
-          fileData.name || `file-${index}`
-        );
-      }
-    }
-  } else {
-    // If no file, send empty to avoid double media
-    formDataWithFiles.append(`tenant_comp[${index}][existing_file_url]`, "");
-  }
-}
-
+            if (docType.upload_file) {
+              if (doc.upload_file) {
+                const fileData = await convertToBlob(doc.upload_file);
+                if (fileData) {
+                  if (typeof fileData === "string") {
+                    let cleaned = fileData.replace(/^\/?media\/?/, "");
+                    formDataWithFiles.append(
+                      `tenant_comp[${index}][existing_file_url]`,
+                      `/media/${cleaned}`
+                    );
+                  } else {
+                    formDataWithFiles.append(
+                      `tenant_comp[${index}][upload_file]`,
+                      fileData,
+                      fileData.name || `file-${index}`
+                    );
+                  }
+                }
+              } else {
+                formDataWithFiles.append(`tenant_comp[${index}][existing_file_url]`, "");
+              }
+            }
           }
         })
       );
@@ -237,6 +234,7 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
       );
 
       console.log("Successfully updated tenant:", response.data);
+      toast.success("Tenant updated successfully!"); // Success toast
       onNext({ formData, response: response.data });
     } catch (err) {
       console.error("Error updating tenant:", err);
@@ -250,7 +248,7 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
           errorMessage = err.response.data.message || err.message;
         }
       }
-      setError(errorMessage);
+      toast.error(errorMessage); // Use toast for error
     } finally {
       setLoading(false);
     }
@@ -273,9 +271,7 @@ const ReviewPage = ({ formData, onBack, onNext, tenantId }) => {
 
   return (
     <div className="flex flex-col h-full">
-      {error && (
-        <p className="text-red-500 mb-4 p-2 bg-red-100 rounded">{error}</p>
-      )}
+      {/* <Toaster position="top-right" reverseOrder={false} />  */}
       <div className="border rounded-md border-[#E9E9E9] p-5">
         <h2 className="review-page-head">Tenant</h2>
         <div className="grid grid-cols-1 md:grid-cols-2">
