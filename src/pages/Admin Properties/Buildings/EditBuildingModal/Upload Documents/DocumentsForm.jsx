@@ -36,11 +36,18 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
   const [docTypes, setDocTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isFormValid, setIsFormValid] = useState(false); // Added for Next button validation
 
   // Synchronize documents state with initialData when it changes
   useEffect(() => {
     setDocuments(normalizeDocuments(initialData?.documents));
   }, [initialData]);
+
+  // Validate form to enable/disable Next button
+  useEffect(() => {
+    const hasValidDocType = documents.some((doc) => doc.doc_type !== "");
+    setIsFormValid(hasValidDocType);
+  }, [documents]);
 
   // Helper function to display file names
   const getFileDisplayText = (files) => {
@@ -363,7 +370,8 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
           </button>
           <button
             type="submit"
-            className="bg-[#2892CE] text-white hover:bg-[#1f709e] next-button duration-200"
+            className={`bg-[#2892CE] text-white hover:bg-[#1f709e] next-button duration-200 ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={!isFormValid}
           >
             Next
           </button>

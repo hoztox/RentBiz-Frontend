@@ -31,6 +31,7 @@ const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
   const [states, setStates] = useState([]);
   const [loading, setLoading] = useState({ countries: false, states: false });
   const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({}); // Added for field validation
 
   // Fetch countries on mount
   useEffect(() => {
@@ -106,12 +107,40 @@ const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
     }
   }, [initialData]);
 
+  // Validation function from BuildingInfoForm1, updated to handle non-string values
+  const validateField = (name, value) => {
+    const stringValue = String(value); // Convert value to string
+    if (["building_no", "plot_no"].includes(name)) {
+      if (!stringValue.trim()) {
+        return `${name.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())} is required and cannot be only spaces.`;
+      }
+      // Allow alphanumeric characters but require at least one digit for building_no and plot_no
+      if (!/^(?=.*\d)[a-zA-Z0-9-]+$/.test(stringValue.trim())) {
+        return `${name.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())} must contain at least one digit and only alphanumeric characters or hyphens.`;
+      }
+    } else if (["building_name", "building_address", "country"].includes(name)) {
+      if (!stringValue.trim()) {
+        return `${name.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())} is required and cannot be only spaces.`;
+      }
+    }
+    return "";
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    const trimmedValue = value.trimStart(); // Prevent leading spaces
     setFormState((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: trimmedValue,
     }));
+
+    // Validate the field
+    const error = validateField(name, trimmedValue);
+    setErrors((prev) => ({
+      ...prev,
+      [name]: error,
+    }));
+
     if (name === "status" || name === "country" || name === "state") {
       setIsSelectFocused((prev) => ({ ...prev, [name]: false }));
     }
@@ -127,39 +156,39 @@ const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const errors = {};
-    const requiredFields = [
-      "building_no",
-      "plot_no",
-      "building_name",
-      "building_address",
-      "status",
-      "country", // Make country required
-    ];
+    const newErrors = {};
+    const requiredFields = ["building_no", "plot_no", "building_name", "building_address", "country"];
+
+    // Validate all required fields
     requiredFields.forEach((field) => {
-      if (!formState[field]) {
-        errors[field] = `${field.replace("_", " ")} is required`;
-      }
+      const error = validateField(field, formState[field]);
+      if (error) newErrors[field] = error;
     });
+
+    // Check for buildingId as in original handleSubmit
     if (!buildingId) {
-      errors.buildingId = "Building ID is required.";
+      newErrors.buildingId = "Building ID is required.";
     }
-    if (Object.keys(errors).length > 0) {
-      setError(Object.values(errors).join(", "));
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) {
+      setError(Object.values(newErrors).join(", "));
       return;
     }
+
     const tempData = {
       building_id: buildingId,
-      building_no: formState.building_no || null,
-      plot_no: formState.plot_no || null,
-      building_name: formState.building_name || null,
-      building_address: formState.building_address || null,
-      description: formState.description || null,
-      remarks: formState.remarks || null,
+      building_no: formState.building_no.trim() || null,
+      plot_no: formState.plot_no.trim() || null,
+      building_name: formState.building_name.trim() || null,
+      building_address: formState.building_address.trim() || null,
+      description: formState.description.trim() || null,
+      remarks: formState.remarks.trim() || null,
       status: formState.status || "active",
       latitude: parseFloat(formState.latitude) || null,
       longitude: parseFloat(formState.longitude) || null,
-      land_mark: formState.land_mark || null,
+      land_mark: formState.land_mark.trim() || null,
       company: formState.company || localStorage.getItem("company_id"),
       user: formState.user || localStorage.getItem("user_id") || null,
       country: formState.country || null,
@@ -183,9 +212,12 @@ const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
             name="building_no"
             value={formState.building_no}
             onChange={handleInputChange}
-            className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
+            className={`w-full building-info-form-inputs focus:border-gray-300 duration-200 ${
+              errors.building_no ? "border-red-500" : ""
+            }`}
             required
           />
+          {errors.building_no && <p className="text-red-500 text-sm">{errors.building_no}</p>}
         </div>
         <div className="col-span-1">
           <label className="block building-info-form-label">Plot No*</label>
@@ -194,9 +226,12 @@ const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
             name="plot_no"
             value={formState.plot_no}
             onChange={handleInputChange}
-            className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
+            className={`w-full building-info-form-inputs focus:border-gray-300 duration-200 ${
+              errors.plot_no ? "border-red-500" : ""
+            }`}
             required
           />
+          {errors.plot_no && <p className="text-red-500 text-sm">{errors.plot_no}</p>}
         </div>
         <div className="col-span-1">
           <label className="block building-info-form-label">Building Name*</label>
@@ -205,9 +240,12 @@ const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
             name="building_name"
             value={formState.building_name}
             onChange={handleInputChange}
-            className="w-full building-info-form-inputs focus:border-gray-300 duration-200"
+            className={`w-full building-info-form-inputs focus:border-gray-300 duration-200 ${
+              errors.building_name ? "border-red-500" : ""
+            }`}
             required
           />
+          {errors.building_name && <p className="text-red-500 text-sm">{errors.building_name}</p>}
         </div>
         <div className="col-span-1">
           <label className="block building-info-form-label">Address*</label>
@@ -215,9 +253,12 @@ const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
             name="building_address"
             value={formState.building_address}
             onChange={handleInputChange}
-            className="w-full building-info-form-inputs resize-none focus:border-gray-300 duration-200"
+            className={`w-full building-info-form-inputs resize-none focus:border-gray-300 duration-200 ${
+              errors.building_address ? "border-red-500" : ""
+            }`}
             required
           />
+          {errors.building_address && <p className="text-red-500 text-sm">{errors.building_address}</p>}
         </div>
         <div className="col-span-1">
           <label className="block building-info-form-label">Country*</label>
@@ -228,7 +269,9 @@ const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
               onChange={handleInputChange}
               onFocus={() => setIsSelectFocused((prev) => ({ ...prev, country: true }))}
               onBlur={() => setIsSelectFocused((prev) => ({ ...prev, country: false }))}
-              className="w-full appearance-none building-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer"
+              className={`w-full appearance-none building-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer ${
+                errors.country ? "border-red-500" : ""
+              }`}
               required
             >
               <option value="">Select Country</option>
@@ -246,6 +289,7 @@ const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
               />
             </div>
           </div>
+          {errors.country && <p className="text-red-500 text-sm">{errors.country}</p>}
         </div>
         <div className="col-span-1">
           <label className="block building-info-form-label">State</label>
@@ -282,7 +326,7 @@ const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
             value={formState.description}
             onChange={handleInputChange}
             rows="2"
-            className="w-full building-info-form-inputs resize-none focus:border-gray-300 duration-200"
+            className="w-full building-info-form-inputs resize-none focus:border-gray-300jon-200 duration-200"
           />
         </div>
         <div className="col-span-1">
@@ -291,7 +335,9 @@ const BuildingInfoForm = ({ onNext, initialData, buildingId }) => {
             name="remarks"
             value={formState.remarks}
             onChange={handleInputChange}
-            rows="2"
+            rows="
+
+2"
             className="w-full building-info-form-inputs resize-none focus:border-gray-300 duration-200"
           />
         </div>
