@@ -3,10 +3,10 @@ import axios from "axios";
 import { BASE_URL } from "../../../../utils/config";
 import DocumentsView from "./DocumentView";
 import "./ReviewPage.css";
+import toast, { Toaster } from "react-hot-toast"; // Import react-hot-toast
 
 const ReviewPage = ({ formData, onBack, onNext }) => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [idTypes, setIdTypes] = useState([]);
 
   const tenant = formData?.tenant || {};
@@ -22,9 +22,7 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
     console.log("Role:", role);
     console.log("Raw company_id from localStorage:", storedCompanyId);
 
-    if (role === "company") {
-      return storedCompanyId;
-    } else if (role === "user" || role === "admin") {
+    if (role === "company" || role === "user" || role === "admin") {
       return storedCompanyId;
     }
 
@@ -35,12 +33,21 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
     const fetchIdTypes = async () => {
       try {
         const companyId = getUserCompanyId();
+        if (!companyId) {
+          throw new Error("Company ID not found.");
+        }
         const response = await axios.get(
-          `${BASE_URL}/company/id_type/company/${companyId}`
+          `${BASE_URL}/company/id_type/company/${companyId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
         );
         setIdTypes(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error("Error fetching ID types:", error);
+        toast.error("Failed to load ID types."); // Use toast for error
         setIdTypes([]);
       }
     };
@@ -57,7 +64,7 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
 
   const handleNext = async () => {
     setLoading(true);
-    setError(null);
+
     const requiredFields = [
       "tenant_name",
       "nationality",
@@ -76,10 +83,11 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
     ];
     const missingFields = requiredFields.filter((field) => !tenant[field]);
     if (missingFields.length > 0) {
-      setError(`Please fill required fields: ${missingFields.join(", ")}`);
+      toast.error(`Please fill required fields: ${missingFields.join(", ")}`); // Use toast for error
       setLoading(false);
       return;
     }
+
     try {
       const getValueOrEmpty = (value) => {
         return value === null || value === undefined ? "" : value;
@@ -102,7 +110,7 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
       );
       formDataWithFiles.append("address", tenant.address);
       formDataWithFiles.append("tenant_type", tenant.tenant_type);
-      formDataWithFiles.append("license_no", tenant.license_no);
+      formDataWithFiles.append("license_no", getValueOrEmpty(tenant.license_no));
       formDataWithFiles.append("id_type", tenant.id_type);
       formDataWithFiles.append("id_number", tenant.id_number);
       formDataWithFiles.append("id_validity_date", tenant.id_validity_date);
@@ -115,6 +123,7 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
       );
       formDataWithFiles.append("status", tenant.status);
       formDataWithFiles.append("remarks", getValueOrEmpty(tenant.remarks));
+
       // Prepare documents in the format backend expects
       if (documents.length > 0) {
         const documentData = documents.map((doc, index) => ({
@@ -139,6 +148,7 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
           }
         });
       }
+
       console.log("FormData contents:");
       for (const [key, value] of formDataWithFiles.entries()) {
         console.log(
@@ -146,22 +156,25 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
           value instanceof File ? `File: ${value.name}` : value
         );
       }
+
       const response = await axios.post(
         `${BASE_URL}/company/tenant/create/`,
         formDataWithFiles,
         {
           headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "multipart/form-data",
           },
         }
       );
+
       console.log("Successfully created tenant:", response.data);
-      onNext({ formData, response: response.data });
+      onNext({ formData, response: response.data }); // Success toast removed
     } catch (err) {
       console.error("Error creating tenant:", err);
-      setError(
-        `Failed to save tenant: ${err.response?.data?.message || err.message}`
-      );
+      const errorMessage =
+        err.response?.data?.message || err.message || "Failed to save tenant.";
+      toast.error(`Failed to save tenant: ${errorMessage}`); // Use toast for error
     } finally {
       setLoading(false);
     }
@@ -178,9 +191,7 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
 
   return (
     <div className="flex flex-col h-full">
-      {error && (
-        <p className="text-red-500 mb-4 p-2 bg-red-100 rounded">{error}</p>
-      )}
+      <Toaster position="top-right" reverseOrder={false} /> {/* Add Toaster */}
       <div className="border rounded-md border-[#E9E9E9] p-5">
         <h2 className="review-page-head">Tenant</h2>
         <div className="grid grid-cols-1 md:grid-cols-2">
