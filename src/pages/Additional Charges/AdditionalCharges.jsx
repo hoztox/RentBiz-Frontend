@@ -11,12 +11,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import ConfirmationModal from "../../components/ConfirmationModal/ConfirmationModal";
 import axios from "axios";
 import { BASE_URL } from "../../utils/config";
+import { toast, Toaster } from "react-hot-toast";
 
 const AdminAdditionalCharges = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
-  const { openModal } = useModal();
+  const { openModal, refreshCounter } = useModal();
   const [selectedOption, setSelectedOption] = useState("all");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
@@ -54,17 +55,19 @@ const AdminAdditionalCharges = () => {
         setTotalItems(response.data.count || 0);
         console.log(response, "Response from fetchAdditionalCharges");
       } else {
-        setError(
-          response.data.results.message || "Failed to fetch additional charges"
-        );
+        const errorMessage =
+          response.data.results.message || "Failed to fetch additional charges";
+        setError(errorMessage);
+        toast.error(errorMessage);
         setCharges([]);
         setTotalItems(0);
       }
     } catch (err) {
-      setError(
+      const errorMessage =
         "Error fetching additional charges: " +
-          (err.response?.data?.results?.message || err.message)
-      );
+        (err.response?.data?.results?.message || err.message);
+      setError(errorMessage);
+      toast.error(errorMessage);
       setCharges([]);
       setTotalItems(0);
     } finally {
@@ -82,30 +85,31 @@ const AdminAdditionalCharges = () => {
             search: searchTerm,
             status: selectedOption === "all" ? "" : selectedOption,
           },
-          responseType: 'blob', // Important for handling binary data
+          responseType: "blob",
         }
       );
 
-      // Create a URL for the blob and trigger download
       const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.setAttribute('download', 'additional_charges.csv');
+      link.setAttribute("download", "additional_charges.csv");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      toast.success("CSV downloaded successfully");
     } catch (err) {
-      setError(
+      const errorMessage =
         "Error downloading CSV: " +
-          (err.response?.data?.message || err.message)
-      );
+        (err.response?.data?.message || err.message);
+      setError(errorMessage);
+      toast.error(errorMessage);
     }
   };
 
   useEffect(() => {
     fetchAdditionalCharges(currentPage, searchTerm, selectedOption);
-  }, [currentPage, searchTerm, selectedOption]);
+  }, [currentPage, searchTerm, selectedOption, refreshCounter]);
 
   const handleDeleteClick = (charge) => {
     setItemToDelete(charge);
@@ -123,13 +127,15 @@ const AdminAdditionalCharges = () => {
         }
       );
       if (response.status === 204 || response.data.success) {
+        toast.success("Charge deleted successfully");
         fetchAdditionalCharges(currentPage, searchTerm, selectedOption);
       }
     } catch (err) {
-      setError(
+      const errorMessage =
         "Error deleting charge: " +
-          (err.response?.data?.message || err.message)
-      );
+        (err.response?.data?.message || err.message);
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsDeleteModalOpen(false);
       setItemToDelete(null);
@@ -180,10 +186,26 @@ const AdminAdditionalCharges = () => {
   };
 
   if (loading) return <div className="p-5">Loading...</div>;
-  if (error) return <div className="text-red-500 p-5">{error}</div>;
+  if (error)
+    return (
+      <div className="border border-[#E9E9E9] rounded-md p-5">
+        <div className="flex flex-col justify-center items-center h-64 gap-4">
+          <div className="text-red-500">{error}</div>
+          <button
+            onClick={() =>
+              fetchAdditionalCharges(currentPage, searchTerm, selectedOption)
+            }
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
 
   return (
     <div className="border border-[#E9E9E9] rounded-md admin-add-charges-table">
+      <Toaster />
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] admin-add-charges-table-header">
         <h1 className="admin-add-charges-head">Additional Charges</h1>
         <div className="flex flex-col md:flex-row gap-[10px] admin-add-charges-inputs-container">
@@ -217,7 +239,7 @@ const AdminAdditionalCharges = () => {
                 className="relative right-[5px] md:right-0 w-[15px] h-[15px]"
               />
             </button>
-            <button 
+            <button
               className="flex items-center justify-center gap-2 h-[38px] rounded-md duration-200 admin-add-charges-download-btn w-[122px]"
               onClick={handleDownloadCSV}
             >
@@ -237,11 +259,19 @@ const AdminAdditionalCharges = () => {
           <thead>
             <tr className="border-b border-[#E9E9E9] h-[57px]">
               <th className="px-5 text-left admin-add-charges-thead">ID</th>
-              <th className="px-5 text-left admin-add-charges-thead">CHARGE ID</th>
-              <th className="pl-5 text-left admin-add-charges-thead">AMOUNT DUE</th>
+              <th className="px-5 text-left admin-add-charges-thead">
+                CHARGE ID
+              </th>
+              <th className="pl-5 text-left admin-add-charges-thead">
+                AMOUNT DUE
+              </th>
               <th className="px-5 text-left admin-add-charges-thead">REASON</th>
-              <th className="px-5 text-left admin-add-charges-thead">IN DATE</th>
-              <th className="px-5 text-left admin-add-charges-thead">DUE DATE</th>
+              <th className="px-5 text-left admin-add-charges-thead">
+                IN DATE
+              </th>
+              <th className="px-5 text-left admin-add-charges-thead">
+                DUE DATE
+              </th>
               <th className="px-5 text-left admin-add-charges-thead w-[68px]">
                 STATUS
               </th>
@@ -263,7 +293,9 @@ const AdminAdditionalCharges = () => {
                   {charge.charge_type?.name || "N/A"}
                 </td>
                 <td className="pl-5 text-left admin-add-charges-data">
-                  {charge.amount ? parseFloat(charge.amount).toFixed(2) : "0.00"}
+                  {charge.amount
+                    ? parseFloat(charge.amount).toFixed(2)
+                    : "0.00"}
                 </td>
                 <td className="px-5 text-left admin-add-charges-data">
                   {charge.reason || "N/A"}
@@ -291,6 +323,8 @@ const AdminAdditionalCharges = () => {
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
                       charge.status === "paid"
                         ? "bg-[#28C76F29] text-[#28C76F]"
+                        : charge.status === "invoice"
+                        ? "bg-[#E8EFF6] text-[#1458A2]"
                         : "bg-[#FFE1E1] text-[#C72828]"
                     }`}
                   >
@@ -324,17 +358,17 @@ const AdminAdditionalCharges = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="admin-add-charges-table-row-head">
-              <th className="px-5 w-[35%] text-left admin-add-charges-thead admin-add-charges-id-column">
+              <th className="px-5 w-[46%] text-left admin-add-charges-thead admin-add-charges-id-column">
                 ID
               </th>
-              <th className="px-[10px] w-[45%] text-left admin-add-charges-thead admin-add-charges-charge-id-column">
+              <th className="px-[10px] w-[34%] text-left admin-add-charges-thead admin-add-charges-charge-id-column">
                 CHARGE ID
               </th>
-              <th className="px-5 w-[20%] text-right admin-add-charges-thead"></th>
+              <th className="px-5 text-right admin-add-charges-thead"></th>
             </tr>
           </thead>
           <tbody>
-            {charges.map((charge, index) => (
+            {charges.map((charge) => (
               <React.Fragment key={charge.id}>
                 <tr
                   className={`${
@@ -378,28 +412,24 @@ const AdminAdditionalCharges = () => {
                       <td colSpan={3} className="px-5">
                         <div className="admin-add-charges-dropdown-content">
                           <div className="admin-add-charges-dropdown-grid">
-                            <div className="admin-add-charges-dropdown-item w-[30%]">
-                              <div className="admin-add-charges-dropdown-label">
-                                AMOUNT DUE
-                              </div>
+                            <div className="admin-add-charges-dropdown-item w-[50%]">
+                              <div className="admin-add-charges-dropdown-label">AMOUNT DUE</div>
                               <div className="admin-add-charges-dropdown-value">
                                 {charge.amount
                                   ? parseFloat(charge.amount).toFixed(2)
                                   : "0.00"}
                               </div>
                             </div>
-                            <div className="admin-add-charges-dropdown-item label-reason w-[30%]">
-                              <div className="admin-add-charges-dropdown-label">
-                                REASON
-                              </div>
+                            <div className="admin-add-charges-dropdown-item w-[50%]">
+                              <div className="admin-add-charges-dropdown-label">REASON</div>
                               <div className="admin-add-charges-dropdown-value">
                                 {charge.reason || "N/A"}
                               </div>
                             </div>
-                            <div className="admin-add-charges-dropdown-item label-in-date w-[30%]">
-                              <div className="admin-add-charges-dropdown-label">
-                                IN DATE
-                              </div>
+                          </div>
+                          <div className="admin-add-charges-dropdown-grid">
+                            <div className="admin-add-charges-dropdown-item w-[50%]">
+                              <div className="admin-add-charges-dropdown-label">IN DATE</div>
                               <div className="admin-add-charges-dropdown-value">
                                 {charge.in_date
                                   ? new Date(charge.in_date).toLocaleDateString(
@@ -413,10 +443,8 @@ const AdminAdditionalCharges = () => {
                                   : "N/A"}
                               </div>
                             </div>
-                            <div className="admin-add-charges-dropdown-item label-due w-[30%]">
-                              <div className="admin-add-charges-dropdown-label">
-                                DUE DATE
-                              </div>
+                            <div className="admin-add-charges-dropdown-item w-[50%]">
+                              <div className="admin-add-charges-dropdown-label">DUE DATE</div>
                               <div className="admin-add-charges-dropdown-value">
                                 {charge.due_date
                                   ? new Date(charge.due_date).toLocaleDateString(
@@ -432,15 +460,15 @@ const AdminAdditionalCharges = () => {
                             </div>
                           </div>
                           <div className="admin-add-charges-dropdown-grid">
-                            <div className="admin-add-charges-dropdown-item w-[30%]">
-                              <div className="admin-add-charges-dropdown-label">
-                                STATUS
-                              </div>
+                            <div className="admin-add-charges-dropdown-item w-[50%]">
+                              <div className="admin-add-charges-dropdown-label">STATUS</div>
                               <div className="admin-add-charges-dropdown-value">
                                 <span
                                   className={`admin-add-charges-status ${
                                     charge.status === "paid"
                                       ? "bg-[#28C76F29] text-[#28C76F]"
+                                      : charge.status === "invoice"
+                                      ? "bg-[#E8EFF6] text-[#1458A2]"
                                       : "bg-[#FFE1E1] text-[#C72828]"
                                   }`}
                                 >
@@ -449,10 +477,8 @@ const AdminAdditionalCharges = () => {
                                 </span>
                               </div>
                             </div>
-                            <div className="admin-add-charges-dropdown-item w-[67%] label-action">
-                              <div className="admin-add-charges-dropdown-label">
-                                ACTION
-                              </div>
+                            <div className="admin-add-charges-dropdown-item w-[50%]">
+                              <div className="admin-add-charges-dropdown-label">ACTION</div>
                               <div className="admin-add-charges-dropdown-value flex items-center gap-4 mt-[10px]">
                                 <button onClick={() => handleEditClick(charge)}>
                                   <img
@@ -484,7 +510,7 @@ const AdminAdditionalCharges = () => {
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
         <span className="collection-list-pagination">
-          Showing {((currentPage - 1) * itemsPerPage) + 1} to{" "}
+          Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
           {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems}{" "}
           entries
         </span>
@@ -504,9 +530,7 @@ const AdminAdditionalCharges = () => {
               1
             </button>
           )}
-          {startPage > 2 && (
-            <span className="px-2 flex items-center">...</span>
-          )}
+          {startPage > 2 && <span className="px-2 flex items-center">...</span>}
           {[...Array(endPage - startPage + 1)].map((_, i) => (
             <button
               key={startPage + i}
