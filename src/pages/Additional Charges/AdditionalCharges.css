@@ -148,10 +148,9 @@
   .admin-add-charges-thead {
     font-size: 12px !important;
   }
-  .admin-add-charges-dropdown-label{
-    font-size: 11px !important;
-  }
-  .label-reason, .label-due, .label-action {
+  .label-reason,
+  .label-due,
+  .label-action {
     padding-left: 0px !important;
   }
   .admin-add-charges-pagination-btn {
@@ -167,7 +166,9 @@
 }
 
 @media (max-width: 375px) {
-  .label-reason, .label-due, .label-action {
+  .label-reason,
+  .label-due,
+  .label-action {
     padding-left: 2px !important;
   }
 }

@@ -6,9 +6,10 @@ import plusicon from "../../../assets/Images/Additional Charges/input-plus-icon.
 import { useModal } from "../../../context/ModalContext";
 import axios from "axios";
 import { BASE_URL } from "../../../utils/config";
+import { toast } from "react-hot-toast";
 
 const UpdateAdditionalCharges = () => {
-  const { modalState, closeModal } = useModal();
+  const { modalState, closeModal, triggerRefresh } = useModal();
   const [tenancyContract, setTenancyContract] = useState("");
   const [inDate, setInDate] = useState("");
   const [chargeCode, setChargeCode] = useState("");
@@ -70,7 +71,8 @@ const UpdateAdditionalCharges = () => {
     const companyId = getUserCompanyId();
     if (!companyId) {
       setError("Company ID not found. Please ensure you are logged in.");
-      console.log("Error: No company ID found");
+      toast.error("Company ID not found. Please ensure you are logged in.")
+      // console.log("Error: No company ID found");
       return;
     }
 
@@ -94,7 +96,7 @@ const UpdateAdditionalCharges = () => {
       console.log("Charge Types State:", chargesResponse.data.data || chargesResponse.data);
     } catch (err) {
       setError("Failed to fetch options: " + err.message);
-      console.error("Fetch Options Error:", err);
+      toast.error("Fetch Options Error:", err.message);
     }
   };
 
@@ -134,12 +136,13 @@ const UpdateAdditionalCharges = () => {
           setTaxAmount("");
           setTotalAmount("");
           setError(response.data.message || "Failed to fetch tax preview");
+          toast.error(response.data.message || "Failed to fetch tax preview");
         }
       } catch (err) {
         setTaxAmount("");
         setTotalAmount("");
         setError("Error fetching tax preview: " + err.message);
-        console.error("Tax Preview Error:", err);
+        toast.error("Tax Preview Error:" + err.message);
       }
     };
 
@@ -149,6 +152,7 @@ const UpdateAdditionalCharges = () => {
   const handleUpdate = async () => {
     if (!tenancyContract || !chargeCode || !reason || !dueDate || !amountDue || !status || !inDate) {
       setError("Please fill all required fields (Tenancy Contract, Charge Code, Reason, In Date, Due Date, Amount Due, Status)");
+      toast.error("Please fill all required fields (Tenancy Contract, Charge Code, Reason, In Date, Due Date, Amount Due, Status)");
       console.log("Validation Failed: Missing fields", { tenancyContract, chargeCode, reason, inDate, dueDate, amountDue, status });
       return;
     }
@@ -176,13 +180,16 @@ const UpdateAdditionalCharges = () => {
       console.log("Update Response:", response.data);
 
       if (response.data.success) {
+        toast.success("Additional charge updated successfully")
+        triggerRefresh();
         closeModal();
       } else {
         setError(response.data.message || "Failed to update additional charge");
+        toast.error(response.data.message || "Failed to update additional charge");
       }
     } catch (err) {
       setError("Error updating additional charge: " + err.message);
-      console.error("Update Error:", err);
+      toast.error("Error Updating additional charge:", err.message);
     } finally {
       setLoading(false);
     }
@@ -205,7 +212,7 @@ const UpdateAdditionalCharges = () => {
           </button>
         </div>
 
-        {error && <div className="text-red-500 text-center mb-4">{error}</div>}
+        {/* {error && <div className="text-red-500 text-center mb-4">{error}</div>} */}
 
         <div className="md:p-6 mt-[-15px]">
           <div className="grid uc-grid-cols-2 gap-6">
@@ -294,7 +301,12 @@ const UpdateAdditionalCharges = () => {
                   ))}
                 </select>
                 <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                  <img src={plusicon} alt="plus-icon" className="w-6 h-6" />
+                  <ChevronDown
+                    size={16}
+                    className={`text-[#201D1E] transition-transform duration-300 ${
+                      isSelectOpenChargeCode ? "rotate-180" : "rotate-0"
+                    }`}
+                  />
                 </div>
               </div>
             </div>
@@ -407,8 +419,8 @@ const UpdateAdditionalCharges = () => {
                 className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-charges-input"
               />
             </div>
-
-            <div className="flex items-end justify-end mb-1">
+          </div>
+          <div className="flex items-end justify-end mt-7 mb-1">
               <button
                 type="button"
                 onClick={handleUpdate}
@@ -418,7 +430,6 @@ const UpdateAdditionalCharges = () => {
                 {loading ? "Saving..." : "Save"}
               </button>
             </div>
-          </div>
         </div>
       </div>
     </div>
