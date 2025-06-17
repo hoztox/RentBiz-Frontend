@@ -16,6 +16,8 @@ import { motion, AnimatePresence } from "framer-motion";
 const TenantsMaster = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [totalCount, setTotalCount] = useState(0);
   const [expandedRows, setExpandedRows] = useState({});
   const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,8 +30,9 @@ const TenantsMaster = () => {
 
   // Dropdown options
   const dropdownOptions = [
-    { label: "Showing", value: "showing" },
-    { label: "All", value: "all" },
+    { label: "All", value: "" },
+    { label: "Active", value: "active" },
+    { label: "Inactive", value: "inactive" },
   ];
 
   const getUserCompanyId = () => {
@@ -48,43 +51,67 @@ const TenantsMaster = () => {
     return null;
   };
 
-  const companyId = getUserCompanyId();
+const companyId = getUserCompanyId();
 
-  const fetchTenants = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(
-        `${BASE_URL}/company/tenant/company/${companyId}/`,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      const data = Array.isArray(response.data)
-        ? response.data
-        : response.data.results || [];
-      console.log("Tenants: Fetched tenants:", data);
-      setTenants(data);
-      setLoading(false);
-    } catch (error) {
+// 🔄 Reset to page 1 when search or filter changes
+useEffect(() => {
+  setCurrentPage(1);
+}, [searchTerm, statusFilter]);
+
+// 📦 Fetch tenants from API
+const fetchTenants = async () => {
+  try {
+    setLoading(true);
+
+    const response = await axios.get(
+      `${BASE_URL}/company/tenant/company/${companyId}/`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        params: {
+          search: searchTerm,
+          status: statusFilter,
+          page: currentPage,
+          page_size: itemsPerPage,
+        },
+      }
+    );
+
+    setTenants(response.data.results || []);
+    setTotalCount(response.data.count || 0);
+  } catch (error) {
+    if (error.response?.status === 404 && currentPage > 1) {
+      // auto-reset to page 1 if not found
+      setCurrentPage(1);
+    } else {
       console.error("Error fetching tenants:", error);
       setError(
         "Failed to fetch tenants: " +
           (error.response?.data?.message || error.message)
       );
-      setLoading(false);
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
 
-  useEffect(() => {
-    if (companyId) {
-      fetchTenants();
-    } else {
-      setError("Company ID not found.");
-      setLoading(false);
-    }
-  }, [companyId, refreshCounter]);
+// 🚀 Trigger fetch when any dependency changes
+useEffect(() => {
+  if (companyId) {
+    fetchTenants();
+  } else {
+    setError("Company ID not found.");
+    setLoading(false);
+  }
+}, [
+  companyId,
+  refreshCounter,
+  searchTerm,
+  statusFilter,
+  currentPage,
+  itemsPerPage,
+]);
 
   const handleDeleteTenant = async () => {
     if (!tenantToDelete) return;
@@ -123,32 +150,12 @@ const TenantsMaster = () => {
     }));
   };
 
-  const filteredData = tenants.filter(
-    (tenant) =>
-      (tenant.tenant_name?.toLowerCase() || "").includes(
-        searchTerm.toLowerCase()
-      ) ||
-      (tenant.address?.toLowerCase() || "").includes(
-        searchTerm.toLowerCase()
-      ) ||
-      (tenant.code?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (tenant.tenant_type?.toLowerCase() || "").includes(
-        searchTerm.toLowerCase()
-      ) ||
-      (tenant.status?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (tenant.phone?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (tenant.email?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (tenant.id_type?.title?.toLowerCase() || "").includes(
-        searchTerm.toLowerCase()
-      )
-  );
+  const filteredData = tenants;
+    
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  const paginatedData = filteredData;
+  
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
@@ -172,7 +179,7 @@ const TenantsMaster = () => {
     },
   };
 
-  if (loading) return <div className="p-5">Loading...</div>;
+  // if (loading) return <div className="p-5">Loading...</div>;
   if (error) return <div className="text-red-500 p-5">{error}</div>;
 
   return (
@@ -192,8 +199,8 @@ const TenantsMaster = () => {
             <div className="relative w-[40%] md:w-auto">
               <CustomDropDown
                 options={dropdownOptions}
-                value={selectedOption}
-                onChange={setSelectedOption}
+                value={statusFilter}
+                onChange={setStatusFilter}
                 placeholder="Select"
                 dropdownClassName="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 tenant-selection"
               />
@@ -450,9 +457,9 @@ const TenantsMaster = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
         <span className="collection-list-pagination">
           Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-          {filteredData.length} entries
+          {Math.min((currentPage - 1) * itemsPerPage + 1, totalCount)}{" "}
+          to {Math.min(currentPage * itemsPerPage, totalCount)} of{" "}
+          {totalCount} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
           <button
