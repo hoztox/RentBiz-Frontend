@@ -18,6 +18,8 @@ const Currency = () => {
   const { openModal, refreshCounter } = useModal();
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [totalCount, setTotalCount] = useState(0);
   const [expandedRows, setExpandedRows] = useState({});
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,6 +53,11 @@ const Currency = () => {
 
   const companyId = getUserCompanyId();
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
+  
+
   // Fetch currencies from backend
   const fetchCurrencies = async () => {
     if (!companyId) {
@@ -60,7 +67,7 @@ const Currency = () => {
       return;
     }
     try {
-      setLoading(true);
+      // setLoading(true);
       setError(null);
       const response = await axios.get(
         `${BASE_URL}/company/currency/company/${companyId}`,
@@ -68,20 +75,36 @@ const Currency = () => {
           headers: {
             "Content-Type": "application/json",
           },
+
+          params: {
+          search: searchTerm,
+          status: statusFilter,
+          page: currentPage,
+          page_size: itemsPerPage,
+        },
         }
       );
-      const currencyData = Array.isArray(response.data)
-        ? response.data
-        : response.data.results || [];
-      setCurrencies(currencyData);
+      // const currencyData = Array.isArray(response.data)
+      //   ? response.data
+      //   : response.data.results || [];
+      setCurrencies(response.data.results || []);
+      setTotalCount(response.data.count || 0);
     } catch (err) {
-      console.error("Error fetching currencies:", err);
-      const errorMessage =
-        err.response?.data?.message ||
-        "Failed to fetch currencies. Please try again.";
-      setError(errorMessage);
-      toast.error(errorMessage);
-      setCurrencies([]);
+  const isPageResetCase = err.response?.status === 404 && currentPage > 1;
+
+  if (isPageResetCase) {
+    setCurrentPage(1); // Trigger refetch for page 1
+    return; // Don't show toast or log — this is expected
+  }
+
+  console.error("Error fetching currencies:", err);
+
+  const errorMessage =
+    err.response?.data?.message || "Failed to fetch currencies. Please try again.";
+  setError(errorMessage);
+  toast.error(errorMessage);
+  setCurrencies([]);
+
     } finally {
       setLoading(false);
     }
@@ -145,23 +168,20 @@ const Currency = () => {
   };
 
   // Filter data based on search term
-  const filteredData = currencies.filter((currency) => {
-    const searchLower = searchTerm.toLowerCase();
-    const createdDate = formatDate(currency.created_at);
-    return (
-      createdDate.toLowerCase().includes(searchLower) ||
-      currency.country?.toLowerCase().includes(searchLower) ||
-      currency.currency?.toLowerCase().includes(searchLower) ||
-      currency.currency_code?.toLowerCase().includes(searchLower) ||
-      currency.minor_unit?.toLowerCase().includes(searchLower)
-    );
-  });
+  const filteredData = currencies;
+  //   const searchLower = searchTerm.toLowerCase();
+  //   const createdDate = formatDate(currency.created_at);
+  //   return (
+  //     createdDate.toLowerCase().includes(searchLower) ||
+  //     currency.country?.toLowerCase().includes(searchLower) ||
+  //     currency.currency?.toLowerCase().includes(searchLower) ||
+  //     currency.currency_code?.toLowerCase().includes(searchLower) ||
+  //     currency.minor_unit?.toLowerCase().includes(searchLower)
+  //   );
+  // });
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  const paginatedData = filteredData;
 
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
@@ -172,7 +192,7 @@ const Currency = () => {
     if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(totalPages);
     }
-  }, [companyId, currentPage, searchTerm, refreshCounter]);
+  }, [companyId, currentPage, searchTerm, refreshCounter,statusFilter,itemsPerPage]);
 
   const handelEditClick = (currency) => {
     console.log("Currency Id:", currency);
@@ -206,15 +226,15 @@ const Currency = () => {
   };
 
   // Loading state
-  if (loading) {
-    return (
-      <div className="border border-[#E9E9E9] rounded-md currency-table">
-        <div className="flex justify-center items-center h-64">
-          <div className="text-lg">Loading currencies...</div>
-        </div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="border border-[#E9E9E9] rounded-md currency-table">
+  //       <div className="flex justify-center items-center h-64">
+  //         <div className="text-lg">Loading currencies...</div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // Error state
   if (error) {
@@ -252,8 +272,8 @@ const Currency = () => {
             <div className="relative w-[40%] md:w-auto">
               <CustomDropDown
                 options={dropdownOption}
-                value={selectedOption}
-                onChange={setSelectedOption}
+                value={statusFilter}
+                onChange={setStatusFilter}
                 className="w-full md:w-[121px]"
                 dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 currency-selection"
               />
@@ -503,10 +523,10 @@ const Currency = () => {
             Showing{" "}
             {Math.min(
               (currentPage - 1) * itemsPerPage + 1,
-              filteredData.length
+              totalCount
             )}{" "}
-            to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-            {filteredData.length} entries
+            to {Math.min(currentPage * itemsPerPage, totalCount)} of{" "}
+            {totalCount} entries
           </span>
           <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
             <button
