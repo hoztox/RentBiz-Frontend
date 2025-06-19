@@ -57,7 +57,7 @@ const Expense = () => {
         console.log("Company ID:", companyId);
 
 
-        const response = await axios.get(`${BASE_URL}/company/expenses/company/${companyId}/`, {
+        const response = await axios.get(`${BASE_URL}/finance/expenses/company/${companyId}/`, {
 
           params: {
             search: searchTerm,

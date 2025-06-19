@@ -399,7 +399,7 @@ const UpdateExpenseModal = () => {
         total_amount: parseFloat(formData.total_amount || formData.amount).toFixed(2),
       };
 
-      const response = await axios.put(`${BASE_URL}/company/expenses/${formData.id}/`, payload);
+      const response = await axios.put(`${BASE_URL}/finance/expenses/${formData.id}/`, payload);
       if (response.data) {
         console.log("Expense Updated: ", response.data);
         closeModal();
