@@ -1015,14 +1015,14 @@ const CreateTenancyModal = () => {
                   </div>
                 ))}
               </div>
+            </div>
               <button
                 onClick={addRow}
-                className="mt-6 bg-[#2892CE] hover:bg-[#1f6c99] duration-200 text-white px-4 pl-2 mb-10 flex items-center tenancy-addrow-btn"
+                className="mt-6 bg-[#2892CE] hover:bg-[#1f6c99] duration-200 text-white px-4 pl-6 mb-10 flex items-center tenancy-addrow-btn"
               >
                 Add Row
                 <Plus size={20} color="#ffffff" className="ml-2" />
               </button>
-            </div>
 
             <div className="mt-6">
               <button
@@ -1049,16 +1049,16 @@ const CreateTenancyModal = () => {
                           <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[162px]">
                             REASON
                           </th>
-                          <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[173px]">
+                          <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[150px]">
                             DUE DATE
                           </th>
-                          <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[55px]">
+                          <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[120px]">
                             STATUS
                           </th>
-                          <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[148px]">
+                          <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[140px]">
                             AMOUNT
                           </th>
-                          <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[70px]">
+                          <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[120px]">
                             TAX
                           </th>
                           <th className="px-[10px] text-left tenancy-modal-thead uppercase w-[43px]">
