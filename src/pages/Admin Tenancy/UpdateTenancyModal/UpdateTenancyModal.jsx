@@ -151,106 +151,107 @@ const UpdateTenancyModal = () => {
 
   // Fetch data from APIs
   useEffect(() => {
-    const fetchData = async () => {
-      const companyId = getUserCompanyId();
-      if (!companyId) {
-        setError("Company ID not found. Please log in again.");
-        toast.error("Company ID invalid.");
-        return;
-      }
-
-      try {
-        setLoading(true);
-        setError(null);
-
-        const [tenantsRes, buildingsRes, buildingsVacant, chargeTypesRes] =
-          await Promise.all([
-            axios.get(`${BASE_URL}/company/tenant/company/${companyId}/`),
-            axios.get(`${BASE_URL}/company/buildings/company/${companyId}/`),
-            axios.get(`${BASE_URL}/company/buildings/vacant/${companyId}/`),
-            axios.get(`${BASE_URL}/company/charges/company/${companyId}/`),
-          ]);
-
-        setTenants(tenantsRes.data);
-        setBuildings(buildingsRes.data);
-        setChargeTypes(chargeTypesRes.data);
-
-        // Combine vacant buildings with the current tenancy's building
-        const tenancyBuilding = modalState.data?.building;
-        if (tenancyBuilding) {
-          const combinedBuildings = [...buildingsVacant.data];
-          const isTenancyBuildingInVacant = buildingsVacant.data.some(
-            (building) => building.id === tenancyBuilding.id
-          );
-          if (!isTenancyBuildingInVacant) {
-            combinedBuildings.push(tenancyBuilding);
-          }
-          const uniqueBuildings = Array.from(
-            new Map(combinedBuildings.map((building) => [building.id, building])).values()
-          );
-          setDisplayBuildings(uniqueBuildings);
-        } else {
-          setDisplayBuildings(buildingsVacant.data);
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        const errorMessage =
-          error.response?.data?.message ||
-          "Failed to load tenancy data. Please try again.";
-        setError(errorMessage);
-        toast.error(errorMessage);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (modalState.isOpen && modalState.type === "tenancy-update") {
-      fetchData();
+  const fetchData = async () => {
+    const companyId = getUserCompanyId();
+    if (!companyId) {
+      setError("Company ID not found. Please log in again.");
+      toast.error("Company ID invalid.");
+      return;
     }
-  }, [modalState.isOpen, modalState.type, modalState.data]);
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const [tenantsRes, buildingsRes, buildingsVacant, chargeTypesRes] =
+        await Promise.all([
+          axios.get(`${BASE_URL}/company/tenant/company/${companyId}/`),
+          axios.get(`${BASE_URL}/company/buildings/company/${companyId}/`),
+          axios.get(`${BASE_URL}/company/buildings/vacant/${companyId}/`),
+          axios.get(`${BASE_URL}/company/charges/company/${companyId}/`),
+        ]);
+
+      // Normalize API responses to arrays
+      setTenants(Array.isArray(tenantsRes.data) ? tenantsRes.data : tenantsRes.data.results || []);
+      setBuildings(Array.isArray(buildingsRes.data) ? buildingsRes.data : buildingsRes.data.results || []);
+      setChargeTypes(Array.isArray(chargeTypesRes.data) ? chargeTypesRes.data : chargeTypesRes.data.results || []);
+
+      // Combine vacant buildings with the current tenancy's building
+      const tenancyBuilding = modalState.data?.building;
+      if (tenancyBuilding) {
+        const combinedBuildings = [...buildingsVacant.data];
+        const isTenancyBuildingInVacant = buildingsVacant.data.some(
+          (building) => building.id === tenancyBuilding.id
+        );
+        if (!isTenancyBuildingInVacant) {
+          combinedBuildings.push(tenancyBuilding);
+        }
+        const uniqueBuildings = Array.from(
+          new Map(combinedBuildings.map((building) => [building.id, building])).values()
+        );
+        setDisplayBuildings(uniqueBuildings);
+      } else {
+        setDisplayBuildings(Array.isArray(buildingsVacant.data) ? buildingsVacant.data : buildingsVacant.data.results || []);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to load tenancy data. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (modalState.isOpen && modalState.type === "tenancy-update") {
+    fetchData();
+  }
+}, [modalState.isOpen, modalState.type, modalState.data]);
 
   // Fetch units when building changes
   useEffect(() => {
-    const fetchUnits = async () => {
-      if (formData.building) {
-        try {
-          const response = await axios.get(
-            `${BASE_URL}/company/units/${formData.building}/vacant-units/`
-          );
-          const vacantUnits = response.data;
-          setUnits(vacantUnits);
+  const fetchUnits = async () => {
+    if (formData.building) {
+      try {
+        const response = await axios.get(
+          `${BASE_URL}/company/units/${formData.building}/vacant-units/`
+        );
+        const vacantUnits = Array.isArray(response.data) ? response.data : response.data.results || [];
+        setUnits(vacantUnits);
 
-          // Combine vacant units with the current tenancy's unit
-          const tenancyUnit = modalState.data?.unit;
-          const tenancyBuildingId = modalState.data?.building?.id;
-          if (tenancyUnit && parseInt(formData.building) === tenancyBuildingId) {
-            const combinedUnits = [...vacantUnits];
-            const isTenancyUnitInVacant = vacantUnits.some(
-              (unit) => unit.id === tenancyUnit.id
-            );
-            if (!isTenancyUnitInVacant) {
-              combinedUnits.push(tenancyUnit);
-            }
-            const uniqueUnits = Array.from(
-              new Map(combinedUnits.map((unit) => [unit.id, unit])).values()
-            );
-            setDisplayUnits(uniqueUnits);
-          } else {
-            setDisplayUnits(vacantUnits);
+        // Combine vacant units with the current tenancy's unit
+        const tenancyUnit = modalState.data?.unit;
+        const tenancyBuildingId = modalState.data?.building?.id;
+        if (tenancyUnit && parseInt(formData.building) === tenancyBuildingId) {
+          const combinedUnits = [...vacantUnits];
+          const isTenancyUnitInVacant = vacantUnits.some(
+            (unit) => unit.id === tenancyUnit.id
+          );
+          if (!isTenancyUnitInVacant) {
+            combinedUnits.push(tenancyUnit);
           }
-        } catch (error) {
-          console.error("Error fetching units:", error);
-          setUnits([]);
-          setDisplayUnits([]);
-          toast.error("Failed to load units.");
+          const uniqueUnits = Array.from(
+            new Map(combinedUnits.map((unit) => [unit.id, unit])).values()
+          );
+          setDisplayUnits(uniqueUnits);
+        } else {
+          setDisplayUnits(vacantUnits);
         }
-      } else {
+      } catch (error) {
+        console.error("Error fetching units:", error);
         setUnits([]);
         setDisplayUnits([]);
+        toast.error("Failed to load units.");
       }
-    };
-    fetchUnits();
-  }, [formData.building, modalState.data]);
+    } else {
+      setUnits([]);
+      setDisplayUnits([]);
+    }
+  };
+  fetchUnits();
+}, [formData.building, modalState.data]);
 
   // Update end_date and total_rent_receivable
   useEffect(() => {
@@ -677,52 +678,60 @@ const UpdateTenancyModal = () => {
 
         <div className="update-tenancy-modal-grid gap-6">
           <div>
-            <label className="block update-tenancy-modal-label">Tenant*</label>
-            <div className="relative">
-              <select
-                name="tenant"
-                value={formData.tenant}
-                onChange={handleInputChange}
-                className="w-full p-2 appearance-none update-tenancy-input-box"
-                onFocus={() => toggleSelectOpen("tenant")}
-                onBlur={() => toggleSelectOpen("tenant")}
-                disabled={loading}
-              >
-                <option value="">Choose</option>
-                {tenants.map((tenant) => (
-                  <option key={tenant.id} value={tenant.id}>
-                    {tenant.tenant_name}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
-                  selectOpenStates["tenant"] ? "rotate-180" : "rotate-0"
-                }`}
-                size={22}
-                color="#201D1E"
-              />
-            </div>
-          </div>
+  <label className="block update-tenancy-modal-label">Tenant*</label>
+  <div className="relative">
+    <select
+      name="tenant"
+      value={formData.tenant}
+      onChange={handleInputChange}
+      className="w-full p-2 appearance-none update-tenancy-input-box"
+      onFocus={() => toggleSelectOpen("tenant")}
+      onBlur={() => toggleSelectOpen("tenant")}
+      disabled={loading}
+    >
+      <option value="">Choose</option>
+      {Array.isArray(tenants) ? (
+        tenants.map((tenant) => (
+          <option key={tenant.id} value={tenant.id}>
+            {tenant.tenant_name || "Unnamed Tenant"}
+          </option>
+        ))
+      ) : (
+        <option disabled>No tenants available</option>
+      )}
+    </select>
+    <ChevronDown
+      className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
+        selectOpenStates["tenant"] ? "rotate-180" : "rotate-0"
+      }`}
+      size={22}
+      color="#201D1E"
+    />
+  </div>
+</div>
           <div>
             <label className="block update-tenancy-modal-label">Building*</label>
             <div className="relative">
               <select
-                name="building"
-                value={formData.building}
-                onChange={handleInputChange}
-                className="w-full p-2 appearance-none update-tenancy-input-box"
-                onFocus={() => toggleSelectOpen("building")}
-                onBlur={() => toggleSelectOpen("building")}
-                disabled={loading}
-              >
-                <option value="">Choose</option>
-                {displayBuildings.map((building) => (
-                  <option key={building.id} value={building.id}>
-                    {building.building_name}
-                  </option>
-                ))}
-              </select>
+  name="building"
+  value={formData.building}
+  onChange={handleInputChange}
+  className="w-full p-2 appearance-none update-tenancy-input-box"
+  onFocus={() => toggleSelectOpen("building")}
+  onBlur={() => toggleSelectOpen("building")}
+  disabled={loading}
+>
+  <option value="">Choose</option>
+  {Array.isArray(displayBuildings) ? (
+    displayBuildings.map((building) => (
+      <option key={building.id} value={building.id}>
+        {building.building_name || "Unnamed Building"}
+      </option>
+    ))
+  ) : (
+    <option disabled>No buildings available</option>
+  )}
+</select>
               <ChevronDown
                 className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
                   selectOpenStates["building"] ? "rotate-180" : "rotate-0"
@@ -738,21 +747,25 @@ const UpdateTenancyModal = () => {
               <label className="block update-tenancy-modal-label">Unit*</label>
               <div className="relative">
                 <select
-                  name="unit"
-                  value={formData.unit}
-                  onChange={handleInputChange}
-                  className="w-full p-2 appearance-none update-tenancy-input-box"
-                  onFocus={() => toggleSelectOpen("unit-selection")}
-                  onBlur={() => toggleSelectOpen("unit-selection")}
-                  disabled={loading}
-                >
-                  <option value="">Choose</option>
-                  {displayUnits.map((unit) => (
-                    <option key={unit.id} value={unit.id}>
-                      {unit.unit_name}
-                    </option>
-                  ))}
-                </select>
+  name="unit"
+  value={formData.unit}
+  onChange={handleInputChange}
+  className="w-full p-2 appearance-none update-tenancy-input-box"
+  onFocus={() => toggleSelectOpen("unit-selection")}
+  onBlur={() => toggleSelectOpen("unit-selection")}
+  disabled={loading}
+>
+  <option value="">Choose</option>
+  {Array.isArray(displayUnits) ? (
+    displayUnits.map((unit) => (
+      <option key={unit.id} value={unit.id}>
+        {unit.unit_name || "Unnamed Unit"}
+      </option>
+    ))
+  ) : (
+    <option disabled>No units available</option>
+  )}
+</select>
                 <ChevronDown
                   className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
                     selectOpenStates["unit-selection"] ? "rotate-180" : "rotate-0"
@@ -971,26 +984,30 @@ const UpdateTenancyModal = () => {
                       </td>
                       <td className="px-[10px] py-[5px] w-[138px] relative">
                         <select
-                          value={charge.charge_type}
-                          onChange={(e) =>
-                            handleAdditionalChargeChange(
-                              charge.id,
-                              "charge_type",
-                              e.target.value
-                            )
-                          }
-                          className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-700 focus:border-gray-700 bg-white update-tenancy-modal-table-select"
-                          onFocus={() => toggleSelectOpen(`charge-${charge.id}`)}
-                          onBlur={() => toggleSelectOpen(`charge-${charge.id}`)}
-                          disabled={loading}
-                        >
-                          <option value="">Choose</option>
-                          {chargeTypes.map((type) => (
-                            <option key={type.id} value={type.id}>
-                              {type.name}
-                            </option>
-                          ))}
-                        </select>
+  value={charge.charge_type}
+  onChange={(e) =>
+    handleAdditionalChargeChange(
+      charge.id,
+      "charge_type",
+      e.target.value
+    )
+  }
+  className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-700 focus:border-gray-700 bg-white update-tenancy-modal-table-select"
+  onFocus={() => toggleSelectOpen(`charge-${charge.id}`)}
+  onBlur={() => toggleSelectOpen(`charge-${charge.id}`)}
+  disabled={loading}
+>
+  <option value="">Choose</option>
+  {Array.isArray(chargeTypes) ? (
+    chargeTypes.map((type) => (
+      <option key={type.id} value={type.id}>
+        {type.name || "Unnamed Charge"}
+      </option>
+    ))
+  ) : (
+    <option disabled>No charge types available</option>
+  )}
+</select>
                         <ChevronDown
                           className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
                             selectOpenStates[`charge-${charge.id}`]
@@ -1300,24 +1317,28 @@ const UpdateTenancyModal = () => {
                         </td>
                         <td className="px-[10px] py-[5px] w-[138px] relative">
                           <select
-                            value={item.charge_type}
-                            onChange={(e) =>
-                              handlePaymentScheduleChange(
-                                item.id,
-                                "charge_type",
-                                e.target.value
-                              )
-                            }
-                            className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-700 focus:border-gray-700 bg-white update-tenancy-modal-table-select cursor-not-allowed"
-                            disabled
-                          >
-                            <option value="">Choose</option>
-                            {chargeTypes.map((type) => (
-                              <option key={type.id} value={type.id}>
-                                {type.name}
-                              </option>
-                            ))}
-                          </select>
+  value={item.charge_type}
+  onChange={(e) =>
+    handlePaymentScheduleChange(
+      item.id,
+      "charge_type",
+      e.target.value
+    )
+  }
+  className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-700 focus:border-gray-700 bg-white update-tenancy-modal-table-select cursor-not-allowed"
+  disabled
+>
+  <option value="">Choose</option>
+  {Array.isArray(chargeTypes) ? (
+    chargeTypes.map((type) => (
+      <option key={type.id} value={type.id}>
+        {type.name || "Unnamed Charge"}
+      </option>
+    ))
+  ) : (
+    <option disabled>No charge types available</option>
+  )}
+</select>
                         </td>
                         <td className="px-[10px] py-[5px] w-[162px]">
                           <input
