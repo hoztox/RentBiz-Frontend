@@ -16,6 +16,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const UnitType = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [expandedRows, setExpandedRows] = useState({});
   const [unitTypes, setUnitTypes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -26,29 +27,44 @@ const UnitType = () => {
   const itemsPerPage = 10;
 
   const dropdownOptions = [
-    { value: "showing", label: "Showing" },
     { value: "all", label: "All" },
+    { value: "showing", label: "Showing" },
   ];
 
   const [selectedOption, setSelectedOption] = useState("showing");
 
   // Fetch unit types from backend
   const fetchData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const unitData = await unitTypesApi.fetch(); // Updated API call
-      setUnitTypes(unitData);
-    } catch (err) {
-      console.error("Error fetching unit types:", err);
-      const errorMessage =
-        err.message || "Failed to fetch unit types. Please try again.";
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
+  try {
+    // setLoading(true);
+    setError(null);
+
+    const response = await unitTypesApi.fetch({
+      search: searchTerm,
+      status: selectedOption,
+      page: currentPage,
+      page_size: itemsPerPage,
+    });
+
+    setUnitTypes(response.results || []);
+    setTotalCount(response.count || 0);
+  } catch (err) {
+    const isPageResetCase = currentPage > totalPages && totalPages > 0;
+
+    if (err?.message?.toLowerCase()?.includes("invalid page")) {
+      // Optional: silently recover or show custom message
+      setCurrentPage(1); // auto reset
+      return;
     }
-  };
+    console.error("Error fetching unit types:", err);
+    const errorMessage = err.message || "Failed to fetch unit types. Please try again.";
+    setError(errorMessage);
+    toast.error(errorMessage);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Handle delete confirmation
   const handleDelete = (id) => {
@@ -110,31 +126,26 @@ const UnitType = () => {
   };
 
   // Filter data based on search term
-  const filteredData = unitTypes.filter((unit) => {
-    const searchLower = searchTerm.toLowerCase();
-    const createdDate = formatDate(unit.created_at);
+  
+  
 
-    return (
-      createdDate.toLowerCase().includes(searchLower) ||
-      unit.title?.toLowerCase().includes(searchLower)
-    );
-  });
-
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
+  const paginatedData = unitTypes;
+    
 
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
   const stats = getUnitTypeStats();
+  useEffect(() => {
+  // Reset to page 1 when filters change
+  setCurrentPage(1);
+}, [searchTerm, selectedOption]);
 
   useEffect(() => {
     fetchData();
-  }, [refreshCounter]);
+  }, [refreshCounter,searchTerm,selectedOption,currentPage,itemsPerPage]);
 
   const handleEditClick = (unit) => {
     openModal("update-unit-type-master", "Update Unit Type Master", unit);
@@ -318,7 +329,7 @@ const UnitType = () => {
               </div>
               <div className="text-center">
                 <p className="text-[#201D1E] unit-card-text">Total Units</p>
-                <p className="text-[#1458A2] unit-card-num">{stats.total}</p>
+                <p className="text-[#1458A2] unit-card-num">{totalCount}</p>
               </div>
             </div>
             <div className="bg-[#F0F8FF] p-5 mt-4 rounded-md">
@@ -480,16 +491,16 @@ const UnitType = () => {
       </div>
 
       {/* Pagination */}
-      {filteredData.length > 0 && (
+      {totalCount > 0 && (
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 utype-pagination-container">
           <span className="utype-collection-list-pagination">
             Showing{" "}
             {Math.min(
               (currentPage - 1) * itemsPerPage + 1,
-              filteredData.length
+              totalCount
             )}{" "}
-            to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-            {filteredData.length} entries
+            to {Math.min(currentPage * itemsPerPage, totalCount)} of{" "}
+            {totalCount} entries
           </span>
           <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto utype-pagination-buttons">
             <button
