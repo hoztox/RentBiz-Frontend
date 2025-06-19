@@ -241,9 +241,9 @@ const TenancyMaster = () => {
                 className="border-b border-gray-200 h-14 hover:bg-gray-50 transition-colors"
               >
                 <td className="px-6 text-gray-700">{tenancy.tenancy_code}</td>
-                <td className="px-6 text-gray-700">{tenancy.tenant?.name || "N/A"}</td>
+                <td className="px-6 text-gray-700">{tenancy.tenant?.tenant_name || "N/A"}</td>
                 <td className="px-6 text-gray-700">{tenancy.building?.building_name || "N/A"}</td>
-                <td className="px-6 text-gray-700">{tenancy.unit?.name || "N/A"}</td>
+                <td className="px-6 text-gray-700">{tenancy.unit?.unit_name || "N/A"}</td>
                 <td className="px-6 text-gray-700 text-center">{tenancy.rental_months}</td>
                 <td className="px-6">
                   <span
@@ -309,7 +309,7 @@ const TenancyMaster = () => {
                   className={`border-b border-gray-200 h-14 ${expandedRows[tenancy.tenancy_code] ? "" : "border-b"}`}
                 >
                   <td className="px-5 text-gray-700">{tenancy.tenancy_code}</td>
-                  <td className="px-3 text-gray-700">{tenancy.tenant?.name || "N/A"}</td>
+                  <td className="px-3 text-gray-700">{tenancy.tenant?.tenant_name || "N/A"}</td>
                   <td className="py-4 flex items-center justify-end h-14">
                     <button
                       className={`p-2 rounded-full transition-colors ${expandedRows[tenancy.tenancy_code] ? "bg-blue-600 text-white" : "bg-gray-100"}`}
@@ -336,7 +336,7 @@ const TenancyMaster = () => {
                           </div>
                           <div>
                             <div className="text-sm font-medium text-gray-500">UNIT NAME</div>
-                            <div className="text-gray-700">{tenancy.unit?.name || "N/A"}</div>
+                            <div className="text-gray-700">{tenancy.unit?.unit_name || "N/A"}</div>
                           </div>
                           <div>
                             <div className="text-sm font-medium text-gray-500">RENTAL MONTHS</div>
