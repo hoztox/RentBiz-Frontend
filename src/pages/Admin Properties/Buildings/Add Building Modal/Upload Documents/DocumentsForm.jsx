@@ -40,6 +40,7 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
   const [docTypes, setDocTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isFormValid, setIsFormValid] = useState(false);
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -76,6 +77,12 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
     // For more than 2 files, show first file name and count
     return `${files[0].name} and ${files.length - 1} more`;
   };
+
+  // Validate form to enable/disable Next button
+  useEffect(() => {
+    const hasValidDocType = documents.some((doc) => doc.doc_type !== "");
+    setIsFormValid(hasValidDocType);
+  }, [documents]);
 
   useEffect(() => {
     const fetchDocTypes = async () => {
@@ -306,7 +313,7 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
             <button
               type="button"
               onClick={handleAddDocument}
-              className="inline-flex justify-center items-center px-V5 py-5 text-[#201D1E] bg-white hover:bg-[#201D1E] hover:text-white add-button duration-200"
+              className="inline-flex justify-center items-center px-5 py-5 text-[#201D1E] bg-white hover:bg-[#201D1E] hover:text-white add-button duration-200"
             >
               Add
               <img src={plusIcon} className="ml-1 h-5 w-5 add-icon" alt="add" />
@@ -324,7 +331,8 @@ const DocumentsForm = ({ onNext, onBack, initialData }) => {
           </button>
           <button
             type="submit"
-            className="bg-[#2892CE] text-white hover:bg-[#1f709e] next-button duration-200"
+            className={`bg-[#2892CE] text-white hover:bg-[#1f709e] next-button duration-200 ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={!isFormValid}
           >
             Next
           </button>

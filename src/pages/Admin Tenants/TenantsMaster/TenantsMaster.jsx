@@ -25,7 +25,6 @@ const TenantsMaster = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [tenantToDelete, setTenantToDelete] = useState(null);
   const { openModal, refreshCounter } = useModal();
-  const [selectedOption, setSelectedOption] = useState("showing"); // State for dropdown
   const itemsPerPage = 10;
 
   // Dropdown options
@@ -51,67 +50,67 @@ const TenantsMaster = () => {
     return null;
   };
 
-const companyId = getUserCompanyId();
+  const companyId = getUserCompanyId();
 
-// 🔄 Reset to page 1 when search or filter changes
-useEffect(() => {
-  setCurrentPage(1);
-}, [searchTerm, statusFilter]);
+  // Reset to page 1 when search or filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
 
-// 📦 Fetch tenants from API
-const fetchTenants = async () => {
-  try {
-    setLoading(true);
+  // Fetch tenants from API
+  const fetchTenants = async () => {
+    try {
+      setLoading(true);
 
-    const response = await axios.get(
-      `${BASE_URL}/company/tenant/company/${companyId}/`,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        params: {
-          search: searchTerm,
-          status: statusFilter,
-          page: currentPage,
-          page_size: itemsPerPage,
-        },
-      }
-    );
-
-    setTenants(response.data.results || []);
-    setTotalCount(response.data.count || 0);
-  } catch (error) {
-    if (error.response?.status === 404 && currentPage > 1) {
-      // auto-reset to page 1 if not found
-      setCurrentPage(1);
-    } else {
-      console.error("Error fetching tenants:", error);
-      setError(
-        "Failed to fetch tenants: " +
-          (error.response?.data?.message || error.message)
+      const response = await axios.get(
+        `${BASE_URL}/company/tenant/company/${companyId}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          params: {
+            search: searchTerm,
+            status: statusFilter,
+            page: currentPage,
+            page_size: itemsPerPage,
+          },
+        }
       );
-    }
-  } finally {
-    setLoading(false);
-  }
-};
 
-// 🚀 Trigger fetch when any dependency changes
-useEffect(() => {
-  if (companyId) {
-    fetchTenants();
-  } else {
-    setError("Company ID not found.");
-    setLoading(false);
-  }
-}, [
-  companyId,
-  refreshCounter,
-  searchTerm,
-  statusFilter,
-  currentPage,
-  itemsPerPage,
-]);
+      setTenants(response.data.results || []);
+      setTotalCount(response.data.count || 0);
+    } catch (error) {
+      if (error.response?.status === 404 && currentPage > 1) {
+        // auto-reset to page 1 if not found
+        setCurrentPage(1);
+      } else {
+        console.error("Error fetching tenants:", error);
+        setError(
+          "Failed to fetch tenants: " +
+            (error.response?.data?.message || error.message)
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Trigger fetch when any dependency changes
+  useEffect(() => {
+    if (companyId) {
+      fetchTenants();
+    } else {
+      setError("Company ID not found.");
+      setLoading(false);
+    }
+  }, [
+    companyId,
+    refreshCounter,
+    searchTerm,
+    statusFilter,
+    currentPage,
+    itemsPerPage,
+  ]);
 
   const handleDeleteTenant = async () => {
     if (!tenantToDelete) return;
@@ -151,11 +150,10 @@ useEffect(() => {
   };
 
   const filteredData = tenants;
-    
 
   const totalPages = Math.ceil(totalCount / itemsPerPage);
   const paginatedData = filteredData;
-  
+
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
@@ -262,7 +260,9 @@ useEffect(() => {
                   {tenant.tenant_name || "N/A"}
                 </td>
                 <td className="pl-5 text-left tenant-data">
-                  {tenant.phone || "N/A"}
+                  {tenant.phone && tenant.email
+                    ? `${tenant.phone}, ${tenant.email}`
+                    : tenant.phone || tenant.email || "N/A"}
                 </td>
                 <td className="px-5 text-left tenant-data">
                   <span
@@ -456,10 +456,9 @@ useEffect(() => {
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
         <span className="collection-list-pagination">
-          Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, totalCount)}{" "}
-          to {Math.min(currentPage * itemsPerPage, totalCount)} of{" "}
-          {totalCount} entries
+          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, totalCount)}{" "}
+          to {Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount}{" "}
+          entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
           <button

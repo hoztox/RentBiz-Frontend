@@ -192,7 +192,7 @@ const ViewInvoiceModal = () => {
         </table>
       </div>
 
-      {/* Mobile View */}
+   
       <div className="view-invoice-modal-mobile-table">
         {items && items.length > 0 ? (
           items.map((item, index) => (
