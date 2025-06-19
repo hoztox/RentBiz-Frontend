@@ -172,7 +172,7 @@ const AddExpenseModal = () => {
 
     setIsCalculating(true);
     try {
-      const response = await axios.post(`${BASE_URL}/company/expenses/calculate-total/`, {
+      const response = await axios.post(`${BASE_URL}/finance/expenses/calculate-total/`, {
         company: companyId,
         charge_type: parseInt(formData.charge_type),
         amount: parseFloat(formData.amount).toFixed(2),
@@ -359,7 +359,7 @@ const AddExpenseModal = () => {
         total_amount: parseFloat(formData.total_amount || formData.amount).toFixed(2),
       };
 
-      const response = await axios.post(`${BASE_URL}/company/expenses/`, payload);
+      const response = await axios.post(`${BASE_URL}/finance/expenses/`, payload);
       if (response.data) {
         console.log("New Expense Added: ", response.data);
         closeModal();
