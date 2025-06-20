@@ -1,7 +1,7 @@
 .view-modal-container {
   width: 100%;
   max-width: 1006px;
-  height: 862px;
+  max-height: calc(90vh - 40px); /* Constrain modal height within viewport */
   border-radius: 6px;
   background-color: #ffffff;
   box-sizing: border-box;
@@ -84,6 +84,44 @@
   display: table;
 }
 
+/* Ensure consistent table layout for both header and body tables */
+.desktop-table table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* Synchronize column widths between header and body */
+.desktop-table thead th,
+.desktop-table tbody td {
+  box-sizing: border-box;
+}
+
+/* Ensure the scrollable body aligns with the header */
+.desktop-table .overflow-y-auto {
+  width: 100%;
+}
+
+/* Remove redundant bottom border from header table to avoid double borders */
+.desktop-table thead tr {
+  border-bottom: none;
+}
+
+/* Add border to scrollable body for visual continuity */
+.desktop-table .overflow-y-auto {
+  border-top: 1px solid #E9E9E9;
+}
+
+/* Ensure horizontal scrolling is consistent */
+.desktop-table .overflow-x-auto {
+  display: block;
+}
+
+/* Scrollable content for desktop view */
+.desktop-scrollable-content {
+  max-height: calc(90vh - 150px); /* Adjust for header and padding */
+  overflow-y: auto;
+}
+
 @media (min-width: 481px) {
   .mobile-table {
     display: none;
@@ -94,7 +132,6 @@
   .view-modal-container {
     width: 100%;
     max-width: 1006px;
-    height: 862px;
     border-radius: 6px;
     background-color: #ffffff;
   }
