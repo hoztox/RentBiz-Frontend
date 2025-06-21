@@ -56,17 +56,29 @@ export const unitTypesApi = {
     }
   },
 
-  fetch: async () => {
-    const companyId = getUserCompanyId();
-    if (!companyId) throw new Error("Company ID not found. Please log in again.");
+ fetch: async ({ search = "", status = "", page = 1, page_size = 10 }) => {
+  const companyId = getUserCompanyId();
+  if (!companyId) throw new Error("Company ID not found. Please log in again.");
 
-    try {
-      const response = await axiosInstance.get(`/company/unit-types/company/${companyId}`);
-      return Array.isArray(response.data) ? response.data : response.data.results || [];
-    } catch (error) {
-      handleApiError(error, "Failed to fetch unit types");
-    }
-  },
+  try {
+    const response = await axiosInstance.get(
+      `/company/unit-types/company/${companyId}/`,
+      {
+        params: {
+          search,
+          status,
+          page,
+          page_size,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    handleApiError(error, "Failed to fetch unit types");
+    return { results: [], count: 0 };
+  }
+},
 
   update: async (unitTypeId, title) => {
     const companyId = getUserCompanyId();
