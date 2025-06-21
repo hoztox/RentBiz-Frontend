@@ -1,9 +1,17 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { BASE_URL } from "../../../utils/config";
-import { Edit } from "lucide-react";
+import { X } from "lucide-react";
+import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
+import tickicon from "../../../assets/Images/Admin Tenancy/tick-icon.svg";
+import "./UpdatePaymentScheduleModal.css";
 
-const UpdatePaymentScheduleModal = ({ tenancy, paymentSchedules, onClose, refreshSchedules }) => {
+const UpdatePaymentScheduleModal = ({
+  tenancy,
+  paymentSchedules,
+  onClose,
+  refreshSchedules,
+}) => {
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [paymentSchedule, setPaymentSchedule] = useState({
     amount: "",
@@ -13,11 +21,11 @@ const UpdatePaymentScheduleModal = ({ tenancy, paymentSchedules, onClose, refres
   const [applyToAllPending, setApplyToAllPending] = useState(false);
 
   const handleEditClick = (schedule) => {
-    setSelectedSchedule(schedule);
+    setSelectedSchedule(selectedSchedule === schedule ? null : schedule);
     setPaymentSchedule({
       amount: schedule.amount || "",
       dueDate: schedule.due_date || "",
-      frequency: "monthly", // Default, adjust if needed
+      frequency: "monthly",
     });
   };
 
@@ -45,139 +53,206 @@ const UpdatePaymentScheduleModal = ({ tenancy, paymentSchedules, onClose, refres
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto py-8">
-      <div className="bg-white rounded-2xl p-8 max-w-2xl w-full mx-4 shadow-2xl max-h-[90vh] flex flex-col">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Update Payment Schedule</h2>
-        <div className="flex-1 overflow-y-auto">
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4">Payment Schedules for {tenancy.tenancy_code}</h3>
+    <div
+      onClick={onClose}
+      className="update-schedule-modal-overlay fixed inset-0 flex items-center justify-center transition-colors z-50"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="update-schedule-modal-container bg-white rounded-md p-6 transition-all desktop-scrollable-content"
+      >
+        <div className="flex justify-between items-center mt-[5px] md:mb-[30px]">
+          <h2 className="update-schedule-modal-head">
+            Update Payment Schedule
+          </h2>
+          <button
+            onClick={onClose}
+            className="update-schedule-modal-close-btn hover:bg-gray-100 duration-200"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <h3 className="payment-schedules-heading mb-5">
+          Payment Schedules for {tenancy.tenancy_code}
+        </h3>
+
+        <div className="border border-[#E9E9E9] rounded-md mb-6 overflow-hidden">
+          <div className="desktop-table">
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
-                <thead>
-                  <tr className="border-b border-gray-200 h-12 bg-gray-50 sticky top-0">
-                    <th className="px-4 text-left text-sm font-semibold text-gray-600">Charge Type</th>
-                    <th className="px-4 text-left text-sm font-semibold text-gray-600">Amount</th>
-                    <th className="px-4 text-left text-sm font-semibold text-gray-600">Due Date</th>
-                    <th className="px-4 text-left text-sm font-semibold text-gray-600">Status</th>
-                    <th className="px-4 text-right text-sm font-semibold text-gray-600">Action</th>
+                <thead className="bg-white sticky top-0 z-10">
+                  <tr className="border-b border-[#E9E9E9] h-[57px]">
+                    <th className="px-[20px] text-left uppercase w-[100px] update-schedule-thead">
+                      Charge Type
+                    </th>
+                    <th className="px-[10px] text-left uppercase w-[100px] update-schedule-thead">
+                      Amount
+                    </th>
+                    <th className="px-[10px] text-left uppercase w-[100px] update-schedule-thead">
+                      Due Date
+                    </th>
+                    <th className="px-[10px] text-left uppercase w-[80px] update-schedule-thead">
+                      Status
+                    </th>
+                    <th className="px-[10px] text-left uppercase w-[50px] update-schedule-thead">
+                      Action
+                    </th>
                   </tr>
                 </thead>
+              </table>
+            </div>
+            <div className="table-body-container overflow-y-auto">
+              <table className="w-full border-collapse">
                 <tbody>
                   {paymentSchedules.map((schedule) => (
-                    <tr key={schedule.id} className="border-b border-gray-200 h-12 hover:bg-gray-50">
-                      <td className="px-4 text-gray-700">{schedule.charge_type?.name || "N/A"}</td>
-                      <td className="px-4 text-gray-700">{schedule.amount}</td>
-                      <td className="px-4 text-gray-700">{schedule.due_date}</td>
-                      <td className="px-4">
-                        <span
-                          className={`px-3 py-1 rounded-full text-sm ${
-                            schedule.status === "pending"
-                              ? "bg-orange-100 text-orange-600"
-                              : schedule.status === "paid"
-                              ? "bg-green-100 text-green-600"
-                              : "bg-blue-100 text-blue-600"
-                          }`}
-                        >
-                          {schedule.status.charAt(0).toUpperCase() + schedule.status.slice(1)}
-                        </span>
-                      </td>
-                      <td className="px-4 text-right">
-                        {schedule.status === "pending" && (
-                          <button
-                            onClick={() => handleEditClick(schedule)}
-                            className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+                    <React.Fragment key={schedule.id}>
+                      <tr className="h-[57px] border-b border-[#E9E9E9] last:border-b-0 hover:bg-gray-100">
+                        <td className="px-[20px] py-[5px] w-[100px] update-schedule-tdata">
+                          {schedule.charge_type?.name || "N/A"}
+                        </td>
+                        <td className="px-[10px] py-[5px] w-[100px] update-schedule-tdata">
+                          {schedule.amount}
+                        </td>
+                        <td className="px-[10px] py-[5px] w-[100px] update-schedule-tdata">
+                          {schedule.due_date}
+                        </td>
+                        <td className="px-[10px] py-[5px] w-[80px] update-schedule-tdata">
+                          <span
+                            className={`px-3 py-1 rounded-md text-sm ${
+                              schedule.status === "pending"
+                                ? "bg-[#FFF7E9] text-[#FBAD27]"
+                                : schedule.status === "paid"
+                                ? "bg-[#DDF6E8] text-[#28C76F]"
+                                : "bg-[#E8EFF6] text-[#1458A2]"
+                            }`}
                           >
-                            <Edit size={18} className="text-blue-600" />
-                          </button>
-                        )}
-                      </td>
-                    </tr>
+                            {schedule.status.charAt(0).toUpperCase() +
+                              schedule.status.slice(1)}
+                          </span>
+                        </td>
+                        <td className="px-[10px] py-[5px] w-[50px] update-schedule-tdata">
+                          {schedule.status === "pending" && (
+                            <button
+                              onClick={() => handleEditClick(schedule)}
+                              className=""
+                            >
+                              <img
+                                src={editicon}
+                                alt="Edit"
+                                className="w-[18px] h-[18px] ml-3 edit-btn duration-200"
+                              />
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                      {selectedSchedule?.id === schedule.id && (
+                        <tr className="border-b last:border-0">
+                          <td colSpan={5} className="px-[20px] py-[15px] h-[96px]">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-4">
+                                {/* Tenancy Code */}
+                                <div className="w-[164px]">
+                                  <label className="block mb-1.5 payment-field-label">
+                                    Tenancy Code
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={tenancy.tenancy_code}
+                                    disabled
+                                    className="w-full h-[38px] payment-input-field"
+                                  />
+                                </div>
+
+                                {/* Payment Amount */}
+                                <div className="w-[164px]">
+                                  <label className="block mb-1.5 payment-field-label">
+                                    Payment Amount
+                                  </label>
+                                  <input
+                                    type="number"
+                                    value={paymentSchedule.amount}
+                                    onChange={(e) =>
+                                      setPaymentSchedule({
+                                        ...paymentSchedule,
+                                        amount: e.target.value,
+                                      })
+                                    }
+                                    className="w-full h-[38px] payment-input-field"
+                                    placeholder="Enter amount"
+                                    required
+                                  />
+                                </div>
+
+                                {/* Due Date */}
+                                <div className="w-[164px]">
+                                  <label className="block mb-1.5 payment-field-label">
+                                    Due Date
+                                  </label>
+                                  <input
+                                    type="date"
+                                    value={paymentSchedule.dueDate}
+                                    disabled
+                                    className="w-full h-[38px] payment-input-field"
+                                  />
+                                </div>
+
+                                {/* Checkbox - Now with full label */}
+                                <div className="relative top-5 flex items-center min-w-[250px] pl-2">
+                                  <input
+                                    type="checkbox"
+                                    id={`applyToAll-${schedule.id}`}
+                                    checked={applyToAllPending}
+                                    onChange={(e) =>
+                                      setApplyToAllPending(e.target.checked)
+                                    }
+                                    className="h-[15px] w-[15px] apply-to-all-checkbox"
+                                  />
+                                  <label
+                                    htmlFor={`applyToAll-${schedule.id}`}
+                                    className="ml-2 whitespace-nowrap apply-to-all-label"
+                                  >
+                                    Apply to all pending payment schedules
+                                  </label>
+                                </div>
+                              </div>
+
+                              {/* Action Buttons - Now aligned to end */}
+                              <div className="relative top-3 flex items-center space-x-3">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedSchedule(null);
+                                    setApplyToAllPending(false);
+                                    setPaymentSchedule({
+                                      amount: "",
+                                      dueDate: "",
+                                      frequency: "monthly",
+                                    });
+                                  }}
+                                  className="w-[32px] h-[32px] flex items-center justify-center border border-[#FF725E] bg-white rounded hover:bg-red-100 duration-200"
+                                >
+                                  <X size={20} color="#FF725E" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={handleSubmit}
+                                  className="w-[32px] h-[32px] flex items-center justify-center border border-[#138567] bg-white rounded hover:bg-green-100 duration-200"
+                                >
+                                  <img src={tickicon} alt="Save" />
+                                </button>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   ))}
                 </tbody>
               </table>
             </div>
           </div>
-          {selectedSchedule && (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Tenancy Code
-                </label>
-                <input
-                  type="text"
-                  value={tenancy.tenancy_code}
-                  disabled
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Payment Amount
-                </label>
-                <input
-                  type="number"
-                  value={paymentSchedule.amount}
-                  onChange={(e) => setPaymentSchedule({ ...paymentSchedule, amount: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter amount"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Due Date
-                </label>
-                <input
-                  type="date"
-                  value={paymentSchedule.dueDate}
-                  disabled
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50"
-                />
-              </div>
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={applyToAllPending}
-                  onChange={(e) => setApplyToAllPending(e.target.checked)}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label className="ml-2 text-sm text-gray-700">
-                  Apply to all pending payment schedules
-                </label>
-              </div>
-              <div className="flex justify-end space-x-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedSchedule(null);
-                    setApplyToAllPending(false);
-                    setPaymentSchedule({ amount: "", dueDate: "", frequency: "monthly" });
-                  }}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Update Schedule
-                </button>
-              </div>
-            </form>
-          )}
         </div>
-        {!selectedSchedule && (
-          <div className="flex justify-end pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
-            >
-              Close
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
