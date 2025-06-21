@@ -672,7 +672,7 @@ const UpdateTenancyModal = () => {
             aria-label="Close modal"
             disabled={loading}
           >
-            <X size={16} color="#201D1E" />
+            <X size={20} />
           </button>
         </div>
 
