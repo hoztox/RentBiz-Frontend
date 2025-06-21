@@ -132,15 +132,29 @@ const UpdatePaymentScheduleModal = ({
                           </span>
                         </td>
                         <td className="px-[10px] py-[5px] w-[50px] update-schedule-tdata">
-                          {schedule.status === "pending" && (
+                          {(schedule.status === "pending" ||
+                            schedule.status === "invoice") && (
                             <button
-                              onClick={() => handleEditClick(schedule)}
-                              className=""
+                              onClick={() =>
+                                schedule.status === "pending"
+                                  ? handleEditClick(schedule)
+                                  : null
+                              }
+                              className={`${
+                                schedule.status === "invoice"
+                                  ? "cursor-not-allowed opacity-50"
+                                  : "cursor-pointer"
+                              }`}
+                              disabled={schedule.status === "invoice"}
                             >
                               <img
                                 src={editicon}
                                 alt="Edit"
-                                className="w-[18px] h-[18px] ml-3 edit-btn duration-200"
+                                className={`w-[18px] h-[18px] ml-3 edit-btn duration-200 ${
+                                  schedule.status === "invoice"
+                                    ? "opacity-50"
+                                    : ""
+                                }`}
                               />
                             </button>
                           )}
@@ -148,7 +162,10 @@ const UpdatePaymentScheduleModal = ({
                       </tr>
                       {selectedSchedule?.id === schedule.id && (
                         <tr className="border-b last:border-0">
-                          <td colSpan={5} className="px-[20px] py-[15px] h-[96px]">
+                          <td
+                            colSpan={5}
+                            className="px-[20px] py-[15px] h-[96px]"
+                          >
                             <div className="flex items-center justify-between">
                               <div className="flex items-center space-x-4">
                                 {/* Tenancy Code */}
