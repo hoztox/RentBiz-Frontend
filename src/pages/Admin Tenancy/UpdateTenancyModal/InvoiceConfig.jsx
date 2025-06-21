@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { X, Save } from "lucide-react";
+import { X } from "lucide-react";
 import { BASE_URL } from "../../../utils/config";
+import "./InvoiceConfig.css";
 
 const InvoiceConfig = ({ tenancy, onClose }) => {
   const [daysBeforeDue, setDaysBeforeDue] = useState(7);
@@ -28,7 +29,7 @@ const InvoiceConfig = ({ tenancy, onClose }) => {
         setHasConfig(false);
         setError(
           err.response?.data?.error ||
-          "Failed to load invoice configuration. Please save to create a new configuration."
+            "Failed to load invoice configuration. Please save to create a new configuration."
         );
       } finally {
         setLoading(false);
@@ -41,12 +42,19 @@ const InvoiceConfig = ({ tenancy, onClose }) => {
   const handleSave = async () => {
     try {
       setLoading(true);
-      await axios.put(`${BASE_URL}/company/tenancies/${tenancy.id}/invoice-config/`, {
-        days_before_due: daysBeforeDue,
-        combine_charges: combineCharges,
-        is_active: isActive,
-      });
-      alert(`Invoice configuration ${hasConfig ? "updated" : "created"} successfully!`);
+      await axios.put(
+        `${BASE_URL}/company/tenancies/${tenancy.id}/invoice-config/`,
+        {
+          days_before_due: daysBeforeDue,
+          combine_charges: combineCharges,
+          is_active: isActive,
+        }
+      );
+      alert(
+        `Invoice configuration ${
+          hasConfig ? "updated" : "created"
+        } successfully!`
+      );
       setHasConfig(true);
       setError(null);
       onClose();
@@ -59,27 +67,23 @@ const InvoiceConfig = ({ tenancy, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-800">
+    <div className="invoice-config-modal-overlay">
+      <div className="invoice-config-modal-wrapper p-6">
+        <div className="flex justify-between items-center md:mb-6">
+          <h2 className="invoice-config-modal-head">
             Invoice Configuration for {tenancy.tenancy_code}
           </h2>
           <button
+            className="invoice-config-close-btn duration-200"
             onClick={onClose}
-            className="p-2 hover:bg-gray-200 rounded-full transition-colors"
           >
-            <X size={20} className="text-gray-600" />
+            <X size={20} className="text-black" />
           </button>
         </div>
-        {error && (
-          <div className="mb-4 p-3 bg-red-100 text-red-600 rounded-lg text-sm">
-            {error}
-          </div>
-        )}
-        <div className="space-y-4">
+        {error && <div className="invoice-config-error mb-4">{error}</div>}
+        <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-600">
+            <label className="invoice-config-modal-label mb-2 block">
               Days Before Due Date
             </label>
             <input
@@ -87,56 +91,54 @@ const InvoiceConfig = ({ tenancy, onClose }) => {
               value={daysBeforeDue}
               onChange={(e) => setDaysBeforeDue(parseInt(e.target.value))}
               min="1"
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="invoice-config-input-style"
+              disabled={loading}
             />
-            <span className="mt-1 block text-sm text-gray-600">
+            <span className="mt-2 block invoice-config-helper-text">
               Number of days before due date to generate and send invoice
             </span>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-600">
+          <div className="flex flex-col gap-1">
+            <label className="invoice-config-modal-label">
               Combine Charges
             </label>
-            <input
-              type="checkbox"
-              checked={combineCharges}
-              onChange={(e) => setCombineCharges(e.target.checked)}
-              className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <span className="ml-2 text-sm text-gray-600">
-              Combine PaymentSchedule and AdditionalCharge in one invoice
-            </span>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={combineCharges}
+                onChange={(e) => setCombineCharges(e.target.checked)}
+                className="invoice-config-checkbox"
+                disabled={loading}
+              />
+              <span className="invoice-config-helper-text">
+                Combine payment schedule and additional charge in one invoice
+              </span>
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-600">
-              Active
-            </label>
-            <input
-              type="checkbox"
-              checked={isActive}
-              onChange={(e) => setIsActive(e.target.checked)}
-              className="mt-1 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <span className="ml-2 text-sm text-gray-600">
-              Enable invoice automation
-            </span>
+          <div className="flex flex-col gap-1">
+            <label className="invoice-config-modal-label">Active</label>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={isActive}
+                onChange={(e) => setIsActive(e.target.checked)}
+                className="invoice-config-checkbox"
+                disabled={loading}
+              />
+              <span className="invoice-config-helper-text">
+                Enable invoice automation
+              </span>
+            </div>
           </div>
         </div>
-        <div className="mt-6 flex justify-end gap-3">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-          >
-            Cancel
-          </button>
+        <div className="mt-8 mb-1 flex justify-end gap-3">
           <button
             onClick={handleSave}
             disabled={loading}
-            className={`flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors ${
+            className={`invoice-config-modal-save-btn px-4 py-2 bg-[#2892CE] text-white rounded-md hover:bg-[#2276a7] transition-colors duration-200 flex items-center${
               loading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
-            <Save size={18} />
             Save
           </button>
         </div>
