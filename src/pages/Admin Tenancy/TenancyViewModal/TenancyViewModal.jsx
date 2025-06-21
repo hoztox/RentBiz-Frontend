@@ -5,6 +5,7 @@ import closeicon from "../../../assets/Images/Admin Tenancy/close-icon.svg";
 import printicon from "../../../assets/Images/Admin Tenancy/download-icon-blue.svg";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
+import { X } from "lucide-react";
 
 const TenancyViewModal = () => {
   const { modalState, closeModal } = useModal();
@@ -142,7 +143,7 @@ const TenancyViewModal = () => {
               onClick={closeModal}
               className="tenancy-view-modal-close-btn hover:bg-gray-100 duration-200"
             >
-              <img src={closeicon} alt="Close" className="w-[15px] h-[15px]" />
+              <X size={20} />
             </button>
           </div>
         </div>

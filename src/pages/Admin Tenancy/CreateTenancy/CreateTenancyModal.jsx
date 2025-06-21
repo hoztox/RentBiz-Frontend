@@ -486,7 +486,7 @@ const CreateTenancyModal = () => {
               className="tenancy-close-btn hover:bg-gray-100 duration-200"
               aria-label="Close modal"
             >
-              <X size={24} color="#201D1E" />
+              <X size={20} />
             </button>
           </div>
 
