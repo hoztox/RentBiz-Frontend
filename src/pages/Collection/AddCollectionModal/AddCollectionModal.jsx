@@ -1,40 +1,120 @@
 import React, { useEffect, useState } from "react";
-import "./AddCollectionModal.css";
-import { ChevronDown } from "lucide-react";
-import closeicon from "../../../assets/Images/Collection/close-icon.svg";
-import calendaricon from "../../../assets/Images/Collection/calendar-icon.svg";
+import { ChevronDown, X, Calendar } from "lucide-react";
+import axios from "axios";
 import { useModal } from "../../../context/ModalContext";
+import { BASE_URL } from "../../../utils/config";
 
 const AddCollectionModal = () => {
   const { modalState, closeModal } = useModal();
   const [form, setForm] = useState({
-    selectTenancy: "",
-    buildingName: "",
-    unitName: "",
+    selectInvoice: "",
+    tenancyName: "",
     endDate: "",
     paymentDate: "",
     paymentMethod: "",
-    remarks: "",
+    referenceNumber: "",
+    amount: "",
+    accountHolderName: "",
+    accountNumber: "",
+    chequeNumber: "",
+    chequeDate: "",
   });
-  const [isSelectOpenTenancy, setIsSelectOpenTenancy] = useState(false);
-  const [isSelectOpenStatus, setIsSelectOpenStatus] = useState(false);
+  const [invoices, setInvoices] = useState([]);
+  const [invoiceDetails, setInvoiceDetails] = useState({
+    payment_schedules: [],
+    additional_charges: [],
+    total_amount_to_collect: "0.00",
+    total_tax_amount: "0.00",
+    taxes: [],
+  });
+  const [isSelectOpenInvoice, setIsSelectOpenInvoice] = useState(false);
+  const [isSelectOpenPaymentMethod, setIsSelectOpenPaymentMethod] = useState(false);
   const [formData, setFormData] = useState({
-    collectionItems: [
-      {
-        chargeType: "",
-        description: "",
-        date: "",
-        amount: "",
-        vat: "",
-        balance: "",
-        amountPaid: "",
-        total: "0",
-      },
-    ],
+    collectionItems: [],
   });
-  const [openDropdowns, setOpenDropdowns] = useState({
-    chargeType: false,
-  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [showDetails, setShowDetails] = useState(false);
+
+  useEffect(() => {
+    if (modalState.isOpen && modalState.type === "create-collection") {
+      setLoading(true);
+      setError(null);
+      axios
+        .get(`${BASE_URL}/finance/unpaid-invoices/`)
+        .then((response) => {
+          if (Array.isArray(response.data)) {
+            setInvoices(response.data);
+          } else {
+            console.error("Unexpected response format:", response.data);
+            setError("Invalid data format received from server");
+            setInvoices([]);
+          }
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching unpaid invoices:", error);
+          setError("Failed to fetch invoices. Please try again.");
+          setInvoices([]);
+          setLoading(false);
+        });
+    }
+  }, [modalState.isOpen]);
+
+  useEffect(() => {
+    if (form.selectInvoice) {
+      setLoading(true);
+      setError(null);
+      axios
+        .get(`${BASE_URL}/finance/invoice-details/${form.selectInvoice}/`)
+        .then((response) => {
+          setInvoiceDetails(response.data);
+          setForm((prev) => ({
+            ...prev,
+            tenancyName: response.data.invoice.tenancy_name || "",
+            endDate: response.data.invoice.end_date
+              ? new Date(response.data.invoice.end_date).toLocaleDateString("en-GB")
+              : "",
+          }));
+          setFormData({
+            collectionItems: [
+              ...response.data.payment_schedules.map((ps) => ({
+                id: ps.id,
+                type: "payment_schedule",
+                chargeType: ps.charge_type || "",
+                description: ps.reason || "",
+                date: ps.due_date
+                  ? new Date(ps.due_date).toLocaleDateString("en-GB")
+                  : "",
+                amount: ps.amount || "0.00",
+                tax: ps.tax || "0.00",
+                total: ps.total || "0.00",
+                balance: ps.balance || "0.00",
+              })),
+              ...response.data.additional_charges.map((ac) => ({
+                id: ac.id,
+                type: "additional_charge",
+                chargeType: ac.charge_type || "",
+                description: ac.reason || "",
+                date: ac.due_date
+                  ? new Date(ac.due_date).toLocaleDateString("en-GB")
+                  : "",
+                amount: ac.amount || "0.00",
+                tax: ac.tax || "0.00",
+                total: ac.total || "0.00",
+                balance: ac.balance || "0.00",
+              })),
+            ],
+          });
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching invoice details:", error);
+          setError("Failed to fetch invoice details. Please try again.");
+          setLoading(false);
+        });
+    }
+  }, [form.selectInvoice]);
 
   const updateForm = (key, value) => {
     setForm((prev) => ({
@@ -43,598 +123,409 @@ const AddCollectionModal = () => {
     }));
   };
 
-  const handleItemChange = (index, field, value) => {
-    setFormData((prev) => {
-      const updatedItems = [...prev.collectionItems];
-      updatedItems[index] = { ...updatedItems[index], [field]: value };
-      return { ...prev, collectionItems: updatedItems };
-    });
+  const formatDateForBackend = (dateStr) => {
+    if (!dateStr) return "";
+    // Assuming input is in dd/mm/yyyy format
+    const [day, month, year] = dateStr.split("/");
+    return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
   };
-
-  const toggleDropdown = (field) => {
-    setOpenDropdowns((prev) => ({
-      ...prev,
-      [field]: !prev[field],
-    }));
-  };
-
-  useEffect(() => {
-    if (modalState.isOpen) {
-      setForm({
-        selectTenancy: "",
-        buildingName: "",
-        unitName: "",
-        endDate: "",
-        paymentDate: "",
-        paymentMethod: "",
-        remarks: "",
-      });
-      setFormData({
-        collectionItems: [
-          {
-            chargeType: "",
-            description: "",
-            date: "",
-            amount: "",
-            vat: "",
-            balance: "",
-            amountPaid: "",
-            total: "0",
-          },
-        ],
-      });
-    }
-  }, [modalState.isOpen]);
 
   const handleSave = () => {
-    const {
-      selectTenancy,
-      buildingName,
-      unitName,
-      endDate,
-      paymentDate,
-      paymentMethod,
-      remarks,
-    } = form;
+    const { selectInvoice, paymentDate, paymentMethod, amount, accountHolderName, accountNumber, referenceNumber, chequeNumber, chequeDate } = form;
 
-    if (
-      selectTenancy &&
-      buildingName &&
-      unitName &&
-      endDate &&
-      paymentDate &&
-      paymentMethod &&
-      remarks
-    ) {
-      console.log("New Charge Added: ", form);
-      console.log("Collection Items: ", formData.collectionItems);
-      closeModal();
+    // Validate required fields
+    let requiredFields = [selectInvoice, paymentDate, paymentMethod, amount];
+    if (paymentMethod === "bank_transfer") {
+      requiredFields.push(accountHolderName, accountNumber, referenceNumber);
+    }
+    if (paymentMethod === "cheque") {
+      requiredFields.push(accountHolderName, accountNumber, referenceNumber, chequeNumber, chequeDate);
+    }
+
+    if (requiredFields.every((field) => field)) {
+      const collectionData = {
+        invoice: selectInvoice,
+        amount: parseFloat(amount),
+        collection_date: formatDateForBackend(paymentDate),
+        collection_mode: paymentMethod,
+        reference_number: referenceNumber || null,
+        status: "completed",
+        ...(paymentMethod === "bank_transfer" || paymentMethod === "cheque"
+          ? {
+              account_holder_name: accountHolderName,
+              account_number: accountNumber,
+            }
+          : {}),
+        ...(paymentMethod === "cheque"
+          ? {
+              cheque_number: chequeNumber,
+              cheque_date: formatDateForBackend(chequeDate),
+            }
+          : {}),
+      };
+
+      setLoading(true);
+      setError(null);
+      axios
+        .post(`${BASE_URL}/finance/create-collection/`, collectionData)
+        .then((response) => {
+          console.log("Collection created:", response.data);
+          closeModal();
+        })
+        .catch((error) => {
+          console.error("Error creating collection:", error);
+          setError("Failed to create collection. Please try again.");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     } else {
-      console.log("Please fill all required fields");
+      setError("Please fill all required fields.");
     }
   };
 
-  // Only render for "create-invoice" type
   if (!modalState.isOpen || modalState.type !== "create-collection") {
     return null;
   }
 
   return (
-    <div className="financial-collection-modal-wrapper">
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 financial-collection-modal-overlay">
-        <div className="bg-white rounded-md w-[1006px] shadow-lg p-1 financial-collection-modal-container">
-          <div className="flex justify-between items-center md:p-6 mt-2">
-            <h2 className="text-[#201D1E] financial-collection-head">
-              Create New Collection
-            </h2>
-            <button
-              onClick={closeModal}
-              className="financial-collection-close-btn hover:bg-gray-100 duration-200"
-            >
-              <img src={closeicon} alt="close" className="w-[15px] h-[15px]" />
-            </button>
-          </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-4 font-sans">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 bg-gray-100 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-800">New Collection Receipt</h2>
+          <button
+            onClick={closeModal}
+            className="p-1 rounded-full hover:bg-gray-200 transition-colors"
+            disabled={loading}
+          >
+            <X size={18} className="text-gray-600" />
+          </button>
+        </div>
 
-          <div className="md:p-6 md:mt-[-15px]">
-            <div className="grid gap-6 financial-collection-modal-grid">
-              {/* First row */}
-              <div className="space-y-2">
-                <label className="block financial-collection-label">
-                  Select Tenancy
-                </label>
-                <div className="relative">
-                  <select
-                    value={form.selectTenancy}
-                    onChange={(e) => {
-                      updateForm("selectTenancy", e.target.value);
-                      if (e.target.value === "") {
-                        e.target.classList.add("financial-collection-selected");
-                      } else {
-                        e.target.classList.remove(
-                          "financial-collection-selected"
-                        );
-                      }
-                    }}
-                    onFocus={() => setIsSelectOpenTenancy(true)}
-                    onBlur={() => setIsSelectOpenTenancy(false)}
-                    className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-collection-selection ${
-                      form.selectTenancy === ""
-                        ? "financial-collection-selected"
-                        : ""
-                    }`}
-                  >
-                    <option value="" disabled hidden>
-                      Choose
-                    </option>
-                    <option value="contract1">Contract 1</option>
-                    <option value="contract2">Contract 2</option>
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto p-6 bg-white">
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-md text-sm">
+              {error}
+            </div>
+          )}
+          {loading && (
+            <div className="mb-4 p-3 bg-blue-50 text-blue-600 rounded-md text-sm">
+              Loading...
+            </div>
+          )}
+          <div className="space-y-6">
+            {/* Invoice Summary Section */}
+            <div className="border border-gray-200 rounded-md p-5 bg-gray-50">
+              <h3 className="text-lg font-medium text-gray-800 mb-3">Invoice Summary</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-600">Select Invoice*</label>
+                  <div className="relative w-2/3">
+                    <select
+                      value={form.selectInvoice}
+                      onChange={(e) => updateForm("selectInvoice", e.target.value)}
+                      onFocus={() => setIsSelectOpenInvoice(true)}
+                      onBlur={() => setIsSelectOpenInvoice(false)}
+                      className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-800 text-sm ${
+                        form.selectInvoice === "" ? "text-gray-400" : ""
+                      } disabled:bg-gray-100`}
+                      disabled={loading}
+                    >
+                      <option value="" disabled hidden>
+                        Choose Invoice
+                      </option>
+                      {invoices.map((invoice) => (
+                        <option key={invoice.id} value={invoice.id}>
+                          {invoice.invoice_number} - {invoice.tenancy_name}
+                        </option>
+                      ))}
+                    </select>
                     <ChevronDown
                       size={16}
-                      className={`text-[#201D1E] transition-transform duration-300 ${
-                        isSelectOpenTenancy ? "rotate-180" : "rotate-0"
+                      className={`absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 transition-transform ${
+                        isSelectOpenInvoice ? "rotate-180" : ""
                       }`}
                     />
                   </div>
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="block financial-collection-label">
-                  Building Name*
-                </label>
-                <input
-                  type="text"
-                  value={form.buildingName}
-                  onChange={(e) => updateForm("buildingName", e.target.value)}
-                  placeholder="Enter Building Name"
-                  className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-collection-input"
-                />
-              </div>
-
-              {/* Second row */}
-              <div className="space-y-2">
-                <label className="block financial-collection-label">
-                  Unit Name*
-                </label>
-                <div className="relative">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-600">Tenancy Name</label>
                   <input
                     type="text"
-                    value={form.unitName}
-                    onChange={(e) => updateForm("unitName", e.target.value)}
-                    placeholder="Enter Unit Name"
-                    className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-collection-input"
+                    value={form.tenancyName}
+                    readOnly
+                    className="w-2/3 px-3 py-2 border border-gray-200 bg-gray-100 rounded-md text-gray-800 text-sm"
                   />
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="block financial-collection-label">
-                  End Date
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={form.endDate}
-                    onChange={(e) => updateForm("endDate", e.target.value)}
-                    placeholder="dd/mm/yyyy"
-                    className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-collection-input"
-                  />
-                  <div className="absolute inset-y-0 right-1 flex items-center px-2">
-                    <img
-                      src={calendaricon}
-                      alt="calendar"
-                      className="w-5 h-5"
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-600">End Date</label>
+                  <div className="relative w-2/3">
+                    <input
+                      type="text"
+                      value={form.endDate}
+                      readOnly
+                      className="w-full px-3 py-2 border border-gray-200 bg-gray-100 rounded-md text-gray-800 text-sm"
                     />
-                  </div>
-                </div>
-              </div>
-
-              {/* Table Section */}
-              <div className="financial-collection-modal-table-wrapper">
-                <div className="mt-[10px] overflow-x-auto border border-[#E9E9E9] rounded-md financial-collection-modal-overflow-x-auto">
-                  {/* Desktop Table */}
-                  <div className="financial-collection-modal-desktop-table">
-                    <table className="w-full border-collapse financial-collection-modal-table">
-                      <thead>
-                        <tr className="border-b border-[#E9E9E9] h-[57px]">
-                          <th className="px-[10px] text-left financial-collection-modal-thead uppercase w-[117px]">
-                            Charge Type
-                          </th>
-                          <th className="px-[10px] text-left financial-collection-modal-thead uppercase w-[132px]">
-                            Description
-                          </th>
-                          <th className="px-[10px] text-left financial-collection-modal-thead uppercase w-[137px]">
-                            Date
-                          </th>
-                          <th className="px-[10px] text-left financial-collection-modal-thead uppercase w-[117px]">
-                            Amount
-                          </th>
-                          <th className="px-[10px] text-left financial-collection-modal-thead uppercase w-[42px]">
-                            VAT
-                          </th>
-                          <th className="px-[10px] text-left financial-collection-modal-thead uppercase w-[50px]">
-                            Total
-                          </th>
-                          <th className="px-[10px] text-left financial-collection-modal-thead uppercase w-[66px]">
-                            Balance
-                          </th>
-                          <th className="px-[10px] text-left financial-collection-modal-thead uppercase w-[118px]">
-                            Amount Paid
-                          </th>
-                          <th className="px-[10px] text-left financial-collection-modal-thead uppercase w-[43px]">
-                            Total
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {formData.collectionItems.map((item, index) => (
-                          <tr key={index} className="h-[57px]">
-                            {/* CHARGE TYPE */}
-                            <td className="px-[5px] py-[5px] w-[116px] relative">
-                              <select
-                                value={item.chargeType}
-                                onChange={(e) =>
-                                  handleItemChange(
-                                    index,
-                                    "chargeType",
-                                    e.target.value
-                                  )
-                                }
-                                onFocus={() => toggleDropdown("chargeType")}
-                                onBlur={() => toggleDropdown("chargeType")}
-                                className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white financial-collection-modal-table-select"
-                              >
-                                <option value="">Choose</option>
-                                <option value="rent">Rent</option>
-                                <option value="maintenance">Maintenance</option>
-                              </select>
-                              <ChevronDown
-                                className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
-                                  openDropdowns.chargeType ? "rotate-180" : ""
-                                }`}
-                              />
-                            </td>
-
-                            {/* DESCRIPTION */}
-                            <td className="px-[5px] py-[5px] w-[150px]">
-                              <input
-                                type="text"
-                                placeholder="Enter Description"
-                                value={item.description}
-                                onChange={(e) =>
-                                  handleItemChange(
-                                    index,
-                                    "description",
-                                    e.target.value
-                                  )
-                                }
-                                className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-collection-modal-table-input"
-                              />
-                            </td>
-
-                            {/* DATE */}
-                            <td className="px-[5px] py-[5px] w-[136px] relative">
-                              <input
-                                type="text"
-                                placeholder="mm/dd/yyyy"
-                                value={item.date}
-                                onChange={(e) =>
-                                  handleItemChange(
-                                    index,
-                                    "date",
-                                    e.target.value
-                                  )
-                                }
-                                className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-collection-modal-table-input"
-                              />
-                              <img
-                                src={calendaricon}
-                                alt="Calendar"
-                                className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                              />
-                            </td>
-
-                            {/* AMOUNT */}
-                            <td className="px-[5px] py-[5px] w-[129px]">
-                              <input
-                                type="text"
-                                placeholder="Enter Amount"
-                                value={item.amount}
-                                onChange={(e) =>
-                                  handleItemChange(
-                                    index,
-                                    "amount",
-                                    e.target.value
-                                  )
-                                }
-                                className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-collection-modal-table-input"
-                              />
-                            </td>
-
-                            {/* VAT */}
-                            <td className="px-[5px] py-[5px] w-[42px] text-left text-[14px] font-normal text-[#201D1E]">
-                              {Number(item.vat).toFixed(4)}
-                            </td>
-
-                            {/* TOTAL */}
-                            <td className="px-[5px] py-[5px] w-[44px] text-left text-[14px] font-normal text-[#201D1E]">
-                              {Number(item.total).toFixed(4)}
-                            </td>
-
-                            {/* BALANCE */}
-                            <td className="px-[10px] py-[5px] w-[44px] text-left text-[14px] font-normal text-[#201D1E]">
-                              {Number(item.balance).toFixed(4)}
-                            </td>
-
-                            {/* AMOUNT PAID */}
-                            <td className="px-[5px] py-[5px] w-[126px]">
-                              <input
-                                type="text"
-                                placeholder="Enter Amount"
-                                value={item.amountPaid}
-                                onChange={(e) =>
-                                  handleItemChange(
-                                    index,
-                                    "amountPaid",
-                                    e.target.value
-                                  )
-                                }
-                                className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-collection-modal-table-input"
-                              />
-                            </td>
-
-                            {/* TOTAL */}
-                            <td className="px-[5px] py-[5px] w-[35px] text-left text-[14px] font-normal text-[#201D1E]">
-                              {Number(item.total).toFixed(4)}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Mobile Table */}
-                  <div className="financial-collection-modal-mobile-table">
-                    {formData.collectionItems.map((item, index) => (
-                      <div
-                        key={index}
-                        className="financial-collection-modal-mobile-section"
-                      >
-                        {/* First Header: Charge Type and Description (unchanged) */}
-                        <div className="financial-collection-modal-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-2">
-                          <div className="px-[10px] flex items-center financial-collection-modal-thead uppercase">
-                            Charge Type
-                          </div>
-                          <div className="px-[10px] flex items-center financial-collection-modal-thead uppercase w-[50%]">
-                            Description
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 border-b border-[#E9E9E9]">
-                          <div className="px-[10px] py-[10px] h-[57px] relative w-[100%]">
-                            <select
-                              value={item.chargeType}
-                              onChange={(e) =>
-                                handleItemChange(
-                                  index,
-                                  "chargeType",
-                                  e.target.value
-                                )
-                              }
-                              className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 bg-white financial-collection-modal-table-select"
-                            >
-                              <option value="">Choose</option>
-                              <option value="rent">Rent</option>
-                              <option value="maintenance">Maintenance</option>
-                            </select>
-                            <ChevronDown
-                              className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none`}
-                            />
-                          </div>
-                          <div className="px-[10px] py-[10px] w-[100%]">
-                            <input
-                              type="text"
-                              placeholder="Enter Description"
-                              value={item.description}
-                              onChange={(e) =>
-                                handleItemChange(
-                                  index,
-                                  "description",
-                                  e.target.value
-                                )
-                              }
-                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-collection-modal-table-input"
-                            />
-                          </div>
-                        </div>
-
-                        {/* Second Header: Date, Amount, VAT (3 columns) */}
-                        <div className="financial-collection-modal-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-3">
-                          <div className="px-[10px] flex items-center financial-collection-modal-thead uppercase">
-                            Date
-                          </div>
-                          <div className="px-[10px] flex items-center financial-collection-modal-thead uppercase">
-                            Amount
-                          </div>
-                          <div className="px-[10px] flex items-center financial-collection-modal-thead uppercase">
-                            VAT
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-3 border-b border-[#E9E9E9]">
-                          <div className="px-[10px] py-[10px] relative">
-                            <input
-                              type="text"
-                              placeholder="mm/dd/yyyy"
-                              value={item.date}
-                              onChange={(e) =>
-                                handleItemChange(index, "date", e.target.value)
-                              }
-                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-collection-modal-table-input"
-                            />
-                            <img
-                              src={calendaricon}
-                              alt="Calendar"
-                              className="absolute right-[20px] top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none"
-                            />
-                          </div>
-                          <div className="px-[10px] py-[10px]">
-                            <input
-                              type="text"
-                              placeholder="Enter Amount"
-                              value={item.amount}
-                              onChange={(e) =>
-                                handleItemChange(
-                                  index,
-                                  "amount",
-                                  e.target.value
-                                )
-                              }
-                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-collection-modal-table-input"
-                            />
-                          </div>
-                          <div className="px-[10px] py-[5px] flex items-center text-[14px] font-normal text-[#201D1E]">
-                            {Number(item.vat).toFixed(4)}
-                          </div>
-                        </div>
-
-                        {/* Third Header: Total, Balance, Amount Paid, Total (4 columns) */}
-                        <div className="financial-collection-modal-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-4">
-                          <div className="px-[10px] flex items-center financial-collection-modal-thead uppercase">
-                            Total
-                          </div>
-                          <div className="px-[10px] flex items-center financial-collection-modal-thead uppercase">
-                            Balance
-                          </div>
-                          <div className="px-[10px] flex items-center financial-collection-modal-thead uppercase">
-                            Amount Paid
-                          </div>
-                          <div className="px-[10px] flex items-center financial-collection-modal-thead uppercase">
-                            Total
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-4">
-                          <div className="px-[10px] py-[5px] flex items-center text-[14px] font-normal text-[#201D1E]">
-                            {Number(item.total).toFixed(4)}
-                          </div>
-                          <div className="px-[10px] py-[5px] flex items-center text-[14px] font-normal text-[#201D1E]">
-                            {Number(item.balance).toFixed(4)}
-                          </div>
-                          <div className="px-[10px] py-[10px]">
-                            <input
-                              type="text"
-                              placeholder="Enter Amount"
-                              value={item.amountPaid}
-                              onChange={(e) =>
-                                handleItemChange(
-                                  index,
-                                  "amountPaid",
-                                  e.target.value
-                                )
-                              }
-                              className="w-full h-[38px] border placeholder-[#b7b5be] focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-collection-modal-table-input"
-                            />
-                          </div>
-                          <div className="px-[10px] py-[5px] flex items-center text-[14px] font-normal text-[#201D1E]">
-                            {Number(item.total).toFixed(4)}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Third row */}
-              <div className="space-y-2">
-                <label className="block financial-collection-label">
-                  Payment Date*
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={form.paymentDate}
-                    onChange={(e) => updateForm("paymentDate", e.target.value)}
-                    placeholder="dd/mm/yyyy"
-                    className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-collection-input"
-                  />
-                  <div className="absolute inset-y-0 right-1 flex items-center px-2">
-                    <img
-                      src={calendaricon}
-                      alt="calendar"
-                      className="w-5 h-5"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="block financial-collection-label">
-                  Payment Method*
-                </label>
-                <div className="relative">
-                  <select
-                    value={form.paymentMethod}
-                    onChange={(e) => {
-                      updateForm("paymentMethod", e.target.value);
-                      if (e.target.value === "") {
-                        e.target.classList.add("financial-collection-selected");
-                      } else {
-                        e.target.classList.remove(
-                          "financial-collection-selected"
-                        );
-                      }
-                    }}
-                    onFocus={() => setIsSelectOpenStatus(true)}
-                    onBlur={() => setIsSelectOpenStatus(false)}
-                    className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-collection-selection ${
-                      form.paymentMethod === ""
-                        ? "financial-collection-selected"
-                        : ""
-                    }`}
-                  >
-                    <option value="" disabled hidden>
-                      Choose
-                    </option>
-                    <option value="cash">Cash</option>
-                    <option value="bank_transfer">Bank Transfer</option>
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                    <ChevronDown
+                    <Calendar
                       size={16}
-                      className={`text-[#201D1E] transition-transform duration-300 ${
-                        isSelectOpenStatus ? "rotate-180" : "rotate-0"
-                      }`}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500"
                     />
                   </div>
                 </div>
-              </div>
-
-              {/* Sixth row - Remarks and Save button on same row */}
-              <div className="space-y-2 mb-1">
-                <label className="block financial-collection-label">
-                  Remarks
-                </label>
-                <input
-                  type="text"
-                  value={form.remarks}
-                  onChange={(e) => updateForm("remarks", e.target.value)}
-                  placeholder="Enter Remarks"
-                  className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-collection-input"
-                />
-              </div>
-
-              <div className="flex items-end justify-end mb-1">
-                <button
-                  type="button"
-                  onClick={handleSave}
-                  className="bg-[#2892CE] text-white financial-collection-save-btn duration-200"
-                >
-                  Save
-                </button>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-600">Total Balance</label>
+                  <input
+                    type="text"
+                    value={Number(invoiceDetails.total_amount_to_collect).toFixed(2)}
+                    readOnly
+                    className="w-2/3 px-3 py-2 border border-gray-200 bg-gray-100 rounded-md text-gray-800 text-sm font-semibold"
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-600">Total Tax</label>
+                  <input
+                    type="text"
+                    value={Number(invoiceDetails.total_tax_amount).toFixed(2)}
+                    readOnly
+                    className="w-2/3 px-3 py-2 border border-gray-200 bg-gray-100 rounded-md text-gray-800 text-sm font-semibold"
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-600">Applicable Taxes</label>
+                  <div className="w-2/3 flex flex-wrap gap-2">
+                    {invoiceDetails.taxes.length > 0 ? (
+                      invoiceDetails.taxes.map((tax, index) => (
+                        <span
+                          key={index}
+                          className="inline-block px-2 py-1 bg-blue-100 text-blue-700 rounded-md text-xs"
+                        >
+                          {tax.tax_type}: {tax.tax_percentage}% ({Number(tax.tax_amount).toFixed(2)})
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-xs text-gray-500">No taxes applied</span>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
+
+            {/* Collection Details */}
+            <div className="border border-gray-200 rounded-md p-5 bg-gray-50">
+              <h3 className="text-lg font-medium text-gray-800 mb-3">Collection Details</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-600">Amount*</label>
+                  <input
+                    type="number"
+                    value={form.amount}
+                    onChange={(e) => updateForm("amount", e.target.value)}
+                    placeholder="Enter Amount"
+                    className="w-2/3 px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm disabled:bg-gray-100"
+                    disabled={loading}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-600">Payment Date*</label>
+                  <div className="relative w-2/3">
+                    <input
+                      type="text"
+                      value={form.paymentDate}
+                      onChange={(e) => updateForm("paymentDate", e.target.value)}
+                      placeholder="dd/mm/yyyy"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm disabled:bg-gray-100"
+                      disabled={loading}
+                    />
+                    <Calendar
+                      size={16}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-gray-600">Payment Method*</label>
+                  <div className="relative w-2/3">
+                    <select
+                      value={form.paymentMethod}
+                      onChange={(e) => updateForm("paymentMethod", e.target.value)}
+                      onFocus={() => setIsSelectOpenPaymentMethod(true)}
+                      onBlur={() => setIsSelectOpenPaymentMethod(false)}
+                      className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm ${
+                        form.paymentMethod === "" ? "text-gray-400" : ""
+                      } disabled:bg-gray-100`}
+                      disabled={loading}
+                    >
+                      <option value="" disabled hidden>
+                        Choose
+                      </option>
+                      <option value="cash">Cash</option>
+                      <option value="bank_transfer">Bank Transfer</option>
+                      <option value="credit_card">Credit Card</option>
+                      <option value="cheque">Cheque</option>
+                      <option value="online_payment">Online Payment</option>
+                    </select>
+                    <ChevronDown
+                      size={16}
+                      className={`absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 transition-transform ${
+                        isSelectOpenPaymentMethod ? "rotate-180" : ""
+                      }`}
+                    />
+                  </div>
+                </div>
+                {(form.paymentMethod === "bank_transfer" || form.paymentMethod === "cheque") && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-medium text-gray-600">Account Holder Name*</label>
+                      <input
+                        type="text"
+                        value={form.accountHolderName}
+                        onChange={(e) => updateForm("accountHolderName", e.target.value)}
+                        placeholder="Enter Account Holder Name"
+                        className="w-2/3 px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm disabled:bg-gray-100"
+                        disabled={loading}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-medium text-gray-600">Account Number*</label>
+                      <input
+                        type="text"
+                        value={form.accountNumber}
+                        onChange={(e) => updateForm("accountNumber", e.target.value)}
+                        placeholder="Enter Account Number"
+                        className="w-2/3 px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm disabled:bg-gray-100"
+                        disabled={loading}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-medium text-gray-600">Reference Number*</label>
+                      <input
+                        type="text"
+                        value={form.referenceNumber}
+                        onChange={(e) => updateForm("referenceNumber", e.target.value)}
+                        placeholder="Enter Reference Number"
+                        className="w-2/3 px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm disabled:bg-gray-100"
+                        disabled={loading}
+                      />
+                    </div>
+                  </>
+                )}
+                {form.paymentMethod === "cheque" && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-medium text-gray-600">Cheque Number*</label>
+                      <input
+                        type="text"
+                        value={form.chequeNumber}
+                        onChange={(e) => updateForm("chequeNumber", e.target.value)}
+                        placeholder="Enter Cheque Number"
+                        className="w-2/3 px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm disabled:bg-gray-100"
+                        disabled={loading}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-medium text-gray-600">Cheque Date*</label>
+                      <div className="relative w-2/3">
+                        <input
+                          type="text"
+                          value={form.chequeDate}
+                          onChange={(e) => updateForm("chequeDate", e.target.value)}
+                          placeholder="dd/mm/yyyy"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm disabled:bg-gray-100"
+                          disabled={loading}
+                        />
+                        <Calendar
+                          size={16}
+                          className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Toggleable Collection Items Table */}
+            <div className="border border-gray-200 rounded-md p-5 bg-gray-50">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-lg font-medium text-gray-800">Payment Details</h3>
+                <button
+                  onClick={() => setShowDetails(!showDetails)}
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  {showDetails ? "Hide Details" : "Show Details"}
+                </button>
+              </div>
+              {showDetails && (
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        {[
+                          "Charge Type",
+                          "Description",
+                          "Date",
+                          "Amount",
+                          "Tax",
+                          "Total",
+                          "Balance",
+                        ].map((header) => (
+                          <th
+                            key={header}
+                            className="px-3 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider"
+                          >
+                            {header}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {formData.collectionItems.map((item, index) => (
+                        <tr key={index} className="hover:bg-gray-50">
+                          <td className="px-3 py-2 text-sm text-gray-800">{item.chargeType}</td>
+                          <td className="px-3 py-2 text-sm text-gray-800">{item.description}</td>
+                          <td className="px-3 py-2 text-sm text-gray-800">{item.date}</td>
+                          <td className="px-3 py-2 text-sm text-gray-800">
+                            {Number(item.amount).toFixed(2)}
+                          </td>
+                          <td className="px-3 py-2 text-sm text-gray-800">
+                            {Number(item.tax).toFixed(2)}
+                          </td>
+                          <td className="px-3 py-2 text-sm text-gray-800">
+                            {Number(item.total).toFixed(2)}
+                          </td>
+                          <td className="px-3 py-2 text-sm text-gray-800">
+                            {Number(item.balance).toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 bg-gray-100 border-t border-gray-200 flex justify-end space-x-3">
+          <button
+            type="button"
+            onClick={closeModal}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:ring-1 focus:ring-gray-500 text-sm transition-colors disabled:bg-gray-100"
+            disabled={loading}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:ring-1 focus:ring-blue-500 text-sm transition-colors disabled:bg-gray-400"
+            disabled={loading}
+          >
+            {loading ? "Saving..." : "Save Collection"}
+          </button>
         </div>
       </div>
     </div>
