@@ -1,0 +1,166 @@
+.update-schedule-modal-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.update-schedule-modal-container {
+  width: 1006px;
+  height: 870px;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.desktop-scrollable-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.desktop-scrollable-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.desktop-scrollable-content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.desktop-scrollable-content::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.update-schedule-modal-head {
+  font-family: "Inter Tight";
+  font-size: 21px;
+  font-weight: 500;
+  color: black;
+}
+
+.update-schedule-modal-close-btn {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  border: 1px solid #e9e9e9;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.payment-schedules-heading {
+  font-family: "Public Sans";
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0px;
+  color: black;
+}
+
+.update-schedule-thead {
+  font-family: "Inter Tight";
+  font-size: 13px;
+  color: #85909f;
+  opacity: 0.8;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+.update-schedule-tdata {
+  font-family: "Inter Tight";
+  font-size: 14px;
+  color: black;
+  font-weight: normal;
+}
+
+.edit-btn:hover {
+  filter: brightness(0) saturate(100%) invert(8%) sepia(7%) saturate(582%)
+    hue-rotate(289deg) brightness(100%) contrast(91%);
+}
+
+.desktop-table {
+  display: block;
+  max-height: calc(
+    870px - 200px
+  ); /* Modal height minus header, padding, and margins */
+  overflow-y: auto;
+}
+
+.table-body-container {
+  overflow-y: auto;
+}
+
+.payment-field-label {
+  font-family: "Inter Tight";
+  font-weight: 400;
+  font-size: 13px;
+  letter-spacing: 0px;
+  color: black;
+}
+
+.payment-input-field {
+  border: 1px solid #e9e9e9;
+  background-color: white;
+  border-radius: 6px;
+  padding: 7px 14px;
+  outline: none;
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+  color: #201d1e;
+}
+
+.apply-to-all-checkbox {
+  appearance: none;
+  width: 19px;
+  height: 19px;
+  border: 2px solid #e9e9e9;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+}
+
+.apply-to-all-checkbox:checked {
+  background-color: transparent;
+  border-color: #2892CE; /* Match the blue color from AddDocumentModal's save button */
+}
+
+.apply-to-all-checkbox:checked::after {
+  content: url('../../../assets/Images/Admin Masters/tickmark.svg'); /* Use the same tickmark.svg as in AddDocumentModal */
+  position: absolute;
+  top: 36.8%;
+  left: 53.3%;
+  transform: translate(-50%, -50%);
+  filter: brightness(0) saturate(100%) invert(46%) sepia(54%) saturate(906%) hue-rotate(161deg) brightness(96%) contrast(80%); /* Exact filter from AddDocumentModal */
+}
+
+.apply-to-all-label {
+  font-family: "Inter Tight";
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  font-size: 13px;
+}
+
+@media (max-width: 1024px) {
+  .update-schedule-modal-container {
+    width: 90vw;
+    height: auto;
+    min-height: 600px;
+  }
+  .desktop-table {
+    max-height: calc(600px - 200px); /* Adjust for smaller modal height */
+  }
+}
+
+@media (max-width: 767px) {
+  .desktop-table {
+    display: none;
+  }
+  .update-schedule-modal-container {
+    width: 95vw;
+    height: auto;
+    min-height: 500px;
+  }
+  .desktop-table {
+    max-height: calc(500px - 200px); /* Adjust for mobile modal height */
+  }
+}
