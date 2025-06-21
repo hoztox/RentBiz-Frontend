@@ -27,7 +27,6 @@ const TenancyMaster = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [tenancyToDelete, setTenancyToDelete] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [showInvoiceConfigModal, setShowInvoiceConfigModal] = useState(false);
   const [selectedTenancy, setSelectedTenancy] = useState(null);
   const [paymentSchedules, setPaymentSchedules] = useState([]);
   const itemsPerPage = 10;
@@ -120,9 +119,8 @@ const TenancyMaster = () => {
     setShowPaymentModal(true);
   };
 
-  const handleInvoiceConfigClick = (tenancy) => {
-    setSelectedTenancy(tenancy);
-    setShowInvoiceConfigModal(true);
+const handleInvoiceConfigClick = (tenancy) => {
+    openModal("invoice-config", "Invoice Configuration", tenancy);
   };
 
   const toggleRowExpand = (id) => {
@@ -611,12 +609,12 @@ const TenancyMaster = () => {
           refreshSchedules={() => fetchPaymentSchedules(selectedTenancy.id)}
         />
       )}
-      {showInvoiceConfigModal && (
+      {/* {showInvoiceConfigModal && (
         <InvoiceConfig
           tenancy={selectedTenancy}
           onClose={() => setShowInvoiceConfigModal(false)}
         />
-      )}
+      )} */}
     </div>
   );
 };

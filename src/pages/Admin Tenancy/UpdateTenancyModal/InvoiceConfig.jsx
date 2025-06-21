@@ -2,15 +2,23 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { X } from "lucide-react";
 import { BASE_URL } from "../../../utils/config";
+import { useModal } from "../../../context/ModalContext";
 import "./InvoiceConfig.css";
 
-const InvoiceConfig = ({ tenancy, onClose }) => {
+const InvoiceConfig = () => {
+  const { modalState, closeModal } = useModal();
   const [daysBeforeDue, setDaysBeforeDue] = useState(7);
   const [combineCharges, setCombineCharges] = useState(false);
   const [isActive, setIsActive] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [hasConfig, setHasConfig] = useState(true);
+
+  // Only render for "invoice-config" type
+  if (!modalState.isOpen || modalState.type !== "invoice-config") return null;
+
+  const tenancy = modalState.data; // Get tenancy data from modal context
+  if (!tenancy) return null; // Safeguard against missing tenancy data
 
   useEffect(() => {
     const fetchInvoiceConfig = async () => {
@@ -57,7 +65,7 @@ const InvoiceConfig = ({ tenancy, onClose }) => {
       );
       setHasConfig(true);
       setError(null);
-      onClose();
+      closeModal();
     } catch (err) {
       console.error("Error saving invoice config:", err);
       setError("Failed to save invoice configuration. Please try again.");
@@ -67,15 +75,21 @@ const InvoiceConfig = ({ tenancy, onClose }) => {
   };
 
   return (
-    <div className="invoice-config-modal-overlay">
-      <div className="invoice-config-modal-wrapper p-6">
+    <div
+      className="invoice-config-modal-overlay fixed inset-0 flex items-center justify-center transition-colors z-50"
+      onClick={closeModal}
+    >
+      <div
+        className="invoice-config-modal-wrapper bg-white rounded-md p-6 transition-all"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center md:mb-6">
           <h2 className="invoice-config-modal-head">
             Invoice Configuration for {tenancy.tenancy_code}
           </h2>
           <button
             className="invoice-config-close-btn duration-200"
-            onClick={onClose}
+            onClick={closeModal}
           >
             <X size={20} className="text-black" />
           </button>
@@ -135,7 +149,7 @@ const InvoiceConfig = ({ tenancy, onClose }) => {
           <button
             onClick={handleSave}
             disabled={loading}
-            className={`invoice-config-modal-save-btn px-4 py-2 bg-[#2892CE] text-white rounded-md hover:bg-[#2276a7] transition-colors duration-200 flex items-center${
+            className={`invoice-config-modal-save-btn px-4 py-2 bg-[#2892CE] text-white rounded-md hover:bg-[#2276a7] transition-colors duration-200 flex items-center ${
               loading ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
