@@ -39,6 +39,7 @@ import EditBuildingModal from "./Admin Properties/Buildings/EditBuildingModal/Ed
 import AddUnitModal from "./Admin Properties/Units/Add Unit Modal/AddUnitModal";
 import EditUnitModal from "./Admin Properties/Units/Edit Unit Modal/EditUnitModal";
 import EditTenantModal from "./Admin Tenants/EditTenantModal/EditTenantModal";
+import InvoiceConfig from "./Admin Tenancy/UpdateTenancyModal/InvoiceConfig";
 
 const Layout = () => {
   const { modalState, closeModal } = useModal();
@@ -55,30 +56,36 @@ const Layout = () => {
       {/* Conditionally render modals */}
       {modalState.isOpen && modalState.type === "user-create" && <AdminCreateUserModal />}
       {modalState.isOpen && modalState.type === "user-update" && <EditUserModal />}
-      {modalState.isOpen && modalState.type === "create-building" && <AddBuildingModal open={modalState.isOpen} onClose={closeModal} />}
-         {modalState.isOpen && modalState.type === "edit-building" && (
+      {modalState.isOpen && modalState.type === "create-building" && (
+        <AddBuildingModal open={modalState.isOpen} onClose={closeModal} />
+      )}
+      {modalState.isOpen && modalState.type === "edit-building" && (
         <EditBuildingModal
           open={modalState.isOpen}
           onClose={closeModal}
           buildingId={modalState.data?.buildingId}
         />
       )}
-      {modalState.isOpen && modalState.type === "create-unit" && <AddUnitModal open={modalState.isOpen} onClose={closeModal} />}
-        {modalState.isOpen && modalState.type === "edit-unit" && (
+      {modalState.isOpen && modalState.type === "create-unit" && (
+        <AddUnitModal open={modalState.isOpen} onClose={closeModal} />
+      )}
+      {modalState.isOpen && modalState.type === "edit-unit" && (
         <EditUnitModal
           open={modalState.isOpen}
           onClose={closeModal}
           unitId={modalState.data?.unitId}
         />
       )}
-      {modalState.isOpen && modalState.type === "create-tenant" && <CreateTenantModal open={modalState.isOpen} onClose={closeModal}  />} 
-        {modalState.isOpen && modalState.type === "edit-tenant" && (
+      {modalState.isOpen && modalState.type === "create-tenant" && (
+        <CreateTenantModal open={modalState.isOpen} onClose={closeModal} />
+      )}
+      {modalState.isOpen && modalState.type === "edit-tenant" && (
         <EditTenantModal
           open={modalState.isOpen}
           onClose={closeModal}
           tenantId={modalState.data?.tenantId}
         />
-      )}  
+      )}
       {modalState.isOpen && modalState.type === "tenancy-create" && <CreateTenancyModal />}
       {modalState.isOpen && modalState.type === "tenancy-update" && <UpdateTenancyModal />}
       {modalState.isOpen && modalState.type === "tenancy-view" && <TenancyViewModal />}
@@ -108,6 +115,7 @@ const Layout = () => {
       {modalState.isOpen && modalState.type === "update-expense" && <UpdateExpenseModal />}
       {modalState.isOpen && modalState.type === "create-refund" && <AddRefundModal />}
       {modalState.isOpen && modalState.type === "update-refund" && <UpdateRefundModal />}
+      {modalState.isOpen && modalState.type === "invoice-config" && <InvoiceConfig />}
     </div>
   );
 };

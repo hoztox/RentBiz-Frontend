@@ -228,9 +228,9 @@ const Units = () => {
                   <span
                     className={`px-[10px] py-[5px] h-[24px] rounded-[4px] unit-status ${
                       unit.unit_status === "occupied"
-                        ? "bg-[#D1E8FF] text-[#1A73E8] !w-[75px]"
+                        ? "bg-[#E8EFF6] text-[#1458A2] !w-[75px]"
                         : unit.unit_status === "renovation"
-                        ? "bg-[#FFF0F0] text-[#D32F2F] !w-[90px]"
+                        ? "bg-[#FDEAEA] text-[#A31414] !w-[75px]"
                         : unit.unit_status === "vacant"
                         ? "bg-[#ebffea] text-[#18ac18] !w-[60px]"
                         : unit.unit_status === "disputed"

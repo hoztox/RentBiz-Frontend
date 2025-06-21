@@ -4,6 +4,8 @@ import { BASE_URL } from "../../../utils/config";
 import { X } from "lucide-react";
 import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
 import tickicon from "../../../assets/Images/Admin Tenancy/tick-icon.svg";
+import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
+import { motion, AnimatePresence } from "framer-motion";
 import "./UpdatePaymentScheduleModal.css";
 
 const UpdatePaymentScheduleModal = ({
@@ -19,6 +21,7 @@ const UpdatePaymentScheduleModal = ({
     frequency: "monthly",
   });
   const [applyToAllPending, setApplyToAllPending] = useState(false);
+  const [expandedRows, setExpandedRows] = useState({});
 
   const handleEditClick = (schedule) => {
     setSelectedSchedule(selectedSchedule === schedule ? null : schedule);
@@ -27,6 +30,13 @@ const UpdatePaymentScheduleModal = ({
       dueDate: schedule.due_date || "",
       frequency: "monthly",
     });
+  };
+
+  const toggleRowExpand = (id) => {
+    setExpandedRows((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -50,6 +60,25 @@ const UpdatePaymentScheduleModal = ({
       console.error("Error updating payment schedule:", error);
       alert("Failed to update payment schedule.");
     }
+  };
+
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
+      },
+    },
   };
 
   return (
@@ -78,6 +107,7 @@ const UpdatePaymentScheduleModal = ({
         </h3>
 
         <div className="border border-[#E9E9E9] rounded-md mb-6 overflow-hidden">
+          {/* Desktop Table */}
           <div className="desktop-table">
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
@@ -268,6 +298,236 @@ const UpdatePaymentScheduleModal = ({
                 </tbody>
               </table>
             </div>
+          </div>
+
+          {/* Mobile Table */}
+          <div className="mobile-table block md:hidden">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="payment-table-row-head">
+                  <th className="px-5 w-[50%] text-left update-schedule-thead payment-charge-column">
+                    CHARGE TYPE
+                  </th>
+                  <th className="px-3 w-[50%] text-left update-schedule-thead payment-amount-column">
+                    AMOUNT
+                  </th>
+                  <th className="px-5 text-right update-schedule-thead"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {paymentSchedules.map((schedule) => (
+                  <React.Fragment key={schedule.id}>
+                    <tr
+                      className={`${
+                        expandedRows[schedule.id]
+                          ? "payment-mobile-no-border"
+                          : "payment-mobile-with-border"
+                      } border-b border-[#E9E9E9] h-[57px]`}
+                    >
+                      <td className="px-5 text-left update-schedule-tdata payment-charge-column">
+                        {schedule.charge_type?.name || "N/A"}
+                      </td>
+                      <td className="px-3 text-left update-schedule-tdata payment-amount-column">
+                        {schedule.amount}
+                      </td>
+                      <td className="py-4 flex items-center justify-end h-[57px]">
+                        <div
+                          className={`payment-dropdown-field ${
+                            expandedRows[schedule.id] ? "active" : ""
+                          }`}
+                          onClick={() => toggleRowExpand(schedule.id)}
+                        >
+                          <img
+                            src={downarrow}
+                            alt="drop-down-arrow"
+                            className={`payment-dropdown-img ${
+                              expandedRows[schedule.id] ? "text-white" : ""
+                            }`}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                    <AnimatePresence>
+                      {expandedRows[schedule.id] && (
+                        <motion.tr
+                          className="payment-mobile-with-border border-b border-[#E9E9E9]"
+                          initial="hidden"
+                          animate="visible"
+                          exit="hidden"
+                          variants={dropdownVariants}
+                        >
+                          <td colSpan={3} className="px-5">
+                            <div className="payment-dropdown-content">
+                              {/* Single row with all three items */}
+                              <div className="payment-grid grid grid-cols-3 gap-4">
+                                <div className="payment-grid-item w-[40%]">
+                                  <div className="payment-dropdown-label">
+                                    DUE DATE
+                                  </div>
+                                  <div className="payment-dropdown-value">
+                                    {schedule.due_date}
+                                  </div>
+                                </div>
+                                <div className="payment-grid-item w-[30%]">
+                                  <div className="payment-dropdown-label">
+                                    STATUS
+                                  </div>
+                                  <div className="payment-dropdown-value">
+                                    <span
+                                      className={`px-3 py-1 rounded-md text-sm payment-status ${
+                                        schedule.status === "pending"
+                                          ? "bg-[#FFF7E9] text-[#FBAD27]"
+                                          : schedule.status === "paid"
+                                          ? "bg-[#DDF6E8] text-[#28C76F]"
+                                          : "bg-[#E8EFF6] text-[#1458A2]"
+                                      }`}
+                                    >
+                                      {schedule.status.charAt(0).toUpperCase() +
+                                        schedule.status.slice(1)}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="payment-grid-item payment-action-column w-[15%]">
+                                  <div className="payment-dropdown-label">
+                                    ACTION
+                                  </div>
+                                  <div className="payment-dropdown-value payment-flex payment-items-center payment-gap-2">
+                                    {(schedule.status === "pending" ||
+                                      schedule.status === "invoice") && (
+                                      <button
+                                        onClick={() =>
+                                          schedule.status === "pending"
+                                            ? handleEditClick(schedule)
+                                            : null
+                                        }
+                                        className={`${
+                                          schedule.status === "invoice"
+                                            ? "cursor-not-allowed opacity-50"
+                                            : "cursor-pointer"
+                                        }`}
+                                        disabled={schedule.status === "invoice"}
+                                      >
+                                        <img
+                                          src={editicon}
+                                          alt="Edit"
+                                          className={`w-[18px] h-[18px] mt-2 edit-btn duration-200 ${
+                                            schedule.status === "invoice"
+                                              ? "opacity-50"
+                                              : ""
+                                          }`}
+                                        />
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {/* Mobile Edit Form */}
+                              {selectedSchedule?.id === schedule.id && (
+                                <div className="mobile-edit-form mt-4 p-4 bg-gray-50 rounded-md">
+                                  <div className="space-y-4">
+                                    {/* Tenancy Code */}
+                                    <div>
+                                      <label className="block mb-1.5 payment-field-label">
+                                        Tenancy Code
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={tenancy.tenancy_code}
+                                        disabled
+                                        className="w-full h-[38px] payment-input-field"
+                                      />
+                                    </div>
+
+                                    {/* Payment Amount */}
+                                    <div>
+                                      <label className="block mb-1.5 payment-field-label">
+                                        Payment Amount
+                                      </label>
+                                      <input
+                                        type="number"
+                                        value={paymentSchedule.amount}
+                                        onChange={(e) =>
+                                          setPaymentSchedule({
+                                            ...paymentSchedule,
+                                            amount: e.target.value,
+                                          })
+                                        }
+                                        className="w-full h-[38px] payment-input-field"
+                                        placeholder="Enter amount"
+                                        required
+                                      />
+                                    </div>
+
+                                    {/* Due Date */}
+                                    <div>
+                                      <label className="block mb-1.5 payment-field-label">
+                                        Due Date
+                                      </label>
+                                      <input
+                                        type="date"
+                                        value={paymentSchedule.dueDate}
+                                        disabled
+                                        className="w-full h-[38px] payment-input-field"
+                                      />
+                                    </div>
+
+                                    {/* Checkbox */}
+                                    <div className="flex items-center">
+                                      <input
+                                        type="checkbox"
+                                        id={`mobile-applyToAll-${schedule.id}`}
+                                        checked={applyToAllPending}
+                                        onChange={(e) =>
+                                          setApplyToAllPending(e.target.checked)
+                                        }
+                                        className="h-[15px] w-[15px] apply-to-all-checkbox"
+                                      />
+                                      <label
+                                        htmlFor={`mobile-applyToAll-${schedule.id}`}
+                                        className="ml-2 apply-to-all-label"
+                                      >
+                                        Apply to all pending payment schedules
+                                      </label>
+                                    </div>
+
+                                    {/* Action Buttons */}
+                                    <div className="flex items-center justify-end space-x-3 pt-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedSchedule(null);
+                                          setApplyToAllPending(false);
+                                          setPaymentSchedule({
+                                            amount: "",
+                                            dueDate: "",
+                                            frequency: "monthly",
+                                          });
+                                        }}
+                                        className="w-[32px] h-[32px] flex items-center justify-center border border-[#FF725E] bg-white rounded hover:bg-red-100 duration-200"
+                                      >
+                                        <X size={20} color="#FF725E" />
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={handleSubmit}
+                                        className="w-[32px] h-[32px] flex items-center justify-center border border-[#138567] bg-white rounded hover:bg-green-100 duration-200"
+                                      >
+                                        <img src={tickicon} alt="Save" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </motion.tr>
+                      )}
+                    </AnimatePresence>
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
