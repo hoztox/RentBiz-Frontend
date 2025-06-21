@@ -17,6 +17,8 @@ const UnitType = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [apartmentCount, setApartmentCount] = useState(0);
+  const [shopCount, setShopCount] = useState(0);
   const [expandedRows, setExpandedRows] = useState({});
   const [unitTypes, setUnitTypes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,38 +26,64 @@ const UnitType = () => {
   const { openModal, refreshCounter } = useModal();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [unitTypeIdToDelete, setUnitTypeIdToDelete] = useState(null);
-  const itemsPerPage = 10;
+  const itemsPerPage = 15;
 
   const dropdownOptions = [
-    { value: "all", label: "All" },
     { value: "showing", label: "Showing" },
+    { value: "all", label: "All" },
+   
+   
   ];
 
   const [selectedOption, setSelectedOption] = useState("showing");
 
   // Fetch unit types from backend
-  const fetchData = async () => {
+ const fetchData = async () => {
   try {
-    // setLoading(true);
     setError(null);
 
-    const response = await unitTypesApi.fetch({
+    const filters = {
       search: searchTerm,
-      status: selectedOption,
       page: currentPage,
       page_size: itemsPerPage,
-    });
+    };
 
-    setUnitTypes(response.results || []);
+    if (["shop", "apartment"].includes(selectedOption)) {
+    filters.title_filter = selectedOption;
+   }
+
+    const response = await unitTypesApi.fetch(filters);
+    const results = response.results || [];
+    console.log("RESULT SAMPLE:", results[0]);
+
+    setUnitTypes(results);
     setTotalCount(response.count || 0);
+    // 👉 Count apartments & shops on the current page
+   const apartmentOnPage = results.filter(
+   item => item.title?.toLowerCase() === "apartment"
+   ).length;
+
+  const shopOnPage = results.filter(
+  item => item.title?.toLowerCase() === "shop"
+  ).length;
+
+    // 👉 Reset counters on page 1, accumulate on next pages
+    if (currentPage === 1) {
+      setApartmentCount(apartmentOnPage);
+      setShopCount(shopOnPage);
+    } else {
+      setApartmentCount(prev => prev + apartmentOnPage);
+      setShopCount(prev => prev + shopOnPage);
+    }
+
   } catch (err) {
     const isPageResetCase = currentPage > totalPages && totalPages > 0;
 
     if (err?.message?.toLowerCase()?.includes("invalid page")) {
-      // Optional: silently recover or show custom message
-      setCurrentPage(1); // auto reset
+      setCurrentPage(1);
       return;
     }
+
     console.error("Error fetching unit types:", err);
     const errorMessage = err.message || "Failed to fetch unit types. Please try again.";
     setError(errorMessage);
@@ -64,7 +92,6 @@ const UnitType = () => {
     setLoading(false);
   }
 };
-
 
   // Handle delete confirmation
   const handleDelete = (id) => {
@@ -129,23 +156,24 @@ const UnitType = () => {
   
   
 
-  const totalPages = Math.ceil(totalCount / itemsPerPage);
-  const paginatedData = unitTypes;
-    
+const totalPages = Math.ceil(totalCount / itemsPerPage);
+const paginatedData = unitTypes;
 
-  const maxPageButtons = 5;
-  const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
-  const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+const maxPageButtons = 5;
+const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const stats = getUnitTypeStats();
-  useEffect(() => {
-  // Reset to page 1 when filters change
-  setCurrentPage(1);
+const stats = getUnitTypeStats();
+
+useEffect(() => {
+  setApartmentCount(0);
+  setShopCount(0);
+  setCurrentPage(1); // Reset to page 1 when filters change
 }, [searchTerm, selectedOption]);
 
-  useEffect(() => {
-    fetchData();
-  }, [refreshCounter,searchTerm,selectedOption,currentPage,itemsPerPage]);
+useEffect(() => {
+  fetchData();
+}, [refreshCounter, searchTerm, selectedOption, currentPage, itemsPerPage]);
 
   const handleEditClick = (unit) => {
     openModal("update-unit-type-master", "Update Unit Type Master", unit);
@@ -268,7 +296,7 @@ const UnitType = () => {
                 </tr>
               </thead>
               <tbody>
-                {paginatedData.length === 0 ? (
+                {unitTypes.length === 0 ? (
                   <tr>
                     <td
                       colSpan={4}
@@ -278,10 +306,10 @@ const UnitType = () => {
                     </td>
                   </tr>
                 ) : (
-                  paginatedData.map((unit, index) => {
-                    const isLastItemOnPage = index === paginatedData.length - 1;
+                  unitTypes.map((unit, index) => {
+                    const isLastItemOnPage = index === unitTypes.length - 1;
                     const shouldRemoveBorder =
-                      isLastItemOnPage && paginatedData.length === itemsPerPage;
+                      isLastItemOnPage && unitTypes.length === itemsPerPage;
 
                     return (
                       <tr
@@ -339,7 +367,7 @@ const UnitType = () => {
                     Total Apartment
                   </p>
                   <p className="text-[#1458A2] apartment-card-num mt-2">
-                    {stats.apartments}
+                    {apartmentCount}
                   </p>
                 </div>
                 <div className="w-1/3">
@@ -361,7 +389,7 @@ const UnitType = () => {
                 <div className="w-1/3">
                   <p className="text-[#201D1E] unit-card-text">Total Shop</p>
                   <p className="text-[#1458A2] shop-card-num mt-2">
-                    {stats.shops}
+                    {shopCount}
                   </p>
                 </div>
                 <div className="w-1/3">
@@ -397,14 +425,14 @@ const UnitType = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedData.length === 0 ? (
+            {unitTypes.length === 0 ? (
               <tr>
                 <td colSpan={3} className="px-5 py-8 text-center text-gray-500">
                   No unit types found
                 </td>
               </tr>
             ) : (
-              paginatedData.map((unit, index) => (
+              unitTypes.map((unit, index) => (
                 <React.Fragment key={unit.id}>
                   <tr
                     className={`${
