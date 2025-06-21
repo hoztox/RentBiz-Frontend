@@ -127,7 +127,7 @@ const AddInvoiceModal = () => {
         Array.isArray(tenancy.payment_schedules)
       ) {
         tenancy.payment_schedules.forEach((schedule) => {
-          if (schedule.status === "pending") {
+          if (schedule.status === "pending" || schedule.status === "partially_paid") {
             paymentSchedules.push({
               id: schedule.id,
               charge_type: schedule.charge_type?.name || "Unknown",
@@ -138,10 +138,14 @@ const AddInvoiceModal = () => {
                 ? parseFloat(schedule.amount).toFixed(2)
                 : "0.00",
               tax: schedule.tax ? parseFloat(schedule.tax).toFixed(2) : "0.00",
-              total: schedule.total
-                ? parseFloat(schedule.total).toFixed(2)
+              total: schedule.balance
+                ? parseFloat(schedule.balance).toFixed(2)
                 : "0.00",
-              selected: false,
+              amount_paid: schedule.amount_paid
+                ? parseFloat(schedule.amount_paid).toFixed(2)
+                : "0.00",
+              status: schedule.status,
+              selected: schedule.status === "partially_paid",
             });
           }
         });
@@ -152,7 +156,7 @@ const AddInvoiceModal = () => {
         Array.isArray(tenancy.additional_charges)
       ) {
         tenancy.additional_charges.forEach((charge) => {
-          if (charge.status === "pending") {
+          if (charge.status === "pending" || charge.status === "partially_paid") {
             additionalCharges.push({
               id: charge.id,
               charge_type: charge.charge_type?.name || "Unknown",
@@ -163,17 +167,34 @@ const AddInvoiceModal = () => {
                 ? parseFloat(charge.amount).toFixed(2)
                 : "0.00",
               tax: charge.tax ? parseFloat(charge.tax).toFixed(2) : "0.00",
-              total: charge.total
-                ? parseFloat(charge.total).toFixed(2)
+              total: charge.balance
+                ? parseFloat(charge.balance).toFixed(2)
                 : "0.00",
-              selected: false,
+              amount_paid: charge.amount_paid
+                ? parseFloat(charge.amount_paid).toFixed(2)
+                : "0.00",
+              status: charge.status,
+              selected: charge.status === "partially_paid",
             });
           }
         });
       }
 
-      setSelectedPaymentSchedules(paymentSchedules);
-      setSelectedAdditionalCharges(additionalCharges);
+      // Sort to show partially_paid items first
+      const sortedPaymentSchedules = paymentSchedules.sort((a, b) => {
+        if (a.status === "partially_paid" && b.status !== "partially_paid") return -1;
+        if (a.status !== "partially_paid" && b.status === "partially_paid") return 1;
+        return 0;
+      });
+
+      const sortedAdditionalCharges = additionalCharges.sort((a, b) => {
+        if (a.status === "partially_paid" && b.status !== "partially_paid") return -1;
+        if (a.status !== "partially_paid" && b.status === "partially_paid") return 1;
+        return 0;
+      });
+
+      setSelectedPaymentSchedules(sortedPaymentSchedules);
+      setSelectedAdditionalCharges(sortedAdditionalCharges);
     } catch (error) {
       console.error("Error initializing selected items:", error);
     }
@@ -270,8 +291,10 @@ const AddInvoiceModal = () => {
         return;
       }
 
-      setLoading(true);
-      setError(null);
+      if (!formData.inDate) {
+        setError("Invoice date is required.");
+        return;
+      }
 
       const selectedItems = [
         ...selectedPaymentSchedules
@@ -282,8 +305,9 @@ const AddInvoiceModal = () => {
             due_date: item.due_date,
             amount: parseFloat(item.amount) || 0,
             tax: parseFloat(item.tax) || 0,
-            type: "payment_schedule",
             total: parseFloat(item.total) || 0,
+            amount_paid: parseFloat(item.amount_paid) || 0,
+            type: "payment_schedule",
             schedule_id: item.id,
           })),
         ...selectedAdditionalCharges
@@ -294,11 +318,20 @@ const AddInvoiceModal = () => {
             due_date: item.due_date,
             amount: parseFloat(item.amount) || 0,
             tax: parseFloat(item.tax) || 0,
-            type: "additional_charge",
             total: parseFloat(item.total) || 0,
+            amount_paid: parseFloat(item.amount_paid) || 0,
+            type: "additional_charge",
             charge_id: item.id,
           })),
       ];
+
+      if (selectedItems.length === 0) {
+        setError("Please select at least one item to invoice.");
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
 
       const invoiceData = {
         company: companyId,
@@ -332,7 +365,11 @@ const AddInvoiceModal = () => {
         "Error creating invoice:",
         error.response?.data?.errors || error.message
       );
-      setError(error.response?.data?.errors || "Error creating invoice");
+      setError(
+        error.response?.data?.errors ||
+          error.response?.data?.message ||
+          "Error creating invoice"
+      );
     } finally {
       setLoading(false);
     }
@@ -413,6 +450,7 @@ const AddInvoiceModal = () => {
                 value={formData.inDate}
                 onChange={handleChange}
                 className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-input"
+                required
               />
             </div>
 
@@ -443,7 +481,7 @@ const AddInvoiceModal = () => {
             </div>
 
             <div>
-              <label className="block mb-3 invoice-modal-label">End Date</label>
+              <label className="block mb-3 invoice-modal-label">Due Date</label>
               <input
                 type="date"
                 name="endDate"
@@ -486,8 +524,11 @@ const AddInvoiceModal = () => {
                           <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">
                             Tax
                           </th>
+                          <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">
+                            Amount Paid
+                          </th>
                           <th className="px-[10px] text-left invoice-modal-thead uppercase w-[80px]">
-                            Total
+                            Balance
                           </th>
                         </tr>
                       </thead>
@@ -501,7 +542,9 @@ const AddInvoiceModal = () => {
                         {selectedPaymentSchedules.map((item, index) => (
                           <tr
                             key={index}
-                            className="border-b border-[#E9E9E9] last:border-b-0"
+                            className={`border-b border-[#E9E9E9] last:border-b-0 ${
+                              item.status === "partially_paid" ? "bg-yellow-100" : ""
+                            }`}
                           >
                             <td className="px-[10px] py-[5px] w-[50px]">
                               <input
@@ -528,6 +571,9 @@ const AddInvoiceModal = () => {
                             <td className="px-[10px] py-[5px] w-[100px] invoice-modal-tdata">
                               {item.tax}
                             </td>
+                            <td className="px-[10px] py-[5px] w-[100px] invoice-modal-tdata">
+                              {item.amount_paid}
+                            </td>
                             <td className="px-[10px] py-[5px] w-[80px] invoice-modal-tdata">
                               {item.total}
                             </td>
@@ -543,7 +589,9 @@ const AddInvoiceModal = () => {
                   {selectedPaymentSchedules.map((item, index) => (
                     <div
                       key={index}
-                      className="border-b border-[#E9E9E9] last:border-b-0 invoice-mobile-section"
+                      className={`border-b border-[#E9E9E9] last:border-b-0 invoice-mobile-section ${
+                        item.status === "partially_paid" ? "bg-yellow-100" : ""
+                      }`}
                     >
                       <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
                         <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[25%]">
@@ -582,7 +630,7 @@ const AddInvoiceModal = () => {
                           Amount
                         </div>
                       </div>
-                      <div className="flex justify-start border-b border-[#E9E9E9] h-[67px]">
+                      <div className="flex justify-between border-b border-[#E9E9E9] h-[67px]">
                         <div className="px-[10px] py-[13px] w-[50%] invoice-modal-tdata">
                           {item.due_date}
                         </div>
@@ -595,14 +643,24 @@ const AddInvoiceModal = () => {
                           Tax
                         </div>
                         <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[50%]">
-                          Total
+                          Amount Paid
+                        </div>
+                      </div>
+                      <div className="flex justify-between border-b border-[#E9E9E9] h-[67px]">
+                        <div className="px-[10px] py-[13px] w-[50%] invoice-modal-tdata">
+                          {item.tax}
+                        </div>
+                        <div className="px-[10px] py-[13px] w-[50%] invoice-modal-tdata">
+                          {item.amount_paid}
+                        </div>
+                      </div>
+                      <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
+                        <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[50%]">
+                          Balance
                         </div>
                       </div>
                       <div className="flex justify-start h-[67px]">
-                        <div className="px-[10px] py-[13px] w-full invoice-modal-tdata">
-                          {item.tax}
-                        </div>
-                        <div className="px-[10px] py-[13px] w-full invoice-modal-tdata">
+                        <div className="px-[10px] py-[13px] w-[50%] invoice-modal-tdata">
                           {item.total}
                         </div>
                       </div>
@@ -645,8 +703,11 @@ const AddInvoiceModal = () => {
                           <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">
                             Tax
                           </th>
+                          <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">
+                            Amount Paid
+                          </th>
                           <th className="px-[10px] text-left invoice-modal-thead uppercase w-[80px]">
-                            Total
+                            Balance
                           </th>
                         </tr>
                       </thead>
@@ -660,7 +721,9 @@ const AddInvoiceModal = () => {
                         {selectedAdditionalCharges.map((item, index) => (
                           <tr
                             key={index}
-                            className="border-b border-[#E9E9E9] last:border-b-0"
+                            className={`border-b border-[#E9E9E9] last:border-b-0 ${
+                              item.status === "partially_paid" ? "bg-yellow-100" : ""
+                            }`}
                           >
                             <td className="px-[10px] py-[5px] w-[50px]">
                               <input
@@ -687,6 +750,9 @@ const AddInvoiceModal = () => {
                             <td className="px-[10px] py-[5px] w-[100px] invoice-modal-tdata">
                               {item.tax}
                             </td>
+                            <td className="px-[10px] py-[5px] w-[100px] invoice-modal-tdata">
+                              {item.amount_paid}
+                            </td>
                             <td className="px-[10px] py-[5px] w-[80px] invoice-modal-tdata">
                               {item.total}
                             </td>
@@ -702,7 +768,9 @@ const AddInvoiceModal = () => {
                   {selectedAdditionalCharges.map((item, index) => (
                     <div
                       key={index}
-                      className="border-b border-[#E9E9E9] last:border-b-0 invoice-mobile-section"
+                      className={`border-b border-[#E9E9E9] last:border-b-0 invoice-mobile-section ${
+                        item.status === "partially_paid" ? "bg-yellow-100" : ""
+                      }`}
                     >
                       <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
                         <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[25%]">
@@ -754,13 +822,23 @@ const AddInvoiceModal = () => {
                           Tax
                         </div>
                         <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[50%]">
-                          Total
+                          Amount Paid
                         </div>
                       </div>
-                      <div className="flex justify-between h-[67px]">
+                      <div className="flex justify-between border-b border-[#E9E9E9] h-[67px]">
                         <div className="px-[10px] py-[13px] w-[50%] invoice-modal-tdata">
                           {item.tax}
                         </div>
+                        <div className="px-[10px] py-[13px] w-[50%] invoice-modal-tdata">
+                          {item.amount_paid}
+                        </div>
+                      </div>
+                      <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
+                        <div className="px-[10px] flex items-center invoice-modal-thead uppercase w-[50%]">
+                          Balance
+                        </div>
+                      </div>
+                      <div className="flex justify-start h-[67px]">
                         <div className="px-[10px] py-[13px] w-[50%] invoice-modal-tdata">
                           {item.total}
                         </div>
@@ -787,7 +865,7 @@ const AddInvoiceModal = () => {
             className="bg-[#2892CE] hover:bg-[#076094] text-white py-2 px-6 mb-3 invoice-modal-save-btn"
             disabled={loading}
           >
-            {loading ? "Generate..." : "Generate "}
+            {loading ? "Generating..." : "Generate Invoice"}
           </button>
         </div>
       </div>

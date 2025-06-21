@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Collection.css";
 import plusicon from "../../assets/Images/Collection/plus-icon.svg";
 import downloadicon from "../../assets/Images/Collection/download-icon.svg";
@@ -9,63 +9,56 @@ import downarrow from "../../assets/Images/Collection/downarrow.svg";
 import { useModal } from "../../context/ModalContext";
 import CustomDropDown from "../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
+import { BASE_URL } from "../../utils/config";
 
 const Collection = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
   const { openModal } = useModal();
-  const itemsPerPage = 10;
+  const [collections, setCollections] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Dropdown options for CustomDropDown
-  const dropdownOptions = [
-    { value: "showing", label: "Showing" },
-    { value: "all", label: "All" },
+  // Dropdown options for payment method filter
+  const paymentMethodOptions = [
+    { value: "", label: "All" },
+    { value: "cash", label: "Cash" },
+    { value: "bank_transfer", label: "Bank Transfer" },
+    { value: "credit_card", label: "Credit Card" },
+    { value: "cheque", label: "Cheque" },
+    { value: "online_payment", label: "Online Payment" },
   ];
 
-  // State for selected dropdown value
-  const [selectedOption, setSelectedOption] = useState("showing");
+  // State for selected payment method
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
 
-  const demoData = [
-    {
-      id: "#RCT2002001",
-      date: "24 Nov 2024",
-      tenancyId: "TC0013-1",
-      tenantName: "Manea Bin Saeed",
-      amount: "300.00",
-      description: "Test test test ",
-      payment: "Cash",
-      status: "Paid",
-    },
-    {
-      id: "#RCT2002001",
-      date: "24 Nov 2024",
-      tenancyId: "TC0013-1",
-      tenantName: "Manea Bin Saeed",
-      amount: "300.00",
-      description: "Test test test ",
-      payment: "Bank Transfer",
-      status: "Paid",
-    },
-  ];
-
-  const filteredData = demoData.filter(
-    (collection) =>
-      collection.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      collection.date.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      collection.tenancyId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      collection.tenantName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      collection.amount.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      collection.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      collection.payment.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      collection.status.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  // Fetch collections from API
+  useEffect(() => {
+    const fetchCollections = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axios.get(`${BASE_URL}/finance/collections/`, {
+          params: {
+            page: currentPage,
+            search: searchTerm,
+            payment_method: selectedPaymentMethod,
+          },
+        });
+        setCollections(response.data.results);
+        setTotalPages(Math.ceil(response.data.count / 10)); // Assuming 10 items per page
+      } catch (err) {
+        console.error("Error fetching collections:", err);
+        setError("Failed to load collections. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCollections();
+  }, [currentPage, searchTerm, selectedPaymentMethod]);
 
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
@@ -117,10 +110,10 @@ const Collection = () => {
             />
             <div className="relative w-[40%] md:w-auto">
               <CustomDropDown
-                options={dropdownOptions}
-                value={selectedOption}
-                onChange={setSelectedOption}
-                className="w-full md:w-[121px]"
+                options={paymentMethodOptions}
+                value={selectedPaymentMethod}
+                onChange={setSelectedPaymentMethod}
+                className="w-full md:w-[200px]"
                 dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 collection-selection"
               />
             </div>
@@ -148,311 +141,270 @@ const Collection = () => {
           </div>
         </div>
       </div>
-      <div className="collection-desktop-only">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b border-[#E9E9E9] h-[57px]">
-              <th className="px-5 text-left collection-thead">ID</th>
-              <th className="px-5 text-left collection-thead">DATE</th>
-              <th className="pl-5 text-left collection-thead">TENANCY ID</th>
-              <th className="pl-5 text-left collection-thead">TENANT NAME</th>
-              <th className="px-5 text-left collection-thead">AMOUNT</th>
-              <th className="px-5 text-left collection-thead">DESCRIPTION</th>
-              <th className="px-5 text-left collection-thead">
-                PAYMENT METHOD
-              </th>
-              <th className="px-5 text-left collection-thead w-[68px]">
-                STATUS
-              </th>
-              <th className="px-5 pr-11 text-right collection-thead">ACTION</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedData.map((collection, index) => (
-              <tr
-                key={index}
-                className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
-              >
-                <td className="px-5 text-left collection-data">
-                  {collection.id}
-                </td>
-                <td className="px-5 text-left collection-data">
-                  {collection.date}
-                </td>
-                <td className="pl-5 text-left collection-data">
-                  {collection.tenancyId}
-                </td>
-                <td className="pl-5 text-left collection-data">
-                  {collection.tenantName}
-                </td>
-                <td className="px-5 text-left collection-data">
-                  {collection.amount}
-                </td>
-                <td className="px-5 text-left collection-data">
-                  {collection.description}
-                </td>
-                <td className="px-5 text-left collection-data">
-                  {collection.payment}
-                </td>
-                <td className="px-5 text-left collection-data">
-                  <span
-                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] h-[28px] ${
-                      collection.status === "Paid"
-                        ? "bg-[#28C76F29] text-[#28C76F]"
-                        : "bg-[#FFE1E1] text-[#C72828]"
-                    }`}
-                  >
-                    {collection.status}
-                  </span>
-                </td>
-                <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={() => handleEditClick(collection)}>
-                    <img
-                      src={editicon}
-                      alt="Edit"
-                      className="w-[18px] h-[18px] action-btn duration-200"
-                    />
-                  </button>
-                  <button>
-                    <img
-                      src={downloadactionicon}
-                      alt="Download"
-                      className="w-[18px] h-[18px] action-btn duration-200"
-                    />
-                  </button>
-                  <button>
-                    <img
-                      src={printericon}
-                      alt="Printer"
-                      className="w-[18px] h-[18px] action-btn duration-200"
-                    />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="block md:hidden">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="collection-table-row-head">
-              <th className="px-5 text-left collection-thead collection-id-column">
-                ID
-              </th>
-              <th className="px-5 text-left collection-thead collection-date-column">
-                TENANT NAME
-              </th>
-              <th className="px-5 text-right collection-thead"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedData.map((collection, index) => (
-              <React.Fragment key={index}>
-                <tr
-                  className={`${
-                    expandedRows[collection.id + index]
-                      ? "collection-mobile-no-border"
-                      : "collection-mobile-with-border"
-                  } border-b border-[#E9E9E9] h-[57px]`}
-                >
-                  <td className="px-5 text-left collection-data collection-id-column">
-                    {collection.id}
-                  </td>
-                  <td className="px-5 text-left collection-data collection-date-column">
-                    {collection.tenantName}
-                  </td>
-                  <td className="py-4 flex items-center justify-end h-[57px]">
-                    <div
-                      className={`collection-dropdown-field ${
-                        expandedRows[collection.id + index] ? "active" : ""
-                      }`}
-                      onClick={() => toggleRowExpand(collection.id + index)}
-                    >
-                      <img
-                        src={downarrow}
-                        alt="drop-down-arrow"
-                        className={`collection-dropdown-img ${
-                          expandedRows[collection.id + index]
-                            ? "text-white"
-                            : ""
-                        }`}
-                      />
-                    </div>
-                  </td>
+      {loading && (
+        <div className="p-5 text-center">Loading...</div>
+      )}
+      {error && (
+        <div className="p-5 text-center text-red-600">{error}</div>
+      )}
+      {!loading && !error && (
+        <>
+          <div className="collection-desktop-only">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b border-[#E9E9E9] h-[57px]">
+                  <th className="px-5 text-left collection-thead">ID</th>
+                  <th className="px-5 text-left collection-thead">DATE</th>
+                  <th className="pl-5 text-left collection-thead">TENANCY ID</th>
+                  <th className="pl-5 text-left collection-thead">TENANT NAME</th>
+                  <th className="px-5 text-left collection-thead">AMOUNT</th>
+                  <th className="px-5 text-left collection-thead">DESCRIPTION</th>
+                  <th className="px-5 text-left collection-thead">PAYMENT METHOD</th>
+                  <th className="px-5 text-left collection-thead w-[68px]">STATUS</th>
+                  <th className="px-5 pr-11 text-right collection-thead">ACTION</th>
                 </tr>
-                <AnimatePresence>
-                  {expandedRows[collection.id + index] && (
-                    <motion.tr
-                      className="collection-mobile-with-border border-b border-[#E9E9E9]"
-                      initial="hidden"
-                      animate="visible"
-                      exit="hidden"
-                      variants={dropdownVariants}
+              </thead>
+              <tbody>
+                {collections.map((collection, index) => (
+                  <tr
+                    key={index}
+                    className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
+                  >
+                    <td className="px-5 text-left collection-data">{collection.id}</td>
+                    <td className="px-5 text-left collection-data">{collection.collection_date}</td>
+                    <td className="pl-5 text-left collection-data">{collection.tenancy_id}</td>
+                    <td className="pl-5 text-left collection-data">{collection.tenant_name}</td>
+                    <td className="px-5 text-left collection-data">{collection.amount}</td>
+                    <td className="px-5 text-left collection-data">{collection.description || '-'}</td>
+                    <td className="px-5 text-left collection-data">
+                      {collection.collection_mode.replace('_', ' ').toUpperCase()}
+                    </td>
+                    <td className="px-5 text-left collection-data">
+                      <span
+                        className={`px-[10px] py-[5px] rounded-[4px] w-[69px] h-[28px] ${
+                          collection.status === "completed"
+                            ? "bg-[#28C76F29] text-[#28C76F]"
+                            : "bg-[#FFE1E1] text-[#C72828]"
+                        }`}
+                      >
+                        {collection.status.toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
+                      <button onClick={() => handleEditClick(collection)}>
+                        <img
+                          src={editicon}
+                          alt="Edit"
+                          className="w-[18px] h-[18px] action-btn duration-200"
+                        />
+                      </button>
+                      <button>
+                        <img
+                          src={downloadactionicon}
+                          alt="Download"
+                          className="w-[18px] h-[18px] action-btn duration-200"
+                        />
+                      </button>
+                      <button>
+                        <img
+                          src={printericon}
+                          alt="Printer"
+                          className="w-[18px] h-[18px] action-btn duration-200"
+                        />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="block md:hidden">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="collection-table-row-head">
+                  <th className="px-5 text-left collection-thead collection-id-column">ID</th>
+                  <th className="px-5 text-left collection-thead collection-date-column">TENANT NAME</th>
+                  <th className="px-5 text-right collection-thead"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {collections.map((collection, index) => (
+                  <React.Fragment key={index}>
+                    <tr
+                      className={`${
+                        expandedRows[collection.id + index]
+                          ? "collection-mobile-no-border"
+                          : "collection-mobile-with-border"
+                      } border-b border-[#E9E9E9] h-[57px]`}
                     >
-                      <td colSpan={3} className="px-5">
-                        <div className="collection-dropdown-content">
-                          <div className="collection-dropdown-grid">
-                            <div className="collection-dropdown-item w-[50%]">
-                              <div className="collection-dropdown-label">
-                                TENANCY ID
-                              </div>
-                              <div className="collection-dropdown-value">
-                                {collection.tenancyId}
-                              </div>
-                            </div>
-                            <div className="collection-dropdown-item w-[50%]">
-                              <div className="collection-dropdown-label">
-                                DATE
-                              </div>
-                              <div className="collection-dropdown-value">
-                                {collection.date}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="collection-dropdown-grid">
-                            <div className="collection-dropdown-item w-[50%]">
-                              <div className="collection-dropdown-label">
-                                AMOUNT
-                              </div>
-                              <div className="collection-dropdown-value">
-                                {collection.amount}
-                              </div>
-                            </div>
-                            <div className="collection-dropdown-item w-[50%]">
-                              <div className="collection-dropdown-label">
-                                DESCRIPTION
-                              </div>
-                              <div className="collection-dropdown-value">
-                                {collection.description}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="collection-dropdown-grid">
-                            <div className="collection-dropdown-item w-[50%]">
-                              <div className="collection-dropdown-label">
-                                PAYMENT METHOD
-                              </div>
-                              <div className="collection-dropdown-value">
-                                {collection.payment}
-                              </div>
-                            </div>
-                            <div className="collection-dropdown-item w-[50%]">
-                              <div className="collection-dropdown-label">
-                                STATUS
-                              </div>
-                              <div className="collection-dropdown-value">
-                                <span
-                                  className={`px-[10px] py-[5px] rounded-[4px] w-[69px] h-[28px] ${
-                                    collection.status === "Paid"
-                                      ? "bg-[#28C76F29] text-[#28C76F]"
-                                      : "bg-[#FFE1E1] text-[#C72828]"
-                                  }`}
-                                >
-                                  {collection.status}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="collection-dropdown-grid">
-                            <div className="collection-dropdown-item w-[100%]">
-                              <div className="collection-dropdown-label">
-                                ACTION
-                              </div>
-                              <div className="collection-dropdown-value flex items-center gap-4">
-                                <button
-                                  onClick={() => handleEditClick(collection)}
-                                >
-                                  <img
-                                    src={editicon}
-                                    alt="Edit"
-                                    className="w-[18px] h-[18px] action-btn duration-200"
-                                  />
-                                </button>
-                                <button>
-                                  <img
-                                    src={downloadactionicon}
-                                    alt="Download"
-                                    className="w-[18px] h-[18px] action-btn duration-200"
-                                  />
-                                </button>
-                                <button>
-                                  <img
-                                    src={printericon}
-                                    alt="Printer"
-                                    className="w-[18px] h-[18px] action-btn duration-200"
-                                  />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
+                      <td className="px-5 text-left collection-data collection-id-column">{collection.id}</td>
+                      <td className="px-5 text-left collection-data collection-date-column">{collection.tenant_name}</td>
+                      <td className="py-4 flex items-center justify-end h-[57px]">
+                        <div
+                          className={`collection-dropdown-field ${
+                            expandedRows[collection.id + index] ? "active" : ""
+                          }`}
+                          onClick={() => toggleRowExpand(collection.id + index)}
+                        >
+                          <img
+                            src={downarrow}
+                            alt="drop-down-arrow"
+                            className={`collection-dropdown-img ${
+                              expandedRows[collection.id + index] ? "text-white" : ""
+                            }`}
+                          />
                         </div>
                       </td>
-                    </motion.tr>
-                  )}
-                </AnimatePresence>
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 px-5 collection-pagination-container">
-        <span className="collection-list-pagination collection-pagination-text">
-          Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-          {filteredData.length} entries
-        </span>
-        <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto collection-pagination-buttons">
-          <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(currentPage - 1)}
-          >
-            Previous
-          </button>
-          {startPage > 1 && (
-            <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
-              onClick={() => setCurrentPage(1)}
-            >
-              1
-            </button>
-          )}
-          {startPage > 2 && <span className="px-2 flex items-center">...</span>}
-          {[...Array(endPage - startPage + 1)].map((_, i) => (
-            <button
-              key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
-                currentPage === startPage + i
-                  ? "bg-[#1458A2] text-white"
-                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-              }`}
-              onClick={() => setCurrentPage(startPage + i)}
-            >
-              {startPage + i}
-            </button>
-          ))}
-          {endPage < totalPages - 1 && (
-            <span className="px-2 flex items-center">...</span>
-          )}
-          {endPage < totalPages && (
-            <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
-              onClick={() => setCurrentPage(totalPages)}
-            >
-              {totalPages}
-            </button>
-          )}
-          <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(currentPage + 1)}
-          >
-            Next
-          </button>
-        </div>
-      </div>
+                    </tr>
+                    <AnimatePresence>
+                      {expandedRows[collection.id + index] && (
+                        <motion.tr
+                          className="collection-mobile-with-border border-b border-[#E9E9E9]"
+                          initial="hidden"
+                          animate="visible"
+                          exit="hidden"
+                          variants={dropdownVariants}
+                        >
+                          <td colSpan={3} className="px-5">
+                            <div className="collection-dropdown-content">
+                              <div className="collection-dropdown-grid">
+                                <div className="collection-dropdown-item w-[50%]">
+                                  <div className="collection-dropdown-label">TENANCY ID</div>
+                                  <div className="collection-dropdown-value">{collection.tenancy_id}</div>
+                                </div>
+                                <div className="collection-dropdown-item w-[50%]">
+                                  <div className="collection-dropdown-label">DATE</div>
+                                  <div className="collection-dropdown-value">{collection.collection_date}</div>
+                                </div>
+                              </div>
+                              <div className="collection-dropdown-grid">
+                                <div className="collection-dropdown-item w-[50%]">
+                                  <div className="collection-dropdown-label">AMOUNT</div>
+                                  <div className="collection-dropdown-value">{collection.amount}</div>
+                                </div>
+                                <div className="collection-dropdown-item w-[50%]">
+                                  <div className="collection-dropdown-label">DESCRIPTION</div>
+                                  <div className="collection-dropdown-value">{collection.description || '-'}</div>
+                                </div>
+                              </div>
+                              <div className="collection-dropdown-grid">
+                                <div className="collection-dropdown-item w-[50%]">
+                                  <div className="collection-dropdown-label">PAYMENT METHOD</div>
+                                  <div className="collection-dropdown-value">
+                                    {collection.collection_mode.replace('_', ' ').toUpperCase()}
+                                  </div>
+                                </div>
+                                <div className="collection-dropdown-item w-[50%]">
+                                  <div className="collection-dropdown-label">STATUS</div>
+                                  <div className="collection-dropdown-value">
+                                    <span
+                                      className={`px-[10px] py-[5px] rounded-[4px] w-[69px] h-[28px] ${
+                                        collection.status === "completed"
+                                          ? "bg-[#28C76F29] text-[#28C76F]"
+                                          : "bg-[#FFE1E1] text-[#C72828]"
+                                      }`}
+                                    >
+                                      {collection.status.toUpperCase()}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="collection-dropdown-grid">
+                                <div className="collection-dropdown-item w-[100%]">
+                                  <div className="collection-dropdown-label">ACTION</div>
+                                  <div className="collection-dropdown-value flex items-center gap-4">
+                                    <button onClick={() => handleEditClick(collection)}>
+                                      <img
+                                        src={editicon}
+                                        alt="Edit"
+                                        className="w-[18px] h-[18px] action-btn duration-200"
+                                      />
+                                    </button>
+                                    <button>
+                                      <img
+                                        src={downloadactionicon}
+                                        alt="Download"
+                                        className="w-[18px] h-[18px] action-btn duration-200"
+                                      />
+                                    </button>
+                                    <button>
+                                      <img
+                                        src={printericon}
+                                        alt="Printer"
+                                        className="w-[18px] h-[18px] action-btn duration-200"
+                                      />
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </motion.tr>
+                      )}
+                    </AnimatePresence>
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 px-5 collection-pagination-container">
+            <span className="collection-list-pagination collection-pagination-text">
+              Showing {collections.length > 0 ? (currentPage - 1) * 10 + 1 : 0} to{" "}
+              {Math.min(currentPage * 10, collections.length + (currentPage - 1) * 10)} of{" "}
+              {totalPages * 10} entries
+            </span>
+            <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto collection-pagination-buttons">
+              <button
+                className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(currentPage - 1)}
+              >
+                Previous
+              </button>
+              {startPage > 1 && (
+                <button
+                  className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+                  onClick={() => setCurrentPage(1)}
+                >
+                  1
+                </button>
+              )}
+              {startPage > 2 && <span className="px-2 flex items-center">...</span>}
+              {[...Array(endPage - startPage + 1)].map((_, i) => (
+                <button
+                  key={startPage + i}
+                  className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
+                    currentPage === startPage + i
+                      ? "bg-[#1458A2] text-white"
+                      : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
+                  }`}
+                  onClick={() => setCurrentPage(startPage + i)}
+                >
+                  {startPage + i}
+                </button>
+              ))}
+              {endPage < totalPages - 1 && (
+                <span className="px-2 flex items-center">...</span>
+              )}
+              {endPage < totalPages && (
+                <button
+                  className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
+                  onClick={() => setCurrentPage(totalPages)}
+                >
+                  {totalPages}
+                </button>
+              )}
+              <button
+                className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(currentPage + 1)}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
