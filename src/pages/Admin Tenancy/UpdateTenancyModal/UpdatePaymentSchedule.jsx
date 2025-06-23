@@ -6,14 +6,18 @@ import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
 import tickicon from "../../../assets/Images/Admin Tenancy/tick-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
 import { motion, AnimatePresence } from "framer-motion";
+import { useModal } from "../../../context/ModalContext";
 import "./UpdatePaymentScheduleModal.css";
 
-const UpdatePaymentScheduleModal = ({
-  tenancy,
-  paymentSchedules,
-  onClose,
-  refreshSchedules,
-}) => {
+const UpdatePaymentScheduleModal = () => {
+  const { modalState, closeModal } = useModal();
+
+  // Only render for "update-payment-schedule" type
+  if (!modalState.isOpen || modalState.type !== "update-payment-schedule") return null;
+
+  const { tenancy, paymentSchedules } = modalState.data || {};
+  if (!tenancy || !paymentSchedules) return null; // Safeguard against missing data
+
   const [selectedSchedule, setSelectedSchedule] = useState(null);
   const [paymentSchedule, setPaymentSchedule] = useState({
     amount: "",
@@ -51,11 +55,11 @@ const UpdatePaymentScheduleModal = ({
         `${BASE_URL}/company/tenancies/${tenancy.id}/payment-schedules/${selectedSchedule.id}/`,
         payload
       );
-      await refreshSchedules();
       setSelectedSchedule(null);
       setApplyToAllPending(false);
       setPaymentSchedule({ amount: "", dueDate: "", frequency: "monthly" });
       alert("Payment schedule updated successfully!");
+      closeModal();
     } catch (error) {
       console.error("Error updating payment schedule:", error);
       alert("Failed to update payment schedule.");
@@ -83,7 +87,7 @@ const UpdatePaymentScheduleModal = ({
 
   return (
     <div
-      onClick={onClose}
+      onClick={closeModal}
       className="update-schedule-modal-overlay fixed inset-0 flex items-center justify-center transition-colors z-50"
     >
       <div
@@ -95,7 +99,7 @@ const UpdatePaymentScheduleModal = ({
             Update Payment Schedule
           </h2>
           <button
-            onClick={onClose}
+            onClick={closeModal}
             className="update-schedule-modal-close-btn hover:bg-gray-100 duration-200"
           >
             <X size={20} />
@@ -421,7 +425,7 @@ const UpdatePaymentScheduleModal = ({
                                   </div>
                                 </div>
                               </div>
-                              
+
                               {/* Mobile Edit Form */}
                               {selectedSchedule?.id === schedule.id && (
                                 <div className="mobile-edit-form mt-4 p-4 bg-gray-50 rounded-md">

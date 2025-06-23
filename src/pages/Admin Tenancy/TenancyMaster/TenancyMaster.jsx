@@ -13,8 +13,6 @@ import { BASE_URL } from "../../../utils/config";
 import CustomDropDown from "../../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
 import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
-import UpdatePaymentScheduleModal from "../UpdateTenancyModal/UpdatePaymentSchedule";
-import InvoiceConfig from "../UpdateTenancyModal/InvoiceConfig";
 import { Edit } from "lucide-react";
 
 const TenancyMaster = () => {
@@ -26,9 +24,6 @@ const TenancyMaster = () => {
   const [loading, setLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [tenancyToDelete, setTenancyToDelete] = useState(null);
-  const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [selectedTenancy, setSelectedTenancy] = useState(null);
-  const [paymentSchedules, setPaymentSchedules] = useState([]);
   const itemsPerPage = 10;
   const { openModal, refreshCounter } = useModal();
 
@@ -80,10 +75,11 @@ const TenancyMaster = () => {
       const response = await axios.get(
         `${BASE_URL}/company/tenancies/${tenancyId}/payment-schedules/`
       );
-      setPaymentSchedules(response.data);
+      return response.data; // Return the fetched data
     } catch (error) {
       console.error("Error fetching payment schedules:", error);
       alert("Failed to fetch payment schedules.");
+      return []; // Return empty array on error
     }
   };
 
@@ -113,14 +109,16 @@ const TenancyMaster = () => {
     setTenancyToDelete(null);
   };
 
-  const handlePaymentScheduleClick = async (tenancy) => {
-    setSelectedTenancy(tenancy);
-    await fetchPaymentSchedules(tenancy.id);
-    setShowPaymentModal(true);
+  const handleInvoiceConfigClick = (tenancy) => {
+    openModal("invoice-config", "Invoice Configuration", tenancy);
   };
 
-const handleInvoiceConfigClick = (tenancy) => {
-    openModal("invoice-config", "Invoice Configuration", tenancy);
+  const handlePaymentScheduleClick = async (tenancy) => {
+    const paymentSchedules = await fetchPaymentSchedules(tenancy.id);
+    openModal("update-payment-schedule", "Update Payment Schedule", {
+      tenancy,
+      paymentSchedules,
+    });
   };
 
   const toggleRowExpand = (id) => {
@@ -601,20 +599,6 @@ const handleInvoiceConfigClick = (tenancy) => {
         onConfirm={handleDeleteConfirm}
         onCancel={handleDeleteCancel}
       />
-      {showPaymentModal && (
-        <UpdatePaymentScheduleModal
-          tenancy={selectedTenancy}
-          paymentSchedules={paymentSchedules}
-          onClose={() => setShowPaymentModal(false)}
-          refreshSchedules={() => fetchPaymentSchedules(selectedTenancy.id)}
-        />
-      )}
-      {/* {showInvoiceConfigModal && (
-        <InvoiceConfig
-          tenancy={selectedTenancy}
-          onClose={() => setShowInvoiceConfigModal(false)}
-        />
-      )} */}
     </div>
   );
 };
