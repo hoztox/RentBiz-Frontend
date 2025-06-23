@@ -244,8 +244,8 @@ const UpdatePaymentScheduleModal = ({
                                   />
                                 </div>
 
-                                {/* Checkbox - Now with full label */}
-                                <div className="relative top-5 flex items-center min-w-[250px] pl-2">
+                                {/* Checkbox */}
+                                <div className="relative top-5 flex items-center min-w-[250px]">
                                   <input
                                     type="checkbox"
                                     id={`applyToAll-${schedule.id}`}
@@ -264,7 +264,7 @@ const UpdatePaymentScheduleModal = ({
                                 </div>
                               </div>
 
-                              {/* Action Buttons - Now aligned to end */}
+                              {/* Action Buttons */}
                               <div className="relative top-3 flex items-center space-x-3">
                                 <button
                                   type="button"
