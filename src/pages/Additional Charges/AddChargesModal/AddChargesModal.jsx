@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./AddChargesModal.css";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import closeicon from "../../../assets/Images/Additional Charges/close-icon.svg";
 import plusicon from "../../../assets/Images/Additional Charges/input-plus-icon.svg";
 import { useModal } from "../../../context/ModalContext";
@@ -10,40 +10,33 @@ import { toast } from "react-hot-toast";
 
 const AddChargesModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
-  const [tenancyContract, setTenancyContract] = useState("");
-  const [inDate, setInDate] = useState("");
-  const [chargeCode, setChargeCode] = useState("");
-  const [reason, setReason] = useState("");
-  const [amountDue, setAmountDue] = useState("");
-  const [taxAmount, setTaxAmount] = useState("");
-  const [totalAmount, setTotalAmount] = useState("");
-  const [dueDate, setDueDate] = useState("");
-  const [status, setStatus] = useState("");
-  const [remarks, setRemarks] = useState("");
+  const [formData, setFormData] = useState({
+    building: "",
+    unit: "",
+    tenancy: "",
+    inDate: "",
+    chargeCode: "",
+    reason: "",
+    amountDue: "",
+    taxAmount: "",
+    totalAmount: "",
+    dueDate: "",
+    status: "",
+    remarks: "",
+  });
+  const [openDropdowns, setOpenDropdowns] = useState({
+    building: false,
+    unit: false,
+    tenancy: false,
+    chargeCode: false,
+    status: false,
+  });
+  const [buildings, setBuildings] = useState([]);
+  const [units, setUnits] = useState([]);
   const [tenancies, setTenancies] = useState([]);
   const [chargeTypes, setChargeTypes] = useState([]);
-  const [isSelectOpenTenancy, setIsSelectOpenTenancy] = useState(false);
-  const [isSelectOpenChargeCode, setIsSelectOpenChargeCode] = useState(false);
-  const [isSelectOpenStatus, setIsSelectOpenStatus] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (modalState.isOpen && modalState.type === "create-additional-charges") {
-      setTenancyContract("");
-      setInDate("");
-      setChargeCode("");
-      setReason("");
-      setAmountDue("");
-      setTaxAmount("");
-      setTotalAmount("");
-      setDueDate("");
-      setStatus("");
-      setRemarks("");
-      setError("");
-      fetchOptions();
-    }
-  }, [modalState.isOpen, modalState.type]);
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -61,38 +54,206 @@ const AddChargesModal = () => {
     return null;
   };
 
-  const fetchOptions = async () => {
-    const companyId = getUserCompanyId();
-    if (!companyId) {
-      setError("Company ID not found. Please ensure you are logged in.");
-      toast.error("Company ID not found. Please ensure you are logged in.");
-      return;
-    }
-
+  const fetchBuildings = async () => {
     try {
-      const [tenanciesResponse, chargesResponse] = await Promise.all([
-        axios.get(`${BASE_URL}/company/tenancies/occupied/${companyId}/`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }),
-        axios.get(`${BASE_URL}/company/charges/company/${companyId}/`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }),
-      ]);
+      const companyId = getUserCompanyId();
+      if (!companyId) {
+        setError("No company ID found");
+        toast.error("No company ID found");
+        return;
+      }
 
-      setTenancies(tenanciesResponse.data.data || tenanciesResponse.data || []);
-      setChargeTypes(chargesResponse.data.data || chargesResponse.data || []);
-    } catch (err) {
-      setError("Failed to fetch options: " + err.message);
-      toast.error("Failed to fetch options: " + err.message);
+      setLoading(true);
+      setError(null);
+
+      const response = await axios.get(
+        `${BASE_URL}/company/buildings/occupied/${companyId}/`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+
+      if (response.data && Array.isArray(response.data)) {
+        const sortedBuildings = response.data.sort((a, b) => a.id - b.id);
+        setBuildings(sortedBuildings);
+      } else {
+        setBuildings([]);
+      }
+    } catch (error) {
+      console.error("Error fetching buildings:", error);
+      setError("Failed to fetch buildings");
+      toast.error("Failed to fetch buildings");
+      setBuildings([]);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const fetchUnits = async (buildingId) => {
+    try {
+      const companyId = getUserCompanyId();
+      if (!companyId || !buildingId) {
+        setError("Company ID or Building ID not found");
+        toast.error("Company ID or Building ID not found");
+        return;
+      }
+
+      setError(null);
+
+      const response = await axios.get(
+        `${BASE_URL}/company/units/${buildingId}/occupied-units/`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+
+      if (response.data && Array.isArray(response.data)) {
+        const sortedUnits = response.data.sort((a, b) => a.id - b.id);
+        setUnits(sortedUnits);
+      } else {
+        setUnits([]);
+      }
+    } catch (error) {
+      console.error("Error fetching units:", error);
+      setError("Failed to fetch units");
+      toast.error("Failed to fetch units");
+      setUnits([]);
+    }
+  };
+
+  const fetchTenancies = async (unitId) => {
+    try {
+      const companyId = getUserCompanyId();
+      if (!companyId || !unitId) {
+        setError("Company ID or Unit ID not found");
+        toast.error("Company ID or Unit ID not found");
+        return;
+      }
+
+      setError(null);
+
+      const response = await axios.get(
+        `${BASE_URL}/company/tenancies/company/${companyId}/${unitId}/`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+
+      if (response.data && Array.isArray(response.data.results)) {
+        const sortedTenancies = response.data.results.sort((a, b) => a.id - b.id);
+        setTenancies(sortedTenancies);
+      } else {
+        setTenancies([]);
+      }
+    } catch (error) {
+      console.error("Error fetching tenancies:", error);
+      setError("Failed to fetch tenancies");
+      toast.error("Failed to fetch tenancies");
+      setTenancies([]);
+    }
+  };
+
+  const fetchChargeTypes = async () => {
+    try {
+      const companyId = getUserCompanyId();
+      if (!companyId) {
+        setError("Company ID not found");
+        toast.error("Company ID not found");
+        return;
+      }
+
+      setLoading(true);
+      const response = await axios.get(
+        `${BASE_URL}/company/charges/company/${companyId}/`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+
+      if (response.data && Array.isArray(response.data)) {
+        setChargeTypes(response.data);
+      } else {
+        setChargeTypes([]);
+      }
+    } catch (error) {
+      console.error("Error fetching charge types:", error);
+      setError("Failed to fetch charge types");
+      toast.error("Failed to fetch charge types");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (modalState.isOpen && modalState.type === "create-additional-charges") {
+      setFormData({
+        building: "",
+        unit: "",
+        tenancy: "",
+        inDate: "",
+        chargeCode: "",
+        reason: "",
+        amountDue: "",
+        taxAmount: "",
+        totalAmount: "",
+        dueDate: "",
+        status: "",
+        remarks: "",
+      });
+      setBuildings([]);
+      setUnits([]);
+      setTenancies([]);
+      setChargeTypes([]);
+      setError("");
+      fetchBuildings();
+      fetchChargeTypes();
+    }
+  }, [modalState.isOpen, modalState.type]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    if (name === "building" && value) {
+      setFormData((prev) => ({
+        ...prev,
+        unit: "",
+        tenancy: "",
+      }));
+      setUnits([]);
+      setTenancies([]);
+      fetchUnits(value);
+    } else if (name === "unit" && value) {
+      setFormData((prev) => ({
+        ...prev,
+        tenancy: "",
+      }));
+      setTenancies([]);
+      fetchTenancies(value);
+    } else if (name === "tenancy" || name === "inDate" || name === "chargeCode" || name === "reason" || name === "dueDate" || name === "amountDue" || name === "status" || name === "remarks") {
+      setError("");
+    }
+  };
+
+  const toggleDropdown = (name) => {
+    setOpenDropdowns((prev) => ({
+      ...prev,
+      [name]: !prev[name],
+    }));
   };
 
   useEffect(() => {
     const fetchTaxPreview = async () => {
       const companyId = getUserCompanyId();
-      if (!companyId || !chargeCode || !amountDue || !dueDate || !inDate) {
-        setTaxAmount("");
-        setTotalAmount("");
+      if (!companyId || !formData.chargeCode || !formData.amountDue || !formData.dueDate || !formData.inDate) {
+        setFormData((prev) => ({
+          ...prev,
+          taxAmount: "",
+          totalAmount: "",
+        }));
         return;
       }
 
@@ -101,11 +262,11 @@ const AddChargesModal = () => {
           `${BASE_URL}/company/tenancies/preview-additional-charge-tax/`,
           {
             company: companyId,
-            charge_type: chargeCode,
-            amount: amountDue,
-            due_date: dueDate,
-            in_date: inDate,
-            reason: reason || "Additional Charge",
+            charge_type: formData.chargeCode,
+            amount: formData.amountDue,
+            due_date: formData.dueDate,
+            in_date: formData.inDate,
+            reason: formData.reason || "Additional Charge",
           },
           {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -113,49 +274,63 @@ const AddChargesModal = () => {
         );
 
         if (response.data.success) {
-          setTaxAmount(response.data.additional_charge.tax || "0.00");
-          setTotalAmount(response.data.additional_charge.total || "0.00");
+          setFormData((prev) => ({
+            ...prev,
+            taxAmount: response.data.additional_charge.tax || "0.00",
+            totalAmount: response.data.additional_charge.total || "0.00",
+          }));
           setError("");
         } else {
-          setTaxAmount("");
-          setTotalAmount("");
+          setFormData((prev) => ({
+            ...prev,
+            taxAmount: "",
+            totalAmount: "",
+          }));
           setError(response.data.message || "Failed to fetch tax preview");
           toast.error(response.data.message || "Failed to fetch tax preview");
         }
       } catch (err) {
-        setTaxAmount("");
-        setTotalAmount("");
+        setFormData((prev) => ({
+          ...prev,
+          taxAmount: "",
+          totalAmount: "",
+        }));
         setError("Error fetching tax preview: " + err.message);
         toast.error("Error fetching tax preview: " + err.message);
       }
     };
 
     fetchTaxPreview();
-  }, [chargeCode, amountDue, dueDate, inDate, reason]);
+  }, [formData.chargeCode, formData.amountDue, formData.dueDate, formData.inDate, formData.reason]);
 
   const handleSave = async () => {
-    if (!tenancyContract || !chargeCode || !reason || !dueDate || !amountDue || !status || !inDate) {
-      setError("Please fill all required fields (Tenancy Contract, Charge Code, Reason, In Date, Due Date, Amount Due, Status)");
+    if (!formData.building || !formData.unit || !formData.tenancy || !formData.chargeCode || !formData.reason || !formData.dueDate || !formData.amountDue || !formData.status || !formData.inDate) {
+      setError("Please fill all required fields (Building, Unit, Tenancy Contract, Charge Code, Reason, In Date, Due Date, Amount Due, Status)");
       toast.error("Please fill all required fields");
       return;
     }
 
-    const formData = {
-      tenancy: tenancyContract,
-      charge_type: chargeCode,
-      reason,
-      in_date: inDate,
-      due_date: dueDate,
-      amount: amountDue,
-      tax: taxAmount || "0.00",
-      status,
+    const payload = {
+      tenancy: formData.tenancy,
+      charge_type: formData.chargeCode,
+      reason: formData.reason,
+      in_date: formData.inDate,
+      due_date: formData.dueDate,
+      amount: formData.amountDue,
+      tax: formData.taxAmount || "0.00",
+      status: formData.status,
+      remarks: formData.remarks,
     };
 
     try {
       setLoading(true);
-      const response = await axios.post(`${BASE_URL}/company/additional-charges/create/`, formData, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
+      const response = await axios.post(
+        `${BASE_URL}/company/additional-charges/create/`,
+        payload,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
 
       if (response.data.success) {
         toast.success("Additional charge created successfully");
@@ -186,33 +361,38 @@ const AddChargesModal = () => {
             onClick={closeModal}
             className="add-charges-close-btn hover:bg-gray-100 duration-200"
           >
-            <img src={closeicon} alt="close" className="w-[15px] h-[15px]" />
+            <X size={20} />
           </button>
         </div>
 
-        {/* {error && <div className="text-red-500 text-center mb-4">{error}</div>} */}
+        {error && <div className="text-red-500 text-center mb-4">{error}</div>}
+
+        {loading && (
+          <div className="text-center py-4">
+            <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            <span className="ml-2">Loading...</span>
+          </div>
+        )}
 
         <div className="md:p-6 mt-[-15px]">
           <div className="grid ac-grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="block add-charges-label">Tenancy Contract*</label>
+              <label className="block add-charges-label">Select Building*</label>
               <div className="relative">
                 <select
-                  value={tenancyContract}
-                  onChange={(e) => {
-                    setTenancyContract(e.target.value);
-                    setError("");
-                  }}
-                  onFocus={() => setIsSelectOpenTenancy(true)}
-                  onBlur={() => setIsSelectOpenTenancy(false)}
+                  name="building"
+                  value={formData.building}
+                  onChange={handleChange}
+                  onFocus={() => toggleDropdown("building")}
+                  onBlur={() => setTimeout(() => toggleDropdown("building"), 150)}
                   className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-selection ${
-                    !tenancyContract ? "add-charges-selected" : ""
+                    !formData.building ? "add-charges-selected" : ""
                   }`}
                 >
-                  <option value="" disabled hidden>Choose</option>
-                  {tenancies.map((tenancy) => (
-                    <option key={tenancy.id} value={tenancy.id}>
-                      {tenancy.tenancy_code} - {tenancy.tenant.tenant_name || "N/A"}
+                  <option value="" disabled>Choose Building</option>
+                  {buildings.map((building) => (
+                    <option key={building.id} value={building.id}>
+                      {building.building_name} ({building.code})
                     </option>
                   ))}
                 </select>
@@ -220,7 +400,71 @@ const AddChargesModal = () => {
                   <ChevronDown
                     size={16}
                     className={`text-[#201D1E] transition-transform duration-300 ${
-                      isSelectOpenTenancy ? "rotate-180" : "rotate-0"
+                      openDropdowns.building ? "rotate-180" : "rotate-0"
+                    }`}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block add-charges-label">Select Unit*</label>
+              <div className="relative">
+                <select
+                  name="unit"
+                  value={formData.unit}
+                  onChange={handleChange}
+                  onFocus={() => toggleDropdown("unit")}
+                  onBlur={() => setTimeout(() => toggleDropdown("unit"), 150)}
+                  className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-selection ${
+                    !formData.unit ? "add-charges-selected" : ""
+                  }`}
+                  disabled={!formData.building}
+                >
+                  <option value="" disabled>Choose Unit</option>
+                  {units.map((unit) => (
+                    <option key={unit.id} value={unit.id}>
+                      {unit.unit_name} ({unit.code})
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                  <ChevronDown
+                    size={16}
+                    className={`text-[#201D1E] transition-transform duration-300 ${
+                      openDropdowns.unit ? "rotate-180" : "rotate-0"
+                    }`}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block add-charges-label">Tenancy Contract*</label>
+              <div className="relative">
+                <select
+                  name="tenancy"
+                  value={formData.tenancy}
+                  onChange={handleChange}
+                  onFocus={() => toggleDropdown("tenancy")}
+                  onBlur={() => setTimeout(() => toggleDropdown("tenancy"), 150)}
+                  className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-selection ${
+                    !formData.tenancy ? "add-charges-selected" : ""
+                  }`}
+                  disabled={!formData.unit}
+                >
+                  <option value="" disabled>Choose</option>
+                  {tenancies.map((tenancy) => (
+                    <option key={tenancy.id} value={tenancy.id}>
+                      {tenancy.tenancy_code} - {tenancy.tenant?.tenant_name || "N/A"}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                  <ChevronDown
+                    size={16}
+                    className={`text-[#201D1E] transition-transform duration-300 ${
+                      openDropdowns.tenancy ? "rotate-180" : "rotate-0"
                     }`}
                   />
                 </div>
@@ -231,11 +475,9 @@ const AddChargesModal = () => {
               <label className="block add-charges-label">In Date*</label>
               <input
                 type="date"
-                value={inDate}
-                onChange={(e) => {
-                  setInDate(e.target.value);
-                  setError("");
-                }}
+                name="inDate"
+                value={formData.inDate}
+                onChange={handleChange}
                 className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-input"
               />
             </div>
@@ -244,11 +486,9 @@ const AddChargesModal = () => {
               <label className="block add-charges-label">Due Date*</label>
               <input
                 type="date"
-                value={dueDate}
-                onChange={(e) => {
-                  setDueDate(e.target.value);
-                  setError("");
-                }}
+                name="dueDate"
+                value={formData.dueDate}
+                onChange={handleChange}
                 className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-input"
               />
             </div>
@@ -257,18 +497,16 @@ const AddChargesModal = () => {
               <label className="block add-charges-label">Charge Code*</label>
               <div className="relative">
                 <select
-                  value={chargeCode}
-                  onChange={(e) => {
-                    setChargeCode(e.target.value);
-                    setError("");
-                  }}
-                  onFocus={() => setIsSelectOpenChargeCode(true)}
-                  onBlur={() => setIsSelectOpenChargeCode(false)}
+                  name="chargeCode"
+                  value={formData.chargeCode}
+                  onChange={handleChange}
+                  onFocus={() => toggleDropdown("chargeCode")}
+                  onBlur={() => setTimeout(() => toggleDropdown("chargeCode"), 150)}
                   className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-selection ${
-                    !chargeCode ? "add-charges-selected" : ""
+                    !formData.chargeCode ? "add-charges-selected" : ""
                   }`}
                 >
-                  <option value="" disabled hidden>Choose</option>
+                  <option value="" disabled>Choose</option>
                   {chargeTypes.map((charge) => (
                     <option key={charge.id} value={charge.id}>{charge.name}</option>
                   ))}
@@ -277,7 +515,7 @@ const AddChargesModal = () => {
                   <ChevronDown
                     size={16}
                     className={`text-[#201D1E] transition-transform duration-300 ${
-                      isSelectOpenChargeCode ? "rotate-180" : "rotate-0"
+                      openDropdowns.chargeCode ? "rotate-180" : "rotate-0"
                     }`}
                   />
                 </div>
@@ -288,11 +526,9 @@ const AddChargesModal = () => {
               <label className="block add-charges-label">Reason*</label>
               <input
                 type="text"
-                value={reason}
-                onChange={(e) => {
-                  setReason(e.target.value);
-                  setError("");
-                }}
+                name="reason"
+                value={formData.reason}
+                onChange={handleChange}
                 placeholder="Enter The Reason"
                 className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-input"
               />
@@ -302,11 +538,9 @@ const AddChargesModal = () => {
               <label className="block add-charges-label">Amount Due*</label>
               <input
                 type="number"
-                value={amountDue}
-                onChange={(e) => {
-                  setAmountDue(e.target.value);
-                  setError("");
-                }}
+                name="amountDue"
+                value={formData.amountDue}
+                onChange={handleChange}
                 placeholder="Enter Amount Due"
                 className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-input"
                 min="0"
@@ -319,7 +553,8 @@ const AddChargesModal = () => {
               <div className="relative">
                 <input
                   type="text"
-                  value={taxAmount}
+                  name="taxAmount"
+                  value={formData.taxAmount}
                   readOnly
                   className="block w-full px-3 py-2 border border-gray-200 bg-gray-100 add-charges-input"
                 />
@@ -333,7 +568,8 @@ const AddChargesModal = () => {
               <label className="block add-charges-label">Total Amount</label>
               <input
                 type="text"
-                value={totalAmount}
+                name="totalAmount"
+                value={formData.totalAmount}
                 readOnly
                 className="block w-full px-3 py-2 border border-gray-200 bg-gray-100 add-charges-input"
               />
@@ -343,18 +579,16 @@ const AddChargesModal = () => {
               <label className="block add-charges-label">Status*</label>
               <div className="relative">
                 <select
-                  value={status}
-                  onChange={(e) => {
-                    setStatus(e.target.value);
-                    setError("");
-                  }}
-                  onFocus={() => setIsSelectOpenStatus(true)}
-                  onBlur={() => setIsSelectOpenStatus(false)}
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  onFocus={() => toggleDropdown("status")}
+                  onBlur={() => setTimeout(() => toggleDropdown("status"), 150)}
                   className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-selection ${
-                    !status ? "add-charges-selected" : ""
+                    !formData.status ? "add-charges-selected" : ""
                   }`}
                 >
-                  <option value="" disabled hidden>Choose</option>
+                  <option value="" disabled>Choose</option>
                   <option value="paid">Paid</option>
                   <option value="pending">Pending</option>
                 </select>
@@ -362,7 +596,7 @@ const AddChargesModal = () => {
                   <ChevronDown
                     size={16}
                     className={`text-[#201D1E] transition-transform duration-300 ${
-                      isSelectOpenStatus ? "rotate-180" : "rotate-0"
+                      openDropdowns.status ? "rotate-180" : "rotate-0"
                     }`}
                   />
                 </div>
@@ -373,8 +607,9 @@ const AddChargesModal = () => {
               <label className="block add-charges-label">Remarks</label>
               <input
                 type="text"
-                value={remarks}
-                onChange={(e) => setRemarks(e.target.value)}
+                name="remarks"
+                value={formData.remarks}
+                onChange={handleChange}
                 placeholder="Enter Remarks"
                 className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-charges-input"
               />
