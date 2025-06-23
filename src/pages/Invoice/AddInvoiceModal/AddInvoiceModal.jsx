@@ -9,6 +9,8 @@ import axios from "axios";
 const AddInvoiceModal = () => {
   const { modalState, closeModal } = useModal();
   const [formData, setFormData] = useState({
+    building: "",
+    unit: "",
     tenancy: "",
     inDate: "",
     building_name: "",
@@ -17,9 +19,13 @@ const AddInvoiceModal = () => {
   });
 
   const [openDropdowns, setOpenDropdowns] = useState({
+    building: false,
+    unit: false,
     tenancy: false,
   });
 
+  const [buildings, setBuildings] = useState([]);
+  const [units, setUnits] = useState([]);
   const [tenancies, setTenancies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [tenancyDetails, setTenancyDetails] = useState(null);
@@ -30,14 +36,12 @@ const AddInvoiceModal = () => {
   const getUserCompanyId = () => {
     try {
       const role = localStorage.getItem("role")?.toLowerCase();
-
       if (role === "company") {
         return localStorage.getItem("company_id");
       } else if (role === "user" || role === "admin") {
         const userCompanyId = localStorage.getItem("company_id");
         return userCompanyId ? JSON.parse(userCompanyId) : null;
       }
-
       return null;
     } catch (e) {
       console.error("Error getting user company ID:", e);
@@ -45,7 +49,7 @@ const AddInvoiceModal = () => {
     }
   };
 
-  const fetchTenancies = async () => {
+  const fetchBuildings = async () => {
     try {
       const companyId = getUserCompanyId();
       if (!companyId) {
@@ -57,13 +61,78 @@ const AddInvoiceModal = () => {
       setError(null);
 
       const response = await axios.get(
-        `${BASE_URL}/company/tenancies/company/${companyId}/`
+        `${BASE_URL}/company/buildings/occupied/${companyId}/`
       );
 
       if (response.data && Array.isArray(response.data)) {
-        const sortedTenancies = response.data.sort((a, b) => a.id - b.id);
+        const sortedBuildings = response.data.sort((a, b) => a.id - b.id);
+        setBuildings(sortedBuildings);
+        console.log("Fetched and sorted buildings:", sortedBuildings);
+      } else {
+        setBuildings([]);
+        console.log("No buildings found or invalid response format");
+      }
+    } catch (error) {
+      console.error("Error fetching buildings:", error);
+      setError("Failed to fetch buildings");
+      setBuildings([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUnits = async (buildingId) => {
+    try {
+      const companyId = getUserCompanyId();
+      if (!companyId || !buildingId) {
+        setError("Company ID or Building ID not found");
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+
+      // Use the correct endpoint matching the Django view
+      const response = await axios.get(
+        `${BASE_URL}/company/units/${buildingId}/occupied-units/`
+      );
+
+      if (response.data && Array.isArray(response.data)) {
+        const sortedUnits = response.data.sort((a, b) => a.id - b.id);
+        setUnits(sortedUnits);
+        console.log("Fetched and sorted units:", sortedUnits);
+      } else {
+        setUnits([]);
+        console.log("No units found or invalid response format");
+      }
+    } catch (error) {
+      console.error("Error fetching units:", error);
+      setError("Failed to fetch units");
+      setUnits([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTenancies = async (unitId) => {
+    try {
+      const companyId = getUserCompanyId();
+      if (!companyId || !unitId) {
+        setError("Company ID or Unit ID not found");
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+
+      const response = await axios.get(
+        `${BASE_URL}/company/tenancies/company/${companyId}/${unitId}/`
+      );
+
+      if (response.data && Array.isArray(response.data.results)) {
+        const sortedTenancies = response.data.results.sort((a, b) => a.id - b.id);
         setTenancies(sortedTenancies);
-        console.log("Fetched and sorted tenancies:", response.data);
+        console.log("Fetched and sorted tenancies:", sortedTenancies);
       } else {
         setTenancies([]);
         console.log("No tenancies found or invalid response format");
@@ -100,7 +169,6 @@ const AddInvoiceModal = () => {
         }));
 
         initializeSelectedItems(tenancy);
-
         console.log("Fetched tenancy details:", tenancy);
       } else {
         console.error(
@@ -180,7 +248,6 @@ const AddInvoiceModal = () => {
         });
       }
 
-      // Sort to show partially_paid items first
       const sortedPaymentSchedules = paymentSchedules.sort((a, b) => {
         if (a.status === "partially_paid" && b.status !== "partially_paid") return -1;
         if (a.status !== "partially_paid" && b.status === "partially_paid") return 1;
@@ -202,17 +269,24 @@ const AddInvoiceModal = () => {
 
   const resetForm = () => {
     setFormData({
+      building: "",
+      unit: "",
       tenancy: "",
       inDate: "",
       building_name: "",
       unit_name: "",
       endDate: "",
     });
+    setBuildings([]);
+    setUnits([]);
+    setTenancies([]);
     setTenancyDetails(null);
     setSelectedPaymentSchedules([]);
     setSelectedAdditionalCharges([]);
     setError(null);
     setOpenDropdowns({
+      building: false,
+      unit: false,
       tenancy: false,
     });
   };
@@ -220,7 +294,7 @@ const AddInvoiceModal = () => {
   useEffect(() => {
     if (modalState.isOpen && modalState.type === "create-invoice") {
       resetForm();
-      fetchTenancies();
+      fetchBuildings();
     }
   }, [modalState.isOpen, modalState.type]);
 
@@ -231,7 +305,34 @@ const AddInvoiceModal = () => {
       [name]: value,
     }));
 
-    if (name === "tenancy" && value) {
+    if (name === "building" && value) {
+      // Reset dependent fields when building changes
+      setFormData((prev) => ({
+        ...prev,
+        unit: "",
+        tenancy: "",
+        building_name: buildings.find((b) => b.id === parseInt(value))?.building_name || "",
+        unit_name: "",
+      }));
+      setUnits([]);
+      setTenancies([]);
+      setTenancyDetails(null);
+      setSelectedPaymentSchedules([]);
+      setSelectedAdditionalCharges([]);
+      fetchUnits(value);
+    } else if (name === "unit" && value) {
+      // Reset tenancy-related fields when unit changes
+      setFormData((prev) => ({
+        ...prev,
+        tenancy: "",
+        unit_name: units.find((u) => u.id === parseInt(value))?.unit_name || "",
+      }));
+      setTenancies([]);
+      setTenancyDetails(null);
+      setSelectedPaymentSchedules([]);
+      setSelectedAdditionalCharges([]);
+      fetchTenancies(value);
+    } else if (name === "tenancy" && value) {
       fetchTenancyDetails(value);
     }
   };
@@ -409,6 +510,76 @@ const AddInvoiceModal = () => {
           <div className="invoice-modal-grid gap-6">
             <div>
               <label className="block mb-3 invoice-modal-label">
+                Select Building
+              </label>
+              <div className="relative">
+                <select
+                  name="building"
+                  value={formData.building}
+                  onChange={handleChange}
+                  onFocus={() => toggleDropdown("building")}
+                  onBlur={() =>
+                    setTimeout(() => toggleDropdown("building"), 150)
+                  }
+                  className={`block w-full border py-2 px-3 pr-8 focus:outline-none focus:ring-gray-500 focus:border-gray-500 appearance-none invoice-modal-select ${
+                    formData.building === "" ? "invoice-modal-selected" : ""
+                  }`}
+                  disabled={loading}
+                >
+                  <option value="" disabled>
+                    Choose Building
+                  </option>
+                  {buildings.map((building) => (
+                    <option key={building.id} value={building.id}>
+                      {building.building_name} ({building.code})
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown
+                  className={`absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#201D1E] pointer-events-none transition-transform duration-200 ${
+                    openDropdowns.building ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block mb-3 invoice-modal-label">
+                Select Unit
+              </label>
+              <div className="relative">
+                <select
+                  name="unit"
+                  value={formData.unit}
+                  onChange={handleChange}
+                  onFocus={() => toggleDropdown("unit")}
+                  onBlur={() =>
+                    setTimeout(() => toggleDropdown("unit"), 150)
+                  }
+                  className={`block w-full border py-2 px-3 pr-8 focus:outline-none focus:ring-gray-500 focus:border-gray-500 appearance-none invoice-modal-select ${
+                    formData.unit === "" ? "invoice-modal-selected" : ""
+                  }`}
+                  disabled={loading || !formData.building}
+                >
+                  <option value="" disabled>
+                    Choose Unit
+                  </option>
+                  {units.map((unit) => (
+                    <option key={unit.id} value={unit.id}>
+                      {unit.unit_name} ({unit.code})
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown
+                  className={`absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#201D1E] pointer-events-none transition-transform duration-200 ${
+                    openDropdowns.unit ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block mb-3 invoice-modal-label">
                 Select Tenancy
               </label>
               <div className="relative">
@@ -423,7 +594,7 @@ const AddInvoiceModal = () => {
                   className={`block w-full border py-2 px-3 pr-8 focus:outline-none focus:ring-gray-500 focus:border-gray-500 appearance-none invoice-modal-select ${
                     formData.tenancy === "" ? "invoice-modal-selected" : ""
                   }`}
-                  disabled={loading}
+                  disabled={loading || !formData.unit}
                 >
                   <option value="" disabled>
                     Choose Tenancy
