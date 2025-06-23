@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./AddInvoiceModal.css";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import closeicon from "../../../assets/Images/Invoice/close-icon.svg";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
@@ -57,8 +57,7 @@ const AddInvoiceModal = () => {
         return;
       }
 
-      setLoading(true);
-      setError(null);
+      setError(null); // Clear any previous errors
 
       const response = await axios.get(
         `${BASE_URL}/company/buildings/occupied/${companyId}/`
@@ -76,8 +75,6 @@ const AddInvoiceModal = () => {
       console.error("Error fetching buildings:", error);
       setError("Failed to fetch buildings");
       setBuildings([]);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -89,10 +86,8 @@ const AddInvoiceModal = () => {
         return;
       }
 
-      setLoading(true);
-      setError(null);
+      setError(null); // Clear any previous errors
 
-      // Use the correct endpoint matching the Django view
       const response = await axios.get(
         `${BASE_URL}/company/units/${buildingId}/occupied-units/`
       );
@@ -109,8 +104,6 @@ const AddInvoiceModal = () => {
       console.error("Error fetching units:", error);
       setError("Failed to fetch units");
       setUnits([]);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -122,8 +115,7 @@ const AddInvoiceModal = () => {
         return;
       }
 
-      setLoading(true);
-      setError(null);
+      setError(null); // Clear any previous errors
 
       const response = await axios.get(
         `${BASE_URL}/company/tenancies/company/${companyId}/${unitId}/`
@@ -141,15 +133,12 @@ const AddInvoiceModal = () => {
       console.error("Error fetching tenancies:", error);
       setError("Failed to fetch tenancies");
       setTenancies([]);
-    } finally {
-      setLoading(false);
     }
   };
 
   const fetchTenancyDetails = async (tenancyId) => {
     try {
-      setLoading(true);
-      setError(null);
+      setError(null); // Clear any previous errors
 
       const response = await axios.get(
         `${BASE_URL}/company/tenancies/${tenancyId}/`
@@ -180,8 +169,6 @@ const AddInvoiceModal = () => {
     } catch (error) {
       console.error("Error fetching tenancy details:", error);
       setError("Error fetching tenancy details");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -306,7 +293,6 @@ const AddInvoiceModal = () => {
     }));
 
     if (name === "building" && value) {
-      // Reset dependent fields when building changes
       setFormData((prev) => ({
         ...prev,
         unit: "",
@@ -321,7 +307,6 @@ const AddInvoiceModal = () => {
       setSelectedAdditionalCharges([]);
       fetchUnits(value);
     } else if (name === "unit" && value) {
-      // Reset tenancy-related fields when unit changes
       setFormData((prev) => ({
         ...prev,
         tenancy: "",
@@ -431,7 +416,7 @@ const AddInvoiceModal = () => {
         return;
       }
 
-      setLoading(true);
+      setLoading(true); // Keep loading for invoice creation
       setError(null);
 
       const invoiceData = {
@@ -472,7 +457,7 @@ const AddInvoiceModal = () => {
           "Error creating invoice"
       );
     } finally {
-      setLoading(false);
+      setLoading(false); // Reset loading after invoice creation
     }
   };
 
@@ -488,7 +473,7 @@ const AddInvoiceModal = () => {
             onClick={closeModal}
             className="invoice-modal-close-btn hover:bg-gray-100 duration-200"
           >
-            <img src={closeicon} alt="close" />
+            <X size={20} />
           </button>
         </div>
 
@@ -1033,10 +1018,10 @@ const AddInvoiceModal = () => {
           <button
             type="button"
             onClick={handleSave}
-            className="bg-[#2892CE] hover:bg-[#076094] text-white py-2 px-6 mb-3 invoice-modal-save-btn"
+            className="bg-[#2892CE] hover:bg-[#076094] duration-200 text-white py-2 px-6 mb-3 invoice-modal-save-btn"
             disabled={loading}
           >
-            {loading ? "Generating..." : "Generate Invoice"}
+            {loading ? "Generating..." : "Generate"}
           </button>
         </div>
       </div>
