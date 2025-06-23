@@ -73,15 +73,19 @@ const Invoice = () => {
       console.log("API Response:", response.data);
 
       if (response.data && response.data.results) {
-        const mappedInvoices = response.data.results.map((invoice) => ({
-          dbId: invoice.id,
-          id: invoice.invoice_number || `INV${new Date().getFullYear()}${Math.floor(Math.random() * 1000)}`,
-          date: invoice.in_date || "",
-          tenantName: invoice.tenancy?.tenant?.tenant_name || "Unknown",
-          amountDue: invoice.total_amount ? parseFloat(invoice.total_amount).toFixed(2) : "0.00",
-          status: invoice.status || "unpaid",
-          view: viewicon,
-        }));
+        const mappedInvoices = response.data.results.map((invoice) => {
+          console.log("Invoice object:", invoice);
+          return {
+            dbId: invoice.id,
+            id: invoice.invoice_number || `INV${new Date().getFullYear()}${Math.floor(Math.random() * 1000)}`,
+            date: invoice.in_date || "",
+            tenancyCode: invoice.tenancy?.tenancy_code || invoice.tenancy_code || "N/A",
+            tenantName: invoice.tenancy?.tenant?.tenant_name || "Unknown",
+            amountDue: invoice.total_amount ? parseFloat(invoice.total_amount).toFixed(2) : "0.00",
+            status: invoice.status || "unpaid",
+            view: viewicon,
+          };
+        });
         setInvoices(mappedInvoices);
         setTotalPages(Math.ceil(response.data.count / itemsPerPage));
         console.log("Fetched invoices:", mappedInvoices);
@@ -97,6 +101,11 @@ const Invoice = () => {
       setLoading(false);
     }
   };
+
+  // Log invoices state to verify data persistence
+  useEffect(() => {
+    console.log("Current invoices state:", invoices);
+  }, [invoices]);
 
   const handleDownloadCSV = async () => {
     try {
@@ -116,10 +125,9 @@ const Invoice = () => {
 
       const response = await axios.get(`${BASE_URL}/company/invoices/company/${companyId}/export-csv/`, {
         params,
-        responseType: 'blob', // Important for handling binary data
+        responseType: 'blob',
       });
 
-      // Create a URL for the blob and trigger download
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
@@ -209,13 +217,16 @@ const Invoice = () => {
 
   const handleViewClick = (invoice) => {
     console.log("Selected invoice for view:", invoice);
-    openModal("view-invoice", "View Invoice", invoice);
+    openModal("view-invoice", "View Invoice", {
+      ...invoice,
+      tenancyId: invoice.tenancyCode, // Pass tenancyCode as tenancyId for ViewInvoiceModal
+    });
   };
 
   const getStatusBadge = (status) => {
-    const badgeClass = status === "paid" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
+    const badgeClass = status === "paid" ? "bg-[#28C76F29] text-[#28C76F]" : "bg-[#FFE1E1] text-[#C72828]";
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${badgeClass} capitalize`}>
+      <span className={`px-[10px] py-[5px] rounded-[4px] text-xs font-medium ${badgeClass} capitalize`}>
         {status}
       </span>
     );
@@ -257,7 +268,7 @@ const Invoice = () => {
               />
             </button>
             <button
-              className="flex items-center justify-center gap-2 h-[38px] rounded-md duration-200 inv-download-btn w-[122px]"
+              className="flex items-center justify-center gap-2 h-[40px] rounded-md duration-200 inv-download-btn w-[122px]"
               onClick={handleDownloadCSV}
             >
               Download
@@ -292,44 +303,49 @@ const Invoice = () => {
                 <tr className="border-b border-[#E9E9E9] h-[57px]">
                   <th className="px-5 text-left inv-thead">ID</th>
                   <th className="px-5 text-left inv-thead">DATE</th>
+                  <th className="px-5 text-left inv-thead">TENANCY ID</th>
                   <th className="pl-5 text-left inv-thead">TENANT NAME</th>
-                  <th className="px-5 text-left inv-thead w-[10%]">AMOUNT DUE</th>
+                  <th className="px-5 text-left inv-thead">AMOUNT DUE</th>
                   <th className="px-5 text-left inv-thead">STATUS</th>
-                  <th className="pl-12 pr-5 text-center inv-thead">VIEW</th>
+                  <th className="px-5 text-center inv-thead">VIEW</th>
                   <th className="px-5 pr-6 text-right inv-thead">ACTION</th>
                 </tr>
               </thead>
               <tbody>
-                {invoices.map((invoice) => (
-                  <tr
-                    key={invoice.dbId}
-                    className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
-                  >
-                    <td className="px-5 text-left inv-data">{invoice.id}</td>
-                    <td className="px-5 text-left inv-data">{invoice.date}</td>
-                    <td className="pl-5 text-left inv-data">{invoice.tenantName}</td>
-                    <td className="px-5 text-left inv-data">{invoice.amountDue}</td>
-                    <td className="px-5 text-left inv-data">{getStatusBadge(invoice.status)}</td>
-                    <td className="pl-14 text-center pr-5 pt-2">
-                      <button onClick={() => handleViewClick(invoice)}>
-                        <img
-                          src={invoice.view}
-                          alt="View"
-                          className="w-[30px] h-[24px] inv-action-btn duration-200"
-                        />
-                      </button>
-                    </td>
-                    <td className="px-5 flex items-center justify-end h-[57px]">
-                      <button onClick={() => handleDeleteClick(invoice)}>
-                        <img
-                          src={deleteicon}
-                          alt="Delete"
-                          className="w-[18px] h-[18px] inv-action-btn duration-200 mr-[24px]"
-                        />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {invoices.map((invoice) => {
+                  console.log("Rendering invoice:", invoice); // Debug rendering
+                  return (
+                    <tr
+                      key={invoice.dbId}
+                      className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
+                    >
+                      <td className="px-5 text-left inv-data">{invoice.id}</td>
+                      <td className="px-5 text-left inv-data">{invoice.date}</td>
+                      <td className="px-5 text-left inv-data">{invoice.tenancyCode || "N/A"}</td>
+                      <td className="pl-5 text-left inv-data">{invoice.tenantName}</td>
+                      <td className="px-5 text-left inv-data">{invoice.amountDue}</td>
+                      <td className="px-5 text-left inv-data">{getStatusBadge(invoice.status)}</td>
+                      <td className="px-5 text-center pt-2">
+                        <button onClick={() => handleViewClick(invoice)}>
+                          <img
+                            src={invoice.view}
+                            alt="View"
+                            className="w-[30px] h-[24px] inv-action-btn duration-200"
+                          />
+                        </button>
+                      </td>
+                      <td className="px-5 flex items-center justify-end h-[57px]">
+                        <button onClick={() => handleDeleteClick(invoice)}>
+                          <img
+                            src={deleteicon}
+                            alt="Delete"
+                            className="w-[18px] h-[18px] inv-action-btn duration-200 mr-[24px]"
+                          />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -343,89 +359,96 @@ const Invoice = () => {
                 </tr>
               </thead>
               <tbody>
-                {invoices.map((invoice) => (
-                  <React.Fragment key={invoice.dbId}>
-                    <tr
-                      className={`${expandedRows[invoice.dbId]
-                        ? "inv-mobile-no-border"
-                        : "inv-mobile-with-border"
-                        } border-b border-[#E9E9E9] h-[57px]`}
-                    >
-                      <td className="px-5 text-left inv-data inv-id-column">{invoice.id}</td>
-                      <td className="px-5 text-left inv-data inv-date-column">{invoice.tenantName}</td>
-                      <td className="py-4 flex items-center justify-end h-[57px]">
-                        <div
-                          className={`inv-dropdown-field ${expandedRows[invoice.dbId] ? "active" : ""}`}
-                          onClick={() => toggleRowExpand(invoice.dbId)}
-                        >
-                          <img
-                            src={downarrow}
-                            alt="drop-down-arrow"
-                            className={`inv-dropdown-img ${expandedRows[invoice.dbId] ? "text-white" : ""}`}
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                    <AnimatePresence>
-                      {expandedRows[invoice.dbId] && (
-                        <motion.tr
-                          className="inv-mobile-with-border border-b border-[#E9E9E9]"
-                          initial="hidden"
-                          animate="visible"
-                          exit="hidden"
-                          variants={dropdownVariants}
-                        >
-                          <td colSpan={3} className="px-5">
-                            <div className="inv-dropdown-content">
-                              <div className="inv-dropdown-content-grid">
-                                <div className="inv-dropdown-content-item w-[50%]">
-                                  <div className="inv-dropdown-label">DATE</div>
-                                  <div className="inv-dropdown-value">{invoice.date}</div>
+                {invoices.map((invoice) => {
+                  console.log("Rendering mobile invoice:", invoice); // Debug mobile rendering
+                  return (
+                    <React.Fragment key={invoice.dbId}>
+                      <tr
+                        className={`${expandedRows[invoice.dbId]
+                          ? "inv-mobile-no-border"
+                          : "inv-mobile-with-border"
+                          } border-b border-[#E9E9E9] h-[57px]`}
+                      >
+                        <td className="px-5 text-left inv-data inv-id-column">{invoice.id}</td>
+                        <td className="px-5 text-left inv-data inv-date-column">{invoice.tenantName}</td>
+                        <td className="py-4 flex items-center justify-end h-[57px]">
+                          <div
+                            className={`inv-dropdown-field ${expandedRows[invoice.dbId] ? "active" : ""}`}
+                            onClick={() => toggleRowExpand(invoice.dbId)}
+                          >
+                            <img
+                              src={downarrow}
+                              alt="drop-down-arrow"
+                              className={`inv-dropdown-img ${expandedRows[invoice.dbId] ? "text-white" : ""}`}
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                      <AnimatePresence>
+                        {expandedRows[invoice.dbId] && (
+                          <motion.tr
+                            className="inv-mobile-with-border border-b border-[#E9E9E9]"
+                            initial="hidden"
+                            animate="visible"
+                            exit="hidden"
+                            variants={dropdownVariants}
+                          >
+                            <td colSpan={3} className="px-5">
+                              <div className="inv-dropdown-content">
+                                <div className="inv-dropdown-content-grid">
+                                  <div className="inv-dropdown-content-item w-[50%]">
+                                    <div className="inv-dropdown-label">DATE</div>
+                                    <div className="inv-dropdown-value">{invoice.date}</div>
+                                  </div>
+                                  <div className="inv-dropdown-content-item w-[50%]">
+                                    <div className="inv-dropdown-label">TENANCY ID</div>
+                                    <div className="inv-dropdown-value">{invoice.tenancyCode || "N/A"}</div>
+                                  </div>
                                 </div>
-                                <div className="inv-dropdown-content-item w-[50%]">
-                                  <div className="inv-dropdown-label">AMOUNT DUE</div>
-                                  <div className="inv-dropdown-value">{invoice.amountDue}</div>
+                                <div className="inv-dropdown-content-grid">
+                                  <div className="inv-dropdown-content-item w-[50%]">
+                                    <div className="inv-dropdown-label">AMOUNT DUE</div>
+                                    <div className="inv-dropdown-value">{invoice.amountDue}</div>
+                                  </div>
+                                  <div className="inv-dropdown-content-item w-[50%]">
+                                    <div className="inv-dropdown-label">STATUS</div>
+                                    <div className="inv-dropdown-value">{getStatusBadge(invoice.status)}</div>
+                                  </div>
                                 </div>
-                              </div>
-                              <div className="inv-dropdown-content-grid">
-                                <div className="inv-dropdown-content-item w-[50%]">
-                                  <div className="inv-dropdown-label">STATUS</div>
-                                  <div className="inv-dropdown-value">{getStatusBadge(invoice.status)}</div>
-                                </div>
-                                <div className="inv-dropdown-content-item w-[50%]">
-                                  <div className="inv-dropdown-label">VIEW</div>
-                                  <div className="inv-dropdown-value">
-                                    <button onClick={() => handleViewClick(invoice)}>
-                                      <img
-                                        src={viewicon}
-                                        alt="View"
-                                        className="w-[30px] h-[24px] tenancy-action-btn duration-200"
-                                      />
-                                    </button>
+                                <div className="inv-dropdown-content-grid">
+                                  <div className="inv-dropdown-content-item w-[50%]">
+                                    <div className="inv-dropdown-label">VIEW</div>
+                                    <div className="inv-dropdown-value">
+                                      <button onClick={() => handleViewClick(invoice)}>
+                                        <img
+                                          src={viewicon}
+                                          alt="View"
+                                          className="w-[30px] h-[24px] tenancy-action-btn duration-200"
+                                        />
+                                      </button>
+                                    </div>
+                                  </div>
+                                  <div className="inv-dropdown-content-item w-[50%]">
+                                    <div className="inv-dropdown-label">ACTION</div>
+                                    <div className="inv-dropdown-value flex items-center gap-4">
+                                      <button onClick={() => handleDeleteClick(invoice)}>
+                                        <img
+                                          src={deleteicon}
+                                          alt="Delete"
+                                          className="w-[18px] h-[18px] inv-action-btn duration-200"
+                                        />
+                                      </button>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                              <div className="inv-dropdown-content-grid">
-                                <div className="inv-dropdown-content-item w-[50%]">
-                                  <div className="inv-dropdown-label">ACTION</div>
-                                  <div className="inv-dropdown-value flex items-center gap-4">
-                                    <button onClick={() => handleDeleteClick(invoice)}>
-                                      <img
-                                        src={deleteicon}
-                                        alt="Delete"
-                                        className="w-[18px] h-[18px] inv-action-btn duration-200"
-                                      />
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </td>
-                        </motion.tr>
-                      )}
-                    </AnimatePresence>
-                  </React.Fragment>
-                ))}
+                            </td>
+                          </motion.tr>
+                        )}
+                      </AnimatePresence>
+                    </React.Fragment>
+                  );
+                })}
               </tbody>
             </table>
           </div>

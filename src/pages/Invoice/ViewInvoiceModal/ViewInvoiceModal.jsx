@@ -4,6 +4,7 @@ import { useModal } from "../../../context/ModalContext";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../../../utils/config";
+import { X } from "lucide-react";
 
 const ViewInvoiceModal = () => {
   const { modalState, closeModal } = useModal();
@@ -170,7 +171,7 @@ const ViewInvoiceModal = () => {
               items.map((item, index) => (
                 <tr key={`${type}-${item.id || index}`} className="h-[57px] border-b border-[#E9E9E9] last:border-b-0">
                   <td className="px-[10px] py-[5px] w-[140px] view-invoice-charges-tdata">
-                    {item.charge_type?.name || "N/A"}
+                    {item.charge_type || "N/A"}
                   </td>
                   <td className="px-[10px] py-[5px] w-[160px] view-invoice-charges-tdata">
                     {item.reason || "N/A"}
@@ -243,7 +244,7 @@ const ViewInvoiceModal = () => {
             onClick={closeModal}
             className="view-invoice-modal-close-btn hover:bg-gray-100 duration-200"
           >
-            <img src={closeicon} alt="Close" className="w-[15px] h-[15px]" />
+            <X size={20} />
           </button>
         </div>
 
