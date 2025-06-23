@@ -40,6 +40,7 @@ import AddUnitModal from "./Admin Properties/Units/Add Unit Modal/AddUnitModal";
 import EditUnitModal from "./Admin Properties/Units/Edit Unit Modal/EditUnitModal";
 import EditTenantModal from "./Admin Tenants/EditTenantModal/EditTenantModal";
 import InvoiceConfig from "./Admin Tenancy/UpdateTenancyModal/InvoiceConfig";
+import UpdatePaymentScheduleModal from "./Admin Tenancy/UpdateTenancyModal/UpdatePaymentSchedule";
 
 const Layout = () => {
   const { modalState, closeModal } = useModal();
@@ -116,6 +117,7 @@ const Layout = () => {
       {modalState.isOpen && modalState.type === "create-refund" && <AddRefundModal />}
       {modalState.isOpen && modalState.type === "update-refund" && <UpdateRefundModal />}
       {modalState.isOpen && modalState.type === "invoice-config" && <InvoiceConfig />}
+      {modalState.isOpen && modalState.type === "update-payment-schedule" && <UpdatePaymentScheduleModal />}
     </div>
   );
 };
