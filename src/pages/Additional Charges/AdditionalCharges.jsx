@@ -290,7 +290,7 @@ const AdminAdditionalCharges = () => {
                   {charge.id}
                 </td>
                 <td className="px-5 text-left admin-add-charges-data">
-                  {charge.charge_type?.name || "N/A"}
+                  {charge.charge_type || "N/A"}
                 </td>
                 <td className="pl-5 text-left admin-add-charges-data">
                   {charge.amount
@@ -381,7 +381,7 @@ const AdminAdditionalCharges = () => {
                     {charge.id}
                   </td>
                   <td className="px-[10px] text-left admin-add-charges-data admin-add-charges-charge-id-column">
-                    {charge.charge_type?.name || "N/A"}
+                    {charge.charge_type || "N/A"}
                   </td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
