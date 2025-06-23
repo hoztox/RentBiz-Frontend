@@ -10,6 +10,8 @@ import { toast } from "react-hot-toast";
 
 const UpdateAdditionalCharges = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
+  const [building, setBuilding] = useState("");
+  const [unit, setUnit] = useState("");
   const [tenancyContract, setTenancyContract] = useState("");
   const [inDate, setInDate] = useState("");
   const [chargeCode, setChargeCode] = useState("");
@@ -20,8 +22,12 @@ const UpdateAdditionalCharges = () => {
   const [dueDate, setDueDate] = useState("");
   const [status, setStatus] = useState("");
   const [remarks, setRemarks] = useState("");
+  const [buildings, setBuildings] = useState([]);
+  const [units, setUnits] = useState([]);
   const [tenancies, setTenancies] = useState([]);
   const [chargeTypes, setChargeTypes] = useState([]);
+  const [isSelectOpenBuilding, setIsSelectOpenBuilding] = useState(false);
+  const [isSelectOpenUnit, setIsSelectOpenUnit] = useState(false);
   const [isSelectOpenTenancy, setIsSelectOpenTenancy] = useState(false);
   const [isSelectOpenChargeCode, setIsSelectOpenChargeCode] = useState(false);
   const [isSelectOpenStatus, setIsSelectOpenStatus] = useState(false);
@@ -31,6 +37,8 @@ const UpdateAdditionalCharges = () => {
   useEffect(() => {
     if (modalState.isOpen && modalState.type === "update-additional-charges" && modalState.data) {
       console.log("Modal State:", modalState);
+      setBuilding(modalState.data.tenancy_detail?.unit?.building?.id || "");
+      setUnit(modalState.data.tenancy_detail?.unit?.id || "");
       setTenancyContract(String(modalState.data.tenancy || ""));
       setInDate(modalState.data.in_date ? new Date(modalState.data.in_date).toISOString().split("T")[0] : "");
       setChargeCode(modalState.data.charge_type?.id || "");
@@ -67,33 +75,123 @@ const UpdateAdditionalCharges = () => {
     return null;
   };
 
+  const fetchBuildings = async () => {
+    try {
+      const companyId = getUserCompanyId();
+      if (!companyId) {
+        setError("No company ID found");
+        toast.error("No company ID found");
+        return;
+      }
+
+      const response = await axios.get(
+        `${BASE_URL}/company/buildings/occupied/${companyId}/`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+
+      if (response.data && Array.isArray(response.data)) {
+        const sortedBuildings = response.data.sort((a, b) => a.id - b.id);
+        setBuildings(sortedBuildings);
+      } else {
+        setBuildings([]);
+      }
+    } catch (error) {
+      console.error("Error fetching buildings:", error);
+      setError("Failed to fetch buildings");
+      toast.error("Failed to fetch buildings");
+      setBuildings([]);
+    }
+  };
+
+  const fetchUnits = async (buildingId) => {
+    try {
+      const companyId = getUserCompanyId();
+      if (!companyId || !buildingId) {
+        setError("Company ID or Building ID not found");
+        toast.error("Company ID or Building ID not found");
+        return;
+      }
+
+      const response = await axios.get(
+        `${BASE_URL}/company/units/${buildingId}/occupied-units/`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+
+      if (response.data && Array.isArray(response.data)) {
+        const sortedUnits = response.data.sort((a, b) => a.id - b.id);
+        setUnits(sortedUnits);
+      } else {
+        setUnits([]);
+      }
+    } catch (error) {
+      console.error("Error fetching units:", error);
+      setError("Failed to fetch units");
+      toast.error("Failed to fetch units");
+      setUnits([]);
+    }
+  };
+
+  const fetchTenancies = async (unitId) => {
+    try {
+      const companyId = getUserCompanyId();
+      if (!companyId || !unitId) {
+        setError("Company ID or Unit ID not found");
+        toast.error("Company ID or Unit ID not found");
+        return;
+      }
+
+      const response = await axios.get(
+        `${BASE_URL}/company/tenancies/company/${companyId}/${unitId}/`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+
+      if (response.data && Array.isArray(response.data.results)) {
+        const sortedTenancies = response.data.results.sort((a, b) => a.id - b.id);
+        setTenancies(sortedTenancies);
+      } else {
+        setTenancies([]);
+      }
+    } catch (error) {
+      console.error("Error fetching tenancies:", error);
+      setError("Failed to fetch tenancies");
+      toast.error("Failed to fetch tenancies");
+      setTenancies([]);
+    }
+  };
+
   const fetchOptions = async () => {
     const companyId = getUserCompanyId();
     if (!companyId) {
       setError("Company ID not found. Please ensure you are logged in.");
       toast.error("Company ID not found. Please ensure you are logged in.")
-      // console.log("Error: No company ID found");
       return;
     }
 
     try {
-      const [tenanciesResponse, chargesResponse] = await Promise.all([
-        axios.get(`${BASE_URL}/company/tenancies/occupied/${companyId}/`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }),
+      // Fetch buildings and charge types
+      await Promise.all([
+        fetchBuildings(),
         axios.get(`${BASE_URL}/company/charges/company/${companyId}/`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }),
+        }).then(response => {
+          console.log("Charges Response:", response.data);
+          setChargeTypes(response.data.data || response.data || []);
+        })
       ]);
 
-      console.log("Tenancies Response:", tenanciesResponse.data);
-      console.log("Charges Response:", chargesResponse.data);
-
-      setTenancies(tenanciesResponse.data.data || tenanciesResponse.data || []);
-      setChargeTypes(chargesResponse.data.data || chargesResponse.data || []);
-
-      console.log("Tenancies State:", tenanciesResponse.data.data || tenanciesResponse.data);
-      console.log("Charge Types State:", chargesResponse.data.data || chargesResponse.data);
+      // If building and unit are already set from modal data, fetch the corresponding units and tenancies
+      if (building) {
+        await fetchUnits(building);
+        if (unit) {
+          await fetchTenancies(unit);
+        }
+      }
     } catch (err) {
       setError("Failed to fetch options: " + err.message);
       toast.error("Fetch Options Error:", err.message);
@@ -148,6 +246,28 @@ const UpdateAdditionalCharges = () => {
 
     fetchTaxPreview();
   }, [chargeCode, amountDue, dueDate, inDate, reason]);
+
+  const handleBuildingChange = (buildingId) => {
+    setBuilding(buildingId);
+    setUnit("");
+    setTenancyContract("");
+    setUnits([]);
+    setTenancies([]);
+    if (buildingId) {
+      fetchUnits(buildingId);
+    }
+    setError("");
+  };
+
+  const handleUnitChange = (unitId) => {
+    setUnit(unitId);
+    setTenancyContract("");
+    setTenancies([]);
+    if (unitId) {
+      fetchTenancies(unitId);
+    }
+    setError("");
+  };
 
   const handleUpdate = async () => {
     if (!tenancyContract || !chargeCode || !reason || !dueDate || !amountDue || !status || !inDate) {
@@ -216,6 +336,68 @@ const UpdateAdditionalCharges = () => {
 
         <div className="md:p-6 mt-[-15px]">
           <div className="grid uc-grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="block update-charges-label">Select Building*</label>
+              <div className="relative">
+                <select
+                  value={building}
+                  disabled={true}
+                  onChange={(e) => handleBuildingChange(e.target.value)}
+                  onFocus={() => setIsSelectOpenBuilding(true)}
+                  onBlur={() => setIsSelectOpenBuilding(false)}
+                  className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-charges-selection ${
+                    !building ? "update-charges-selected" : ""
+                  }`}
+                >
+                  <option value="" disabled>Choose Building</option>
+                  {buildings.map((buildingItem) => (
+                    <option key={buildingItem.id} value={buildingItem.id}>
+                      {buildingItem.building_name} ({buildingItem.code})
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                  <ChevronDown
+                    size={16}
+                    className={`text-[#201D1E] transition-transform duration-300 ${
+                      isSelectOpenBuilding ? "rotate-180" : "rotate-0"
+                    }`}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block update-charges-label">Select Unit*</label>
+              <div className="relative">
+                <select
+                  value={unit}
+                  disabled={true}
+                  onChange={(e) => handleUnitChange(e.target.value)}
+                  onFocus={() => setIsSelectOpenUnit(true)}
+                  onBlur={() => setIsSelectOpenUnit(false)}
+                  className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 update-charges-selection ${
+                    !unit ? "update-charges-selected" : ""
+                  }`}
+                >
+                  <option value="" disabled>Choose Unit</option>
+                  {units.map((unitItem) => (
+                    <option key={unitItem.id} value={unitItem.id}>
+                      {unitItem.unit_name} ({unitItem.code})
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                  <ChevronDown
+                    size={16}
+                    className={`text-[#201D1E] transition-transform duration-300 ${
+                      isSelectOpenUnit ? "rotate-180" : "rotate-0"
+                    }`}
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-2">
               <label className="block update-charges-label">Tenancy Contract*</label>
               <div className="relative">
