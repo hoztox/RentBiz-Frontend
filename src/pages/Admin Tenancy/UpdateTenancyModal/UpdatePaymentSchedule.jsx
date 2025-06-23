@@ -139,7 +139,7 @@ const UpdatePaymentScheduleModal = ({
                     <React.Fragment key={schedule.id}>
                       <tr className="h-[57px] border-b border-[#E9E9E9] last:border-b-0 hover:bg-gray-100">
                         <td className="px-[20px] py-[5px] w-[100px] update-schedule-tdata">
-                          {schedule.charge_type?.name || "N/A"}
+                          {schedule.charge_type || "N/A"}
                         </td>
                         <td className="px-[10px] py-[5px] w-[100px] update-schedule-tdata">
                           {schedule.amount}
@@ -325,7 +325,7 @@ const UpdatePaymentScheduleModal = ({
                       } border-b border-[#E9E9E9] h-[57px]`}
                     >
                       <td className="px-5 text-left update-schedule-tdata payment-charge-column">
-                        {schedule.charge_type?.name || "N/A"}
+                        {schedule.charge_type || "N/A"}
                       </td>
                       <td className="px-3 text-left update-schedule-tdata payment-amount-column">
                         {schedule.amount}
@@ -374,7 +374,7 @@ const UpdatePaymentScheduleModal = ({
                                   </div>
                                   <div className="payment-dropdown-value">
                                     <span
-                                      className={`px-3 py-1 rounded-md text-sm payment-status ${
+                                      className={`px-3 py-1 !pt-[2px] rounded-md text-sm payment-status ${
                                         schedule.status === "pending"
                                           ? "bg-[#FFF7E9] text-[#FBAD27]"
                                           : schedule.status === "paid"
