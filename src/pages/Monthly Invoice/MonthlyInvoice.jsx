@@ -186,40 +186,37 @@ const MonthlyInvoice = () => {
     <div className="border border-[#E9E9E9] rounded-md mi-table">
       <Toaster />
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] mi-table-header">
-        <h1 className="mi-head">Invoice List (Auto Generated)</h1>
-        <div className="flex flex-col md:flex-row gap-[10px] mi-inputs-container">
-          <div className="flex flex-col md:flex-row gap-[10px] w-full">
-            <input
-              type="text"
-              placeholder="Search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 mi-search"
-            />
-            <div className="relative w-[40%] md:w-auto">
-              <CustomDropDown
-                options={dropdownOptions}
-                value={statusFilter}
-                onChange={setStatusFilter}
-                placeholder="Select Status"
-                className="w-full md:w-[121px]"
-                dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 mi-selection"
-              />
-            </div>
-          </div>
-          <div className="flex gap-[10px] mi-action-buttons-container w-full md:w-auto justify-start">
-
-            <button className="flex items-center justify-center gap-2 h-[38px] rounded-md duration-200 mi-download-btn w-[122px]">
-              Download
-              <img
-                src={downloadicon}
-                alt="Download Icon"
-                className="w-[15px] h-[15px] mi-download-img"
-              />
-            </button>
-          </div>
-        </div>
+  <h1 className="mi-head">Invoice List (Auto Generated)</h1>
+  <div className="flex flex-col md:flex-row gap-[10px] mi-inputs-container">
+    <input
+      type="text"
+      placeholder="Search"
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+      className="px-[14px] py-[7px] h-[38px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 mi-search"
+    />
+    <div className="flex flex-row gap-[10px] w-full md:w-auto mi-second-row-container">
+      <div className="relative flex-1 md:flex-none w-[60%] md:w-auto">
+        <CustomDropDown
+          options={dropdownOptions}
+          value={statusFilter}
+          onChange={setStatusFilter}
+          placeholder="Select Status"
+          className="w-full md:w-[121px]"
+          dropdownClassName="h-[38px] px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 mi-selection"
+        />
       </div>
+      <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 mi-download-btn">
+        Download
+        <img
+          src={downloadicon}
+          alt="Download Icon"
+          className="w-[15px] h-[15px] mi-download-img"
+        />
+      </button>
+    </div>
+  </div>
+</div>
       <div className="mi-desktop-only">
         <table className="w-full border-collapse">
           <thead>
@@ -228,7 +225,7 @@ const MonthlyInvoice = () => {
               <th className="px-5 text-left mi-thead">DATE</th>
               <th className="pl-5 text-left mi-thead">TENANCY ID</th>
               <th className="pl-5 text-left mi-thead">TENANT NAME</th>
-              <th className="px-5 text-left mi-thead w-[10%]">AMOUNT DUE</th>
+              <th className="px-5 text-left mi-thead w-[150px]">AMOUNT DUE</th>
               <th className="pl-12 pr-5 text-center mi-thead">VIEW</th>
               <th className="px-5 pr-6 text-right mi-thead">ACTION</th>
             </tr>
