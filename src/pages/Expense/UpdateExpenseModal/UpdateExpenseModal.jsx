@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "./UpdateExpenseModal.css";
-import { ChevronDown } from "lucide-react";
-import closeicon from "../../../assets/Images/Expense/close-icon.svg";
-import calendaricon from "../../../assets/Images/Expense/calendar-icon.svg";
+import { ChevronDown, X } from "lucide-react";
 import { useModal } from "../../../context/ModalContext";
 import axios from "axios";
 import { BASE_URL } from "../../../utils/config";
+import toast from 'react-hot-toast';
 
 const UpdateExpenseModal = () => {
-  const { modalState, closeModal } = useModal();
+  const { modalState, closeModal, triggerRefresh } = useModal();
 
   const initialFormData = {
     id: "",
@@ -23,6 +22,7 @@ const UpdateExpenseModal = () => {
     tax: "",
     total_amount: "",
     description: "",
+    status: "",
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -47,6 +47,7 @@ const UpdateExpenseModal = () => {
     tenant: false,
     unit: false,
     charge_type: false,
+    status: false,
   });
   const [isCalculating, setIsCalculating] = useState(false);
 
@@ -61,7 +62,7 @@ const UpdateExpenseModal = () => {
 
       return companyId ? parseInt(companyId) : null;
     } catch (e) {
-      console.error("Error getting user company ID:", e);
+      toast.error("Error getting company ID");
       return null;
     }
   };
@@ -71,7 +72,7 @@ const UpdateExpenseModal = () => {
       setIsLoading(prev => ({ ...prev, buildings: true }));
       const companyId = getUserCompanyId();
       if (!companyId) {
-        console.error("No company ID found - cannot fetch buildings");
+        toast.error("No company ID found");
         return;
       }
       const response = await axios.get(`${BASE_URL}/company/buildings/company/${companyId}/`);
@@ -80,7 +81,7 @@ const UpdateExpenseModal = () => {
         : response.data.results || response.data.data || [];
       setDropdownData(prev => ({ ...prev, buildings: buildingsData }));
     } catch (error) {
-      console.error("Error fetching buildings:", error);
+      toast.error("Failed to fetch buildings");
       setDropdownData(prev => ({ ...prev, buildings: [] }));
     } finally {
       setIsLoading(prev => ({ ...prev, buildings: false }));
@@ -92,7 +93,7 @@ const UpdateExpenseModal = () => {
       setIsLoading(prev => ({ ...prev, tenancies: true }));
       const companyId = getUserCompanyId();
       if (!companyId) {
-        console.error("No company ID found for tenancies");
+        toast.error("No company ID found for tenancies");
         return;
       }
       const response = await axios.get(`${BASE_URL}/company/tenancies/company/${companyId}/`);
@@ -101,7 +102,7 @@ const UpdateExpenseModal = () => {
         tenancies: Array.isArray(response.data) ? response.data : [],
       }));
     } catch (error) {
-      console.error("Error fetching tenancies:", error);
+      toast.error("Failed to fetch tenancies");
       setDropdownData(prev => ({ ...prev, tenancies: [] }));
     } finally {
       setIsLoading(prev => ({ ...prev, tenancies: false }));
@@ -113,7 +114,7 @@ const UpdateExpenseModal = () => {
       setIsLoading(prev => ({ ...prev, charges: true }));
       const companyId = getUserCompanyId();
       if (!companyId) {
-        console.error("No company ID found for charges");
+        toast.error("No company ID found for charges");
         return;
       }
       const response = await axios.get(`${BASE_URL}/company/charges/company/${companyId}/`);
@@ -122,7 +123,7 @@ const UpdateExpenseModal = () => {
         charges: Array.isArray(response.data) ? response.data : [],
       }));
     } catch (error) {
-      console.error("Error fetching charges:", error);
+      toast.error("Failed to fetch charges");
       setDropdownData(prev => ({ ...prev, charges: [] }));
     } finally {
       setIsLoading(prev => ({ ...prev, charges: false }));
@@ -133,12 +134,12 @@ const UpdateExpenseModal = () => {
     try {
       const companyId = getUserCompanyId();
       if (!companyId) {
-        console.error("No company ID found");
+        toast.error("No company ID found");
         return;
       }
       await Promise.all([fetchBuildings(), fetchCharges(), fetchTenancies()]);
     } catch (error) {
-      console.error("Error in fetchInitialDropdownData:", error);
+      toast.error("Failed to fetch initial data");
     }
   };
 
@@ -159,19 +160,19 @@ const UpdateExpenseModal = () => {
         tax: expenseData.tax || "",
         total_amount: expenseData.total_amount || "",
         description: expenseData.description || "",
+        status: expenseData.status || "",
       });
 
-      // Pre-populate tenant and unit data for tenancy expenses
       if (expenseData.expense_type === "tenancy" && expenseData.tenant && expenseData.unit) {
         setDropdownData(prev => ({
           ...prev,
           tenants: [{
             id: expenseData.tenant.id,
-            name: expenseData.tenant.tenant_name, // Use tenant_name from API
+            name: expenseData.tenant.tenant_name,
           }],
           units: [{
             id: expenseData.unit.id,
-            unit_name: expenseData.unit.unit_name, // Use unit_name from API
+            unit_name: expenseData.unit.unit_name,
             building: expenseData.building?.id,
           }],
         }));
@@ -202,7 +203,7 @@ const UpdateExpenseModal = () => {
 
     const companyId = getUserCompanyId();
     if (!companyId) {
-      console.error("No company ID found");
+      toast.error("No company ID found");
       setFormData(prev => ({
         ...prev,
         tax: "0.00",
@@ -213,7 +214,7 @@ const UpdateExpenseModal = () => {
 
     setIsCalculating(true);
     try {
-      const response = await axios.post(`${BASE_URL}/company/expenses/calculate-total/`, {
+      const response = await axios.post(`${BASE_URL}/finance/expenses/calculate-total/`, {
         company: companyId,
         charge_type: parseInt(formData.charge_type),
         amount: parseFloat(formData.amount).toFixed(2),
@@ -227,7 +228,7 @@ const UpdateExpenseModal = () => {
           total_amount: response.data.total_amount,
         }));
       } else {
-        console.error("Invalid response format:", response.data);
+        toast.error("Invalid response format");
         setFormData(prev => ({
           ...prev,
           tax: "0.00",
@@ -235,7 +236,7 @@ const UpdateExpenseModal = () => {
         }));
       }
     } catch (error) {
-      console.error("Error fetching tax and total:", error);
+      toast.error("Failed to calculate tax and total");
       setFormData(prev => ({
         ...prev,
         tax: "0.00",
@@ -314,13 +315,13 @@ const UpdateExpenseModal = () => {
             tenants: [
               {
                 id: selectedTenancy.tenant?.id,
-                name: selectedTenancy.tenant?.tenant_name, // Fixed: Use tenant_name
+                name: selectedTenancy.tenant?.tenant_name,
               },
             ],
             units: [
               {
                 id: selectedTenancy.unit?.id,
-                unit_name: selectedTenancy.unit?.unit_name, // Fixed: Use unit_name
+                unit_name: selectedTenancy.unit?.unit_name,
                 building: selectedTenancy.building?.id,
               },
             ],
@@ -368,7 +369,7 @@ const UpdateExpenseModal = () => {
   };
 
   const handleUpdate = async () => {
-    const requiredFields = ["building", "expense_type", "charge_type", "date", "amount"];
+    const requiredFields = ["building", "expense_type", "charge_type", "date", "amount", "status"];
     const tenancyRequiredFields = ["tenancy", "tenant", "unit"];
 
     const missingFields = requiredFields.filter(field => !formData[field]);
@@ -377,7 +378,7 @@ const UpdateExpenseModal = () => {
     }
 
     if (missingFields.length > 0) {
-      console.log("Please fill all required fields:", missingFields);
+      toast.error(`Please fill all required fields: ${missingFields.join(", ")}`);
       return;
     }
 
@@ -385,7 +386,7 @@ const UpdateExpenseModal = () => {
       const companyId = getUserCompanyId();
       const userId = getRelevantUserId();
       if (!companyId) {
-        console.error("No company ID found for updating expense");
+        toast.error("No company ID found");
         return;
       }
 
@@ -401,11 +402,12 @@ const UpdateExpenseModal = () => {
 
       const response = await axios.put(`${BASE_URL}/finance/expenses/${formData.id}/`, payload);
       if (response.data) {
-        console.log("Expense Updated: ", response.data);
+        toast.success("Expense updated successfully!");
+        triggerRefresh();
         closeModal();
       }
     } catch (error) {
-      console.error("Error updating expense:", error);
+      toast.error("Failed to update expense");
     }
   };
 
@@ -436,6 +438,11 @@ const UpdateExpenseModal = () => {
       )
     : [];
 
+  const statusChoices = [
+    { value: "pending", label: "Pending" },
+    { value: "paid", label: "Paid" },
+  ];
+
   if (!modalState.isOpen || modalState.type !== "update-expense" || !modalState.data) {
     return null;
   }
@@ -452,7 +459,7 @@ const UpdateExpenseModal = () => {
               onClick={handleClose}
               className="financial-expense-update-close-btn hover:bg-gray-100 duration-200"
             >
-              <img src={closeicon} alt="close" className="w-[15px] h-[15px]" />
+              <X size={20} />
             </button>
           </div>
 
@@ -675,7 +682,7 @@ const UpdateExpenseModal = () => {
                     {Array.isArray(dropdownData.charges) &&
                       dropdownData.charges.map(charge => (
                         <option key={charge.id} value={charge.id}>
-                          {charge.name}
+                          {charge.name }
                         </option>
                       ))}
                   </select>
@@ -683,7 +690,7 @@ const UpdateExpenseModal = () => {
                     <ChevronDown
                       size={16}
                       className={`text-[#201D1E] transition-transform duration-300 ${
-                        isSelectOpen.charge_type ? "rotate-180" : "rotate-0"
+                        isSelectOpen.charge_type ? "rotate-180" : ""
                       }`}
                     />
                   </div>
@@ -699,11 +706,8 @@ const UpdateExpenseModal = () => {
                     type="date"
                     value={formData.date}
                     onChange={handleChange("date")}
-                    className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-update-input"
+                    className="flex w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-update-input"
                   />
-                  <div className="absolute inset-y-0 right-1 flex items-center px-2 pointer-events-none">
-                    <img src={calendaricon} alt="calendar" className="w-5 h-5" />
-                  </div>
                 </div>
               </div>
 
@@ -717,7 +721,7 @@ const UpdateExpenseModal = () => {
                   value={formData.amount}
                   onChange={handleChange("amount")}
                   placeholder="Enter Amount"
-                  className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-update-input"
+                  className="flex w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-update-input"
                 />
               </div>
 
@@ -730,7 +734,7 @@ const UpdateExpenseModal = () => {
                   value={formData.tax}
                   readOnly
                   placeholder="Auto-calculated"
-                  className="block w-full px-3 py-2 border border-gray-200 bg-gray-50 financial-expense-update-input"
+                  className="flex w-full px-3 py-2 border border-gray-200 bg-gray-50 financial-expense-update-input"
                 />
               </div>
 
@@ -743,7 +747,7 @@ const UpdateExpenseModal = () => {
                   value={formData.total_amount}
                   readOnly
                   placeholder="Auto-calculated"
-                  className="block w-full px-3 py-2 border border-gray-200 bg-gray-50 financial-expense-update-input"
+                  className="flex w-full px-3 py-2 border border-gray-200 bg-gray-50 financial-expense-update-input"
                 />
               </div>
 
@@ -751,13 +755,46 @@ const UpdateExpenseModal = () => {
                 <label className="block financial-expense-update-label">
                   Description
                 </label>
-                <textarea
+                <input
                   value={formData.description}
                   onChange={handleChange("description")}
                   placeholder="Enter Description"
-                  rows="3"
-                  className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-update-input"
+                  className="flex w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-update-input"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block financial-expense-update-label">
+                  Status*
+                </label>
+                <div className="relative">
+                  <select
+                    value={formData.status}
+                    onChange={handleChange("status")}
+                    onFocus={() => handleSelectToggle("status")}
+                    onBlur={() => handleSelectToggle("status")}
+                    className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-update-selection ${
+                      formData.status === "" ? "financial-expense-update-selected" : ""
+                    }`}
+                  >
+                    <option value="" disabled hidden>
+                      Choose Status
+                    </option>
+                    {statusChoices.map(status => (
+                      <option key={status.value} value={status.value}>
+                        {status.label}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                    <ChevronDown
+                      size={16}
+                      className={`text-[#201D1E] transition-transform duration-300 ${
+                        isSelectOpen.status ? "rotate-180" : ""
+                      }`}
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-end justify-end financial-expense-update-modal-save-wrapper">

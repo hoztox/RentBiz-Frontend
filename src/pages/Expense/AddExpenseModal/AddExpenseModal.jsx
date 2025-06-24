@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "./AddExpenseModal.css";
-import { ChevronDown } from "lucide-react";
-import closeicon from "../../../assets/Images/Expense/close-icon.svg";
-import calendaricon from "../../../assets/Images/Expense/calendar-icon.svg";
+import { ChevronDown, X } from "lucide-react";
 import { useModal } from "../../../context/ModalContext";
 import axios from "axios";
 import { BASE_URL } from "../../../utils/config";
+import toast from 'react-hot-toast';
 
 const AddExpenseModal = () => {
-  const { modalState, closeModal } = useModal();
+  const { modalState, closeModal, triggerRefresh } = useModal();
   const initialFormData = {
     building: "",
     expense_type: "",
@@ -21,6 +20,7 @@ const AddExpenseModal = () => {
     tax: "",
     total_amount: "",
     description: "",
+    status: "", // Added status field
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -46,6 +46,7 @@ const AddExpenseModal = () => {
     tenant: false,
     unit: false,
     charge_type: false,
+    status: false, // Added status toggle
   });
   const [isCalculating, setIsCalculating] = useState(false);
 
@@ -60,7 +61,7 @@ const AddExpenseModal = () => {
 
       return companyId ? parseInt(companyId) : null;
     } catch (e) {
-      console.error("Error getting user company ID:", e);
+      toast.error("Error getting company ID");
       return null;
     }
   };
@@ -70,7 +71,7 @@ const AddExpenseModal = () => {
       setIsLoading(prev => ({ ...prev, buildings: true }));
       const companyId = getUserCompanyId();
       if (!companyId) {
-        console.error("No company ID found - cannot fetch buildings");
+        toast.error("No company ID found");
         return;
       }
       const response = await axios.get(`${BASE_URL}/company/buildings/company/${companyId}/`);
@@ -79,7 +80,7 @@ const AddExpenseModal = () => {
         : response.data.results || response.data.data || [];
       setDropdownData(prev => ({ ...prev, buildings: buildingsData }));
     } catch (error) {
-      console.error("Error fetching buildings:", error);
+      toast.error("Failed to fetch buildings");
       setDropdownData(prev => ({ ...prev, buildings: [] }));
     } finally {
       setIsLoading(prev => ({ ...prev, buildings: false }));
@@ -91,7 +92,7 @@ const AddExpenseModal = () => {
       setIsLoading(prev => ({ ...prev, tenancies: true }));
       const companyId = getUserCompanyId();
       if (!companyId) {
-        console.error("No company ID found for tenancies");
+        toast.error("No company ID found for tenancies");
         return;
       }
       const response = await axios.get(`${BASE_URL}/company/tenancies/company/${companyId}/`);
@@ -99,9 +100,8 @@ const AddExpenseModal = () => {
         ...prev,
         tenancies: Array.isArray(response.data) ? response.data : [],
       }));
-      console.log("tenancies fetched:", response.data);
     } catch (error) {
-      console.error("Error fetching tenancies:", error);
+      toast.error("Failed to fetch tenancies");
       setDropdownData(prev => ({ ...prev, tenancies: [] }));
     } finally {
       setIsLoading(prev => ({ ...prev, tenancies: false }));
@@ -113,7 +113,7 @@ const AddExpenseModal = () => {
       setIsLoading(prev => ({ ...prev, charges: true }));
       const companyId = getUserCompanyId();
       if (!companyId) {
-        console.error("No company ID found for charges");
+        toast.error("No company ID found for charges");
         return;
       }
       const response = await axios.get(`${BASE_URL}/company/charges/company/${companyId}/`);
@@ -122,7 +122,7 @@ const AddExpenseModal = () => {
         charges: Array.isArray(response.data) ? response.data : [],
       }));
     } catch (error) {
-      console.error("Error fetching charges:", error);
+      toast.error("Failed to fetch charges");
       setDropdownData(prev => ({ ...prev, charges: [] }));
     } finally {
       setIsLoading(prev => ({ ...prev, charges: false }));
@@ -133,12 +133,12 @@ const AddExpenseModal = () => {
     try {
       const companyId = getUserCompanyId();
       if (!companyId) {
-        console.error("No company ID found");
+        toast.error("No company ID found");
         return;
       }
       await Promise.all([fetchBuildings(), fetchCharges(), fetchTenancies()]);
     } catch (error) {
-      console.error("Error in fetchInitialDropdownData:", error);
+      toast.error("Failed to fetch initial data");
     }
   };
 
@@ -161,7 +161,7 @@ const AddExpenseModal = () => {
 
     const companyId = getUserCompanyId();
     if (!companyId) {
-      console.error("No company ID found");
+      toast.error("No company ID found");
       setFormData(prev => ({
         ...prev,
         tax: "0.00",
@@ -185,9 +185,8 @@ const AddExpenseModal = () => {
           tax: response.data.tax,
           total_amount: response.data.total_amount,
         }));
-        console.log("Tax and total updated:", response.data);
       } else {
-        console.error("Invalid response format:", response.data);
+        toast.error("Invalid response format");
         setFormData(prev => ({
           ...prev,
           tax: "0.00",
@@ -195,7 +194,7 @@ const AddExpenseModal = () => {
         }));
       }
     } catch (error) {
-      console.error("Error fetching tax and total:", error);
+      toast.error("Failed to calculate tax and total");
       setFormData(prev => ({
         ...prev,
         tax: "0.00",
@@ -328,7 +327,7 @@ const AddExpenseModal = () => {
   };
 
   const handleSave = async () => {
-    const requiredFields = ["building", "expense_type", "charge_type", "date", "amount"];
+    const requiredFields = ["building", "expense_type", "charge_type", "date", "amount", "status"];
     const tenancyRequiredFields = ["tenancy", "tenant", "unit"];
 
     const missingFields = requiredFields.filter(field => !formData[field]);
@@ -337,7 +336,7 @@ const AddExpenseModal = () => {
     }
 
     if (missingFields.length > 0) {
-      console.log("Please fill all required fields:", missingFields);
+      toast.error(`Please fill all required fields: ${missingFields.join(", ")}`);
       return;
     }
 
@@ -345,7 +344,7 @@ const AddExpenseModal = () => {
       const companyId = getUserCompanyId();
       const userId = getRelevantUserId();
       if (!companyId) {
-        console.error("No company ID found for saving expense");
+        toast.error("No company ID found");
         return;
       }
 
@@ -361,11 +360,12 @@ const AddExpenseModal = () => {
 
       const response = await axios.post(`${BASE_URL}/finance/expenses/`, payload);
       if (response.data) {
-        console.log("New Expense Added: ", response.data);
+        toast.success("Expense added successfully!");
+        triggerRefresh();
         closeModal();
       }
     } catch (error) {
-      console.error("Error saving expense:", error);
+      toast.error("Failed to save expense");
     }
   };
 
@@ -396,6 +396,12 @@ const AddExpenseModal = () => {
       )
     : [];
 
+  // Status choices
+  const statusChoices = [
+    { value: "pending", label: "Pending" },
+    { value: "paid", label: "Paid" },
+  ];
+
   if (!modalState.isOpen || modalState.type !== "create-expense") {
     return null;
   }
@@ -412,7 +418,7 @@ const AddExpenseModal = () => {
               onClick={handleClose}
               className="financial-expense-add-close-btn hover:bg-gray-100 duration-200"
             >
-              <img src={closeicon} alt="close" className="w-[15px] h-[15px]" />
+              <X size={20} />
             </button>
           </div>
 
@@ -442,7 +448,7 @@ const AddExpenseModal = () => {
                   <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                     <ChevronDown
                       size={16}
-                      className={`text-[#201D1E] transition-transform duration-300 ${
+                      classClassName={`text-[#201D1E] transition-transform duration-300 ${
                         isSelectOpen.expense_type ? "rotate-180" : "rotate-0"
                       }`}
                     />
@@ -463,7 +469,7 @@ const AddExpenseModal = () => {
                       onBlur={() => handleSelectToggle("tenancy")}
                       disabled={isLoading.tenancies}
                       className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-add-selection ${
-                        formData.tenancy === "" ? "financial-expense-add-selected" : ""
+                          formData.tenancy === "" ? "financial-expense" : ""
                       } ${isLoading.tenancies ? "opacity-50" : ""}`}
                     >
                       <option value="" disabled hidden>
@@ -662,9 +668,6 @@ const AddExpenseModal = () => {
                     onChange={handleChange("date")}
                     className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-add-input"
                   />
-                  <div className="absolute inset-y-0 right-1 flex items-center px-2 pointer-events-none">
-                    <img src={calendaricon} alt="calendar" className="w-5 h-5" />
-                  </div>
                 </div>
               </div>
 
@@ -712,13 +715,47 @@ const AddExpenseModal = () => {
                 <label className="block financial-expense-add-label">
                   Description
                 </label>
-                <textarea
+                <input
                   value={formData.description}
                   onChange={handleChange("description")}
                   placeholder="Enter Description"
                   rows="3"
                   className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-add-input"
                 />
+              </div>
+
+              <div className="space-y-2">
+                <label className="block financial-expense-add-label">
+                  Status*
+                </label>
+                <div className="relative">
+                  <select
+                    value={formData.status}
+                    onChange={handleChange("status")}
+                    onFocus={() => handleSelectToggle("status")}
+                    onBlur={() => handleSelectToggle("status")}
+                    className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-add-selection ${
+                      formData.status === "" ? "financial-expense-add-selected" : ""
+                    }`}
+                  >
+                    <option value="" disabled hidden>
+                      Choose Status
+                    </option>
+                    {statusChoices.map(status => (
+                      <option key={status.value} value={status.value}>
+                        {status.label}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                    <ChevronDown
+                      size={16}
+                      className={`text-[#201D1E] transition-transform duration-300 ${
+                        isSelectOpen.status ? "rotate-180" : "rotate-0"
+                      }`}
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="flex items-end justify-end financial-expense-add-modal-save-wrapper">
