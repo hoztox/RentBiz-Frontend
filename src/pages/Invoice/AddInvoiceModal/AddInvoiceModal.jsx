@@ -30,7 +30,9 @@ const AddInvoiceModal = () => {
   const [loading, setLoading] = useState(false);
   const [tenancyDetails, setTenancyDetails] = useState(null);
   const [selectedPaymentSchedules, setSelectedPaymentSchedules] = useState([]);
-  const [selectedAdditionalCharges, setSelectedAdditionalCharges] = useState([]);
+  const [selectedAdditionalCharges, setSelectedAdditionalCharges] = useState(
+    []
+  );
 
   const getUserCompanyId = () => {
     try {
@@ -115,7 +117,9 @@ const AddInvoiceModal = () => {
       );
 
       if (response.data && Array.isArray(response.data.results)) {
-        const sortedTenancies = response.data.results.sort((a, b) => a.id - b.id);
+        const sortedTenancies = response.data.results.sort(
+          (a, b) => a.id - b.id
+        );
         setTenancies(sortedTenancies);
         console.log("Fetched and sorted tenancies:", sortedTenancies);
       } else {
@@ -168,18 +172,29 @@ const AddInvoiceModal = () => {
       const paymentSchedules = [];
       const additionalCharges = [];
 
-      if (tenancy?.payment_schedules && Array.isArray(tenancy.payment_schedules)) {
+      if (
+        tenancy?.payment_schedules &&
+        Array.isArray(tenancy.payment_schedules)
+      ) {
         tenancy.payment_schedules.forEach((schedule) => {
-          if (schedule.status === "pending" || schedule.status === "partially_paid") {
+          if (
+            schedule.status === "pending" ||
+            schedule.status === "partially_paid"
+          ) {
             paymentSchedules.push({
               id: schedule.id,
               charge_type: schedule.charge_type?.name || "Unknown",
               description:
-                schedule.reason || `Payment - Due ${schedule.due_date || "No Due Date"}`,
+                schedule.reason ||
+                `Payment - Due ${schedule.due_date || "No Due Date"}`,
               due_date: schedule.due_date || "",
-              amount: schedule.amount ? parseFloat(schedule.amount).toFixed(2) : "0.00",
+              amount: schedule.amount
+                ? parseFloat(schedule.amount).toFixed(2)
+                : "0.00",
               tax: schedule.tax ? parseFloat(schedule.tax).toFixed(2) : "0.00",
-              total: schedule.balance ? parseFloat(schedule.balance).toFixed(2) : "0.00",
+              total: schedule.balance
+                ? parseFloat(schedule.balance).toFixed(2)
+                : "0.00",
               amount_paid: schedule.amount_paid
                 ? parseFloat(schedule.amount_paid).toFixed(2)
                 : "0.00",
@@ -190,18 +205,29 @@ const AddInvoiceModal = () => {
         });
       }
 
-      if (tenancy?.additional_charges && Array.isArray(tenancy.additional_charges)) {
+      if (
+        tenancy?.additional_charges &&
+        Array.isArray(tenancy.additional_charges)
+      ) {
         tenancy.additional_charges.forEach((charge) => {
-          if (charge.status === "pending" || charge.status === "partially_paid") {
+          if (
+            charge.status === "pending" ||
+            charge.status === "partially_paid"
+          ) {
             additionalCharges.push({
               id: charge.id,
               charge_type: charge.charge_type?.name || "Unknown",
               description:
-                charge.reason || `Additional Charge - Due ${charge.due_date || "No Due Date"}`,
+                charge.reason ||
+                `Additional Charge - Due ${charge.due_date || "No Due Date"}`,
               due_date: charge.due_date || "",
-              amount: charge.amount ? parseFloat(charge.amount).toFixed(2) : "0.00",
+              amount: charge.amount
+                ? parseFloat(charge.amount).toFixed(2)
+                : "0.00",
               tax: charge.tax ? parseFloat(charge.tax).toFixed(2) : "0.00",
-              total: charge.balance ? parseFloat(charge.balance).toFixed(2) : "0.00",
+              total: charge.balance
+                ? parseFloat(charge.balance).toFixed(2)
+                : "0.00",
               amount_paid: charge.amount_paid
                 ? parseFloat(charge.amount_paid).toFixed(2)
                 : "0.00",
@@ -213,14 +239,18 @@ const AddInvoiceModal = () => {
       }
 
       const sortedPaymentSchedules = paymentSchedules.sort((a, b) => {
-        if (a.status === "partially_paid" && b.status !== "partially_paid") return -1;
-        if (a.status !== "partially_paid" && b.status === "partially_paid") return 1;
+        if (a.status === "partially_paid" && b.status !== "partially_paid")
+          return -1;
+        if (a.status !== "partially_paid" && b.status === "partially_paid")
+          return 1;
         return 0;
       });
 
       const sortedAdditionalCharges = additionalCharges.sort((a, b) => {
-        if (a.status === "partially_paid" && b.status !== "partially_paid") return -1;
-        if (a.status !== "partially_paid" && b.status === "partially_paid") return 1;
+        if (a.status === "partially_paid" && b.status !== "partially_paid")
+          return -1;
+        if (a.status !== "partially_paid" && b.status === "partially_paid")
+          return 1;
         return 0;
       });
 
@@ -228,7 +258,9 @@ const AddInvoiceModal = () => {
       setSelectedAdditionalCharges(sortedAdditionalCharges);
     } catch (error) {
       console.error("Error initializing selected items:", error);
-      toast.error("Failed to initialize payment schedules or additional charges");
+      toast.error(
+        "Failed to initialize payment schedules or additional charges"
+      );
     }
   };
 
@@ -274,7 +306,8 @@ const AddInvoiceModal = () => {
         ...prev,
         unit: "",
         tenancy: "",
-        building_name: buildings.find((b) => b.id === parseInt(value))?.building_name || "",
+        building_name:
+          buildings.find((b) => b.id === parseInt(value))?.building_name || "",
         unit_name: "",
       }));
       setUnits([]);
@@ -380,7 +413,8 @@ const AddInvoiceModal = () => {
           .filter((item) => item.selected)
           .map((item) => ({
             charge_type: item.charge_type,
-            description: item.description || `Payment - Due ${item.due_date || "N/A"}`, // Fallback description
+            description:
+              item.description || `Payment - Due ${item.due_date || "N/A"}`, // Fallback description
             due_date: item.due_date,
             amount: parseFloat(item.amount) || 0,
             tax: parseFloat(item.tax) || 0,
@@ -393,7 +427,9 @@ const AddInvoiceModal = () => {
           .filter((item) => item.selected)
           .map((item) => ({
             charge_type: item.charge_type,
-            description: item.description || `Additional Charge - Due ${item.due_date || "N/A"}`, // Fallback description
+            description:
+              item.description ||
+              `Additional Charge - Due ${item.due_date || "N/A"}`, // Fallback description
             due_date: item.due_date,
             amount: parseFloat(item.amount) || 0,
             tax: parseFloat(item.tax) || 0,
@@ -441,7 +477,10 @@ const AddInvoiceModal = () => {
         toast.error(response.data?.message || "Failed to create invoice");
       }
     } catch (error) {
-      console.error("Error creating invoice:", error.response?.data || error.message);
+      console.error(
+        "Error creating invoice:",
+        error.response?.data || error.message
+      );
       // Parse validation errors
       let errorMessage = "Error creating invoice";
       if (error.response?.data) {
@@ -452,7 +491,9 @@ const AddInvoiceModal = () => {
           errorMessage = items
             .map((item, index) => {
               if (item.description) {
-                return `Item ${index + 1} description error: ${item.description.join(", ")}`;
+                return `Item ${
+                  index + 1
+                } description error: ${item.description.join(", ")}`;
               }
               return null;
             })
@@ -493,11 +534,15 @@ const AddInvoiceModal = () => {
               <span className="ml-2">Loading...</span>
             </div>
           )}
-          {!loading && selectedPaymentSchedules.length === 0 && selectedAdditionalCharges.length === 0 && tenancyDetails && (
-            <div className="text-gray-600 mb-5">
-              No pending payment schedules or additional charges available for this tenancy.
-            </div>
-          )}
+          {!loading &&
+            selectedPaymentSchedules.length === 0 &&
+            selectedAdditionalCharges.length === 0 &&
+            tenancyDetails && (
+              <div className="text-gray-600 mb-5">
+                No pending payment schedules or additional charges available for
+                this tenancy.
+              </div>
+            )}
 
           <div className="invoice-modal-grid gap-6">
             <div>
@@ -545,9 +590,7 @@ const AddInvoiceModal = () => {
                   value={formData.unit}
                   onChange={handleChange}
                   onFocus={() => toggleDropdown("unit")}
-                  onBlur={() =>
-                    setTimeout(() => toggleDropdown("unit"), 150)
-                  }
+                  onBlur={() => setTimeout(() => toggleDropdown("unit"), 150)}
                   className={`block w-full border py-2 px-3 pr-8 focus:outline-none focus:ring-gray-500 focus:border-gray-500 appearance-none invoice-modal-select ${
                     formData.unit === "" ? "invoice-modal-selected" : ""
                   }`}
@@ -605,18 +648,34 @@ const AddInvoiceModal = () => {
               </div>
             </div>
 
-            <div>
-              <label className="block mb-3 invoice-modal-label">In Date*</label>
-              <input
-                type="date"
-                name="inDate"
-                value={formData.inDate}
-                onChange={handleChange}
-                className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-input"
-                required
-              />
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col w-full">
+                <label className="block mb-3 invoice-modal-label">
+                  In Date*
+                </label>
+                <input
+                  type="date"
+                  name="inDate"
+                  value={formData.inDate}
+                  onChange={handleChange}
+                  className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-select"
+                  required
+                />
+              </div>
+              <div className="flex flex-col w-full">
+                <label className="block mb-3 invoice-modal-label">
+                  Due Date*
+                </label>
+                <input
+                  type="date"
+                  name="endDate"
+                  value={formData.endDate}
+                  onChange={handleChange}
+                  className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-select"
+                  required
+                />
+              </div>
             </div>
-
             <div>
               <label className="block mb-3 invoice-modal-label">
                 Building Name*
@@ -625,7 +684,7 @@ const AddInvoiceModal = () => {
                 type="text"
                 name="building_name"
                 value={formData.building_name}
-                className="block w-full border py-2 px-3 bg-gray-100 invoice-modal-input"
+                className="block w-full border py-2 px-3 bg-gray-100 focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-select"
                 readOnly
               />
             </div>
@@ -638,20 +697,8 @@ const AddInvoiceModal = () => {
                 type="text"
                 name="unit_name"
                 value={formData.unit_name}
-                className="block w-full border py-2 px-3 bg-gray-100 invoice-modal-input"
+                className="block w-full border py-2 px-3 bg-gray-100 focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-select"
                 readOnly
-              />
-            </div>
-
-            <div>
-              <label className="block mb-3 invoice-modal-label">Due Date*</label>
-              <input
-                type="date"
-                name="endDate"
-                value={formData.endDate}
-                onChange={handleChange}
-                className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-input"
-                required
               />
             </div>
           </div>
@@ -707,7 +754,9 @@ const AddInvoiceModal = () => {
                           <tr
                             key={index}
                             className={`border-b border-[#E9E9E9] last:border-b-0 ${
-                              item.status === "partially_paid" ? "bg-yellow-100" : ""
+                              item.status === "partially_paid"
+                                ? "bg-yellow-100"
+                                : ""
                             }`}
                           >
                             <td className="px-[10px] py-[5px] w-[50px]">
@@ -773,9 +822,7 @@ const AddInvoiceModal = () => {
                           <input
                             type="checkbox"
                             checked={item.selected}
-                            onChange={() =>
-                              handlePaymentScheduleToggle(index)
-                            }
+                            onChange={() => handlePaymentScheduleToggle(index)}
                             className="w-4 h-4"
                           />
                         </div>
@@ -886,7 +933,9 @@ const AddInvoiceModal = () => {
                           <tr
                             key={index}
                             className={`border-b border-[#E9E9E9] last:border-b-0 ${
-                              item.status === "partially_paid" ? "bg-yellow-100" : ""
+                              item.status === "partially_paid"
+                                ? "bg-yellow-100"
+                                : ""
                             }`}
                           >
                             <td className="px-[10px] py-[5px] w-[50px]">
@@ -952,9 +1001,7 @@ const AddInvoiceModal = () => {
                           <input
                             type="checkbox"
                             checked={item.selected}
-                            onChange={() =>
-                              handleAdditionalChargeToggle(index)
-                            }
+                            onChange={() => handleAdditionalChargeToggle(index)}
                             className="w-4 h-4"
                           />
                         </div>
