@@ -63,7 +63,7 @@ const mobileRouteTitles = {
   "/admin/masters-currency": "Currency",
   "/admin/additional-charges": "Additional Charges",
   "/admin/invoice": "Invoice List",
-  "/admin/monthly-invoice": "Monthly Invoice List",
+  "/admin/monthly-invoice": "Invoice List Auto Generated",
   "/admin/collection": "Collection",
   "/admin/expense": "Expenses",
   "/admin/refund": "Refund",
