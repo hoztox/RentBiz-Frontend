@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./UpdateChargesModal.css";
-import { ChevronDown } from "lucide-react";
-import closeicon from "../../../assets/Images/Additional Charges/close-icon.svg";
+import { ChevronDown, X } from "lucide-react";
 import plusicon from "../../../assets/Images/Additional Charges/input-plus-icon.svg";
 import { useModal } from "../../../context/ModalContext";
 import axios from "axios";
@@ -328,11 +327,9 @@ const UpdateAdditionalCharges = () => {
             onClick={closeModal}
             className="update-charges-close-btn hover:bg-gray-100 duration-200"
           >
-            <img src={closeicon} alt="close" className="w-[15px] h-[15px]" />
+            <X size={20} />
           </button>
         </div>
-
-        {/* {error && <div className="text-red-500 text-center mb-4">{error}</div>} */}
 
         <div className="md:p-6 mt-[-15px]">
           <div className="grid uc-grid-cols-2 gap-6">
