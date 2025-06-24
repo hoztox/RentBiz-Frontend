@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import "./AddInvoiceModal.css";
 import { ChevronDown, X } from "lucide-react";
-import closeicon from "../../../assets/Images/Invoice/close-icon.svg";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 
 const AddInvoiceModal = () => {
-  const { modalState, closeModal } = useModal();
+  const { modalState, closeModal, triggerRefresh } = useModal();
   const [formData, setFormData] = useState({
     building: "",
     unit: "",
@@ -29,7 +29,6 @@ const AddInvoiceModal = () => {
   const [tenancies, setTenancies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [tenancyDetails, setTenancyDetails] = useState(null);
-  const [error, setError] = useState(null);
   const [selectedPaymentSchedules, setSelectedPaymentSchedules] = useState([]);
   const [selectedAdditionalCharges, setSelectedAdditionalCharges] = useState([]);
 
@@ -53,11 +52,9 @@ const AddInvoiceModal = () => {
     try {
       const companyId = getUserCompanyId();
       if (!companyId) {
-        setError("No company ID found");
+        toast.error("No company ID found");
         return;
       }
-
-      setError(null); // Clear any previous errors
 
       const response = await axios.get(
         `${BASE_URL}/company/buildings/occupied/${companyId}/`
@@ -73,7 +70,7 @@ const AddInvoiceModal = () => {
       }
     } catch (error) {
       console.error("Error fetching buildings:", error);
-      setError("Failed to fetch buildings");
+      toast.error("Failed to fetch buildings");
       setBuildings([]);
     }
   };
@@ -82,11 +79,9 @@ const AddInvoiceModal = () => {
     try {
       const companyId = getUserCompanyId();
       if (!companyId || !buildingId) {
-        setError("Company ID or Building ID not found");
+        toast.error("Company ID or Building ID not found");
         return;
       }
-
-      setError(null); // Clear any previous errors
 
       const response = await axios.get(
         `${BASE_URL}/company/units/${buildingId}/occupied-units/`
@@ -102,7 +97,7 @@ const AddInvoiceModal = () => {
       }
     } catch (error) {
       console.error("Error fetching units:", error);
-      setError("Failed to fetch units");
+      toast.error("Failed to fetch units");
       setUnits([]);
     }
   };
@@ -111,11 +106,9 @@ const AddInvoiceModal = () => {
     try {
       const companyId = getUserCompanyId();
       if (!companyId || !unitId) {
-        setError("Company ID or Unit ID not found");
+        toast.error("Company ID or Unit ID not found");
         return;
       }
-
-      setError(null); // Clear any previous errors
 
       const response = await axios.get(
         `${BASE_URL}/company/tenancies/company/${companyId}/${unitId}/`
@@ -131,15 +124,13 @@ const AddInvoiceModal = () => {
       }
     } catch (error) {
       console.error("Error fetching tenancies:", error);
-      setError("Failed to fetch tenancies");
+      toast.error("Failed to fetch tenancies");
       setTenancies([]);
     }
   };
 
   const fetchTenancyDetails = async (tenancyId) => {
     try {
-      setError(null); // Clear any previous errors
-
       const response = await axios.get(
         `${BASE_URL}/company/tenancies/${tenancyId}/`
       );
@@ -164,11 +155,11 @@ const AddInvoiceModal = () => {
           "Failed to fetch tenancy details:",
           response.data?.message || "Unknown error"
         );
-        setError("Failed to fetch tenancy details");
+        toast.error("Failed to fetch tenancy details");
       }
     } catch (error) {
       console.error("Error fetching tenancy details:", error);
-      setError("Error fetching tenancy details");
+      toast.error("Error fetching tenancy details");
     }
   };
 
@@ -177,25 +168,18 @@ const AddInvoiceModal = () => {
       const paymentSchedules = [];
       const additionalCharges = [];
 
-      if (
-        tenancy.payment_schedules &&
-        Array.isArray(tenancy.payment_schedules)
-      ) {
+      if (tenancy?.payment_schedules && Array.isArray(tenancy.payment_schedules)) {
         tenancy.payment_schedules.forEach((schedule) => {
           if (schedule.status === "pending" || schedule.status === "partially_paid") {
             paymentSchedules.push({
               id: schedule.id,
               charge_type: schedule.charge_type?.name || "Unknown",
               description:
-                schedule.reason || `Payment - Due ${schedule.due_date}`,
+                schedule.reason || `Payment - Due ${schedule.due_date || "No Due Date"}`,
               due_date: schedule.due_date || "",
-              amount: schedule.amount
-                ? parseFloat(schedule.amount).toFixed(2)
-                : "0.00",
+              amount: schedule.amount ? parseFloat(schedule.amount).toFixed(2) : "0.00",
               tax: schedule.tax ? parseFloat(schedule.tax).toFixed(2) : "0.00",
-              total: schedule.balance
-                ? parseFloat(schedule.balance).toFixed(2)
-                : "0.00",
+              total: schedule.balance ? parseFloat(schedule.balance).toFixed(2) : "0.00",
               amount_paid: schedule.amount_paid
                 ? parseFloat(schedule.amount_paid).toFixed(2)
                 : "0.00",
@@ -206,25 +190,18 @@ const AddInvoiceModal = () => {
         });
       }
 
-      if (
-        tenancy.additional_charges &&
-        Array.isArray(tenancy.additional_charges)
-      ) {
+      if (tenancy?.additional_charges && Array.isArray(tenancy.additional_charges)) {
         tenancy.additional_charges.forEach((charge) => {
           if (charge.status === "pending" || charge.status === "partially_paid") {
             additionalCharges.push({
               id: charge.id,
               charge_type: charge.charge_type?.name || "Unknown",
               description:
-                charge.reason || `Additional charge - Due ${charge.due_date}`,
+                charge.reason || `Additional Charge - Due ${charge.due_date || "No Due Date"}`,
               due_date: charge.due_date || "",
-              amount: charge.amount
-                ? parseFloat(charge.amount).toFixed(2)
-                : "0.00",
+              amount: charge.amount ? parseFloat(charge.amount).toFixed(2) : "0.00",
               tax: charge.tax ? parseFloat(charge.tax).toFixed(2) : "0.00",
-              total: charge.balance
-                ? parseFloat(charge.balance).toFixed(2)
-                : "0.00",
+              total: charge.balance ? parseFloat(charge.balance).toFixed(2) : "0.00",
               amount_paid: charge.amount_paid
                 ? parseFloat(charge.amount_paid).toFixed(2)
                 : "0.00",
@@ -251,6 +228,7 @@ const AddInvoiceModal = () => {
       setSelectedAdditionalCharges(sortedAdditionalCharges);
     } catch (error) {
       console.error("Error initializing selected items:", error);
+      toast.error("Failed to initialize payment schedules or additional charges");
     }
   };
 
@@ -270,7 +248,6 @@ const AddInvoiceModal = () => {
     setTenancyDetails(null);
     setSelectedPaymentSchedules([]);
     setSelectedAdditionalCharges([]);
-    setError(null);
     setOpenDropdowns({
       building: false,
       unit: false,
@@ -373,13 +350,29 @@ const AddInvoiceModal = () => {
       const userId = getRelevantUserId();
 
       if (!companyId) {
-        setError("Company ID is required to create an invoice.");
+        toast.error("Company ID is required to create an invoice.");
         return;
       }
 
       if (!formData.inDate) {
-        setError("Invoice date is required.");
+        toast.error("Invoice date is required.");
         return;
+      }
+
+      if (!formData.endDate) {
+        toast.error("Due date is required.");
+        return;
+      }
+
+      // Validate endDate format (YYYY-MM-DD)
+      let formattedEndDate = formData.endDate;
+      if (formData.endDate) {
+        const endDate = new Date(formData.endDate);
+        if (isNaN(endDate.getTime())) {
+          toast.error("Due date is invalid. Please use YYYY-MM-DD format.");
+          return;
+        }
+        formattedEndDate = endDate.toISOString().split("T")[0]; // Ensure YYYY-MM-DD
       }
 
       const selectedItems = [
@@ -387,7 +380,7 @@ const AddInvoiceModal = () => {
           .filter((item) => item.selected)
           .map((item) => ({
             charge_type: item.charge_type,
-            description: item.description,
+            description: item.description || `Payment - Due ${item.due_date || "N/A"}`, // Fallback description
             due_date: item.due_date,
             amount: parseFloat(item.amount) || 0,
             tax: parseFloat(item.tax) || 0,
@@ -400,7 +393,7 @@ const AddInvoiceModal = () => {
           .filter((item) => item.selected)
           .map((item) => ({
             charge_type: item.charge_type,
-            description: item.description,
+            description: item.description || `Additional Charge - Due ${item.due_date || "N/A"}`, // Fallback description
             due_date: item.due_date,
             amount: parseFloat(item.amount) || 0,
             tax: parseFloat(item.tax) || 0,
@@ -412,57 +405,72 @@ const AddInvoiceModal = () => {
       ];
 
       if (selectedItems.length === 0) {
-        setError("Please select at least one item to invoice.");
+        toast.error("Please select at least one item to invoice.");
         return;
       }
 
-      setLoading(true); // Keep loading for invoice creation
-      setError(null);
+      setLoading(true);
 
       const invoiceData = {
         company: companyId,
         user: userId,
         tenancy: formData.tenancy,
         invoice_date: formData.inDate,
-        end_date: formData.endDate,
+        end_date: formattedEndDate,
         building_name: formData.building_name,
         unit_name: formData.unit_name,
         items: selectedItems,
         total_amount: parseFloat(calculateGrandTotal()),
       };
 
+      console.log("Invoice Data Payload:", invoiceData); // Debug log
+
       const response = await axios.post(
         `${BASE_URL}/company/invoice/create/`,
         invoiceData
       );
 
+      console.log("API Response:", response.data);
+
       if (response.data && response.data.success) {
         console.log("Invoice Created Successfully:", response.data);
+        toast.success("Invoice created successfully!");
+        triggerRefresh();
         closeModal();
       } else {
-        console.error(
-          "Failed to create invoice:",
-          response.data?.message || "Unknown error"
-        );
-        setError(response.data?.message || "Failed to create invoice");
+        toast.error(response.data?.message || "Failed to create invoice");
       }
     } catch (error) {
-      console.error(
-        "Error creating invoice:",
-        error.response?.data?.errors || error.message
-      );
-      setError(
-        error.response?.data?.errors ||
-          error.response?.data?.message ||
-          "Error creating invoice"
-      );
+      console.error("Error creating invoice:", error.response?.data || error.message);
+      // Parse validation errors
+      let errorMessage = "Error creating invoice";
+      if (error.response?.data) {
+        const { end_date, items } = error.response.data;
+        if (end_date) {
+          errorMessage = `Due date error: ${end_date.join(", ")}`;
+        } else if (items && Array.isArray(items)) {
+          errorMessage = items
+            .map((item, index) => {
+              if (item.description) {
+                return `Item ${index + 1} description error: ${item.description.join(", ")}`;
+              }
+              return null;
+            })
+            .filter(Boolean)
+            .join("; ");
+        } else if (error.response.data.message) {
+          errorMessage = error.response.data.message;
+        }
+      }
+      toast.error(errorMessage);
     } finally {
-      setLoading(false); // Reset loading after invoice creation
+      setLoading(false);
     }
   };
 
   return (
     <div className="modal-overlay">
+      <Toaster />
       <div className="invoice-modal-container bg-white rounded-md w-[1006px] max-h-[90vh] flex flex-col">
         {/* Fixed Header */}
         <div className="flex justify-between items-center md:p-6 border-gray-200 flex-shrink-0">
@@ -479,16 +487,15 @@ const AddInvoiceModal = () => {
 
         {/* Scrollable Content */}
         <div className="flex-1 md:overflow-y-auto md:p-6">
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-              {error}
-            </div>
-          )}
-
           {loading && (
             <div className="text-center py-4">
               <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
               <span className="ml-2">Loading...</span>
+            </div>
+          )}
+          {!loading && selectedPaymentSchedules.length === 0 && selectedAdditionalCharges.length === 0 && tenancyDetails && (
+            <div className="text-gray-600 mb-5">
+              No pending payment schedules or additional charges available for this tenancy.
             </div>
           )}
 
@@ -637,13 +644,14 @@ const AddInvoiceModal = () => {
             </div>
 
             <div>
-              <label className="block mb-3 invoice-modal-label">Due Date</label>
+              <label className="block mb-3 invoice-modal-label">Due Date*</label>
               <input
                 type="date"
                 name="endDate"
                 value={formData.endDate}
                 onChange={handleChange}
-                className="block w-full border py-2 px-3 invoice-modal-input"
+                className="block w-full border py-2 px-3 focus:outline-none focus:ring-gray-500 focus:border-gray-500 invoice-modal-input"
+                required
               />
             </div>
           </div>

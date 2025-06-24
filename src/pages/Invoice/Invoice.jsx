@@ -16,7 +16,7 @@ const Invoice = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
-  const { openModal } = useModal();
+  const { openModal, refreshCounter } = useModal();
   const [selectedOption, setSelectedOption] = useState("all");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
@@ -156,7 +156,7 @@ const Invoice = () => {
       const response = await axios.delete(`${BASE_URL}/company/invoice/delete/${itemToDelete.dbId}/`);
       if (response.data && response.data.success) {
         setInvoices((prev) => prev.filter((invoice) => invoice.dbId !== itemToDelete.dbId));
-        alert(`Invoice ${itemToDelete.id} deleted successfully`);
+        // alert(`Invoice ${itemToDelete.id} deleted successfully`);
         console.log("Deleted invoice:", itemToDelete.dbId);
       } else {
         throw new Error(response.data?.message || "Failed to delete invoice");
@@ -173,7 +173,7 @@ const Invoice = () => {
 
   useEffect(() => {
     fetchInvoices();
-  }, [searchTerm, selectedOption, currentPage]);
+  }, [searchTerm, selectedOption, currentPage, refreshCounter]);
 
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
