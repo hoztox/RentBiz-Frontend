@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import "./EditUserModal.css";
-import closeicon from "../../../assets/Images/Admin Users Management/close-icon.svg";
 import addImageIcon from "../../../assets/Images/Admin Users Management/addImageIcon.svg";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../../../context/ModalContext";
 import { toast } from "react-hot-toast";
@@ -73,7 +72,10 @@ const EditUserModal = () => {
 
   // Only render for "user-update" type
   if (!modalState.isOpen || modalState.type !== "user-update") {
-    console.log("Modal not rendering:", { isOpen: modalState.isOpen, type: modalState.type });
+    console.log("Modal not rendering:", {
+      isOpen: modalState.isOpen,
+      type: modalState.type,
+    });
     return null;
   }
 
@@ -319,7 +321,7 @@ const EditUserModal = () => {
             aria-label="Close modal"
             disabled={isLoading}
           >
-            <img src={closeicon} alt="Close" />
+            <X size={20} />
           </button>
         </div>
 
@@ -400,7 +402,9 @@ const EditUserModal = () => {
               required
             />
             {fieldErrors.username && (
-              <p className="text-red-600 text-xs mt-1">{fieldErrors.username}</p>
+              <p className="text-red-600 text-xs mt-1">
+                {fieldErrors.username}
+              </p>
             )}
           </div>
 
@@ -466,13 +470,15 @@ const EditUserModal = () => {
               color="#201D1E"
             />
             {fieldErrors.user_role && (
-              <p className="text-red-600 text-xs mt-1">{fieldErrors.user_role}</p>
+              <p className="text-red-600 text-xs mt-1">
+                {fieldErrors.user_role}
+              </p>
             )}
           </div>
         </div>
 
         {/* Button Row - Change Password and Edit User aligned */}
-         <div className="px-4 md:px-6 mt-6 mb-10 button-container">
+        <div className="px-4 md:px-6 mt-6 mb-10 button-container">
           <button
             className={`reset-button duration-200 ${
               isLoading
@@ -484,7 +490,7 @@ const EditUserModal = () => {
           >
             Change Password
           </button>
-          
+
           <button
             className={`create-user-button duration-200 ${
               isLoading
