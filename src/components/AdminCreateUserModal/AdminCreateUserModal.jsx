@@ -1,8 +1,7 @@
 import React, { useState, useRef } from "react";
 import "./AdminCreateUserModal.css";
-import cancelIcon from "../../assets/Images/Admin Create Modal/cancelIcon.svg";
 import addImageIcon from "../../assets/Images/Admin Create Modal/addImageIcon.svg";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../../context/ModalContext";
@@ -354,7 +353,7 @@ const AdminCreateUserModal = () => {
             onClick={closeModal}
             aria-label="Close modal"
           >
-            <img src={cancelIcon} alt="Close" className="w-5 h-5" />
+            <X size={20} />
           </button>
         </div>
 

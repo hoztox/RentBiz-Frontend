@@ -181,9 +181,9 @@ const Expense = () => {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-[#E9E9E9] h-[57px]">
-                  <th className="px-5 text-left expense-thead">ID</th>
-                  <th className="px-5 text-left expense-thead">DATE</th>
-                  <th className="pl-5 text-left expense-thead">EXPENSE TYPE</th>
+                  <th className="px-5 text-left expense-thead w-[100px]">ID</th>
+                  <th className="px-5 text-left expense-thead w-[150px]">DATE</th>
+                  <th className="pl-5 text-left expense-thead w-[150px]">EXPENSE TYPE</th>
                   <th className="pl-5 text-left expense-thead w-[150px]">
                     AMOUNT
                   </th>
