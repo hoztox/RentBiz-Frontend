@@ -19,8 +19,10 @@ const UnitInfoForm = ({ onNext, onBack, initialData }) => {
     }
   );
   const [unitTypes, setUnitTypes] = useState([]);
+  const [nextPageUrl, setNextPageUrl] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [isSelectFocused, setIsSelectFocused] = useState(false);
   const [companyId, setCompanyId] = useState(null);
   const [userId, setUserId] = useState(null);
@@ -52,25 +54,36 @@ const UnitInfoForm = ({ onNext, onBack, initialData }) => {
     return null;
   };
 
-  useEffect(() => {
-    const fetchUnitTypes = async () => {
-      setLoading(true);
-      try {
-        const companyId = getUserCompanyId();
-        const response = await axios.get(`${BASE_URL}/company/unit-types/company/${companyId}`);
-        setUnitTypes(Array.isArray(response.data) ? response.data : []);
-        setError(null);
-      } catch (error) {
-        console.error("Error fetching unit types:", error);
-        setError("Failed to load unit types. Using default options.");
-        setUnitTypes([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchUnitTypes = async (url = null) => {
+    try {
+      setIsFetchingMore(!!url);
+      if (!url) setLoading(true);
 
-    setCompanyId(getUserCompanyId());
-    setUserId(getRelevantUserId());
+      const companyId = getUserCompanyId();
+      if (!companyId && !url) throw new Error("Company ID not found");
+
+      const apiUrl =
+        url || `${BASE_URL}/company/unit-types/company/${companyId}`;
+      const response = await axios.get(apiUrl);
+
+      const newUnitTypes = Array.isArray(response.data?.results)
+        ? response.data.results
+        : [];
+
+      setUnitTypes((prev) => (url ? [...prev, ...newUnitTypes] : newUnitTypes));
+      setNextPageUrl(response.data.next);
+      setError(null);
+    } catch (error) {
+      console.error("Error fetching unit types:", error);
+      setError(error.message || "Failed to load unit types");
+      if (!url) setUnitTypes([]);
+    } finally {
+      setLoading(false);
+      setIsFetchingMore(false);
+    }
+  };
+
+  useEffect(() => {
     fetchUnitTypes();
   }, []);
 
@@ -78,7 +91,10 @@ const UnitInfoForm = ({ onNext, onBack, initialData }) => {
     const { name, value } = e.target;
     setFormState({
       ...formState,
-      [name]: name === "no_of_bedrooms" || name === "no_of_bathrooms" ? parseInt(value) || "" : value,
+      [name]:
+        name === "no_of_bedrooms" || name === "no_of_bathrooms"
+          ? parseInt(value) || ""
+          : value,
     });
     if (name === "unit_type" || name === "unit_status") {
       setIsSelectFocused(false);
@@ -87,7 +103,13 @@ const UnitInfoForm = ({ onNext, onBack, initialData }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const requiredFields = ["unit_name", "unit_type", "address", "premise_no", "unit_status"];
+    const requiredFields = [
+      "unit_name",
+      "unit_type",
+      "address",
+      "premise_no",
+      "unit_status",
+    ];
     const missingFields = requiredFields.filter((field) => !formState[field]);
     if (missingFields.length > 0) {
       setError(`Please fill required fields: ${missingFields.join(", ")}`);
@@ -151,7 +173,13 @@ const UnitInfoForm = ({ onNext, onBack, initialData }) => {
               name="unit_type"
               value={formState.unit_type}
               onChange={handleInputChange}
-              onFocus={() => setIsSelectFocused(true)}
+              onFocus={() => {
+                setIsSelectFocused(true);
+                // Load more when dropdown opens if there are more items
+                if (nextPageUrl && !isFetchingMore) {
+                  fetchUnitTypes(nextPageUrl);
+                }
+              }}
               onBlur={() => setIsSelectFocused(false)}
               className="w-full appearance-none unit-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer"
               required
@@ -166,10 +194,9 @@ const UnitInfoForm = ({ onNext, onBack, initialData }) => {
                   </option>
                 ))
               ) : (
-                <>
-                  No unit types available. Please add.
-                </>
+                <>No unit types available. Please add.</>
               )}
+              {isFetchingMore && <option value="">Loading more...</option>}
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown

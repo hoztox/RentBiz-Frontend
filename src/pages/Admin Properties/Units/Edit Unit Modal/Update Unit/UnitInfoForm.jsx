@@ -23,14 +23,18 @@ const UnitInfoForm = ({ onNext, onBack, initialData, unitId }) => {
     user: null,
   });
   const [unitTypes, setUnitTypes] = useState([]);
+  const [nextPageUrl, setNextPageUrl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
   const [isSelectFocused, setIsSelectFocused] = useState(false);
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
     const storedCompanyId = localStorage.getItem("company_id");
-    return role === "company" || role === "user" || role === "admin" ? storedCompanyId : null;
+    return role === "company" || role === "user" || role === "admin"
+      ? storedCompanyId
+      : null;
   };
 
   const getRelevantUserId = () => {
@@ -42,19 +46,34 @@ const UnitInfoForm = ({ onNext, onBack, initialData, unitId }) => {
   };
 
   useEffect(() => {
-    const fetchUnitTypes = async () => {
-      setLoading(true);
+    const fetchUnitTypes = async (url = null) => {
       try {
+        setIsFetchingMore(!!url);
+        if (!url) setLoading(true);
+
         const companyId = getUserCompanyId();
-        const response = await axios.get(`${BASE_URL}/company/unit-types/company/${companyId}`);
-        setUnitTypes(Array.isArray(response.data) ? response.data : []);
+        if (!companyId && !url) throw new Error("Company ID not found");
+
+        const apiUrl =
+          url || `${BASE_URL}/company/unit-types/company/${companyId}`;
+        const response = await axios.get(apiUrl);
+
+        const newUnitTypes = Array.isArray(response.data?.results)
+          ? response.data.results
+          : [];
+
+        setUnitTypes((prev) =>
+          url ? [...prev, ...newUnitTypes] : newUnitTypes
+        );
+        setNextPageUrl(response.data.next);
         setError(null);
       } catch (error) {
         console.error("Error fetching unit types:", error);
-        setError("Failed to load unit types. Using default options.");
-        setUnitTypes([]);
+        setError(error.message || "Failed to load unit types");
+        if (!url) setUnitTypes([]);
       } finally {
         setLoading(false);
+        setIsFetchingMore(false);
       }
     };
 
@@ -90,7 +109,10 @@ const UnitInfoForm = ({ onNext, onBack, initialData, unitId }) => {
     const { name, value } = e.target;
     setFormState({
       ...formState,
-      [name]: name === "no_of_bedrooms" || name === "no_of_bathrooms" ? parseInt(value) || "" : value,
+      [name]:
+        name === "no_of_bedrooms" || name === "no_of_bathrooms"
+          ? parseInt(value) || ""
+          : value,
     });
     if (name === "unit_type" || name === "unit_status") {
       setIsSelectFocused(false);
@@ -99,7 +121,13 @@ const UnitInfoForm = ({ onNext, onBack, initialData, unitId }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const requiredFields = ["unit_name", "unit_type", "address", "premise_no", "unit_status"];
+    const requiredFields = [
+      "unit_name",
+      "unit_type",
+      "address",
+      "premise_no",
+      "unit_status",
+    ];
     const missingFields = requiredFields.filter((field) => !formState[field]);
     if (missingFields.length > 0) {
       setError(`Please fill required fields: ${missingFields.join(", ")}`);
@@ -169,7 +197,13 @@ const UnitInfoForm = ({ onNext, onBack, initialData, unitId }) => {
               name="unit_type"
               value={formState.unit_type}
               onChange={handleInputChange}
-              onFocus={() => setIsSelectFocused(true)}
+              onFocus={() => {
+                setIsSelectFocused(true);
+                // Load more when dropdown opens if there are more items
+                if (nextPageUrl && !isFetchingMore) {
+                  fetchUnitTypes(nextPageUrl);
+                }
+              }}
               onBlur={() => setIsSelectFocused(false)}
               className="w-full appearance-none unit-info-form-inputs focus:border-gray-300 duration-200 cursor-pointer"
               required
@@ -178,18 +212,23 @@ const UnitInfoForm = ({ onNext, onBack, initialData, unitId }) => {
               {loading ? (
                 <option value="">Loading...</option>
               ) : unitTypes.length > 0 ? (
-                unitTypes.map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.title}
-                  </option>
-                ))
+                <>
+                  {unitTypes.map((type) => (
+                    <option key={type.id} value={type.id}>
+                      {type.title}
+                    </option>
+                  ))}
+                  {isFetchingMore && <option value="">Loading more...</option>}
+                </>
               ) : (
                 <option value="">No unit types available. Please add.</option>
               )}
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
-                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${isSelectFocused ? "rotate-180" : ""}`}
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
+                  isSelectFocused ? "rotate-180" : ""
+                }`}
               />
             </div>
           </div>
@@ -264,7 +303,9 @@ const UnitInfoForm = ({ onNext, onBack, initialData, unitId }) => {
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <ChevronDown
-                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${isSelectFocused ? "rotate-180" : ""}`}
+                className={`h-5 w-5 text-[#201D1E] transition-transform duration-300 ${
+                  isSelectFocused ? "rotate-180" : ""
+                }`}
               />
             </div>
           </div>
