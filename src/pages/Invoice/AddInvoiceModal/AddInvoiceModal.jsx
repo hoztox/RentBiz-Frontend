@@ -509,6 +509,22 @@ const AddInvoiceModal = () => {
     }
   };
 
+  const handleSelectAllPaymentSchedules = (isChecked) => {
+    const updatedSchedules = selectedPaymentSchedules.map((schedule) => ({
+      ...schedule,
+      selected: isChecked,
+    }));
+    setSelectedPaymentSchedules(updatedSchedules);
+  };
+
+  const handleSelectAllAdditionalCharges = (isChecked) => {
+    const updatedCharges = selectedAdditionalCharges.map((charge) => ({
+      ...charge,
+      selected: isChecked,
+    }));
+    setSelectedAdditionalCharges(updatedCharges);
+  };
+
   return (
     <div className="modal-overlay">
       <Toaster />
@@ -718,7 +734,20 @@ const AddInvoiceModal = () => {
                       <thead className="bg-white">
                         <tr className="border-b border-[#E9E9E9] h-[57px]">
                           <th className="px-[10px] text-left invoice-modal-thead uppercase w-[50px]">
-                            Select
+                            <input
+                              type="checkbox"
+                              checked={
+                                selectedPaymentSchedules.length > 0 &&
+                                selectedPaymentSchedules.every(
+                                  (item) => item.selected
+                                )
+                              }
+                              onChange={(e) => {
+                                const isChecked = e.target.checked;
+                                handleSelectAllPaymentSchedules(isChecked);
+                              }}
+                              className="table-checkbox"
+                            />
                           </th>
                           <th className="px-[10px] text-left invoice-modal-thead uppercase w-[100px]">
                             Charge Type
@@ -766,7 +795,7 @@ const AddInvoiceModal = () => {
                                 onChange={() =>
                                   handlePaymentScheduleToggle(index)
                                 }
-                                className="w-4 h-4"
+                                className="tdata-checkbox"
                               />
                             </td>
                             <td className="px-[10px] py-[5px] w-[100px] invoice-modal-tdata">
@@ -823,7 +852,7 @@ const AddInvoiceModal = () => {
                             type="checkbox"
                             checked={item.selected}
                             onChange={() => handlePaymentScheduleToggle(index)}
-                            className="w-4 h-4"
+                            className="tdata-checkbox"
                           />
                         </div>
                         <div className="px-[10px] py-[13px] w-[40%] invoice-modal-tdata">
@@ -888,6 +917,7 @@ const AddInvoiceModal = () => {
               <h3 className="text-lg mb-3 additional-charges-heading">
                 Additional Charges
               </h3>
+              
               <div className="border border-[#E9E9E9] rounded-md invoice-mobile-section-container">
                 {/* Desktop Table */}
                 <div className="invoice-desktop-table">
@@ -897,7 +927,20 @@ const AddInvoiceModal = () => {
                       <thead className="bg-white">
                         <tr className="border-b border-[#E9E9E9] h-[57px]">
                           <th className="px-[10px] text-left invoice-modal-thead uppercase w-[50px]">
-                            Select
+                            <input
+                              type="checkbox"
+                              checked={
+                                selectedAdditionalCharges.length > 0 &&
+                                selectedAdditionalCharges.every(
+                                  (item) => item.selected
+                                )
+                              }
+                              onChange={(e) => {
+                                const isChecked = e.target.checked;
+                                handleSelectAllAdditionalCharges(isChecked);
+                              }}
+                              className="table-checkbox"
+                            />
                           </th>
                           <th className="px-[10px] text-left invoice-modal-thead uppercase w-[120px]">
                             Charge Type
@@ -945,7 +988,7 @@ const AddInvoiceModal = () => {
                                 onChange={() =>
                                   handleAdditionalChargeToggle(index)
                                 }
-                                className="w-4 h-4"
+                                className="tdata-checkbox"
                               />
                             </td>
                             <td className="px-[10px] py-[5px] w-[120px] invoice-modal-tdata">
@@ -978,6 +1021,7 @@ const AddInvoiceModal = () => {
 
                 {/* Mobile Table */}
                 <div className="invoice-mobile-table">
+                  
                   {selectedAdditionalCharges.map((item, index) => (
                     <div
                       key={index}
@@ -1002,7 +1046,7 @@ const AddInvoiceModal = () => {
                             type="checkbox"
                             checked={item.selected}
                             onChange={() => handleAdditionalChargeToggle(index)}
-                            className="w-4 h-4"
+                            className="tdata-checkbox"
                           />
                         </div>
                         <div className="px-[10px] py-[13px] w-[40%] invoice-modal-tdata">
