@@ -204,7 +204,7 @@ const ViewInvoiceModal = () => {
               </div>
               <div className="grid grid-cols-2 border-b border-[#E9E9E9] h-[70px]">
                 <div className="px-[10px] py-[10px] view-invoice-charges-tdata">
-                  {item.charge_type?.name || "N/A"}
+                  {item.charge_type || "N/A"}
                 </div>
                 <div className="px-[10px] py-[10px] view-invoice-charges-tdata">
                   {item.reason || "N/A"}
