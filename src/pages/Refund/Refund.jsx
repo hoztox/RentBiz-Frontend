@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Refund.css";
 import plusicon from "../../assets/Images/Refund/plus-icon.svg";
 import downloadicon from "../../assets/Images/Refund/download-icon.svg";
@@ -9,14 +9,24 @@ import downarrow from "../../assets/Images/Refund/downarrow.svg";
 import { useModal } from "../../context/ModalContext";
 import CustomDropDown from "../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
+import { BASE_URL } from "../../utils/config";
+import axios from "axios";
 
 const Refund = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [expandedRows, setExpandedRows] = useState({}); // Fixed initialization to object
+  const [expandedRows, setExpandedRows] = useState({});
   const { openModal } = useModal();
-  const [selectedOption, setSelectedOption] = useState("showing"); // State for dropdown
-  const itemsPerPage = 10;
+  const [selectedOption, setSelectedOption] = useState("showing");
+  const [refunds, setRefunds] = useState([]);
+  const [pagination, setPagination] = useState({
+    count: 0,
+    next: null,
+    previous: null,
+    total_pages: 0,
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   // Dropdown options
   const dropdownOptions = [
@@ -24,56 +34,35 @@ const Refund = () => {
     { label: "All", value: "all" },
   ];
 
-  const demoData = [
-    {
-      id: "01",
-      date: "24 Nov 2024",
-      tenancyId: "TC0013-1",
-      tenantName: "Pharmacy",
-      amount: "300.00",
-      paymentMethod: "Cash",
-      status: "Paid",
-    },
-    {
-      id: "02",
-      date: "24 Nov 2024",
-      tenancyId: "TC0013-1",
-      tenantName: "Pharmacy",
-      amount: "300.00",
-      paymentMethod: "Cash",
-      status: "Paid",
-    },
-    {
-      id: "03",
-      date: "24 Nov 2024",
-      tenancyId: "TC0013-1",
-      tenantName: "Pharmacy",
-      amount: "300.00",
-      paymentMethod: "Bank Transfer",
-      status: "Paid",
-    },
-  ];
+  const fetchRefunds = async () => {
+    try {
+      setLoading(true);
+      setError("");
+      const response = await axios.get(`${BASE_URL}/finance/refunds/`, {
+        params: {
+          page: currentPage,
+          search: searchTerm,
+          filter: selectedOption,
+        },
+      });
+      setRefunds(response.data.results || []);
+      setPagination({
+        count: response.data.count || 0,
+        next: response.data.next,
+        previous: response.data.previous,
+        total_pages: Math.ceil(response.data.count / 10), // Assuming page_size=10
+      });
+    } catch (err) {
+      console.error("Error fetching refunds:", err);
+      setError("Failed to fetch refunds");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const filteredData = demoData.filter(
-    (refund) =>
-      refund.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      refund.date.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      refund.tenancyId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      refund.tenantName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      refund.amount.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      refund.paymentMethod.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      refund.status.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const maxPageButtons = 5;
-  const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
-  const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
+  useEffect(() => {
+    fetchRefunds();
+  }, [currentPage, searchTerm, selectedOption]);
 
   const handleEditClick = (refund) => {
     console.log("Refund ID:", refund);
@@ -105,6 +94,10 @@ const Refund = () => {
       },
     },
   };
+
+  const maxPageButtons = 5;
+  const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
+  const endPage = Math.min(pagination.total_pages, startPage + maxPageButtons - 1);
 
   return (
     <div className="border border-[#E9E9E9] rounded-md refund-table">
@@ -152,6 +145,16 @@ const Refund = () => {
           </div>
         </div>
       </div>
+      {error && (
+        <div className="px-5 py-2 bg-red-100 text-red-700 text-sm">
+          {error}
+        </div>
+      )}
+      {loading && (
+        <div className="px-5 py-2 bg-blue-100 text-blue-700 text-sm">
+          Loading...
+        </div>
+      )}
       <div className="hidden md:block">
         <table className="w-full border-collapse">
           <thead>
@@ -167,23 +170,17 @@ const Refund = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedData.map((refund, index) => (
+            {refunds.map((refund, index) => (
               <tr
                 key={index}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
                 <td className="px-5 text-left refund-data">{refund.id}</td>
-                <td className="px-5 text-left refund-data">{refund.date}</td>
-                <td className="pl-5 text-left refund-data">
-                  {refund.tenancyId}
-                </td>
-                <td className="pl-5 text-left refund-data">
-                  {refund.tenantName}
-                </td>
+                <td className="px-5 text-left refund-data">{refund.processed_date}</td>
+                <td className="pl-5 text-left refund-data">{refund.tenancy_id}</td>
+                <td className="pl-5 text-left refund-data">{refund.tenant_name}</td>
                 <td className="px-5 text-left refund-data">{refund.amount}</td>
-                <td className="px-5 text-left refund-data">
-                  {refund.paymentMethod}
-                </td>
+                <td className="px-5 text-left refund-data">{refund.refund_method}</td>
                 <td className="px-5 text-left refund-data">
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] h-[28px] ${
@@ -227,20 +224,14 @@ const Refund = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="refund-table-row-head">
-              <th className="px-5 pl-[12px] text-left refund-thead refund-id-column">
-                ID
-              </th>
-              <th className="px-5 text-left refund-thead refund-date-column">
-                DATE
-              </th>
-              <th className="px-5 text-left refund-thead refund-tenancy-id-column">
-                TENANCY ID
-              </th>
+              <th className="px-5 pl-[12px] text-left refund-thead refund-id-column">ID</th>
+              <th className="px-5 text-left refund-thead refund-date-column">DATE</th>
+              <th className="px-5 text-left refund-thead refund-tenancy-id-column">TENANCY ID</th>
               <th className="text-right refund-thead"></th>
             </tr>
           </thead>
           <tbody>
-            {paginatedData.map((refund, index) => (
+            {refunds.map((refund, index) => (
               <React.Fragment key={index}>
                 <tr
                   className={`${
@@ -249,15 +240,9 @@ const Refund = () => {
                       : "refund-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 pl-[12px] text-left refund-data refund-id-column">
-                    {refund.id}
-                  </td>
-                  <td className="px-5 text-left refund-data refund-date-column">
-                    {refund.date}
-                  </td>
-                  <td className="px-5 text-left refund-data refund-tenancy-id-column">
-                    {refund.tenancyId}
-                  </td>
+                  <td className="px-5 pl-[12px] text-left refund-data refund-id-column">{refund.id}</td>
+                  <td className="px-5 text-left refund-data refund-date-column">{refund.processed_date}</td>
+                  <td className="px-5 text-left refund-data refund-tenancy-id-column">{refund.tenancy_id}</td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`refund-dropdown-field ${
@@ -288,35 +273,21 @@ const Refund = () => {
                         <div className="refund-dropdown-content">
                           <div className="refund-dropdown-grid">
                             <div className="refund-dropdown-item refund-tenant-name-column">
-                              <div className="refund-dropdown-label">
-                                TENANT NAME
-                              </div>
-                              <div className="refund-dropdown-value">
-                                {refund.tenantName}
-                              </div>
+                              <div className="refund-dropdown-label">TENANT NAME</div>
+                              <div className="refund-dropdown-value">{refund.tenant_name}</div>
                             </div>
                             <div className="refund-dropdown-item refund-amount-column">
-                              <div className="refund-dropdown-label">
-                                AMOUNT
-                              </div>
-                              <div className="refund-dropdown-value">
-                                {refund.amount}
-                              </div>
+                              <div className="refund-dropdown-label">AMOUNT</div>
+                              <div className="refund-dropdown-value">{refund.amount}</div>
                             </div>
                             <div className="refund-dropdown-item refund-payment-method-column">
-                              <div className="refund-dropdown-label">
-                                PAYMENT METHOD
-                              </div>
-                              <div className="refund-dropdown-value">
-                                {refund.paymentMethod}
-                              </div>
+                              <div className="refund-dropdown-label">PAYMENT METHOD</div>
+                              <div className="refund-dropdown-value">{refund.refund_method}</div>
                             </div>
                           </div>
                           <div className="refund-dropdown-grid">
                             <div className="refund-dropdown-item refund-status-column">
-                              <div className="refund-dropdown-label">
-                                STATUS
-                              </div>
+                              <div className="refund-dropdown-label">STATUS</div>
                               <div className="refund-dropdown-value">
                                 <span
                                   className={`refund-status ${
@@ -330,9 +301,7 @@ const Refund = () => {
                               </div>
                             </div>
                             <div className="refund-dropdown-item refund-action-column">
-                              <div className="refund-dropdown-label">
-                                ACTION
-                              </div>
+                              <div className="refund-dropdown-label">ACTION</div>
                               <div className="refund-dropdown-value flex items-center gap-4 p-[5px]">
                                 <button onClick={() => handleEditClick(refund)}>
                                   <img
@@ -370,15 +339,13 @@ const Refund = () => {
       </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 refund-pagination-container">
         <span className="refund-pagination collection-list-pagination">
-          Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-          {filteredData.length} entries
+          Showing {Math.min((currentPage - 1) * 10 + 1, pagination.count)} to{" "}
+          {Math.min(currentPage * 10, pagination.count)} of {pagination.count} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto refund-pagination-buttons">
           <button
             className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
-            disabled={currentPage === 1}
+            disabled={!pagination.previous}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
             Previous
@@ -405,20 +372,20 @@ const Refund = () => {
               {startPage + i}
             </button>
           ))}
-          {endPage < totalPages - 1 && (
+          {endPage < pagination.total_pages - 1 && (
             <span className="px-2 flex items-center">...</span>
           )}
-          {endPage < totalPages && (
+          {endPage < pagination.total_pages && (
             <button
               className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
-              onClick={() => setCurrentPage(totalPages)}
+              onClick={() => setCurrentPage(pagination.total_pages)}
             >
-              {totalPages}
+              {pagination.total_pages}
             </button>
           )}
           <button
             className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
-            disabled={currentPage === totalPages}
+            disabled={!pagination.next}
             onClick={() => setCurrentPage(currentPage + 1)}
           >
             Next
