@@ -15,7 +15,11 @@ const TenancyViewModal = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (modalState.isOpen && modalState.type === "tenancy-view" && modalState.data) {
+    if (
+      modalState.isOpen &&
+      modalState.type === "tenancy-view" &&
+      modalState.data
+    ) {
       console.log("Modal opened with data:", modalState.data); // Debug log
 
       const fetchTenancyData = async () => {
@@ -27,18 +31,21 @@ const TenancyViewModal = () => {
           const tenancyId = modalState.data.tenancy_code || modalState.data.id;
           console.log("Fetching tenancy with ID:", tenancyId); // Debug log
 
-          const response = await axios.get(`${BASE_URL}/company/tenancies/${tenancyId}/`);
+          const response = await axios.get(
+            `${BASE_URL}/company/tenancies/${tenancyId}/`
+          );
           const data = response.data;
           console.log("Fetched tenancy data:", data); // Debug log
 
           // Initialize expanded states for additional charges
-          const initialExpandedStates = data.additional_charges?.reduce(
-            (acc, charge) => ({
-              ...acc,
-              [charge.id]: false,
-            }),
-            {}
-          ) || {};
+          const initialExpandedStates =
+            data.additional_charges?.reduce(
+              (acc, charge) => ({
+                ...acc,
+                [charge.id]: false,
+              }),
+              {}
+            ) || {};
 
           setExpandedStates(initialExpandedStates);
           setTenancyData(data);
@@ -69,9 +76,12 @@ const TenancyViewModal = () => {
   const handlePrint = async () => {
     try {
       const tenancyId = modalState.data.id || modalState.data.tenancy_code;
-      const response = await axios.get(`${BASE_URL}/company/tenancy/${tenancyId}/download-pdf/`, {
-        responseType: "blob", // Important for handling binary data (PDF)
-      });
+      const response = await axios.get(
+        `${BASE_URL}/company/tenancy/${tenancyId}/download-pdf/`,
+        {
+          responseType: "blob", // Important for handling binary data (PDF)
+        }
+      );
 
       // Create a blob URL and trigger download
       const blob = new Blob([response.data], { type: "application/pdf" });
@@ -156,65 +166,108 @@ const TenancyViewModal = () => {
               <div className="pr-0 md:pr-4 border-r-0 md:border-r border-[#E9E9E9]">
                 <div className="tenancy-view-modal-label mb-1">Tenant Name</div>
                 <div className="tenancy-view-modal-data">
-                  {tenancyData.tenant?.tenant_name || tenancyData.tenant?.name || "N/A"}
+                  {tenancyData.tenant?.tenant_name ||
+                    tenancyData.tenant?.name ||
+                    "N/A"}
                 </div>
 
                 <div className="tenancy-view-modal-label mb-1 mt-4">Unit</div>
                 <div className="tenancy-view-modal-data">
-                  {tenancyData.unit?.unit_name || tenancyData.unit?.name || "N/A"}
+                  {tenancyData.unit?.unit_name ||
+                    tenancyData.unit?.name ||
+                    "N/A"}
                 </div>
 
-                <div className="tenancy-view-modal-label mb-1 mt-4">Start Date</div>
-                <div className="tenancy-view-modal-data">{tenancyData.start_date || "N/A"}</div>
+                <div className="tenancy-view-modal-label mb-1 mt-4">
+                  Start Date
+                </div>
+                <div className="tenancy-view-modal-data">
+                  {tenancyData.start_date || "N/A"}
+                </div>
 
-                <div className="tenancy-view-modal-label mb-1 mt-4">No. of Payments</div>
-                <div className="tenancy-view-modal-data">{tenancyData.no_payments || "N/A"}</div>
+                <div className="tenancy-view-modal-label mb-1 mt-4">
+                  No. of Payments
+                </div>
+                <div className="tenancy-view-modal-data">
+                  {tenancyData.no_payments || "N/A"}
+                </div>
 
-                <div className="tenancy-view-modal-label mb-1 mt-4">Rent Per Frequency</div>
+                <div className="tenancy-view-modal-label mb-1 mt-4">
+                  Rent Per Frequency
+                </div>
                 <div className="tenancy-view-modal-data">
                   {tenancyData.rent_per_frequency || "N/A"}
                 </div>
 
-                <div className="tenancy-view-modal-label mb-1 mt-4">Deposit (if Any)</div>
-                <div className="tenancy-view-modal-data">{tenancyData.deposit || "N/A"}</div>
+                <div className="tenancy-view-modal-label mb-1 mt-4">
+                  Deposit (if Any)
+                </div>
+                <div className="tenancy-view-modal-data">
+                  {tenancyData.deposit || "N/A"}
+                </div>
 
-                <div className="tenancy-view-modal-label mb-1 mt-4">Remarks</div>
-                <div className="tenancy-view-modal-data">{tenancyData.remarks || "N/A"}</div>
+                <div className="tenancy-view-modal-label mb-1 mt-4">
+                  Remarks
+                </div>
+                <div className="tenancy-view-modal-data">
+                  {tenancyData.remarks || "N/A"}
+                </div>
               </div>
 
               <div className="pl-0 md:pl-4">
                 <div className="tenancy-view-modal-label mb-1">Building</div>
                 <div className="tenancy-view-modal-data">
-                  {tenancyData.building?.building_name || tenancyData.building?.name || "N/A"}
+                  {tenancyData.building?.building_name ||
+                    tenancyData.building?.name ||
+                    "N/A"}
                 </div>
 
-                <div className="tenancy-view-modal-label mb-1 mt-4">Rental Months</div>
-                <div className="tenancy-view-modal-data">{tenancyData.rental_months || "N/A"}</div>
+                <div className="tenancy-view-modal-label mb-1 mt-4">
+                  Rental Months
+                </div>
+                <div className="tenancy-view-modal-data">
+                  {tenancyData.rental_months || "N/A"}
+                </div>
 
-                <div className="tenancy-view-modal-label mb-1 mt-4">End Date</div>
-                <div className="tenancy-view-modal-data">{tenancyData.end_date || "N/A"}</div>
+                <div className="tenancy-view-modal-label mb-1 mt-4">
+                  End Date
+                </div>
+                <div className="tenancy-view-modal-data">
+                  {tenancyData.end_date || "N/A"}
+                </div>
 
-                <div className="tenancy-view-modal-label mb-1 mt-4">First Rent Due On</div>
+                <div className="tenancy-view-modal-label mb-1 mt-4">
+                  First Rent Due On
+                </div>
                 <div className="tenancy-view-modal-data">
                   {tenancyData.first_rent_due_on || "N/A"}
                 </div>
 
-                <div className="tenancy-view-modal-label mb-1 mt-4">Total Rent Receivable</div>
+                <div className="tenancy-view-modal-label mb-1 mt-4">
+                  Total Rent Receivable
+                </div>
                 <div className="tenancy-view-modal-data">
                   {tenancyData.total_rent_receivable || "N/A"}
                 </div>
 
-                <div className="tenancy-view-modal-label mb-1 mt-4">Commission (If Any)</div>
-                <div className="tenancy-view-modal-data">{tenancyData.commission || "N/A"}</div>
+                <div className="tenancy-view-modal-label mb-1 mt-4">
+                  Commission (If Any)
+                </div>
+                <div className="tenancy-view-modal-data">
+                  {tenancyData.commission || "N/A"}
+                </div>
               </div>
             </div>
           </div>
 
           {/* Additional Charges Table */}
           <div className="mt-[32px] mb-[50px]">
-            <h3 className="text-[#2892CE] additional-charges-heading">Additional Charges</h3>
+            <h3 className="text-[#2892CE] additional-charges-heading">
+              Additional Charges
+            </h3>
             <div className="mt-5 border border-[#E9E9E9] rounded-md overflow-hidden">
-              {tenancyData.additional_charges && tenancyData.additional_charges.length > 0 ? (
+              {tenancyData.additional_charges &&
+              tenancyData.additional_charges.length > 0 ? (
                 <>
                   {/* Desktop Table */}
                   <div className="desktop-table">
@@ -242,7 +295,7 @@ const TenancyViewModal = () => {
                               Amount
                             </th>
                             <th className="px-[10px] text-left text-gray-700 uppercase w-[50px] view-tenancy-charges-thead">
-                              VAT
+                              Tax
                             </th>
                             <th className="px-[10px] text-left text-gray-700 uppercase w-[44px] view-tenancy-charges-thead">
                               Total
@@ -256,37 +309,39 @@ const TenancyViewModal = () => {
                     <div className="max-h-64 overflow-y-auto overflow-x-auto border-t border-[#E9E9E9]">
                       <table className="w-full border-collapse">
                         <tbody>
-                          {tenancyData.additional_charges.map((charge, index) => (
-                            <tr
-                              key={charge.id || index}
-                              className="h-[57px] border-b border-[#E9E9E9] last:border-b-0 hover:bg-gray-100"
-                            >
-                              <td className="px-[10px] py-[5px] w-[40px] view-tenancy-charges-tdata">
-                                {index + 1}
-                              </td>
-                              <td className="px-[10px] py-[5px] w-[100px] view-tenancy-charges-tdata">
-                                {charge.charge_type?.name || "N/A"}
-                              </td>
-                              <td className="px-[10px] py-[5px] w-[100px] view-tenancy-charges-tdata">
-                                {charge.reason || "N/A"}
-                              </td>
-                              <td className="px-[10px] py-[5px] w-[100px] view-tenancy-charges-tdata">
-                                {charge.due_date || "N/A"}
-                              </td>
-                              <td className="px-[10px] py-[5px] w-[80px] text-left text-[14px] view-tenancy-charges-tdata">
-                                {charge.status || "N/A"}
-                              </td>
-                              <td className="px-[10px] py-[5px] w-[80px] text-left text-[14px] view-tenancy-charges-tdata">
-                                {charge.amount || "N/A"}
-                              </td>
-                              <td className="px-[10px] py-[5px] w-[50px] text-left text-[14px] view-tenancy-charges-tdata">
-                                {charge.vat || "N/A"}
-                              </td>
-                              <td className="px-[10px] py-[5px] w-[44px] text-left text-[14px] view-tenancy-charges-tdata">
-                                {charge.total || "N/A"}
-                              </td>
-                            </tr>
-                          ))}
+                          {tenancyData.additional_charges.map(
+                            (charge, index) => (
+                              <tr
+                                key={charge.id || index}
+                                className="h-[57px] border-b border-[#E9E9E9] last:border-b-0 hover:bg-gray-100"
+                              >
+                                <td className="px-[10px] py-[5px] w-[40px] view-tenancy-charges-tdata">
+                                  {index + 1}
+                                </td>
+                                <td className="px-[10px] py-[5px] w-[100px] view-tenancy-charges-tdata">
+                                  {charge.charge_type || "N/A"}
+                                </td>
+                                <td className="px-[10px] py-[5px] w-[100px] view-tenancy-charges-tdata">
+                                  {charge.reason || "N/A"}
+                                </td>
+                                <td className="px-[10px] py-[5px] w-[100px] view-tenancy-charges-tdata">
+                                  {charge.due_date || "N/A"}
+                                </td>
+                                <td className="px-[10px] py-[5px] w-[80px] text-left text-[14px] view-tenancy-charges-tdata">
+                                  {charge.status || "N/A"}
+                                </td>
+                                <td className="px-[10px] py-[5px] w-[80px] text-left text-[14px] view-tenancy-charges-tdata">
+                                  {charge.amount || "N/A"}
+                                </td>
+                                <td className="px-[10px] py-[5px] w-[50px] text-left text-[14px] view-tenancy-charges-tdata">
+                                  {charge.tax || "N/A"}
+                                </td>
+                                <td className="px-[10px] py-[5px] w-[44px] text-left text-[14px] view-tenancy-charges-tdata">
+                                  {charge.total || "N/A"}
+                                </td>
+                              </tr>
+                            )
+                          )}
                         </tbody>
                       </table>
                     </div>
@@ -301,7 +356,9 @@ const TenancyViewModal = () => {
                       >
                         <div
                           className={`flex justify-between border-b border-[#E9E9E9] h-[57px] rounded-t ${
-                            expandedStates[charge.id || index] ? "bg-[#F2F2F2]" : "bg-white"
+                            expandedStates[charge.id || index]
+                              ? "bg-[#F2F2F2]"
+                              : "bg-white"
                           }`}
                         >
                           <div className="px-[10px] flex items-center view-tenancy-charges-thead uppercase">
@@ -316,7 +373,9 @@ const TenancyViewModal = () => {
                         </div>
                         <div
                           className={`flex justify-between h-[57px] cursor-pointer ${
-                            expandedStates[charge.id || index] ? "border-b border-[#E9E9E9]" : ""
+                            expandedStates[charge.id || index]
+                              ? "border-b border-[#E9E9E9]"
+                              : ""
                           }`}
                           onClick={() => toggleExpand(charge.id || index)}
                         >
@@ -324,7 +383,7 @@ const TenancyViewModal = () => {
                             {charge.id || index + 1}
                           </div>
                           <div className="px-[10px] py-[13px] w-[40%] text-[14px] view-tenancy-charges-tdata">
-                            {charge.charge_type?.name || "N/A"}
+                            {charge.charge_type || "N/A"}
                           </div>
                           <div className="px-[10px] py-[13px] w-[35%] text-[14px] view-tenancy-charges-tdata">
                             {charge.reason || "N/A"}
@@ -357,7 +416,7 @@ const TenancyViewModal = () => {
                             </div>
                             <div className="flex justify-between border-b border-[#E9E9E9] bg-[#F2F2F2] h-[57px]">
                               <div className="px-[10px] flex items-center view-tenancy-charges-thead uppercase w-[50%]">
-                                VAT
+                                TAX
                               </div>
                               <div className="px-[10px] flex items-center view-tenancy-charges-thead uppercase w-[50%]">
                                 TOTAL
@@ -365,7 +424,7 @@ const TenancyViewModal = () => {
                             </div>
                             <div className="flex justify-between h-[57px]">
                               <div className="px-[10px] py-[13px] w-[50%] text-[14px] view-tenancy-charges-tdata">
-                                {charge.vat || "N/A"}
+                                {charge.tax || "N/A"}
                               </div>
                               <div className="px-[10px] py-[13px] w-[50%] text-[14px] view-tenancy-charges-tdata">
                                 {charge.total || "N/A"}
@@ -378,7 +437,9 @@ const TenancyViewModal = () => {
                   </div>
                 </>
               ) : (
-                <div className="p-4 text-center text-gray-500">No additional charges found</div>
+                <div className="p-4 text-center text-gray-500">
+                  No additional charges found
+                </div>
               )}
             </div>
           </div>
