@@ -98,6 +98,59 @@
   font-weight: 600;
 }
 
+.table-checkbox {
+  appearance: none;
+  width: 19px;
+  height: 19px;
+  border: 2px solid #e9e9e9;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.table-checkbox:checked {
+  background-color: #2892CE;
+  border-color: #2892CE;
+}
+
+.table-checkbox:checked::after {
+  content: url('../../../assets/Images/Admin Masters/tickmark.svg');
+  position: absolute;
+  top: 47%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  filter: brightness(0) saturate(100%) invert(100%);
+}
+
+.tdata-checkbox {
+  appearance: none;
+  width: 19px;
+  height: 19px;
+  border: 2px solid #e9e9e9;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.tdata-checkbox:checked {
+  background-color: #2892CE;
+  border-color: #2892CE;
+}
+
+.tdata-checkbox:checked::after {
+  content: url('../../../assets/Images/Admin Masters/tickmark.svg');
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  filter: brightness(0) saturate(100%) invert(100%);
+}
+
+
 .grand-total-text {
   font-family: "Inter Tight";
   font-weight: 400;
@@ -135,10 +188,10 @@
   height: 57px;
 }
 
-.invoice-modal-table th:nth-child(1),
+/* .invoice-modal-table th:nth-child(1),
 .invoice-modal-table td:nth-child(1) {
   width: 80px;
-}
+} */
 
 .invoice-modal-table th:nth-child(2),
 .invoice-modal-table td:nth-child(2) {
