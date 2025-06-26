@@ -5,10 +5,10 @@ import downloadicon from "../../../assets/Images/Admin Tenancy/download-icon.svg
 import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
 import terminateicon from "../../../assets/Images/Admin Tenancy/terminate-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
-import TenancyTerminateModal from "./TenancyTerminateModal/TenancyTerminateModal";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 import CustomDropDown from "../../../components/CustomDropDown";
+import TenancyTerminateModal from "./TenancyTerminateModal/TenancyTerminateModal";
 import { motion, AnimatePresence } from "framer-motion";
 
 const TenancyTermination = () => {
@@ -23,13 +23,11 @@ const TenancyTermination = () => {
   const { openModal, refreshCounter } = useModal();
   const itemsPerPage = 10;
 
-  // Dropdown options for CustomDropDown
   const dropdownOptions = [
     { value: "showing", label: "Showing" },
     { value: "all", label: "All" },
   ];
 
-  // State for selected dropdown value
   const [selectedOption, setSelectedOption] = useState("showing");
 
   const getUserCompanyId = () => {
@@ -46,24 +44,23 @@ const TenancyTermination = () => {
         return null;
       }
     }
-
     return null;
   };
 
-  // Fetch tenancies from the backend
   useEffect(() => {
     const fetchTenancies = async () => {
       try {
         const companyId = getUserCompanyId();
+        if (!companyId) {
+          throw new Error("Company ID not found");
+        }
         setLoading(true);
         const response = await axios.get(
           `${BASE_URL}/company/tenancies/occupied/${companyId}/`
         );
-        // Sort tenancies by id in ascending order
         const sortedTenancies = response.data.sort((a, b) => a.id - b.id);
         setTenancies(sortedTenancies);
         setLoading(false);
-        console.log("Fetched and sorted tenancies:", sortedTenancies);
       } catch (err) {
         console.error("Error fetching tenancies:", err);
         setError("Failed to fetch tenancies. Please try again later.");
@@ -74,43 +71,24 @@ const TenancyTermination = () => {
   }, [refreshCounter]);
 
   const handleEditClick = (tenancy) => {
-    console.log("Tenancy ID: Selected Tenancy:", tenancy);
     openModal("tenancy-update", "Update Tenancy", tenancy);
   };
 
   const openTerminateModal = (tenancy) => {
-    setSelectedTenancy(tenancy);
-    setTerminateModalOpen(true);
+    if (tenancy) {
+      setSelectedTenancy(tenancy);
+      setTerminateModalOpen(true);
+    }
   };
 
-  const handleTerminateAction = async () => {
-    if (selectedTenancy) {
-      try {
-        const response = await axios.put(
-          `${BASE_URL}/company/tenancies/${selectedTenancy.id}/`,
-          {
-            is_termination: true,
-            status: "terminated",
-          }
-        );
-        if (response.status === 200) {
-          // Update local state to reflect termination
-          setTenancies((prev) =>
-            prev.map((t) =>
-              t.id === selectedTenancy.id
-                ? { ...t, is_termination: true, status: "terminated" }
-                : t
-            )
-          );
-          console.log(`Tenancy ${selectedTenancy.id} terminated successfully`);
-        } else {
-          console.error("Failed to terminate tenancy");
-        }
-      } catch (error) {
-        console.error("Error terminating tenancy:", error);
-      }
-    }
+  const handleTerminateSuccess = (updatedTenancy) => {
+    setTenancies((prev) =>
+      prev.map((t) =>
+        t.id === updatedTenancy.id ? { ...t, ...updatedTenancy } : t
+      )
+    );
     setTerminateModalOpen(false);
+    setSelectedTenancy(null);
   };
 
   const toggleRowExpand = (tenancy_code) => {
@@ -353,7 +331,6 @@ const TenancyTermination = () => {
                               </div>
                             </div>
                           </div>
-
                           <div className="tterm-grid">
                             <div className="tterm-grid-item">
                               <div className="tterm-dropdown-label">
@@ -457,7 +434,8 @@ const TenancyTermination = () => {
       <TenancyTerminateModal
         isOpen={terminateModalOpen}
         onCancel={() => setTerminateModalOpen(false)}
-        onTerminate={handleTerminateAction}
+        onTerminate={handleTerminateSuccess}
+        tenancy={selectedTenancy}
       />
     </div>
   );
