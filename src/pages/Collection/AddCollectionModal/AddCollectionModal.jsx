@@ -613,8 +613,8 @@ const AddCollectionModal = () => {
             </div>
 
             {/* Second Header: Date, Amount, Tax */}
-            <div className="financial-collection-modal-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-3">
-              <div className="px-[10px] flex items-center financial-collection-modal-thead uppercase">
+            <div className="financial-collection-modal-mobile-header border-b border-[#E9E9E9] h-[50px] flex justify-between">
+              <div className="px-[10px] flex items-center financial-collection-modal-thead uppercase w-[38%]">
                 Date
               </div>
               <div className="px-[10px] flex items-center financial-collection-modal-thead uppercase">
@@ -624,8 +624,8 @@ const AddCollectionModal = () => {
                 Tax
               </div>
             </div>
-            <div className="grid grid-cols-3 border-b h-[57px] border-[#E9E9E9]">
-              <div className="px-[10px] py-[10px] text-[14px] font-normal text-[#201D1E]">
+            <div className="flex grid-cols-3 border-b h-[57px] border-[#E9E9E9] justify-between">
+              <div className="px-[10px] py-[10px] text-[14px] font-normal text-[#201D1E] w-[34%]">
                 {item.date}
               </div>
               <div className="px-[10px] py-[10px] text-[14px] font-normal text-[#201D1E]">
@@ -638,18 +638,18 @@ const AddCollectionModal = () => {
 
             {/* Third Header: Total, Balance */}
             <div className="financial-collection-modal-mobile-header border-b border-[#E9E9E9] h-[50px] grid grid-cols-2">
-              <div className="px-[10px] flex items-center financial-collection-modal-thead uppercase">
+              <div className="px-[10px] flex items-center financial-collection-modal-thead uppercase w-[50%]">
                 Total
               </div>
-              <div className="px-[10px] flex items-center financial-collection-modal-thead uppercase">
+              <div className="px-[10px] flex items-center financial-collection-modal-thead uppercase w-[50%]">
                 Balance
               </div>
             </div>
             <div className="grid grid-cols-2 h-[57px]">
-              <div className="px-[10px] py-[5px] flex items-center text-[14px] font-normal text-[#201D1E]">
+              <div className="px-[10px] py-[5px] flex items-center text-[14px] font-normal text-[#201D1E] w-[50%]">
                 {Number(item.total).toFixed(2)}
               </div>
-              <div className="px-[10px] py-[5px] flex items-center text-[14px] font-normal text-[#201D1E]">
+              <div className="px-[10px] py-[5px] flex items-center text-[14px] font-normal text-[#201D1E] w-[50%]">
                 {Number(item.balance).toFixed(2)}
               </div>
             </div>

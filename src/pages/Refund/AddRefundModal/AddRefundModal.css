@@ -1,8 +1,7 @@
 .add-refund-modal-wrapper {
   all: initial;
-  font-family: "Inter Tight", sans-serif;
+  font-family: "Inter Tight";
   position: fixed;
-  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;

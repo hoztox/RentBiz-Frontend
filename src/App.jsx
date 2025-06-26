@@ -25,7 +25,7 @@ import MonthlyInvoice from './pages/Monthly Invoice/MonthlyInvoice';
 import Collection from './pages/Collection/Collection';
 import Expense from './pages/Expense/Expense';
 import Refund from './pages/Refund/Refund';
-import TenancyReport from './pages/Tenancy Report/TenancyReport';
+// import TenancyReport from './pages/Tenancy Report/TenancyReport';
 import UpcomingCollection from './pages/UpcomingCollection/UpcomingCollection';
 import ReportCollection from './pages/ReportCollection/ReportCollection';
 import IncomeExpenseReport from './pages/IncomeExpenseReport/IncomeExpenseReport';
@@ -81,7 +81,7 @@ const App = () => {
               <Route path="collection" element={<Collection />} />
               <Route path="expense" element={<Expense />} />
               <Route path="refund" element={<Refund />} />
-              <Route path="tenancy-report" element={<TenancyReport />} />
+              {/* <Route path="tenancy-report" element={<TenancyReport />} /> */}
               <Route path="upcoming-collection" element={<UpcomingCollection />} />
               <Route path="collection-report" element={<ReportCollection />} />
               <Route path="income-expense-report" element={<IncomeExpenseReport />} />

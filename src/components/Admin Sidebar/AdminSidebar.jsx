@@ -16,7 +16,7 @@ import monthlyInvoice from "../../assets/Images/Admin Sidebar/monthly invoice.sv
 import financialCollection from "../../assets/Images/Admin Sidebar/financial collection.svg";
 import expense from "../../assets/Images/Admin Sidebar/expense.svg";
 import refund from "../../assets/Images/Admin Sidebar/refund.svg";
-import tenancyReport from "../../assets/Images/Admin Sidebar/tenancy report.svg";
+// import tenancyReport from "../../assets/Images/Admin Sidebar/tenancy report.svg";
 import upcomingCollection from "../../assets/Images/Admin Sidebar/upcoming collection.svg";
 import reportCollection from "../../assets/Images/Admin Sidebar/report collection.svg";
 import incomeExpense from "../../assets/Images/Admin Sidebar/income-expense.svg";
@@ -690,7 +690,7 @@ const AdminSidebar = () => {
 
         <div className="mx-5">
           <h3 className="pb-3 category-head">REPORTS</h3>
-          <div
+          {/* <div
             className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
               activeItem === "TenancyReport"
                 ? "menu-active"
@@ -706,7 +706,7 @@ const AdminSidebar = () => {
               className="w-[18px] sidebar-icon"
             />
             <p className="pb-[2px] menu-text">Tenancy Report</p>
-          </div>
+          </div> */}
           <div
             className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
               activeItem === "UpcomingCollection"
