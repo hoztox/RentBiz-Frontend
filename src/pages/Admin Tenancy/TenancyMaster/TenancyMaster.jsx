@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import "./TenancyMaster.css";
 import plusicon from "../../../assets/Images/Admin Tenancy/plus-icon.svg";
@@ -13,23 +13,89 @@ import { BASE_URL } from "../../../utils/config";
 import CustomDropDown from "../../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
 import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
-import { Edit } from "lucide-react";
+import { Edit, ChevronDown, Filter } from "lucide-react";
 
 const TenancyMaster = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedOption, setSelectedOption] = useState("showing");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
   const [tenancies, setTenancies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [tenancyToDelete, setTenancyToDelete] = useState(null);
-  const itemsPerPage = 10;
+  const [openSelectKey, setOpenSelectKey] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    id: "",
+    tenant: "",
+    building: "",
+    unit: "",
+    status: "",
+    start_date: "",
+    end_date: "",
+  });
+  const [tempFilters, setTempFilters] = useState({
+    id: "",
+    tenant: "",
+    building: "",
+    unit: "",
+    status: "",
+    start_date: "",
+    end_date: "",
+  });
+  const [totalPages, setTotalPages] = useState(1);
   const { openModal, refreshCounter } = useModal();
+  const dateRangeRef = useRef(null);
 
-  const dropdownOptions = [
-    { value: "showing", label: "Showing" },
-    { value: "all", label: "All" },
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        openSelectKey === "date_range" &&
+        dateRangeRef.current &&
+        !dateRangeRef.current.contains(event.target)
+      ) {
+        setOpenSelectKey(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openSelectKey]);
+
+  const itemsPerPage = 10;
+
+  const getUnique = (key) => [...new Set(tenancies.map((item) => item[key]))];
+
+  const uniqueIds = getUnique("tenancy_code");
+  const uniqueTenants = getUnique("tenant")?.map(t => t?.tenant_name || "N/A");
+  const uniqueBuildings = getUnique("building")?.map(b => b?.building_name || "N/A");
+  const uniqueUnits = getUnique("unit")?.map(u => u?.unit_name || "N/A");
+  const uniqueStatuses = getUnique("status");
+
+  const idOptions = [
+    { value: "", label: "All Tenancy" },
+    ...uniqueIds.map((id) => ({ value: id, label: id })),
+  ];
+  const tenantOptions = [
+    { value: "", label: "All Tenants" },
+    ...uniqueTenants.map((tenant) => ({ value: tenant, label: tenant })),
+  ];
+  const buildingOptions = [
+    { value: "", label: "All Buildings" },
+    ...uniqueBuildings.map((building) => ({
+      value: building,
+      label: building,
+    })),
+  ];
+  const unitOptions = [
+    { value: "", label: "All Units" },
+    ...uniqueUnits.map((unit) => ({ value: unit, label: unit })),
+  ];
+  const statusOptions = [
+    { value: "", label: "All Statuses" },
+    ...uniqueStatuses.map((status) => ({ value: status, label: status.charAt(0).toUpperCase() + status.slice(1) })),
   ];
 
   const getUserCompanyId = () => {
@@ -51,15 +117,29 @@ const TenancyMaster = () => {
   };
 
   useEffect(() => {
-    const fetchAndSortTenancies = async () => {
+    const fetchTenancies = async () => {
       try {
         const companyId = getUserCompanyId();
         setLoading(true);
+        const params = {
+          page: currentPage,
+          page_size: itemsPerPage,
+        };
+        if (searchTerm) params.search = searchTerm;
+        if (filters.building) params.building = filters.building;
+        if (filters.status) params.status = filters.status;
+        if (filters.unit) params.unit = filters.unit;
+        if (filters.start_date) params.start_date = filters.start_date;
+        if (filters.end_date) params.end_date = filters.end_date;
+        if (filters.id) params.tenancy_code = filters.id;
+        if (filters.tenant) params.tenant = filters.tenant;
+
         const response = await axios.get(
-          `${BASE_URL}/company/tenancies/company/${companyId}/`
+          `${BASE_URL}/company/tenancies/company/${companyId}/`,
+          { params }
         );
-        const sortedTenancies = response.data.sort((a, b) => a.id - b.id);
-        setTenancies(sortedTenancies);
+        setTenancies(response.data.results || []);
+        setTotalPages(Math.ceil(response.data.count / itemsPerPage));
       } catch (error) {
         console.error("Error fetching tenancies:", error);
       } finally {
@@ -67,19 +147,19 @@ const TenancyMaster = () => {
       }
     };
 
-    fetchAndSortTenancies();
-  }, [refreshCounter]);
+    fetchTenancies();
+  }, [refreshCounter, searchTerm, filters, currentPage]);
 
   const fetchPaymentSchedules = async (tenancyId) => {
     try {
       const response = await axios.get(
         `${BASE_URL}/company/tenancies/${tenancyId}/payment-schedules/`
       );
-      return response.data; // Return the fetched data
+      return response.data;
     } catch (error) {
       console.error("Error fetching payment schedules:", error);
       alert("Failed to fetch payment schedules.");
-      return []; // Return empty array on error
+      return [];
     }
   };
 
@@ -128,6 +208,64 @@ const TenancyMaster = () => {
     }));
   };
 
+  const toggleDateRange = () => {
+    setOpenSelectKey(openSelectKey === "date_range" ? null : "date_range");
+  };
+
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
+  };
+
+  const clearFilters = () => {
+    const cleared = {
+      id: "",
+      tenant: "",
+      building: "",
+      unit: "",
+      status: "",
+      start_date: "",
+      end_date: "",
+    };
+    setFilters(cleared);
+    setTempFilters(cleared);
+    setSearchTerm("");
+    setCurrentPage(1);
+  };
+
+  const handleDownloadCSV = async () => {
+    try {
+      const companyId = getUserCompanyId();
+      const params = {};
+      if (searchTerm) params.search = searchTerm;
+      if (filters.building) params.building = filters.building;
+      if (filters.status) params.status = filters.status;
+      if (filters.unit) params.unit = filters.unit;
+      if (filters.start_date) params.start_date = filters.start_date;
+      if (filters.end_date) params.end_date = filters.end_date;
+      if (filters.id) params.tenancy_code = filters.id;
+      if (filters.tenant) params.tenant = filters.tenant;
+
+      const response = await axios.get(
+        `${BASE_URL}/company/tenancies/${companyId}/export/`,
+        {
+          params,
+          responseType: 'blob',
+        }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'tenancies.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading CSV:", error);
+      alert("Failed to download CSV. Please try again.");
+    }
+  };
+
   const dropdownVariants = {
     hidden: {
       opacity: 0,
@@ -155,27 +293,6 @@ const TenancyMaster = () => {
     openModal("tenancy-update", "Update Tenancy", tenancy);
   };
 
-  const filteredData = tenancies.filter(
-    (tenancy) =>
-      tenancy.tenancy_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tenancy.tenant?.tenant_name
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      tenancy.building?.building_name
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      tenancy.unit?.unit_name
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase()) ||
-      tenancy.status?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const paginatedData = filteredData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
@@ -189,7 +306,7 @@ const TenancyMaster = () => {
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] tenancy-table-header">
         <h1 className="tenancy-head">Tenancy</h1>
         <div className="flex flex-col md:flex-row gap-[10px] tenancy-inputs-container">
-          <div className="flex flex-col md:flex-row gap-[10px] w-full">
+          <div className="flex flex-col md:flex-row gap-[10px] w-full items-center">
             <input
               type="text"
               placeholder="Search"
@@ -197,15 +314,17 @@ const TenancyMaster = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 tenancy-search"
             />
-            <div className="relative w-[40%] md:w-auto">
-              <CustomDropDown
-                options={dropdownOptions}
-                value={selectedOption}
-                onChange={setSelectedOption}
-                className="w-full md:w-[121px]"
-                dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 tenancy-selection"
-              />
-            </div>
+            <button
+              onClick={toggleFilters}
+              className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md duration-200 ${
+                showFilters 
+                  ? 'bg-[#1458A2] text-white' 
+                  : 'bg-[#F0F0F0] text-[#201D1E] hover:bg-[#e6e6e6]'
+              }`}
+            >
+              <Filter size={16} />
+              Filters
+            </button>
           </div>
           <div className="flex gap-[10px] tenancy-action-buttons-container">
             <button
@@ -219,7 +338,10 @@ const TenancyMaster = () => {
                 className="relative right-[5px] w-[16px] h-[15px]"
               />
             </button>
-            <button className="flex items-center justify-center gap-2 w-[45%] md:w-[122px] h-[38px] rounded-md duration-200 tenancy-download-btn">
+            <button 
+              className="flex items-center justify-center gap-2 w-[45%] md:w-[122px] h-[38px] rounded-md duration-200 tenancy-download-btn"
+              onClick={handleDownloadCSV}
+            >
               Download
               <img
                 src={downloadicon}
@@ -230,6 +352,107 @@ const TenancyMaster = () => {
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {showFilters && (
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            variants={dropdownVariants}
+            className="p-5 border-b border-[#E9E9E9] tenancy-desktop-only"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex gap-[10px] flex-wrap">
+                {[
+                  ["id", idOptions],
+                  ["tenant", tenantOptions],
+                  ["building", buildingOptions],
+                  ["unit", unitOptions],
+                  ["status", statusOptions],
+                ].map(([key, options]) => (
+                  <div key={key} className="relative">
+                    <CustomDropDown
+                      options={options}
+                      value={tempFilters[key]}
+                      onChange={(value) =>
+                        setTempFilters((prev) => ({
+                          ...prev,
+                          [key]: value,
+                        }))
+                      }
+                      dropdownClassName="px-[7px] py-[7px] w-[130px] border-[#201D1E20] focus:border-gray-300 tenancy-selection h-[38px]"
+                    />
+                  </div>
+                ))}
+                <div className="relative" ref={dateRangeRef}>
+                  <div
+                    className="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer flex items-center justify-between tenancy-selection"
+                    onClick={toggleDateRange}
+                  >
+                    Date Range
+                    <ChevronDown
+                      className={`ml-2 transition-transform duration-300 ${
+                        openSelectKey === "date_range" ? "rotate-180" : "rotate-0"
+                      }`}
+                    />
+                  </div>
+                  {openSelectKey === "date_range" && (
+                    <div className="absolute z-10 bg-white p-4 mt-1 border border-gray-300 rounded-md shadow-md w-[250px]">
+                      <label className="block text-sm mb-1 filter-btn">
+                        Start Date
+                      </label>
+                      <input
+                        type="date"
+                        value={tempFilters.start_date}
+                        onChange={(e) =>
+                          setTempFilters((prev) => ({
+                            ...prev,
+                            start_date: e.target.value,
+                          }))
+                        }
+                        className="w-full border border-gray-300 rounded-md px-2 py-1 mb-3 outline-none"
+                      />
+                      <label className="block text-sm mb-1 filter-btn">
+                        End Date
+                      </label>
+                      <input
+                        type="date"
+                        value={tempFilters.end_date}
+                        onChange={(e) =>
+                          setTempFilters((prev) => ({
+                            ...prev,
+                            end_date: e.target.value,
+                          }))
+                        }
+                        className="w-full border border-gray-300 rounded-md px-2 py-1 outline-none"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex gap-[10px]">
+                <button
+                  onClick={() => {
+                    setFilters(tempFilters);
+                    setCurrentPage(1);
+                  }}
+                  className="bg-[#201D1E] text-white w-[105px] h-[38px] rounded-md hover:bg-[#F0F0F0] hover:text-[#201D1E] duration-200 filter-btn"
+                >
+                  Filter
+                </button>
+                <button
+                  onClick={clearFilters}
+                  className="w-[105px] h-[38px] bg-[#F0F0F0] text-[#4D4E4D] rounded-md clear-btn hover:bg-[#201D1E] hover:text-white duration-200"
+                >
+                  Clear
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="tenancy-desktop-only">
         <table className="w-full border-collapse">
           <thead>
@@ -253,7 +476,7 @@ const TenancyMaster = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedData.map((tenancy) => (
+            {tenancies.map((tenancy) => (
               <tr
                 key={tenancy.tenancy_code}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
@@ -358,7 +581,7 @@ const TenancyMaster = () => {
             </tr>
           </thead>
           <tbody>
-            {paginatedData.map((tenancy) => (
+            {tenancies.map((tenancy) => (
               <React.Fragment key={tenancy.tenancy_code}>
                 <tr
                   className={`${
@@ -535,9 +758,9 @@ const TenancyMaster = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 tenancy-pagination-container">
         <span className="tenancy-pagination collection-list-pagination">
           Showing{" "}
-          {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
-          to {Math.min(currentPage * itemsPerPage, filteredData.length)} of{" "}
-          {filteredData.length} entries
+          {Math.min((currentPage - 1) * itemsPerPage + 1, tenancies.length)} to{" "}
+          {Math.min(currentPage * itemsPerPage, tenancies.length)} of{" "}
+          {tenancies.length} entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto tenancy-pagination-buttons">
           <button
