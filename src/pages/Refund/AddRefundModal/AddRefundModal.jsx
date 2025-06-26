@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import "./AddRefundModal.css";
 import { ChevronDown, X } from "lucide-react";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 
 const AddRefundModal = () => {
   const { modalState, closeModal } = useModal();
@@ -14,6 +16,11 @@ const AddRefundModal = () => {
     endDate: "",
     paymentDate: "",
     paymentMethod: "",
+    referenceNumber: "",
+    accountHolderName: "",
+    accountNumber: "",
+    chequeNumber: "",
+    chequeDate: "",
     remarks: "",
     amountToRefund: "",
   });
@@ -29,7 +36,12 @@ const AddRefundModal = () => {
   const [units, setUnits] = useState([]);
   const [tenancies, setTenancies] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [isSelectOpenCompany, setIsSelectOpenCompany] = useState(false);
+  const [isSelectOpenBuilding, setIsSelectOpenBuilding] = useState(false);
+  const [isSelectOpenUnit, setIsSelectOpenUnit] = useState(false);
+  const [isSelectOpenTenancy, setIsSelectOpenTenancy] = useState(false);
+  const [isSelectOpenPaymentMethod, setIsSelectOpenPaymentMethod] =
+    useState(false);
 
   const getUserCompanyId = () => {
     try {
@@ -50,7 +62,6 @@ const AddRefundModal = () => {
   const fetchCompanies = async () => {
     try {
       setLoading(true);
-      setError("");
       const role = localStorage.getItem("role")?.toLowerCase();
       if (role === "company") {
         const companyId = getUserCompanyId();
@@ -64,12 +75,12 @@ const AddRefundModal = () => {
           setCompanies(response.data);
         } else {
           setCompanies([]);
-          setError("No companies found");
+          toast.error("No companies found");
         }
       }
     } catch (err) {
       console.error("Error fetching companies:", err);
-      setError("Failed to fetch companies");
+      toast.error("Failed to fetch companies");
     } finally {
       setLoading(false);
     }
@@ -79,11 +90,10 @@ const AddRefundModal = () => {
     try {
       const companyId = form.selectCompany || getUserCompanyId();
       if (!companyId) {
-        setError("No company selected");
+        toast.error("No company selected");
         return;
       }
       setLoading(true);
-      setError("");
       const response = await axios.get(
         `${BASE_URL}/company/buildings/occupied/${companyId}/`
       );
@@ -92,11 +102,11 @@ const AddRefundModal = () => {
         setBuildings(sortedBuildings);
       } else {
         setBuildings([]);
-        setError("No buildings found");
+        toast.error("No buildings found");
       }
     } catch (err) {
       console.error("Error fetching buildings:", err);
-      setError("Failed to fetch buildings");
+      toast.error("Failed to fetch buildings");
       setBuildings([]);
     } finally {
       setLoading(false);
@@ -107,11 +117,10 @@ const AddRefundModal = () => {
     try {
       const companyId = form.selectCompany || getUserCompanyId();
       if (!companyId || !buildingId) {
-        setError("Company or Building not selected");
+        toast.error("Company or Building not selected");
         return;
       }
       setLoading(true);
-      setError("");
       const response = await axios.get(
         `${BASE_URL}/company/units/${buildingId}/occupied-units/`
       );
@@ -120,11 +129,11 @@ const AddRefundModal = () => {
         setUnits(sortedUnits);
       } else {
         setUnits([]);
-        setError("No units found");
+        toast.error("No units found");
       }
     } catch (err) {
       console.error("Error fetching units:", err);
-      setError("Failed to fetch units");
+      toast.error("Failed to fetch units");
       setUnits([]);
     } finally {
       setLoading(false);
@@ -135,24 +144,25 @@ const AddRefundModal = () => {
     try {
       const companyId = form.selectCompany || getUserCompanyId();
       if (!companyId || !unitId) {
-        setError("Company or Unit not selected");
+        toast.error("Company or Unit not selected");
         return;
       }
       setLoading(true);
-      setError("");
       const response = await axios.get(
         `${BASE_URL}/company/tenancies/company/${companyId}/${unitId}/`
       );
       if (response.data && Array.isArray(response.data.results)) {
-        const sortedTenancies = response.data.results.sort((a, b) => a.id - b.id);
+        const sortedTenancies = response.data.results.sort(
+          (a, b) => a.id - b.id
+        );
         setTenancies(sortedTenancies);
       } else {
         setTenancies([]);
-        setError("No tenancies found");
+        toast.error("No tenancies found");
       }
     } catch (err) {
       console.error("Error fetching tenancies:", err);
-      setError("Failed to fetch tenancies");
+      toast.error("Failed to fetch tenancies");
       setTenancies([]);
     } finally {
       setLoading(false);
@@ -162,7 +172,6 @@ const AddRefundModal = () => {
   const fetchExcessDeposits = async (tenancyId) => {
     try {
       setLoading(true);
-      setError("");
       const response = await axios.get(
         `${BASE_URL}/finance/${tenancyId}/excess-deposits/`
       );
@@ -183,11 +192,11 @@ const AddRefundModal = () => {
           alreadyRefunded: 0,
           refundItems: [],
         });
-        setError("No refundable items found for this tenancy");
+        toast.error("No refundable items found for this tenancy");
       }
     } catch (err) {
       console.error("Error fetching refundable items:", err);
-      setError("Failed to load refundable items");
+      toast.error("Failed to load refundable items");
     } finally {
       setLoading(false);
     }
@@ -274,6 +283,11 @@ const AddRefundModal = () => {
         endDate: "",
         paymentDate: "",
         paymentMethod: "",
+        referenceNumber: "",
+        accountHolderName: "",
+        accountNumber: "",
+        chequeNumber: "",
+        chequeDate: "",
         remarks: "",
         amountToRefund: "",
       });
@@ -284,7 +298,6 @@ const AddRefundModal = () => {
         alreadyRefunded: 0,
         refundItems: [],
       });
-      setError("");
       setBuildings([]);
       setUnits([]);
       setTenancies([]);
@@ -301,40 +314,107 @@ const AddRefundModal = () => {
     }));
   };
 
+  const formatDateForBackend = (dateStr) => {
+    if (!dateStr) return "";
+    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!regex.test(dateStr)) {
+      console.error(`Invalid date format: ${dateStr}, expected YYYY-MM-DD`);
+      return "";
+    }
+    return dateStr;
+  };
+
   const handleSave = async () => {
-    const { selectTenancy, paymentDate, paymentMethod, amountToRefund } = form;
+    const {
+      selectTenancy,
+      paymentDate,
+      paymentMethod,
+      amountToRefund,
+      accountHolderName,
+      accountNumber,
+      referenceNumber,
+      chequeNumber,
+      chequeDate,
+    } = form;
     const { totalRefundable, alreadyRefunded } = refundData;
 
-    if (
-      selectTenancy &&
-      paymentDate &&
-      paymentMethod &&
-      amountToRefund &&
-      parseFloat(amountToRefund) > 0 &&
-      parseFloat(amountToRefund) <= (totalRefundable - alreadyRefunded)
-    ) {
-      try {
-        setLoading(true);
-        setError("");
-        const payload = {
-          tenancy_id: parseInt(selectTenancy),
-          amount_refunded: parseFloat(amountToRefund),
-          payment_method: paymentMethod,
-          payment_date: paymentDate,
-          remarks: form.remarks || "",
-        };
+    let requiredFields = [
+      selectTenancy,
+      paymentDate,
+      paymentMethod,
+      amountToRefund,
+    ];
+    if (paymentMethod === "bank_transfer" || paymentMethod === "cheque") {
+      requiredFields.push(accountHolderName, accountNumber, referenceNumber);
+    }
+    if (paymentMethod === "cheque") {
+      requiredFields.push(chequeNumber, chequeDate);
+    }
 
-        const response = await axios.post(`${BASE_URL}/finance/create/refund/`, payload);
-        console.log("Refund created:", response.data);
-        closeModal();
-      } catch (err) {
-        console.error("Failed to create refund:", err);
-        setError("Failed to create refund. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      setError("Please fill all required fields and ensure refund amount is valid");
+    if (!requiredFields.every((field) => field)) {
+      toast.error("Please fill all required fields.");
+      return;
+    }
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(paymentDate)) {
+      toast.error(
+        "Invalid payment date format. Please select a valid date (YYYY-MM-DD)."
+      );
+      return;
+    }
+    if (paymentMethod === "cheque" && !/^\d{4}-\d{2}-\d{2}$/.test(chequeDate)) {
+      toast.error(
+        "Invalid cheque date format. Please select a valid date (YYYY-MM-DD)."
+      );
+      return;
+    }
+
+    if (
+      parseFloat(amountToRefund) <= 0 ||
+      parseFloat(amountToRefund) > totalRefundable - alreadyRefunded
+    ) {
+      toast.error("Please enter a valid refund amount");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const loadingToast = toast.loading("Processing refund...");
+      const payload = {
+        tenancy_id: parseInt(selectTenancy),
+        amount_refunded: parseFloat(amountToRefund),
+        collection_mode: paymentMethod,
+        payment_date: formatDateForBackend(paymentDate),
+        remarks: form.remarks || "",
+        reference_number: referenceNumber || null,
+        ...(paymentMethod === "bank_transfer" || paymentMethod === "cheque"
+          ? {
+              account_holder_name: accountHolderName,
+              account_number: accountNumber,
+            }
+          : {}),
+        ...(paymentMethod === "cheque"
+          ? {
+              cheque_number: chequeNumber,
+              cheque_date: formatDateForBackend(chequeDate),
+            }
+          : {}),
+      };
+
+      const response = await axios.post(
+        `${BASE_URL}/finance/create/refund/`,
+        payload
+      );
+      toast.dismiss(loadingToast);
+      toast.success("Refund created successfully!");
+      console.log("Refund created:", response.data);
+      closeModal();
+    } catch (err) {
+      console.error("Failed to create refund:", err);
+      toast.dismiss();
+      toast.error("Failed to create refund. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -346,301 +426,429 @@ const AddRefundModal = () => {
   const showCompanyDropdown = role !== "company";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl h-[90vh] flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-semibold text-gray-800">Create Refund</h2>
-          <button
-            onClick={closeModal}
-            className="text-gray-500 hover:text-gray-700 transition-colors"
-          >
-            <X size={24} />
-          </button>
-        </div>
-
-        {/* Error Message */}
-        {error && (
-          <div className="px-6 py-2 bg-red-100 text-red-700 text-sm">
-            {error}
+    <div className="add-refund-modal-wrapper">
+      <Toaster />
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 add-refund-modal-overlay">
+        <div className="bg-white rounded-md w-[1006px] shadow-lg p-1 add-refund-modal-container">
+          {/* Header */}
+          <div className="flex justify-between items-center md:p-6 mt-2">
+            <h2 className="text-[#201D1E] add-refund-head">Create Refund</h2>
+            <button
+              onClick={closeModal}
+              className="add-refund-close-btn hover:bg-gray-100 duration-200"
+              disabled={loading}
+            >
+              <X size={20} />
+            </button>
           </div>
-        )}
 
-        {/* Loading Indicator */}
-        {loading && (
-          <div className="px-6 py-2 bg-blue-100 text-blue-700 text-sm">
-            Loading...
-          </div>
-        )}
+          {/* Scrollable Content */}
+          <div className="md:p-6 md:mt-[-15px]">
+            <div className="grid gap-6 add-refund-modal-grid">
+              {showCompanyDropdown && (
+                <div className="space-y-2">
+                  <label className="block add-refund-label">
+                    Select Company*
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={form.selectCompany}
+                      onChange={(e) => {
+                        updateForm("selectCompany", e.target.value);
+                        if (e.target.value === "") {
+                          e.target.classList.add("add-refund-selected");
+                        } else {
+                          e.target.classList.remove("add-refund-selected");
+                        }
+                      }}
+                      onFocus={() => setIsSelectOpenCompany(true)}
+                      onBlur={() => setIsSelectOpenCompany(false)}
+                      className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-selection ${
+                        form.selectCompany === "" ? "add-refund-selected" : ""
+                      }`}
+                      disabled={loading}
+                    >
+                      <option value="" disabled hidden>
+                        Choose Company
+                      </option>
+                      {companies.map((company) => (
+                        <option key={company.id} value={company.id}>
+                          {company.name || `Company ${company.id}`}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                      <ChevronDown
+                        size={16}
+                        className={`text-[#201D1E] transition-transform duration-300 ${
+                          isSelectOpenCompany ? "rotate-180" : "rotate-0"
+                        }`}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
 
-        {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            {showCompanyDropdown && (
-              <div className="space-y-1">
-                <label className="block text-sm font-medium text-gray-700">
-                  Select Company*
+              <div className="space-y-2">
+                <label className="block add-refund-label">
+                  Select Building*
                 </label>
                 <div className="relative">
                   <select
-                    value={form.selectCompany}
-                    onChange={(e) => updateForm("selectCompany", e.target.value)}
-                    className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-md"
+                    value={form.selectBuilding}
+                    onChange={(e) => {
+                      updateForm("selectBuilding", e.target.value);
+                      if (e.target.value === "") {
+                        e.target.classList.add("add-refund-selected");
+                      } else {
+                        e.target.classList.remove("add-refund-selected");
+                      }
+                    }}
+                    onFocus={() => setIsSelectOpenBuilding(true)}
+                    onBlur={() => setIsSelectOpenBuilding(false)}
+                    className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-selection ${
+                      form.selectBuilding === "" ? "add-refund-selected" : ""
+                    }`}
+                    disabled={!form.selectCompany || loading}
                   >
                     <option value="" disabled hidden>
-                      Choose Company
+                      Choose Building
                     </option>
-                    {companies.map((company) => (
-                      <option key={company.id} value={company.id}>
-                        {company.name || `Company ${company.id}`}
+                    {buildings.map((building) => (
+                      <option key={building.id} value={building.id}>
+                        {building.building_name || `Building ${building.id}`}
                       </option>
                     ))}
                   </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                    <ChevronDown size={16} className="text-gray-500" />
+                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                    <ChevronDown
+                      size={16}
+                      className={`text-[#201D1E] transition-transform duration-300 ${
+                        isSelectOpenBuilding ? "rotate-180" : "rotate-0"
+                      }`}
+                    />
                   </div>
                 </div>
               </div>
-            )}
 
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700">
-                Select Building*
-              </label>
-              <div className="relative">
-                <select
-                  value={form.selectBuilding}
-                  onChange={(e) => updateForm("selectBuilding", e.target.value)}
-                  className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-md disabled:bg-gray-100"
-                  disabled={!form.selectCompany}
-                >
-                  <option value="" disabled hidden>
-                    Choose Building
-                  </option>
-                  {buildings.map((building) => (
-                    <option key={building.id} value={building.id}>
-                      {building.building_name || `Building ${building.id}`}
+              <div className="space-y-2">
+                <label className="block add-refund-label">Select Unit*</label>
+                <div className="relative">
+                  <select
+                    value={form.selectUnit}
+                    onChange={(e) => {
+                      updateForm("selectUnit", e.target.value);
+                      if (e.target.value === "") {
+                        e.target.classList.add("add-refund-selected");
+                      } else {
+                        e.target.classList.remove("add-refund-selected");
+                      }
+                    }}
+                    onFocus={() => setIsSelectOpenUnit(true)}
+                    onBlur={() => setIsSelectOpenUnit(false)}
+                    className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-selection ${
+                      form.selectUnit === "" ? "add-refund-selected" : ""
+                    }`}
+                    disabled={!form.selectBuilding || loading}
+                  >
+                    <option value="" disabled hidden>
+                      Choose Unit
                     </option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                  <ChevronDown size={16} className="text-gray-500" />
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700">
-                Select Unit*
-              </label>
-              <div className="relative">
-                <select
-                  value={form.selectUnit}
-                  onChange={(e) => updateForm("selectUnit", e.target.value)}
-                  className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-md disabled:bg-gray-100"
-                  disabled={!form.selectBuilding}
-                >
-                  <option value="" disabled hidden>
-                    Choose Unit
-                  </option>
-                  {units.map((unit) => (
-                    <option key={unit.id} value={unit.id}>
-                      {unit.unit_name || `Unit ${unit.id}`}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                  <ChevronDown size={16} className="text-gray-500" />
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700">
-                Select Tenancy*
-              </label>
-              <div className="relative">
-                <select
-                  value={form.selectTenancy}
-                  onChange={(e) => updateForm("selectTenancy", e.target.value)}
-                  className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-md disabled:bg-gray-100"
-                  disabled={!form.selectUnit}
-                >
-                  <option value="" disabled hidden>
-                    Choose Tenancy
-                  </option>
-                  {tenancies.map((tenancy) => (
-                    <option key={tenancy.id} value={tenancy.id}>
-                      {tenancy.tenant_name || `Tenancy ${tenancy.id}`}
-                    </option>
-                  ))}
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                  <ChevronDown size={16} className="text-gray-500" />
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700">
-                End Date
-              </label>
-              <input
-                type="date"
-                value={form.endDate}
-                onChange={(e) => updateForm("endDate", e.target.value)}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-          </div>
-
-          {/* Summary Section */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-4">Refund Summary</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border border-gray-200 rounded-lg">
-              <div>
-                <p className="text-sm text-gray-600">Deposit Amount</p>
-                <p className="text-lg font-medium">{refundData.depositAmount.toFixed(2)} INR</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Excess Amount</p>
-                <p className="text-lg font-medium">{refundData.excessAmount.toFixed(2)} INR</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Detailed Refund Items Table */}
-          {refundData.refundItems.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-4">Detailed Breakdown</h3>
-              <div className="overflow-x-auto border border-gray-200 rounded-lg">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Charge</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tax</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Excess</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Refundable</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice Collections</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {refundData.refundItems.map((item, index) => (
-                      <tr key={`${item.type}-${item.id}`}>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{item.charge_type}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{item.reason}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{item.due_date}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{Number(item.original_amount).toFixed(2)}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{Number(item.tax).toFixed(2)}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{Number(item.total).toFixed(2)}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{Number(item.excess_amount).toFixed(2)}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{Number(item.total_refundable).toFixed(2)}</td>
-                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                          {Object.entries(item.collections_per_invoice).map(([invoice, amount]) => (
-                            <div key={invoice}>{`${invoice}: ${Number(amount).toFixed(2)}`}</div>
-                          ))}
-                        </td>
-                      </tr>
+                    {units.map((unit) => (
+                      <option key={unit.id} value={unit.id}>
+                        {unit.unit_name || `Unit ${unit.id}`}
+                      </option>
                     ))}
-                  </tbody>
-                </table>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                    <ChevronDown
+                      size={16}
+                      className={`text-[#201D1E] transition-transform duration-300 ${
+                        isSelectOpenUnit ? "rotate-180" : "rotate-0"
+                      }`}
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          )}
 
-          {/* Refund Amount Section */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-4">Refund Amount</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 border border-gray-200 rounded-lg">
-              <div>
-                <p className="text-sm text-gray-600">Total Refundable</p>
-                <p className="text-lg font-medium">{refundData.totalRefundable.toFixed(2)} INR</p>
+              <div className="space-y-2">
+                <label className="block add-refund-label">
+                  Select Tenancy*
+                </label>
+                <div className="relative">
+                  <select
+                    value={form.selectTenancy}
+                    onChange={(e) => {
+                      updateForm("selectTenancy", e.target.value);
+                      if (e.target.value === "") {
+                        e.target.classList.add("add-refund-selected");
+                      } else {
+                        e.target.classList.remove("add-refund-selected");
+                      }
+                    }}
+                    onFocus={() => setIsSelectOpenTenancy(true)}
+                    onBlur={() => setIsSelectOpenTenancy(false)}
+                    className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-selection ${
+                      form.selectTenancy === "" ? "add-refund-selected" : ""
+                    }`}
+                    disabled={!form.selectUnit || loading}
+                  >
+                    <option value="" disabled hidden>
+                      Choose Tenancy
+                    </option>
+                    {tenancies.map((tenancy) => (
+                      <option key={tenancy.id} value={tenancy.id}>
+                        {tenancy.tenant_name || `Tenancy ${tenancy.id}`}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                    <ChevronDown
+                      size={16}
+                      className={`text-[#201D1E] transition-transform duration-300 ${
+                        isSelectOpenTenancy ? "rotate-180" : "rotate-0"
+                      }`}
+                    />
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Already Refunded</p>
-                <p className="text-lg font-medium">{refundData.alreadyRefunded.toFixed(2)} INR</p>
+
+              {/* Summary Section */}
+              <div className="add-refund-modal-table-wrapper">
+                <div className="mt-[5px]">
+                  <h3 className="mb-5 -mt-3 refund-section-title">
+                    Refund Summary
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="mb-1.5 add-refund-label">Deposit Amount</p>
+                      <p className="text-[#1458A2] refund-amount-value">
+                        {refundData.depositAmount.toFixed(2)} INR
+                      </p>
+                    </div>
+                    <div>
+                      <p className="mb-1.5 add-refund-label">Excess Amount</p>
+                      <p className="text-[#1458A2] refund-amount-value">
+                        {refundData.excessAmount.toFixed(2)} INR
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Amount to Refund*</label>
+
+              {/* Refund Amount Section */}
+              <div className="add-refund-modal-table-wrapper">
+                <div className="mt-[5px]">
+                  <h3 className="text-lg font-semibold mb-5 -mt-3 refund-section-title">
+                    Refund Amount
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-2">
+                    <div>
+                      <p className="mb-1.5 add-refund-label">
+                        Total Refundable
+                      </p>
+                      <p className="text-[#1458A2] refund-amount-value">
+                        {refundData.totalRefundable.toFixed(2)} INR
+                      </p>
+                    </div>
+                    <div>
+                      <p className="mb-1.5 add-refund-label">
+                        Already Refunded
+                      </p>
+                      <p className="text-[#1458A2] refund-amount-value">
+                        {refundData.alreadyRefunded.toFixed(2)} INR
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block add-refund-label">
+                  Amount to Refund*
+                </label>
                 <input
                   type="number"
                   value={form.amountToRefund}
                   onChange={(e) => updateForm("amountToRefund", e.target.value)}
                   placeholder="Enter amount"
-                  className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-input"
                   min="0"
                   step="0.01"
+                  disabled={loading}
                 />
               </div>
-            </div>
-          </div>
 
-          {/* Bottom Form Section */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700">
-                Payment Date*
-              </label>
-              <input
-                type="date"
-                value={form.paymentDate}
-                onChange={(e) => updateForm("paymentDate", e.target.value)}
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700">
-                Payment Method*
-              </label>
-              <div className="relative">
-                <select
-                  value={form.paymentMethod}
-                  onChange={(e) => updateForm("paymentMethod", e.target.value)}
-                  className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-md"
-                >
-                  <option value="" disabled hidden>
-                    Choose Method
-                  </option>
-                  <option value="cash">Cash</option>
-                  <option value="bank_transfer">Bank Transfer</option>
-                  <option value="cheque">Cheque</option>
-                  <option value="credit_note">Credit Note</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                  <ChevronDown size={16} className="text-gray-500" />
+              <div className="space-y-2">
+                <label className="block add-refund-label">Payment Date*</label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={form.paymentDate}
+                    onChange={(e) => updateForm("paymentDate", e.target.value)}
+                    className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-input"
+                    disabled={loading}
+                  />
                 </div>
               </div>
-            </div>
 
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-gray-700">
-                Remarks
-              </label>
-              <input
-                type="text"
-                value={form.remarks}
-                onChange={(e) => updateForm("remarks", e.target.value)}
-                placeholder="Enter remarks"
-                className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
+              <div className="space-y-2">
+                <label className="block add-refund-label">
+                  Payment Method*
+                </label>
+                <div className="relative">
+                  <select
+                    value={form.paymentMethod}
+                    onChange={(e) => {
+                      updateForm("paymentMethod", e.target.value);
+                      if (e.target.value === "") {
+                        e.target.classList.add("add-refund-selected");
+                      } else {
+                        e.target.classList.remove("add-refund-selected");
+                      }
+                    }}
+                    onFocus={() => setIsSelectOpenPaymentMethod(true)}
+                    onBlur={() => setIsSelectOpenPaymentMethod(false)}
+                    className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-selection ${
+                      form.paymentMethod === "" ? "add-refund-selected" : ""
+                    }`}
+                    disabled={loading}
+                  >
+                    <option value="" disabled hidden>
+                      Choose
+                    </option>
+                    <option value="cash">Cash</option>
+                    <option value="bank_transfer">Bank Transfer</option>
+                    <option value="credit_card">Credit Card</option>
+                    <option value="cheque">Cheque</option>
+                    <option value="online_payment">Online Payment</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                    <ChevronDown
+                      size={16}
+                      className={`text-[#201D1E] transition-transform duration-300 ${
+                        isSelectOpenPaymentMethod ? "rotate-180" : "rotate-0"
+                      }`}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2 mb-1">
+                <label className="block add-refund-label">Remarks</label>
+                <input
+                  type="text"
+                  value={form.remarks}
+                  onChange={(e) => updateForm("remarks", e.target.value)}
+                  placeholder="Enter Remarks"
+                  className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-input"
+                  disabled={loading}
+                />
+              </div>
+
+              {(form.paymentMethod === "bank_transfer" ||
+                form.paymentMethod === "cheque") && (
+                <>
+                  <div className="space-y-2">
+                    <label className="block add-refund-label">
+                      Account Holder Name*
+                    </label>
+                    <input
+                      type="text"
+                      value={form.accountHolderName}
+                      onChange={(e) =>
+                        updateForm("accountHolderName", e.target.value)
+                      }
+                      placeholder="Enter Account Holder Name"
+                      className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-input"
+                      disabled={loading}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block add-refund-label">
+                      Account Number*
+                    </label>
+                    <input
+                      type="text"
+                      value={form.accountNumber}
+                      onChange={(e) =>
+                        updateForm("accountNumber", e.target.value)
+                      }
+                      placeholder="Enter Account Number"
+                      className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-input"
+                      disabled={loading}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block add-refund-label">
+                      Reference Number*
+                    </label>
+                    <input
+                      type="text"
+                      value={form.referenceNumber}
+                      onChange={(e) =>
+                        updateForm("referenceNumber", e.target.value)
+                      }
+                      placeholder="Enter Reference Number"
+                      className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-input"
+                      disabled={loading}
+                    />
+                  </div>
+                </>
+              )}
+
+              {form.paymentMethod === "cheque" && (
+                <>
+                  <div className="space-y-2">
+                    <label className="block add-refund-label">
+                      Cheque Number*
+                    </label>
+                    <input
+                      type="text"
+                      value={form.chequeNumber}
+                      onChange={(e) =>
+                        updateForm("chequeNumber", e.target.value)
+                      }
+                      placeholder="Enter Cheque Number"
+                      className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-input"
+                      disabled={loading}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block add-refund-label">
+                      Cheque Date*
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="date"
+                        value={form.chequeDate}
+                        onChange={(e) =>
+                          updateForm("chequeDate", e.target.value)
+                        }
+                        className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 add-refund-input"
+                        disabled={loading}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="flex mt-5 items-end justify-end mb-1">
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={loading}
+                className={`bg-[#2892CE] text-white add-refund-save-btn duration-200 ${
+                  loading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                {loading ? "Processing..." : "Save"}
+              </button>
             </div>
           </div>
-        </div>
-
-        {/* Footer with Save Button */}
-        <div className="flex justify-end p-4 border-t border-gray-200">
-          <button
-            onClick={handleSave}
-            disabled={loading}
-            className={`px-4 py-2 rounded-md text-white ${loading ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'} transition-colors`}
-          >
-            {loading ? 'Processing...' : 'Save Refund'}
-          </button>
         </div>
       </div>
     </div>
