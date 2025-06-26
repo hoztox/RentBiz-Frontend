@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Collection.css";
 import plusicon from "../../assets/Images/Collection/plus-icon.svg";
 import downloadicon from "../../assets/Images/Collection/download-icon.svg";
@@ -6,6 +6,7 @@ import editicon from "../../assets/Images/Collection/edit-icon.svg";
 import printericon from "../../assets/Images/Collection/printer-icon.svg";
 import downloadactionicon from "../../assets/Images/Collection/download-action-icon.svg";
 import downarrow from "../../assets/Images/Collection/downarrow.svg";
+import { ChevronDown } from "lucide-react";
 import { useModal } from "../../context/ModalContext";
 import CustomDropDown from "../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
@@ -21,10 +22,32 @@ const Collection = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isDateRangeOpen, setIsDateRangeOpen] = useState(false);
+  const dateRangeRef = useRef(null);
 
-  // Dropdown options for payment method filter
+  // Filter states
+  const [filters, setFilters] = useState({
+    id: "",
+    tenancy_id: "",
+    tenant_name: "",
+    payment_method: "",
+    start_date: "",
+    end_date: "",
+    upcoming_payments: "",
+  });
+  const [tempFilters, setTempFilters] = useState({
+    id: "",
+    tenancy_id: "",
+    tenant_name: "",
+    payment_method: "",
+    start_date: "",
+    end_date: "",
+    upcoming_payments: "",
+  });
+
+  // Dropdown options for filters
   const paymentMethodOptions = [
-    { value: "", label: "All" },
+    { value: "", label: "All Payments" },
     { value: "cash", label: "Cash" },
     { value: "bank_transfer", label: "Bank Transfer" },
     { value: "credit_card", label: "Credit Card" },
@@ -32,8 +55,35 @@ const Collection = () => {
     { value: "online_payment", label: "Online Payment" },
   ];
 
-  // State for selected payment method
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+  const upcomingPaymentsOptions = [
+    { value: "", label: "All" },
+    { value: "true", label: "Upcoming" },
+  ];
+
+  // Get unique values for dropdowns
+  const getUnique = (key) => [...new Set(collections.map((item) => item[key]))];
+
+  const tenancyIdOptions = [
+    { label: "All Tenancies", value: "" },
+    ...getUnique("tenancy_id").map((tid) => ({ label: tid, value: tid })),
+  ];
+  const tenantNameOptions = [
+    { label: "All Tenants", value: "" },
+    ...getUnique("tenant_name").map((name) => ({ label: name, value: name })),
+  ];
+
+  // Close date range dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dateRangeRef.current && !dateRangeRef.current.contains(event.target)) {
+        setIsDateRangeOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Fetch collections from API
   useEffect(() => {
@@ -45,11 +95,18 @@ const Collection = () => {
           params: {
             page: currentPage,
             search: searchTerm,
-            payment_method: selectedPaymentMethod,
+            id: filters.id,
+            tenancy_id: filters.tenancy_id,
+            tenant_name: filters.tenant_name,
+            payment_method: filters.payment_method,
+            start_date: filters.start_date,
+            end_date: filters.end_date,
+            upcoming_payments: filters.upcoming_payments,
           },
         });
         setCollections(response.data.results);
-        setTotalPages(Math.ceil(response.data.count / 10)); // Assuming 10 items per page
+        console.log("Collections fetched:", response.data);
+        setTotalPages(Math.ceil(response.data.count / 10));
       } catch (err) {
         console.error("Error fetching collections:", err);
         setError("Failed to load collections. Please try again.");
@@ -58,7 +115,54 @@ const Collection = () => {
       }
     };
     fetchCollections();
-  }, [currentPage, searchTerm, selectedPaymentMethod]);
+  }, [currentPage, searchTerm, filters]);
+
+  // Handle CSV download
+  const handleDownloadCSV = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}/finance/collections/download/`, {
+        params: {
+          search: searchTerm,
+          id: filters.id,
+          tenancy_id: filters.tenancy_id,
+          tenant_name: filters.tenant_name,
+          payment_method: filters.payment_method,
+          start_date: filters.start_date,
+          end_date: filters.end_date,
+          upcoming_payments: filters.upcoming_payments,
+        },
+        responseType: 'blob',
+      });
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `collections_${new Date().toISOString().replace(/[-:T]/g, '').slice(0, 15)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Error downloading CSV:", err);
+      setError("Failed to download CSV. Please try again.");
+    }
+  };
+
+  const clearFilters = () => {
+    const cleared = {
+      id: "",
+      tenancy_id: "",
+      tenant_name: "",
+      payment_method: "",
+      start_date: "",
+      end_date: "",
+      upcoming_payments: "",
+    };
+    setFilters(cleared);
+    setTempFilters(cleared);
+    setSearchTerm("");
+    setCurrentPage(1);
+  };
 
   const maxPageButtons = 5;
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
@@ -74,6 +178,10 @@ const Collection = () => {
       ...prev,
       [id]: !prev[id],
     }));
+  };
+
+  const toggleDateRange = () => {
+    setIsDateRangeOpen((prev) => !prev);
   };
 
   const dropdownVariants = {
@@ -108,15 +216,6 @@ const Collection = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 collection-search"
             />
-            <div className="relative w-[40%] md:w-auto">
-              <CustomDropDown
-                options={paymentMethodOptions}
-                value={selectedPaymentMethod}
-                onChange={setSelectedPaymentMethod}
-                className="w-full md:w-[200px]"
-                dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 collection-selection"
-              />
-            </div>
           </div>
           <div className="flex gap-[10px] collection-action-buttons w-full md:w-auto justify-start">
             <button
@@ -130,7 +229,10 @@ const Collection = () => {
                 className="relative right-[5px] md:right-0 w-[15px] h-[15px]"
               />
             </button>
-            <button className="flex items-center justify-center gap-2 w-[122px] h-[38px] rounded-md duration-200 collection-download-btn">
+            <button
+              className="flex items-center justify-center gap-2 w-[122px] h-[38px] rounded-md duration-200 collection-download-btn"
+              onClick={handleDownloadCSV}
+            >
               Download
               <img
                 src={downloadicon}
@@ -141,6 +243,94 @@ const Collection = () => {
           </div>
         </div>
       </div>
+
+      <div className="p-5 border-b border-[#E9E9E9] collection-desktop-only ">
+        <div className="flex items-center justify-between">
+          <div className="flex gap-[10px] flexBars-wrap">
+            {[
+              ["tenancy_id", tenancyIdOptions],
+              ["tenant_name", tenantNameOptions],
+              ["payment_method", paymentMethodOptions],
+              ["upcoming_payments", upcomingPaymentsOptions],
+            ].map(([key, options]) => (
+              <div key={key} className="relative">
+                <CustomDropDown
+                  options={options}
+                  value={tempFilters[key]}
+                  onChange={(value) =>
+                    setTempFilters((prev) => ({ ...prev, [key]: value }))
+                  }
+                  placeholder="Select"
+                  dropdownClassName="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer focus:border-gray-300 duration-200 collection-selection"
+                />
+              </div>
+            ))}
+            <div className="relative" ref={dateRangeRef}>
+              <div
+                className="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer flex items-center justify-between collection-selection"
+                onClick={toggleDateRange}
+              >
+                Date Range
+                <ChevronDown
+                  className={`ml-2 transition-transform duration-300 ${
+                    isDateRangeOpen ? "rotate-180" : "rotate-0"
+                  }`}
+                />
+              </div>
+              {isDateRangeOpen && (
+                <div className="absolute z-10 bg-white p-4 mt-1 border border-gray-300 rounded-md shadow-md w-[250px]">
+                  <label className="block text-sm mb-1 filter-btn">
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    value={tempFilters.start_date}
+                    onChange={(e) =>
+                      setTempFilters((prev) => ({
+                        ...prev,
+                        start_date: e.target.value,
+                      }))
+                    }
+                    className="w-full border border-gray-300 rounded-md px-2 py-1 mb-3 outline-none"
+                  />
+                  <label className="block text-sm mb-1 filter-btn">
+                    End Date
+                  </label>
+                  <input
+                    type="date"
+                    value={tempFilters.end_date}
+                    onChange={(e) =>
+                      setTempFilters((prev) => ({
+                        ...prev,
+                        end_date: e.target.value,
+                      }))
+                    }
+                    className="w-full border border-gray-300 rounded-md px-2 py-1 outline-none"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="flex gap-[10px]">
+            <button
+              onClick={() => {
+                setFilters(tempFilters);
+                setCurrentPage(1);
+              }}
+              className="bg-[#201D1E] text-white w-[105px] h-[38px] rounded-md hover:bg-[#F0F0F0] hover:text-[#201D1E] duration-200 filter-btn"
+            >
+              Filter
+            </button>
+            <button
+              onClick={clearFilters}
+              className="w-[105px] h-[38px] bg-[#F0F0F0] text-[#4D4D4D] rounded-md clear-btn hover:bg-[#201D1E] hover:text-white duration-200"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+
       {loading && (
         <div className="p-5 text-center">Loading...</div>
       )}
@@ -155,12 +345,11 @@ const Collection = () => {
                 <tr className="border-b border-[#E9E9E9] h-[57px]">
                   <th className="px-5 text-left collection-thead">ID</th>
                   <th className="px-5 text-left collection-thead">DATE</th>
-                  <th className="pl-5 text-left collection-thead">TENANCY ID</th>
                   <th className="pl-5 text-left collection-thead">TENANT NAME</th>
                   <th className="px-5 text-left collection-thead">AMOUNT</th>
-                  <th className="px-5 text-left collection-thead">DESCRIPTION</th>
                   <th className="px-5 text-left collection-thead">PAYMENT METHOD</th>
                   <th className="px-5 text-left collection-thead w-[68px]">STATUS</th>
+                  <th className="px-5 text-left collection-thead">INVOICE STATUS</th>
                   <th className="px-5 pr-11 text-right collection-thead">ACTION</th>
                 </tr>
               </thead>
@@ -172,10 +361,8 @@ const Collection = () => {
                   >
                     <td className="px-5 text-left collection-data">{collection.id}</td>
                     <td className="px-5 text-left collection-data">{collection.collection_date}</td>
-                    <td className="pl-5 text-left collection-data">{collection.tenancy_id}</td>
                     <td className="pl-5 text-left collection-data">{collection.tenant_name}</td>
                     <td className="px-5 text-left collection-data">{collection.amount}</td>
-                    <td className="px-5 text-left collection-data">{collection.description || '-'}</td>
                     <td className="px-5 text-left collection-data">
                       {collection.collection_mode.replace('_', ' ').toUpperCase()}
                     </td>
@@ -188,6 +375,17 @@ const Collection = () => {
                         }`}
                       >
                         {collection.status.toUpperCase()}
+                      </span>
+                    </td>
+                    <td className="px-5 text-left collection-data">
+                      <span
+                        className={`px-[10px] py-[5px] rounded-[4px] w-[100px] h-[28px] ${
+                          ['unpaid', 'partially_paid'].includes(collection.invoice_status)
+                            ? "bg-[#FFE1E1] text-[#C72828]"
+                            : "bg-[#28C76F29] text-[#28C76F]"
+                        }`}
+                      >
+                        {collection.invoice_status.toUpperCase()}
                       </span>
                     </td>
                     <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
@@ -205,13 +403,7 @@ const Collection = () => {
                           className="w-[18px] h-[18px] action-btn duration-200"
                         />
                       </button>
-                      <button>
-                        <img
-                          src={printericon}
-                          alt="Printer"
-                          className="w-[18px] h-[18px] action-btn duration-200"
-                        />
-                      </button>
+  
                     </td>
                   </tr>
                 ))}
@@ -282,10 +474,6 @@ const Collection = () => {
                                   <div className="collection-dropdown-label">AMOUNT</div>
                                   <div className="collection-dropdown-value">{collection.amount}</div>
                                 </div>
-                                <div className="collection-dropdown-item w-[50%]">
-                                  <div className="collection-dropdown-label">DESCRIPTION</div>
-                                  <div className="collection-dropdown-value">{collection.description || '-'}</div>
-                                </div>
                               </div>
                               <div className="collection-dropdown-grid">
                                 <div className="collection-dropdown-item w-[50%]">
@@ -305,6 +493,22 @@ const Collection = () => {
                                       }`}
                                     >
                                       {collection.status.toUpperCase()}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="collection-dropdown-grid">
+                                <div className="collection-dropdown-item w-[50%]">
+                                  <div className="collection-dropdown-label">INVOICE STATUS</div>
+                                  <div className="collection-dropdown-value">
+                                    <span
+                                      className={`px-[10px] py-[5px] rounded-[4px] w-[100px] h-[28px] ${
+                                        ['unpaid', 'partially_paid'].includes(collection.invoice_status)
+                                          ? "bg-[#FFE1E1] text-[#C72828]"
+                                          : "bg-[#28C76F29] text-[#28C76F]"
+                                      }`}
+                                    >
+                                      {collection.invoice_status.toUpperCase()}
                                     </span>
                                   </div>
                                 </div>
