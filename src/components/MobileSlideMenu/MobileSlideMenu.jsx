@@ -708,7 +708,7 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
             {/* Reports */}
             <div className="mx-5">
               <h3 className="pb-3 category-head">REPORTS</h3>
-              <div
+              {/* <div
                 className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
                   activeItem === "TenancyReport"
                     ? "menu-active"
@@ -727,7 +727,7 @@ const MobileSlideMenu = ({ isMobileMenuOpen, toggleMobileMenu }) => {
                   className="w-[18px] sidebar-icon"
                 />
                 <p className="pb-[2px] menu-text">Tenancy Report</p>
-              </div>
+              </div> */}
               <div
                 className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
                   activeItem === "UpcomingCollection"
