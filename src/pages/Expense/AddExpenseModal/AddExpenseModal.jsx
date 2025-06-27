@@ -20,7 +20,7 @@ const AddExpenseModal = () => {
     tax: "",
     total_amount: "",
     description: "",
-    status: "", // Added status field
+    status: "",
   };
 
   const [formData, setFormData] = useState(initialFormData);
@@ -46,7 +46,7 @@ const AddExpenseModal = () => {
     tenant: false,
     unit: false,
     charge_type: false,
-    status: false, // Added status toggle
+    status: false,
   });
   const [isCalculating, setIsCalculating] = useState(false);
 
@@ -87,7 +87,7 @@ const AddExpenseModal = () => {
     }
   };
 
-  const fetchTenancies = async () => {
+  const fetchTenanciesByUnit = async (unitId) => {
     try {
       setIsLoading(prev => ({ ...prev, tenancies: true }));
       const companyId = getUserCompanyId();
@@ -95,16 +95,39 @@ const AddExpenseModal = () => {
         toast.error("No company ID found for tenancies");
         return;
       }
-      const response = await axios.get(`${BASE_URL}/company/tenancies/company/${companyId}/`);
+      const response = await axios.get(`${BASE_URL}/company/tenancies/unit/${unitId}/`);
       setDropdownData(prev => ({
         ...prev,
         tenancies: Array.isArray(response.data) ? response.data : [],
+      
       }));
+        console.log("sssssssssss",response.data)
     } catch (error) {
       toast.error("Failed to fetch tenancies");
       setDropdownData(prev => ({ ...prev, tenancies: [] }));
     } finally {
       setIsLoading(prev => ({ ...prev, tenancies: false }));
+    }
+  };
+
+  const fetchUnits = async (buildingId) => {
+    try {
+      setIsLoading(prev => ({ ...prev, units: true }));
+      const companyId = getUserCompanyId();
+      if (!companyId) {
+        toast.error("No company ID found for units");
+        return;
+      }
+      const response = await axios.get(`${BASE_URL}/company/units/building/${buildingId}/`);
+      setDropdownData(prev => ({
+        ...prev,
+        units: Array.isArray(response.data) ? response.data : [],
+      }));
+    } catch (error) {
+      toast.error("Failed to fetch units");
+      setDropdownData(prev => ({ ...prev, units: [] }));
+    } finally {
+      setIsLoading(prev => ({ ...prev, units: false }));
     }
   };
 
@@ -136,7 +159,7 @@ const AddExpenseModal = () => {
         toast.error("No company ID found");
         return;
       }
-      await Promise.all([fetchBuildings(), fetchCharges(), fetchTenancies()]);
+      await Promise.all([fetchBuildings(), fetchCharges()]);
     } catch (error) {
       toast.error("Failed to fetch initial data");
     }
@@ -217,12 +240,6 @@ const AddExpenseModal = () => {
     }
   }, [formData.amount, formData.charge_type, formData.date]);
 
-  useEffect(() => {
-    if (formData.expense_type === "tenancy" && dropdownData.tenancies.length === 0) {
-      fetchTenancies();
-    }
-  }, [formData.expense_type, dropdownData.tenancies.length]);
-
   const handleSelectToggle = (field) => {
     setIsSelectOpen(prev => ({
       ...prev,
@@ -239,24 +256,35 @@ const AddExpenseModal = () => {
         if (value === "general") {
           newData.tenancy = "";
           newData.tenant = "";
-          newData.units = "";
+          newData.unit = "";
           newData.building = "";
           setDropdownData(prev => ({
             ...prev,
+            tenancies: [],
             tenants: [],
             units: [],
           }));
         } else if (value === "tenancy") {
           newData.tenancy = "";
           newData.tenant = "";
-          newData.units = "";
+          newData.unit = "";
           newData.building = "";
           setDropdownData(prev => ({
             ...prev,
+            tenancies: [],
             tenants: [],
             units: [],
           }));
         }
+      }
+
+      if (field === "building" && value) {
+        newData.unit = "";
+        fetchUnits(value);
+      }
+
+      if (field === "unit" && value && formData.expense_type === "tenancy") {
+        fetchTenanciesByUnit(value);
       }
 
       if (field === "tenancy" && value) {
@@ -264,10 +292,7 @@ const AddExpenseModal = () => {
           tenancy => tenancy.id === parseInt(value)
         );
         if (selectedTenancy) {
-          newData.building = selectedTenancy.building?.id?.toString() || "";
-          newData.unit = selectedTenancy.unit?.id?.toString() || "";
           newData.tenant = selectedTenancy.tenant?.id?.toString() || "";
-
           setDropdownData(prev => ({
             ...prev,
             tenants: [
@@ -276,33 +301,14 @@ const AddExpenseModal = () => {
                 name: selectedTenancy.tenant?.tenant_name,
               },
             ],
-            units: [
-              {
-                id: selectedTenancy.unit?.id,
-                unit_name: selectedTenancy.unit?.unit_name,
-                building: selectedTenancy.building?.id,
-              },
-            ],
           }));
         } else {
-          newData.building = "";
-          newData.unit = "";
           newData.tenant = "";
           setDropdownData(prev => ({
             ...prev,
             tenants: [],
-            units: [],
           }));
         }
-      } else if (field === "tenancy" && !value) {
-        newData.building = "";
-        newData.unit = "";
-        newData.tenant = "";
-        setDropdownData(prev => ({
-          ...prev,
-          tenants: [],
-          units: [],
-        }));
       }
 
       return newData;
@@ -327,8 +333,8 @@ const AddExpenseModal = () => {
   };
 
   const handleSave = async () => {
-    const requiredFields = ["building", "expense_type", "charge_type", "date", "amount", "status"];
-    const tenancyRequiredFields = ["tenancy", "tenant", "unit"];
+    const requiredFields = ["building", "expense_type", "charge_type", "date", "amount", "status", "unit"];
+    const tenancyRequiredFields = ["tenancy", "tenant"];
 
     const missingFields = requiredFields.filter(field => !formData[field]);
     if (formData.expense_type === "tenancy") {
@@ -396,7 +402,6 @@ const AddExpenseModal = () => {
       )
     : [];
 
-  // Status choices
   const statusChoices = [
     { value: "pending", label: "Pending" },
     { value: "paid", label: "Paid" },
@@ -442,57 +447,18 @@ const AddExpenseModal = () => {
                       Choose Expense Type
                     </option>
                     <option value="general">General</option>
-                    <option value="tenancy">Tenancy
-                    </option>
+                    <option value="tenancy">Tenancy</option>
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                     <ChevronDown
                       size={16}
-                      classClassName={`text-[#201D1E] transition-transform duration-300 ${
+                      className={`text-[#201D1E] transition-transform duration-300 ${
                         isSelectOpen.expense_type ? "rotate-180" : "rotate-0"
                       }`}
                     />
                   </div>
                 </div>
               </div>
-
-              {formData.expense_type === "tenancy" && (
-                <div className="space-y-2">
-                  <label className="block financial-expense-add-label">
-                    Tenancy*
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={formData.tenancy}
-                      onChange={handleChange("tenancy")}
-                      onFocus={() => handleSelectToggle("tenancy")}
-                      onBlur={() => handleSelectToggle("tenancy")}
-                      disabled={isLoading.tenancies}
-                      className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-add-selection ${
-                          formData.tenancy === "" ? "financial-expense" : ""
-                      } ${isLoading.tenancies ? "opacity-50" : ""}`}
-                    >
-                      <option value="" disabled hidden>
-                        {isLoading.tenancies ? "Loading tenancies..." : "Choose Tenancy"}
-                      </option>
-                      {Array.isArray(dropdownData.tenancies) &&
-                        dropdownData.tenancies.map(tenancy => (
-                          <option key={tenancy.id} value={tenancy.id}>
-                            {tenancy.tenancy_code}
-                          </option>
-                        ))}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                      <ChevronDown
-                        size={16}
-                        className={`text-[#201D1E] transition-transform duration-300 ${
-                          isSelectOpen.tenancy ? "rotate-180" : "rotate-0"
-                        }`}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
 
               <div className="space-y-2">
                 <label className="block financial-expense-add-label">
@@ -504,18 +470,10 @@ const AddExpenseModal = () => {
                     onChange={handleChange("building")}
                     onFocus={() => handleSelectToggle("building")}
                     onBlur={() => handleSelectToggle("building")}
-                    disabled={
-                      isLoading.buildings ||
-                      (formData.expense_type === "tenancy" && formData.tenancy)
-                    }
+                    disabled={isLoading.buildings}
                     className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-add-selection ${
                       formData.building === "" ? "financial-expense-add-selected" : ""
-                    } ${
-                      isLoading.buildings ||
-                      (formData.expense_type === "tenancy" && formData.tenancy)
-                        ? "opacity-50"
-                        : ""
-                    }`}
+                    } ${isLoading.buildings ? "opacity-50" : ""}`}
                   >
                     <option value="" disabled hidden>
                       {isLoading.buildings ? "Loading buildings..." : "Choose Building"}
@@ -538,87 +496,148 @@ const AddExpenseModal = () => {
                 </div>
               </div>
 
-              {formData.expense_type === "tenancy" && (
-                <div className="space-y-2">
-                  <label className="block financial-expense-add-label">
-                    Tenant*
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={formData.tenant}
-                      onChange={handleChange("tenant")}
-                      onFocus={() => handleSelectToggle("tenant")}
-                      onBlur={() => handleSelectToggle("tenant")}
-                      disabled={isLoading.tenants || formData.tenancy}
-                      className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-add-selection ${
-                        formData.tenant === "" ? "financial-expense-add-selected" : ""
-                      } ${isLoading.tenants || formData.tenancy ? "opacity-50" : ""}`}
-                    >
-                      <option value="" disabled hidden>
-                        {isLoading.tenants
-                          ? "Loading tenants..."
-                          : !formData.tenancy
-                          ? "Select tenancy first"
-                          : "Choose Tenant"}
+              <div className="space-y-2">
+                <label className="block financial-expense-add-label">
+                  Unit*
+                </label>
+                <div className="relative">
+                  <select
+                    value={formData.unit}
+                    onChange={handleChange("unit")}
+                    onFocus={() => handleSelectToggle("unit")}
+                    onBlur={() => handleSelectToggle("unit")}
+                    disabled={
+                      isLoading.units || 
+                      !formData.building
+                    }
+                    className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-add-selection ${
+                      formData.unit === "" ? "financial-expense-add-selected" : ""
+                    } ${
+                      isLoading.units || !formData.building
+                        ? "opacity-50" 
+                        : ""
+                    }`}
+                  >
+                    <option value="" disabled hidden>
+                      {isLoading.units
+                        ? "Loading units..."
+                        : !formData.building
+                        ? "Select building first"
+                        : "Choose Unit"}
+                    </option>
+                    {filteredUnits.map(unit => (
+                      <option key={unit.id} value={unit.id}>
+                        {unit.unit_name || unit.name}
                       </option>
-                      {Array.isArray(dropdownData.tenants) &&
-                        dropdownData.tenants.map(tenant => (
-                          <option key={tenant.id} value={tenant.id}>
-                            {tenant.name}
-                          </option>
-                        ))}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                      <ChevronDown
-                        size={16}
-                        className={`text-[#201D1E] transition-transform duration-300 ${
-                          isSelectOpen.tenant ? "rotate-180" : "rotate-0"
-                        }`}
-                      />
-                    </div>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                    <ChevronDown
+                      size={16}
+                      className={`text-[#201D1E] transition-transform duration-300 ${
+                        isSelectOpen.unit ? "rotate-180" : "rotate-0"
+                      }`}
+                    />
                   </div>
                 </div>
-              )}
+              </div>
 
               {formData.expense_type === "tenancy" && (
-                <div className="space-y-2">
-                  <label className="block financial-expense-add-label">
-                    Units*
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={formData.unit}
-                      onChange={handleChange("unit")}
-                      onFocus={() => handleSelectToggle("unit")}
-                      onBlur={() => handleSelectToggle("unit")}
-                      disabled={isLoading.units || formData.tenancy}
-                      className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-add-selection ${
-                        formData.units === "" ? "financial-expense-add-selected" : ""
-                      } ${isLoading.units || formData.tenancy ? "opacity-50" : ""}`}
-                    >
-                      <option value="" disabled hidden>
-                        {isLoading.units
-                          ? "Loading units..."
-                          : !formData.building
-                          ? "Select building first"
-                          : "Choose Unit"}
-                      </option>
-                      {filteredUnits.map(unit => (
-                        <option key={unit.id} value={unit.id}>
-                          {unit.unit_name || unit.name}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                      <ChevronDown
-                        size={16}
-                        className={`text-[#201D1E] transition-transform duration-300 ${
-                          isSelectOpen.units ? "rotate-180" : "rotate-0"
+                <>
+                  <div className="space-y-2">
+                    <label className="block financial-expense-add-label">
+                      Tenancy*
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={formData.tenancy}
+                        onChange={handleChange("tenancy")}
+                        onFocus={() => handleSelectToggle("tenancy")}
+                        onBlur={() => handleSelectToggle("tenancy")}
+                        disabled={
+                          isLoading.tenancies ||
+                          !formData.unit
+                        }
+                        className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-add-selection ${
+                          formData.tenancy === "" ? "financial-expense-add-selected" : ""
+                        } ${
+                          isLoading.tenancies || !formData.unit
+                            ? "opacity-50"
+                            : ""
                         }`}
-                      />
+                      >
+                        <option value="" disabled hidden>
+                          {isLoading.tenancies 
+                            ? "Loading tenancies..." 
+                            : !formData.unit
+                            ? "Select unit first"
+                            : "Choose Tenancy"}
+                        </option>
+                        {Array.isArray(dropdownData.tenancies) &&
+                          dropdownData.tenancies.map(tenancy => (
+                            <option key={tenancy.id} value={tenancy.id}>
+                              {tenancy.tenancy_code}
+                            </option>
+                          ))}
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                        <ChevronDown
+                          size={16}
+                          className={`text-[#201D1E] transition-transform duration-300 ${
+                            isSelectOpen.tenancy ? "rotate-180" : "rotate-0"
+                          }`}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+
+                  <div className="space-y-2">
+                    <label className="block financial-expense-add-label">
+                      Tenant*
+                    </label>
+                    <div className="relative">
+                      <select
+                        value={formData.tenant}
+                        onChange={handleChange("tenant")}
+                        onFocus={() => handleSelectToggle("tenant")}
+                        onBlur={() => handleSelectToggle("tenant")}
+                        disabled={
+                          isLoading.tenants || 
+                          !formData.tenancy
+                        }
+                        className={`block w-full pl-3 pr-10 py-2 border border-gray-200 appearance-none focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-add-selection ${
+                          formData.tenant === "" ? "financial-expense-add-selected" : ""
+                        } ${
+                          isLoading.tenants || !formData.tenancy
+                            ? "opacity-50"
+                            : ""
+                        }`}
+                      >
+                        <option value="" disabled hidden>
+                          {isLoading.tenants
+                            ? "Loading tenants..."
+                            : !formData.tenancy
+                            ? "Select tenancy first"
+                            : "Choose Tenant"}
+                        </option>
+                        {Array.isArray(dropdownData.tenants) &&
+                          dropdownData.tenants.map(tenant => (
+                            <option key={tenant.id} value={tenant.id}>
+                              {tenant.name}
+                            </option>
+                          ))}
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                        <ChevronDown
+                          size={16}
+                          className={`text-[#201D1E] transition-transform duration-300 ${
+                            isSelectOpen.tenant ? "rotate-180" : "rotate-0"
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </>
               )}
 
               <div className="space-y-2">
