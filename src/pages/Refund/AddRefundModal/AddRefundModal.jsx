@@ -1116,11 +1116,6 @@ const AddRefundModal = () => {
                     {loading ? "Processing..." : "Save"}
                   </button>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
                     <div className="space-y-2">
                       <label className="block add-refund-label">
                         Cheque Date*
