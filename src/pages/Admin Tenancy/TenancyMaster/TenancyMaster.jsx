@@ -69,9 +69,13 @@ const TenancyMaster = () => {
   const getUnique = (key) => [...new Set(tenancies.map((item) => item[key]))];
 
   const uniqueIds = getUnique("tenancy_code");
-  const uniqueTenants = getUnique("tenant")?.map(t => t?.tenant_name || "N/A");
-  const uniqueBuildings = getUnique("building")?.map(b => b?.building_name || "N/A");
-  const uniqueUnits = getUnique("unit")?.map(u => u?.unit_name || "N/A");
+  const uniqueTenants = getUnique("tenant")?.map(
+    (t) => t?.tenant_name || "N/A"
+  );
+  const uniqueBuildings = getUnique("building")?.map(
+    (b) => b?.building_name || "N/A"
+  );
+  const uniqueUnits = getUnique("unit")?.map((u) => u?.unit_name || "N/A");
   const uniqueStatuses = getUnique("status");
 
   const idOptions = [
@@ -95,7 +99,10 @@ const TenancyMaster = () => {
   ];
   const statusOptions = [
     { value: "", label: "All Statuses" },
-    ...uniqueStatuses.map((status) => ({ value: status, label: status.charAt(0).toUpperCase() + status.slice(1) })),
+    ...uniqueStatuses.map((status) => ({
+      value: status,
+      label: status.charAt(0).toUpperCase() + status.slice(1),
+    })),
   ];
 
   const getUserCompanyId = () => {
@@ -249,14 +256,14 @@ const TenancyMaster = () => {
         `${BASE_URL}/company/tenancies/${companyId}/export/`,
         {
           params,
-          responseType: 'blob',
+          responseType: "blob",
         }
       );
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.setAttribute('download', 'tenancies.csv');
+      link.setAttribute("download", "tenancies.csv");
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -266,21 +273,21 @@ const TenancyMaster = () => {
     }
   };
 
-  const dropdownVariants = {
+  const filterVariants = {
     hidden: {
       opacity: 0,
-      height: 0,
+      scale: 0.95,
       transition: {
         duration: 0.2,
-        ease: "easeInOut",
+        ease治: "easeOut",
       },
     },
     visible: {
       opacity: 1,
-      height: "auto",
+      scale: 1,
       transition: {
-        duration: 0.3,
-        ease: "easeInOut",
+        duration: 0.2,
+        ease: "easeOut",
       },
     },
   };
@@ -314,17 +321,18 @@ const TenancyMaster = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 tenancy-search"
             />
-            <button
-              onClick={toggleFilters}
-              className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md duration-200 ${
-                showFilters 
-                  ? 'bg-[#1458A2] text-white' 
-                  : 'bg-[#F0F0F0] text-[#201D1E] hover:bg-[#e6e6e6]'
+            <motion.button
+              className={`hidden md:flex items-center justify-center gap-2 px-4 py-2 h-[38px] rounded-md duration-200 ${
+                showFilters
+                  ? "bg-[#201D1E] text-white"
+                  : "bg-[#F0F0F0] text-[#201D1E] hover:bg-[#201D1E] hover:text-[#F0F0F0]"
               }`}
+              onClick={toggleFilters}
+              whileTap={{ scale: 0.95 }}
             >
               <Filter size={16} />
               Filters
-            </button>
+            </motion.button>
           </div>
           <div className="flex gap-[10px] tenancy-action-buttons-container">
             <button
@@ -338,7 +346,7 @@ const TenancyMaster = () => {
                 className="relative right-[5px] w-[16px] h-[15px]"
               />
             </button>
-            <button 
+            <button
               className="flex items-center justify-center gap-2 w-[45%] md:w-[122px] h-[38px] rounded-md duration-200 tenancy-download-btn"
               onClick={handleDownloadCSV}
             >
@@ -356,11 +364,11 @@ const TenancyMaster = () => {
       <AnimatePresence>
         {showFilters && (
           <motion.div
+            className="p-5 border-b border-[#E9E9E9] tenancy-desktop-only tenancy-filter-container"
             initial="hidden"
             animate="visible"
             exit="hidden"
-            variants={dropdownVariants}
-            className="p-5 border-b border-[#E9E9E9] tenancy-desktop-only"
+            variants={filterVariants}
           >
             <div className="flex items-center justify-between">
               <div className="flex gap-[10px] flex-wrap">
@@ -620,7 +628,7 @@ const TenancyMaster = () => {
                       initial="hidden"
                       animate="visible"
                       exit="hidden"
-                      variants={dropdownVariants}
+                      variants={filterVariants}
                     >
                       <td colSpan={3} className="px-5">
                         <div className="tenancy-dropdown-content">

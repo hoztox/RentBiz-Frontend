@@ -140,7 +140,7 @@
     margin-bottom: 50px;
   }
   .tenancy-search {
-    width: 60%;
+    width: 100%;
   }
   .tenancy-selection {
     width: 100%;
@@ -249,7 +249,7 @@
     flex-wrap: nowrap;
   }
   .tenancy-search {
-    width: 60%;
+    width: 100%;
   }
   .tenancy-selection {
     width: 100%;
