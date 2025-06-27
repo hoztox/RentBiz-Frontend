@@ -17,8 +17,8 @@ import financialCollection from "../../assets/Images/Admin Sidebar/financial col
 import expense from "../../assets/Images/Admin Sidebar/expense.svg";
 import refund from "../../assets/Images/Admin Sidebar/refund.svg";
 // import tenancyReport from "../../assets/Images/Admin Sidebar/tenancy report.svg";
-import upcomingCollection from "../../assets/Images/Admin Sidebar/upcoming collection.svg";
-import reportCollection from "../../assets/Images/Admin Sidebar/report collection.svg";
+// import upcomingCollection from "../../assets/Images/Admin Sidebar/upcoming collection.svg";
+// import reportCollection from "../../assets/Images/Admin Sidebar/report collection.svg";
 import incomeExpense from "../../assets/Images/Admin Sidebar/income-expense.svg";
 import logoutIcon from "../../assets/Images/Admin Sidebar/logout-icon.svg";
 import CreateTenantModal from "../../pages/Admin Tenants/CreateTenantModal/CreateTenantModal";
@@ -707,7 +707,7 @@ const AdminSidebar = () => {
             />
             <p className="pb-[2px] menu-text">Tenancy Report</p>
           </div> */}
-          <div
+          {/* <div
             className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
               activeItem === "UpcomingCollection"
                 ? "menu-active"
@@ -726,8 +726,8 @@ const AdminSidebar = () => {
               className="w-[18px] sidebar-icon"
             />
             <p className="pb-[2px] menu-text">Upcoming Collection</p>
-          </div>
-          <div
+          </div> */}
+          {/* <div
             className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
               activeItem === "ReportCollection"
                 ? "menu-active"
@@ -746,7 +746,7 @@ const AdminSidebar = () => {
               className="w-[18px] sidebar-icon"
             />
             <p className="pb-[2px] menu-text">Collection</p>
-          </div>
+          </div> */}
           <div
             className={`flex items-center py-[7px] px-3 mb-6 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
               activeItem === "IncomeExpense"
