@@ -447,7 +447,7 @@ const TenancyMaster = () => {
                   }}
                   className="bg-[#201D1E] text-white w-[105px] h-[38px] rounded-md hover:bg-[#F0F0F0] hover:text-[#201D1E] duration-200 filter-btn"
                 >
-                  Filter
+                  Apply
                 </button>
                 <button
                   onClick={clearFilters}
