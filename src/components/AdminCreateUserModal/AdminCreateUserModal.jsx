@@ -575,7 +575,7 @@ const AdminCreateUserModal = () => {
           </div>
         </div>
 
-        <div className="px-4 md:px-6 mt-6 md:mt-1 mb-10 flex justify-end">
+        <div className="px-4 md:px-6 mt-6 md:mt-1 mb-5 flex justify-end">
           <button
             className={`create-user-button duration-200 ${
               isLoading
