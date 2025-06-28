@@ -1,14 +1,47 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios"; 
 import CountUp from "react-countup";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
-import "./chart1.css";
+import "./chart1.css"; 
+import { BASE_URL } from "../../../../utils/config";
 
-const Chart1 = ({ data }) => {
+
+
+
+const Chart1 = ({ companyId }) => {
     const COLORS = ["#C4DFFC", "#FCC2F0", "#D6F2EF"];
     const [activeIndex, setActiveIndex] = useState(null);
+    const [chartData, setChartData] = useState([]); // Initialize as empty array
 
-    // Calculate total properties dynamically
-    const totalProperties = data.reduce((sum, entry) => sum + entry.value, 0);
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const res = await axios.get(
+                    `${BASE_URL}/company/dashboard/tenency-expiring/${companyId}/`
+                );
+                const ranges = res.data.ranges;
+
+                const transformedData = [
+                    { name: "0-30 Days", value: ranges["0-30_days"] || 0 },
+                    { name: "31-60 Days", value: ranges["31-60_days"] || 0 },
+                    { name: "61-90 Days", value: ranges["61-90_days"] || 0 },
+                ];
+
+                setChartData(transformedData);
+            } catch (err) {
+                console.error("Failed to fetch tenancy expiry data:", err);
+                setChartData([
+                    { name: "0-30 Days", value: 0 },
+                    { name: "31-60 Days", value: 0 },
+                    { name: "61-90 Days", value: 0 },
+                ]); // Fallback data on error
+            }
+        };
+
+        fetchData();
+    }, [companyId]);
+
+    const totalProperties = chartData.reduce((sum, entry) => sum + (entry.value || 0), 0);
 
     return (
         <div className="relative p-5 rounded-md border border-[#E9E9E9] w-[35%] chart1">
@@ -17,7 +50,7 @@ const Chart1 = ({ data }) => {
             <div className="relative flex flex-col items-center">
                 <PieChart width={250} height={250}>
                     <Pie
-                        data={data}
+                        data={chartData}
                         dataKey="value"
                         nameKey="name"
                         cx="50%"
@@ -31,7 +64,7 @@ const Chart1 = ({ data }) => {
                         strokeWidth={0}
                         stroke="#fff"
                     >
-                        {data.map((entry, index) => (
+                        {chartData.map((entry, index) => (
                             <Cell
                                 key={`cell-${index}`}
                                 fill={COLORS[index % COLORS.length]}
@@ -42,7 +75,6 @@ const Chart1 = ({ data }) => {
                     <Tooltip />
                 </PieChart>
 
-                {/* Centered Total Properties Text */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center tenancy-chart">
                     <h3 className="total-properties-count">
                         {totalProperties < 10 ? "0" : ""}
@@ -52,9 +84,8 @@ const Chart1 = ({ data }) => {
                 </div>
             </div>
 
-            {/* Legend with Hover Effect */}
             <div className="flex justify-center w-full text-base legends">
-                {data.map((entry, index) => (
+                {chartData.map((entry, index) => (
                     <div
                         key={index}
                         className="flex flex-col items-start cursor-pointer border-style last:border-r-0 days-period"
@@ -68,7 +99,7 @@ const Chart1 = ({ data }) => {
                             ></span>
                             <span className="entry-value">
                                 {entry.value < 10 ? "0" : ""}
-                                <CountUp end={entry.value} duration={1.5} />
+                                <CountUp end={entry.value || 0} duration={1.5} />
                             </span>
                         </div>
                         <span className="entry-name">{entry.name}</span>
