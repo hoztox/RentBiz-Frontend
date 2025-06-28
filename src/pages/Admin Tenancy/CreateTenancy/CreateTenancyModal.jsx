@@ -16,8 +16,9 @@ const CreateTenancyModal = () => {
     chargeId: null,
     taxDetails: [],
   });
-  const [loading, setLoading] = useState(true); // New: Loading state
-  const [error, setError] = useState(null); // New: Error state
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isNoPaymentsManuallySet, setIsNoPaymentsManuallySet] = useState(false);
 
   // API data states
   const [tenants, setTenants] = useState([]);
@@ -97,7 +98,6 @@ const CreateTenancyModal = () => {
           axios.get(`${BASE_URL}/company/charges/company/${companyId}/`),
         ]);
 
-        // Ensure tenants is an array
         setTenants(Array.isArray(tenantsRes.data) ? tenantsRes.data : tenantsRes.data.results || []);
         setBuildings(Array.isArray(buildingsRes.data) ? buildingsRes.data : buildingsRes.data.results || []);
         setChargeTypes(Array.isArray(chargeTypesRes.data) ? chargeTypesRes.data : chargeTypesRes.data.results || []);
@@ -198,8 +198,7 @@ const CreateTenancyModal = () => {
         formData.rental_months &&
         formData.no_payments &&
         formData.first_rent_due_on &&
-        formData.start_date &&
-        (formData.rent_per_frequency || formData.deposit || formData.commission)
+        formData.start_date
       ) {
         try {
           const previewPayload = {
@@ -288,7 +287,9 @@ const CreateTenancyModal = () => {
     };
 
     additionalCharges.forEach((charge) => {
-      fetchTaxPreview(charge);
+      if (charge.charge_type && charge.amount && charge.due_date && charge.reason) {
+        fetchTaxPreview(charge);
+      }
     });
   }, [
     JSON.stringify(
@@ -303,11 +304,21 @@ const CreateTenancyModal = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-      ...(name === "building" ? { unit: "" } : {}),
-    }));
+    setFormData((prev) => {
+      const newFormData = {
+        ...prev,
+        [name]: value,
+        ...(name === "building" ? { unit: "" } : {}),
+        ...(name === "rental_months" && !isNoPaymentsManuallySet
+          ? { no_payments: value }
+          : {}),
+      };
+      return newFormData;
+    });
+
+    if (name === "no_payments") {
+      setIsNoPaymentsManuallySet(true);
+    }
   };
 
   const handleAdditionalChargeChange = (id, field, value) => {
@@ -354,7 +365,22 @@ const CreateTenancyModal = () => {
   };
 
   const removeRow = (id) => {
-    setAdditionalCharges(additionalCharges.filter((charge) => charge.id !== id));
+    if (additionalCharges.length > 1) {
+      setAdditionalCharges(additionalCharges.filter((charge) => charge.id !== id));
+    } else {
+      setAdditionalCharges([
+        {
+          id: "01",
+          charge_type: "",
+          reason: "",
+          due_date: "",
+          amount: "",
+          tax: "0.00",
+          total: "0.00",
+          tax_details: [],
+        },
+      ]);
+    }
   };
 
   const toggleSelectOpen = (field) => {
@@ -386,17 +412,10 @@ const CreateTenancyModal = () => {
         return;
       }
     }
-    for (const charge of additionalCharges) {
-      if (
-        !charge.charge_type ||
-        !charge.reason ||
-        !charge.due_date ||
-        !charge.amount
-      ) {
-        alert("Please fill all fields in Additional Charges");
-        return;
-      }
-    }
+
+    const validAdditionalCharges = additionalCharges.filter(
+      (charge) => charge.charge_type && charge.reason && charge.due_date && charge.amount
+    );
 
     const companyId = getUserCompanyId();
     const userId = getRelevantUserId();
@@ -417,7 +436,7 @@ const CreateTenancyModal = () => {
       commission: parseFloat(formData.commission || 0).toFixed(2),
       remarks: formData.remarks,
       total_receivable: parseFloat(formData.total_receivable || 0).toFixed(2),
-      additional_charges: additionalCharges.map((charge) => ({
+      additional_charges: validAdditionalCharges.map((charge) => ({
         charge_type: parseInt(charge.charge_type),
         reason: charge.reason,
         due_date: charge.due_date,
@@ -677,7 +696,7 @@ const CreateTenancyModal = () => {
               />
             </div>
             <div>
-              <label className="block tenancy-modal-label">Deposit (If Any)</label>
+              <label className="block tenancy-modal-label">Deposit (If any)</label>
               <input
                 type="number"
                 name="deposit"
@@ -690,7 +709,7 @@ const CreateTenancyModal = () => {
               />
             </div>
             <div>
-              <label className="block tenancy-modal-label">Commission (If Any)</label>
+              <label className="block tenancy-modal-label">Commission (If any)</label>
               <input
                 type="number"
                 name="commission"
@@ -717,7 +736,7 @@ const CreateTenancyModal = () => {
 
           <div className="mt-6">
             <h3 className="text-[#2892CE] mb-3 text-[15px] font-semibold font-['Public_Sans']">
-              Additional Charges
+              Additional Charges (If any)
             </h3>
             <div className="mt-6 tenancy-overflow-x-auto tenancy-additional-charges-container border border-[#E9E9E9] rounded-md">
               <div className="tenancy-desktop-table">
@@ -1016,13 +1035,13 @@ const CreateTenancyModal = () => {
                 ))}
               </div>
             </div>
-              <button
-                onClick={addRow}
-                className="mt-6 bg-[#2892CE] hover:bg-[#1f6c99] duration-200 text-white px-4 pl-6 mb-10 flex items-center tenancy-addrow-btn"
-              >
-                Add Row
-                <Plus size={20} color="#ffffff" className="ml-2" />
-              </button>
+            <button
+              onClick={addRow}
+              className="mt-6 bg-[#2892CE] hover:bg-[#1f6c99] duration-200 text-white px-4 pl-6 mb-10 flex items-center tenancy-addrow-btn"
+            >
+              Add Row
+              <Plus size={20} color="#ffffff" className="ml-2" />
+            </button>
 
             <div className="mt-6">
               <button
