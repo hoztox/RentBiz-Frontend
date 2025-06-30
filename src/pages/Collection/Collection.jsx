@@ -3,10 +3,9 @@ import "./Collection.css";
 import plusicon from "../../assets/Images/Collection/plus-icon.svg";
 import downloadicon from "../../assets/Images/Collection/download-icon.svg";
 import editicon from "../../assets/Images/Collection/edit-icon.svg";
-import printericon from "../../assets/Images/Collection/printer-icon.svg";
 import downloadactionicon from "../../assets/Images/Collection/download-action-icon.svg";
 import downarrow from "../../assets/Images/Collection/downarrow.svg";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Filter } from "lucide-react";
 import { useModal } from "../../context/ModalContext";
 import CustomDropDown from "../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,12 +16,13 @@ const Collection = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState({});
-  const { openModal } = useModal();
+  const { openModal, refreshCounter } = useModal();
   const [collections, setCollections] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isDateRangeOpen, setIsDateRangeOpen] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const dateRangeRef = useRef(null);
 
   // Filter states
@@ -75,7 +75,10 @@ const Collection = () => {
   // Close date range dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
-      if (dateRangeRef.current && !dateRangeRef.current.contains(event.target)) {
+      if (
+        dateRangeRef.current &&
+        !dateRangeRef.current.contains(event.target)
+      ) {
         setIsDateRangeOpen(false);
       }
     }
@@ -115,29 +118,38 @@ const Collection = () => {
       }
     };
     fetchCollections();
-  }, [currentPage, searchTerm, filters]);
+  }, [currentPage, searchTerm, filters, refreshCounter]);
 
   // Handle CSV download
   const handleDownloadCSV = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/finance/collections/download/`, {
-        params: {
-          search: searchTerm,
-          id: filters.id,
-          tenancy_id: filters.tenancy_id,
-          tenant_name: filters.tenant_name,
-          payment_method: filters.payment_method,
-          start_date: filters.start_date,
-          end_date: filters.end_date,
-          upcoming_payments: filters.upcoming_payments,
-        },
-        responseType: 'blob',
-      });
+      const response = await axios.get(
+        `${BASE_URL}/finance/collections/download/`,
+        {
+          params: {
+            search: searchTerm,
+            id: filters.id,
+            tenancy_id: filters.tenancy_id,
+            tenant_name: filters.tenant_name,
+            payment_method: filters.payment_method,
+            start_date: filters.start_date,
+            end_date: filters.end_date,
+            upcoming_payments: filters.upcoming_payments,
+          },
+          responseType: "blob",
+        }
+      );
 
       const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.setAttribute('download', `collections_${new Date().toISOString().replace(/[-:T]/g, '').slice(0, 15)}.csv`);
+      link.setAttribute(
+        "download",
+        `collections_${new Date()
+          .toISOString()
+          .replace(/[-:T]/g, "")
+          .slice(0, 15)}.csv`
+      );
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -184,6 +196,29 @@ const Collection = () => {
     setIsDateRangeOpen((prev) => !prev);
   };
 
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
+  };
+
+  const filterVariants = {
+    hidden: {
+      opacity: 0,
+      scale: 0.95,
+      transition: {
+        duration: 0.2,
+        ease: "easeOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.2,
+        ease: "easeOut",
+      },
+    },
+  };
+
   const dropdownVariants = {
     hidden: {
       opacity: 0,
@@ -208,7 +243,7 @@ const Collection = () => {
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] collection-table-header">
         <h1 className="collection-head">Collection</h1>
         <div className="flex flex-col md:flex-row gap-[10px] collection-inputs-container">
-          <div className="flex flex-col md:flex-row gap-[10px] w-full">
+          <div className="flex flex-col md:flex-row gap-[10px] w-full items-center">
             <input
               type="text"
               placeholder="Search"
@@ -216,6 +251,18 @@ const Collection = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 collection-search"
             />
+            <motion.button
+              className={`hidden md:flex items-center justify-center gap-2 px-4 py-2 h-[38px] rounded-md duration-200 ${
+                showFilters
+                  ? "bg-[#201D1E] text-white"
+                  : "bg-[#F0F0F0] text-[#201D1E] hover:bg-[#201D1E] hover:text-[#F0F0F0]"
+              }`}
+              onClick={toggleFilters}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Filter size={16} />
+              Filters
+            </motion.button>
           </div>
           <div className="flex gap-[10px] collection-action-buttons w-full md:w-auto justify-start">
             <button
@@ -244,99 +291,105 @@ const Collection = () => {
         </div>
       </div>
 
-      <div className="p-5 border-b border-[#E9E9E9] collection-desktop-only ">
-        <div className="flex items-center justify-between">
-          <div className="flex gap-[10px] flexBars-wrap">
-            {[
-              ["tenancy_id", tenancyIdOptions],
-              ["tenant_name", tenantNameOptions],
-              ["payment_method", paymentMethodOptions],
-              ["upcoming_payments", upcomingPaymentsOptions],
-            ].map(([key, options]) => (
-              <div key={key} className="relative">
-                <CustomDropDown
-                  options={options}
-                  value={tempFilters[key]}
-                  onChange={(value) =>
-                    setTempFilters((prev) => ({ ...prev, [key]: value }))
-                  }
-                  placeholder="Select"
-                  dropdownClassName="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer focus:border-gray-300 duration-200 collection-selection"
-                />
-              </div>
-            ))}
-            <div className="relative" ref={dateRangeRef}>
-              <div
-                className="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer flex items-center justify-between collection-selection"
-                onClick={toggleDateRange}
-              >
-                Date Range
-                <ChevronDown
-                  className={`ml-2 transition-transform duration-300 ${
-                    isDateRangeOpen ? "rotate-180" : "rotate-0"
-                  }`}
-                />
-              </div>
-              {isDateRangeOpen && (
-                <div className="absolute z-10 bg-white p-4 mt-1 border border-gray-300 rounded-md shadow-md w-[250px]">
-                  <label className="block text-sm mb-1 filter-btn">
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    value={tempFilters.start_date}
-                    onChange={(e) =>
-                      setTempFilters((prev) => ({
-                        ...prev,
-                        start_date: e.target.value,
-                      }))
-                    }
-                    className="w-full border border-gray-300 rounded-md px-2 py-1 mb-3 outline-none"
-                  />
-                  <label className="block text-sm mb-1 filter-btn">
-                    End Date
-                  </label>
-                  <input
-                    type="date"
-                    value={tempFilters.end_date}
-                    onChange={(e) =>
-                      setTempFilters((prev) => ({
-                        ...prev,
-                        end_date: e.target.value,
-                      }))
-                    }
-                    className="w-full border border-gray-300 rounded-md px-2 py-1 outline-none"
-                  />
+      <AnimatePresence>
+        {showFilters && (
+          <motion.div
+            className="p-5 border-b border-[#E9E9E9] collection-desktop-only"
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            variants={filterVariants}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex gap-[10px] flexBars-wrap">
+                {[
+                  ["tenancy_id", tenancyIdOptions],
+                  ["tenant_name", tenantNameOptions],
+                  ["payment_method", paymentMethodOptions],
+                  ["upcoming_payments", upcomingPaymentsOptions],
+                ].map(([key, options]) => (
+                  <div key={key} className="relative">
+                    <CustomDropDown
+                      options={options}
+                      value={tempFilters[key]}
+                      onChange={(value) =>
+                        setTempFilters((prev) => ({ ...prev, [key]: value }))
+                      }
+                      placeholder="Select"
+                      dropdownClassName="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer focus:border-gray-300 duration-200 collection-selection overflow-hidden text-ellipsis whitespace-nowrap"
+                    />
+                  </div>
+                ))}
+                <div className="relative" ref={dateRangeRef}>
+                  <div
+                    className="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer flex items-center justify-between collection-selection"
+                    onClick={toggleDateRange}
+                  >
+                    Date Range
+                    <ChevronDown
+                      className={`ml-2 transition-transform duration-300 ${
+                        isDateRangeOpen ? "rotate-180" : "rotate-0"
+                      }`}
+                    />
+                  </div>
+                  {isDateRangeOpen && (
+                    <div className="absolute z-10 bg-white p-4 mt-1 border border-gray-300 rounded-md shadow-md w-[250px]">
+                      <label className="block text-sm mb-1 filter-btn">
+                        Start Date
+                      </label>
+                      <input
+                        type="date"
+                        value={tempFilters.start_date}
+                        onChange={(e) =>
+                          setTempFilters((prev) => ({
+                            ...prev,
+                            start_date: e.target.value,
+                          }))
+                        }
+                        className="w-full border border-gray-300 rounded-md px-2 py-1 mb-3 outline-none"
+                      />
+                      <label className="block text-sm mb-1 filter-btn">
+                        End Date
+                      </label>
+                      <input
+                        type="date"
+                        value={tempFilters.end_date}
+                        onChange={(e) =>
+                          setTempFilters((prev) => ({
+                            ...prev,
+                            end_date: e.target.value,
+                          }))
+                        }
+                        className="w-full border border-gray-300 rounded-md px-2 py-1 outline-none"
+                      />
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
+              <div className="flex gap-[10px]">
+                <button
+                  onClick={() => {
+                    setFilters(tempFilters);
+                    setCurrentPage(1);
+                  }}
+                  className="bg-[#201D1E] text-white w-[105px] h-[38px] rounded-md hover:bg-[#F0F0F0] hover:text-[#201D1E] duration-200 filter-btn"
+                >
+                  Filter
+                </button>
+                <button
+                  onClick={clearFilters}
+                  className="w-[105px] h-[38px] bg-[#F0F0F0] text-[#4D4D4D] rounded-md clear-btn hover:bg-[#201D1E] hover:text-white duration-200"
+                >
+                  Clear
+                </button>
+              </div>
             </div>
-          </div>
-          <div className="flex gap-[10px]">
-            <button
-              onClick={() => {
-                setFilters(tempFilters);
-                setCurrentPage(1);
-              }}
-              className="bg-[#201D1E] text-white w-[105px] h-[38px] rounded-md hover:bg-[#F0F0F0] hover:text-[#201D1E] duration-200 filter-btn"
-            >
-              Filter
-            </button>
-            <button
-              onClick={clearFilters}
-              className="w-[105px] h-[38px] bg-[#F0F0F0] text-[#4D4D4D] rounded-md clear-btn hover:bg-[#201D1E] hover:text-white duration-200"
-            >
-              Clear
-            </button>
-          </div>
-        </div>
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {loading && (
-        <div className="p-5 text-center">Loading...</div>
-      )}
-      {error && (
-        <div className="p-5 text-center text-red-600">{error}</div>
-      )}
+      {loading && <div className="p-5 text-center">Loading...</div>}
+      {error && <div className="p-5 text-center text-red-600">{error}</div>}
       {!loading && !error && (
         <>
           <div className="collection-desktop-only">
@@ -345,47 +398,59 @@ const Collection = () => {
                 <tr className="border-b border-[#E9E9E9] h-[57px]">
                   <th className="px-5 text-left collection-thead">ID</th>
                   <th className="px-5 text-left collection-thead">DATE</th>
-                  <th className="pl-5 text-left collection-thead">TENANT NAME</th>
-                  <th className="px-5 text-left collection-thead">AMOUNT</th>
-                  <th className="px-5 text-left collection-thead">PAYMENT METHOD</th>
-                  <th className="px-5 text-left collection-thead w-[68px]">STATUS</th>
-                  <th className="px-5 text-left collection-thead">INVOICE STATUS</th>
-                  <th className="px-5 pr-11 text-right collection-thead">ACTION</th>
+                  <th className="pl-5 text-left collection-thead">
+                    TENANT NAME
+                  </th>
+                  <th className="px-5 text-left collection-thead ">AMOUNT</th>
+                  <th className="px-5 text-left collection-thead ">
+                    PAYMENT METHOD
+                  </th>
+                  <th className="px-5 text-left collection-thead">
+                    INVOICE STATUS
+                  </th>
+                  <th className="px-5 py-3 text-right collection-thead w-[100px]">
+                    ACTION
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {collections.map((collection, index) => (
+                {collections.map((collection) => (
                   <tr
-                    key={index}
+                    key={collection.id}
                     className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
                   >
-                    <td className="px-5 text-left collection-data">{collection.id}</td>
-                    <td className="px-5 text-left collection-data">{collection.collection_date}</td>
-                    <td className="pl-5 text-left collection-data">{collection.tenant_name}</td>
-                    <td className="px-5 text-left collection-data">{collection.amount}</td>
                     <td className="px-5 text-left collection-data">
-                      {collection.collection_mode.replace('_', ' ').toUpperCase()}
+                      {collection.id}
+                    </td>
+                    <td className="px-5 text-left collection-data">
+                      {collection.collection_date}
+                    </td>
+                    <td className="pl-5 text-left collection-data">
+                      {collection.tenant_name}
+                    </td>
+                    <td className="px-5 text-left collection-data">
+                      {collection.amount}
+                    </td>
+                    <td className="px-5 text-left collection-data">
+                      {collection.collection_mode
+                        .replace(/_/g, " ")
+                        .replace(/\b\w/g, (char) => char.toUpperCase())}
                     </td>
                     <td className="px-5 text-left collection-data">
                       <span
-                        className={`px-[10px] py-[5px] rounded-[4px] w-[69px] h-[28px] ${
-                          collection.status === "completed"
+                        className={`px-[15px] py-[5px] rounded-[4px] w-[100px] h-[28px] ${
+                          collection.invoice_status === "pending"
+                            ? "bg-[#FFF3E0] text-[#F57C00]"
+                            : collection.invoice_status === "paid"
                             ? "bg-[#28C76F29] text-[#28C76F]"
                             : "bg-[#FFE1E1] text-[#C72828]"
                         }`}
                       >
-                        {collection.status.toUpperCase()}
-                      </span>
-                    </td>
-                    <td className="px-5 text-left collection-data">
-                      <span
-                        className={`px-[10px] py-[5px] rounded-[4px] w-[100px] h-[28px] ${
-                          ['unpaid', 'partially_paid'].includes(collection.invoice_status)
-                            ? "bg-[#FFE1E1] text-[#C72828]"
-                            : "bg-[#28C76F29] text-[#28C76F]"
-                        }`}
-                      >
-                        {collection.invoice_status.toUpperCase()}
+                        {collection.invoice_status === "pending"
+                          ? "Pending"
+                          : collection.invoice_status === "paid"
+                          ? "Paid"
+                          : "Partially Paid"}
                       </span>
                     </td>
                     <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
@@ -403,7 +468,6 @@ const Collection = () => {
                           className="w-[18px] h-[18px] action-btn duration-200"
                         />
                       </button>
-  
                     </td>
                   </tr>
                 ))}
@@ -414,42 +478,50 @@ const Collection = () => {
             <table className="w-full border-collapse">
               <thead>
                 <tr className="collection-table-row-head">
-                  <th className="px-5 text-left collection-thead collection-id-column">ID</th>
-                  <th className="px-5 text-left collection-thead collection-date-column">TENANT NAME</th>
+                  <th className="px-5 text-left collection-thead collection-id-column">
+                    ID
+                  </th>
+                  <th className="px-5 text-left collection-thead collection-date-column">
+                    TENANT NAME
+                  </th>
                   <th className="px-5 text-right collection-thead"></th>
                 </tr>
               </thead>
               <tbody>
-                {collections.map((collection, index) => (
-                  <React.Fragment key={index}>
+                {collections.map((collection) => (
+                  <React.Fragment key={collection.id}>
                     <tr
                       className={`${
-                        expandedRows[collection.id + index]
+                        expandedRows[collection.id]
                           ? "collection-mobile-no-border"
                           : "collection-mobile-with-border"
                       } border-b border-[#E9E9E9] h-[57px]`}
                     >
-                      <td className="px-5 text-left collection-data collection-id-column">{collection.id}</td>
-                      <td className="px-5 text-left collection-data collection-date-column">{collection.tenant_name}</td>
+                      <td className="px-5 text-left collection-data collection-id-column">
+                        {collection.id}
+                      </td>
+                      <td className="px-5 text-left collection-data collection-date-column">
+                        {collection.tenant_name}
+                      </td>
                       <td className="py-4 flex items-center justify-end h-[57px]">
                         <div
                           className={`collection-dropdown-field ${
-                            expandedRows[collection.id + index] ? "active" : ""
+                            expandedRows[collection.id] ? "active" : ""
                           }`}
-                          onClick={() => toggleRowExpand(collection.id + index)}
+                          onClick={() => toggleRowExpand(collection.id)}
                         >
                           <img
                             src={downarrow}
                             alt="drop-down-arrow"
                             className={`collection-dropdown-img ${
-                              expandedRows[collection.id + index] ? "text-white" : ""
+                              expandedRows[collection.id] ? "text-white" : ""
                             }`}
                           />
                         </div>
                       </td>
                     </tr>
                     <AnimatePresence>
-                      {expandedRows[collection.id + index] && (
+                      {expandedRows[collection.id] && (
                         <motion.tr
                           className="collection-mobile-with-border border-b border-[#E9E9E9]"
                           initial="hidden"
@@ -459,6 +531,7 @@ const Collection = () => {
                         >
                           <td colSpan={3} className="px-5">
                             <div className="collection-dropdown-content">
+                              {/* Row 1: Tenancy ID & Date */}
                               <div className="collection-dropdown-grid">
                                 <div className="collection-dropdown-item w-[50%]">
                                   <div className="collection-dropdown-label">TENANCY ID</div>
@@ -469,74 +542,53 @@ const Collection = () => {
                                   <div className="collection-dropdown-value">{collection.collection_date}</div>
                                 </div>
                               </div>
+
+                              {/* Row 2: Amount & Payment Method */}
                               <div className="collection-dropdown-grid">
                                 <div className="collection-dropdown-item w-[50%]">
                                   <div className="collection-dropdown-label">AMOUNT</div>
                                   <div className="collection-dropdown-value">{collection.amount}</div>
                                 </div>
-                              </div>
-                              <div className="collection-dropdown-grid">
                                 <div className="collection-dropdown-item w-[50%]">
                                   <div className="collection-dropdown-label">PAYMENT METHOD</div>
                                   <div className="collection-dropdown-value">
-                                    {collection.collection_mode.replace('_', ' ').toUpperCase()}
-                                  </div>
-                                </div>
-                                <div className="collection-dropdown-item w-[50%]">
-                                  <div className="collection-dropdown-label">STATUS</div>
-                                  <div className="collection-dropdown-value">
-                                    <span
-                                      className={`px-[10px] py-[5px] rounded-[4px] w-[69px] h-[28px] ${
-                                        collection.status === "completed"
-                                          ? "bg-[#28C76F29] text-[#28C76F]"
-                                          : "bg-[#FFE1E1] text-[#C72828]"
-                                      }`}
-                                    >
-                                      {collection.status.toUpperCase()}
-                                    </span>
+                                    {collection.collection_mode
+                                      .replace(/_/g, " ")
+                                      .replace(/\b\w/g, (char) => char.toUpperCase())}
                                   </div>
                                 </div>
                               </div>
+
+                              {/* Row 3: Invoice Status & Action */}
                               <div className="collection-dropdown-grid">
                                 <div className="collection-dropdown-item w-[50%]">
                                   <div className="collection-dropdown-label">INVOICE STATUS</div>
                                   <div className="collection-dropdown-value">
                                     <span
-                                      className={`px-[10px] py-[5px] rounded-[4px] w-[100px] h-[28px] ${
-                                        ['unpaid', 'partially_paid'].includes(collection.invoice_status)
-                                          ? "bg-[#FFE1E1] text-[#C72828]"
-                                          : "bg-[#28C76F29] text-[#28C76F]"
+                                      className={`px-[15px] py-[5px] pt-1 rounded-[4px] h-[28px] inline-block text-center ${
+                                        collection.invoice_status === "pending"
+                                          ? "bg-[#FFF3E0] text-[#F57C00]"
+                                          : collection.invoice_status === "paid"
+                                          ? "bg-[#28C76F29] text-[#28C76F]"
+                                          : "bg-[#FFE1E1] text-[#C72828]"
                                       }`}
                                     >
-                                      {collection.invoice_status.toUpperCase()}
+                                      {collection.invoice_status === "pending"
+                                        ? "Pending"
+                                        : collection.invoice_status === "paid"
+                                        ? "Paid"
+                                        : "Partially Paid"}
                                     </span>
                                   </div>
                                 </div>
-                              </div>
-                              <div className="collection-dropdown-grid">
-                                <div className="collection-dropdown-item w-[100%]">
+                                <div className="collection-dropdown-item w-[50%]">
                                   <div className="collection-dropdown-label">ACTION</div>
-                                  <div className="collection-dropdown-value flex items-center gap-4">
+                                  <div className="collection-dropdown-value flex items-center gap-4 mt-2">
                                     <button onClick={() => handleEditClick(collection)}>
-                                      <img
-                                        src={editicon}
-                                        alt="Edit"
-                                        className="w-[18px] h-[18px] action-btn duration-200"
-                                      />
+                                      <img src={editicon} alt="Edit" className="w-[18px] h-[18px] action-btn duration-200" />
                                     </button>
                                     <button>
-                                      <img
-                                        src={downloadactionicon}
-                                        alt="Download"
-                                        className="w-[18px] h-[18px] action-btn duration-200"
-                                      />
-                                    </button>
-                                    <button>
-                                      <img
-                                        src={printericon}
-                                        alt="Printer"
-                                        className="w-[18px] h-[18px] action-btn duration-200"
-                                      />
+                                      <img src={downloadactionicon} alt="Download" className="w-[18px] h-[18px] action-btn duration-200" />
                                     </button>
                                   </div>
                                 </div>
@@ -553,9 +605,13 @@ const Collection = () => {
           </div>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 px-5 collection-pagination-container">
             <span className="collection-list-pagination collection-pagination-text">
-              Showing {collections.length > 0 ? (currentPage - 1) * 10 + 1 : 0} to{" "}
-              {Math.min(currentPage * 10, collections.length + (currentPage - 1) * 10)} of{" "}
-              {totalPages * 10} entries
+              Showing {collections.length > 0 ? (currentPage - 1) * 10 + 1 : 0}{" "}
+              to{" "}
+              {Math.min(
+                currentPage * 10,
+                collections.length + (currentPage - 1) * 10
+              )}{" "}
+              of {totalPages * 10} entries
             </span>
             <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto collection-pagination-buttons">
               <button
@@ -573,7 +629,9 @@ const Collection = () => {
                   1
                 </button>
               )}
-              {startPage > 2 && <span className="px-2 flex items-center">...</span>}
+              {startPage > 2 && (
+                <span className="px-2 flex items-center">...</span>
+              )}
               {[...Array(endPage - startPage + 1)].map((_, i) => (
                 <button
                   key={startPage + i}
