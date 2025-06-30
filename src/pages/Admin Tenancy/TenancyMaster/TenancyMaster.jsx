@@ -66,42 +66,71 @@ const TenancyMaster = () => {
 
   const itemsPerPage = 10;
 
-  const getUnique = (key) => [...new Set(tenancies.map((item) => item[key]))];
+  const getUnique = (key, valueKey, labelKey) => {
+    const items = tenancies.map((item, index) => ({
+      value: item[key]
+        ? typeof item[key] === "object"
+          ? item[key][valueKey] || "N/A"
+          : item[key]
+        : "N/A",
+      label: item[key]
+        ? typeof item[key] === "object"
+          ? item[key][labelKey] || "N/A"
+          : item[key]
+        : "N/A",
+      key: `${item[key]?.[valueKey] || item[key] || "N/A"}-${item.id || index}`,
+    }));
+    return [...new Map(items.map((item) => [item.value, item])).values()];
+  };
 
-  const uniqueIds = getUnique("tenancy_code");
-  const uniqueTenants = getUnique("tenant")?.map(
-    (t) => t?.tenant_name || "N/A"
+  const uniqueIds = getUnique("tenancy_code", "tenancy_code", "tenancy_code");
+  const uniqueTenants = getUnique("tenant", "tenant_name", "tenant_name");
+  const uniqueBuildings = getUnique(
+    "building",
+    "building_name",
+    "building_name"
   );
-  const uniqueBuildings = getUnique("building")?.map(
-    (b) => b?.building_name || "N/A"
-  );
-  const uniqueUnits = getUnique("unit")?.map((u) => u?.unit_name || "N/A");
-  const uniqueStatuses = getUnique("status");
+  const uniqueUnits = getUnique("unit", "unit_name", "unit_name");
+  const uniqueStatuses = getUnique("status", "status", "status");
 
   const idOptions = [
-    { value: "", label: "All Tenancy" },
-    ...uniqueIds.map((id) => ({ value: id, label: id })),
+    { value: "", label: "All Tenancy", key: "all-tenancy" },
+    ...uniqueIds.map((item) => ({
+      value: item.value,
+      label: item.label,
+      key: item.key,
+    })),
   ];
   const tenantOptions = [
-    { value: "", label: "All Tenants" },
-    ...uniqueTenants.map((tenant) => ({ value: tenant, label: tenant })),
+    { value: "", label: "All Tenants", key: "all-tenants" },
+    ...uniqueTenants.map((item) => ({
+      value: item.value,
+      label: item.label,
+      key: item.key,
+    })),
   ];
   const buildingOptions = [
-    { value: "", label: "All Buildings" },
-    ...uniqueBuildings.map((building) => ({
-      value: building,
-      label: building,
+    { value: "", label: "All Buildings", key: "all-buildings" },
+    ...uniqueBuildings.map((item) => ({
+      value: item.value,
+      label: item.label,
+      key: item.key,
     })),
   ];
   const unitOptions = [
-    { value: "", label: "All Units" },
-    ...uniqueUnits.map((unit) => ({ value: unit, label: unit })),
+    { value: "", label: "All Units", key: "all-units" },
+    ...uniqueUnits.map((item) => ({
+      value: item.value,
+      label: item.label,
+      key: item.key,
+    })),
   ];
   const statusOptions = [
-    { value: "", label: "All Statuses" },
-    ...uniqueStatuses.map((status) => ({
-      value: status,
-      label: status.charAt(0).toUpperCase() + status.slice(1),
+    { value: "", label: "All Statuses", key: "all-statuses" },
+    ...uniqueStatuses.map((item) => ({
+      value: item.value,
+      label: item.value.charAt(0).toUpperCase() + item.value.slice(1),
+      key: item.key,
     })),
   ];
 
@@ -420,7 +449,9 @@ const TenancyMaster = () => {
                     Date Range
                     <ChevronDown
                       className={`ml-2 transition-transform duration-300 ${
-                        openSelectKey === "date_range" ? "rotate-180" : "rotate-0"
+                        openSelectKey === "date_range"
+                          ? "rotate-180"
+                          : "rotate-0"
                       }`}
                     />
                   </div>
@@ -505,7 +536,7 @@ const TenancyMaster = () => {
           <tbody>
             {tenancies.map((tenancy) => (
               <tr
-                key={tenancy.tenancy_code}
+                key={tenancy.id}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
                 <td className="px-5 text-left tenancy-data">
@@ -595,193 +626,193 @@ const TenancyMaster = () => {
         </table>
       </div>
       <div className="block md:hidden">
-  <table className="w-full border-collapse">
-    <thead>
-      <tr className="tenancy-table-row-head">
-        <th className="px-5 w-[50%] text-left tenancy-thead tenancy-id-column">
-          ID
-        </th>
-        <th className="px-3 w-[50%] text-left tenancy-thead tenancy-tenant-column">
-          TENANT NAME
-        </th>
-        <th className="px-5 text-right tenancy-thead"></th>
-      </tr>
-    </thead>
-    <tbody>
-      {tenancies.map((tenancy) => (
-        <React.Fragment key={tenancy.id}>
-          <tr
-            className={`${
-              expandedRows[tenancy.id]
-                ? "tenancy-mobile-no-border"
-                : "tenancy-mobile-with-border"
-            } border-b border-[#E9E9E9] h-[57px]`}
-          >
-            <td className="px-5 text-left tenancy-data tenancy-id-column">
-              {tenancy.tenancy_code}
-            </td>
-            <td className="px-3 text-left tenancy-data tenancy-tenant-column">
-              {tenancy.tenant?.tenant_name || "N/A"}
-            </td>
-            <td className="py-4 flex items-center justify-end h-[57px]">
-              <div
-                className={`tenancy-dropdown-field ${
-                  expandedRows[tenancy.id] ? "active" : ""
-                }`}
-                onClick={() => toggleRowExpand(tenancy.id)}
-              >
-                <img
-                  src={downarrow}
-                  alt="drop-down-arrow"
-                  className={`tenancy-dropdown-img ${
-                    expandedRows[tenancy.id] ? "text-white" : ""
-                  }`}
-                />
-              </div>
-            </td>
-          </tr>
-          <AnimatePresence>
-            {expandedRows[tenancy.id] && (
-              <motion.tr
-                className="tenancy-mobile-with-border border-b border-[#E9E9E9]"
-                initial="hidden"
-                animate="visible"
-                exit="hidden"
-                variants={dropdownVariants}
-              >
-                <td colSpan={3} className="px-5">
-                  <div className="tenancy-dropdown-content">
-                    <div className="tenancy-grid">
-                      <div className="tenancy-grid-item">
-                        <div className="tenancy-dropdown-label">
-                          BUILDING NAME
-                        </div>
-                        <div className="tenancy-dropdown-value">
-                          {tenancy.building?.building_name || "N/A"}
-                        </div>
-                      </div>
-                      <div className="tenancy-grid-item">
-                        <div className="tenancy-dropdown-label">
-                          UNIT NAME
-                        </div>
-                        <div className="tenancy-dropdown-value">
-                          {tenancy.unit?.unit_name || "N/A"}
-                        </div>
-                      </div>
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="tenancy-table-row-head">
+              <th className="px-5 w-[50%] text-left tenancy-thead tenancy-id-column">
+                ID
+              </th>
+              <th className="px-3 w-[50%] text-left tenancy-thead tenancy-tenant-column">
+                TENANT NAME
+              </th>
+              <th className="px-5 text-right tenancy-thead"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {tenancies.map((tenancy) => (
+              <React.Fragment key={tenancy.id}>
+                <tr
+                  className={`${
+                    expandedRows[tenancy.id]
+                      ? "tenancy-mobile-no-border"
+                      : "tenancy-mobile-with-border"
+                  } border-b border-[#E9E9E9] h-[57px]`}
+                >
+                  <td className="px-5 text-left tenancy-data tenancy-id-column">
+                    {tenancy.tenancy_code}
+                  </td>
+                  <td className="px-3 text-left tenancy-data tenancy-tenant-column">
+                    {tenancy.tenant?.tenant_name || "N/A"}
+                  </td>
+                  <td className="py-4 flex items-center justify-end h-[57px]">
+                    <div
+                      className={`tenancy-dropdown-field ${
+                        expandedRows[tenancy.id] ? "active" : ""
+                      }`}
+                      onClick={() => toggleRowExpand(tenancy.id)}
+                    >
+                      <img
+                        src={downarrow}
+                        alt="drop-down-arrow"
+                        className={`tenancy-dropdown-img ${
+                          expandedRows[tenancy.id] ? "text-white" : ""
+                        }`}
+                      />
                     </div>
-                    <div className="tenancy-grid">
-                      <div className="tenancy-grid-item">
-                        <div className="tenancy-dropdown-label">
-                          RENTAL MONTHS
+                  </td>
+                </tr>
+                <AnimatePresence>
+                  {expandedRows[tenancy.id] && (
+                    <motion.tr
+                      className="tenancy-mobile-with-border border-b border-[#E9E9E9]"
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={dropdownVariants}
+                    >
+                      <td colSpan={3} className="px-5">
+                        <div className="tenancy-dropdown-content">
+                          <div className="tenancy-grid">
+                            <div className="tenancy-grid-item">
+                              <div className="tenancy-dropdown-label">
+                                BUILDING NAME
+                              </div>
+                              <div className="tenancy-dropdown-value">
+                                {tenancy.building?.building_name || "N/A"}
+                              </div>
+                            </div>
+                            <div className="tenancy-grid-item">
+                              <div className="tenancy-dropdown-label">
+                                UNIT NAME
+                              </div>
+                              <div className="tenancy-dropdown-value">
+                                {tenancy.unit?.unit_name || "N/A"}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="tenancy-grid">
+                            <div className="tenancy-grid-item">
+                              <div className="tenancy-dropdown-label">
+                                RENTAL MONTHS
+                              </div>
+                              <div className="tenancy-dropdown-value">
+                                {tenancy.rental_months}
+                              </div>
+                            </div>
+                            <div className="tenancy-grid-item">
+                              <div className="tenancy-dropdown-label">
+                                STATUS
+                              </div>
+                              <div className="tenancy-dropdown-value">
+                                <span
+                                  className={`px-[10px] py-[5px] rounded-[4px] w-[69px] tenancy-status ${
+                                    tenancy.status === "active"
+                                      ? "bg-[#DDF6E8] text-[#28C76F]"
+                                      : tenancy.status === "pending"
+                                      ? "bg-[#FFF7E9] text-[#FBAD27]"
+                                      : tenancy.status === "terminated"
+                                      ? "bg-[#FFE6E6] text-[#D32F2F]"
+                                      : tenancy.status === "closed"
+                                      ? "bg-[#E0E0E0] text-[#616161]"
+                                      : tenancy.status === "invoice"
+                                      ? "bg-[#E8EFF6] text-[#1458A2]"
+                                      : "bg-[#E0F7E0] text-[#388E3C]"
+                                  }`}
+                                >
+                                  {tenancy.status.charAt(0).toUpperCase() +
+                                    tenancy.status.slice(1)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="tenancy-grid">
+                            <div className="tenancy-grid-item">
+                              <div className="tenancy-dropdown-label">VIEW</div>
+                              <div className="tenancy-dropdown-value">
+                                <button
+                                  onClick={() => handleViewClick(tenancy)}
+                                >
+                                  <img
+                                    src={viewicon}
+                                    alt="View"
+                                    className="w-[30px] h-[24px] tenancy-action-btn duration-200"
+                                  />
+                                </button>
+                              </div>
+                            </div>
+                            <div className="tenancy-grid-item tenancy-action-column">
+                              <div className="tenancy-dropdown-label">
+                                ACTION
+                              </div>
+                              <div className="tenancy-dropdown-value tenancy-flex tenancy-items-center tenancy-gap-2">
+                                {tenancy.status === "active" ? (
+                                  <>
+                                    <button
+                                      onClick={() =>
+                                        handlePaymentScheduleClick(tenancy)
+                                      }
+                                    >
+                                      <Edit size={20} color="#1458A2" />
+                                    </button>
+                                    <button
+                                      onClick={() =>
+                                        handleInvoiceConfigClick(tenancy)
+                                      }
+                                    >
+                                      <img
+                                        src={configicon}
+                                        alt="Config"
+                                        className="ml-2 tenancy-action-btn duration-200"
+                                      />
+                                    </button>
+                                  </>
+                                ) : (
+                                  <>
+                                    <button
+                                      onClick={() => handleEditClick(tenancy)}
+                                    >
+                                      <img
+                                        src={editicon}
+                                        alt="Edit"
+                                        className="w-[18px] h-[18px] tenancy-action-btn duration-200"
+                                      />
+                                    </button>
+                                    <button
+                                      onClick={() =>
+                                        handleDeleteClick(tenancy.id)
+                                      }
+                                    >
+                                      <img
+                                        src={deleteicon}
+                                        alt="Delete"
+                                        className="w-[18px] h-[18px] tenancy-action-btn duration-200"
+                                      />
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <div className="tenancy-dropdown-value">
-                          {tenancy.rental_months}
-                        </div>
-                      </div>
-                      <div className="tenancy-grid-item">
-                        <div className="tenancy-dropdown-label">
-                          STATUS
-                        </div>
-                        <div className="tenancy-dropdown-value">
-                          <span
-                            className={`px-[10px] py-[5px] rounded-[4px] w-[69px] tenancy-status ${
-                              tenancy.status === "active"
-                                ? "bg-[#DDF6E8] text-[#28C76F]"
-                                : tenancy.status === "pending"
-                                ? "bg-[#FFF7E9] text-[#FBAD27]"
-                                : tenancy.status === "terminated"
-                                ? "bg-[#FFE6E6] text-[#D32F2F]"
-                                : tenancy.status === "closed"
-                                ? "bg-[#E0E0E0] text-[#616161]"
-                                : tenancy.status === "invoice"
-                                ? "bg-[#E8EFF6] text-[#1458A2]"
-                                : "bg-[#E0F7E0] text-[#388E3C]"
-                            }`}
-                          >
-                            {tenancy.status.charAt(0).toUpperCase() +
-                              tenancy.status.slice(1)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="tenancy-grid">
-                      <div className="tenancy-grid-item">
-                        <div className="tenancy-dropdown-label">VIEW</div>
-                        <div className="tenancy-dropdown-value">
-                          <button
-                            onClick={() => handleViewClick(tenancy)}
-                          >
-                            <img
-                              src={viewicon}
-                              alt="View"
-                              className="w-[30px] h-[24px] tenancy-action-btn duration-200"
-                            />
-                          </button>
-                        </div>
-                      </div>
-                      <div className="tenancy-grid-item tenancy-action-column">
-                        <div className="tenancy-dropdown-label">
-                          ACTION
-                        </div>
-                        <div className="tenancy-dropdown-value tenancy-flex tenancy-items-center tenancy-gap-2">
-                          {tenancy.status === "active" ? (
-                            <>
-                              <button
-                                onClick={() =>
-                                  handlePaymentScheduleClick(tenancy)
-                                }
-                              >
-                                <Edit size={20} color="#1458A2" />
-                              </button>
-                              <button
-                                onClick={() =>
-                                  handleInvoiceConfigClick(tenancy)
-                                }
-                              >
-                                <img
-                                  src={configicon}
-                                  alt="Config"
-                                  className="ml-2 tenancy-action-btn duration-200"
-                                />
-                              </button>
-                            </>
-                          ) : (
-                            <>
-                              <button
-                                onClick={() => handleEditClick(tenancy)}
-                              >
-                                <img
-                                  src={editicon}
-                                  alt="Edit"
-                                  className="w-[18px] h-[18px] tenancy-action-btn duration-200"
-                                />
-                              </button>
-                              <button
-                                onClick={() =>
-                                  handleDeleteClick(tenancy.id)
-                                }
-                              >
-                                <img
-                                  src={deleteicon}
-                                  alt="Delete"
-                                  className="w-[18px] h-[18px] tenancy-action-btn duration-200"
-                                />
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-              </motion.tr>
-            )}
-          </AnimatePresence>
-        </React.Fragment>
-      ))}
-    </tbody>
-  </table>
-</div>
+                      </td>
+                    </motion.tr>
+                  )}
+                </AnimatePresence>
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 tenancy-pagination-container">
         <span className="tenancy-pagination collection-list-pagination">
           Showing{" "}
