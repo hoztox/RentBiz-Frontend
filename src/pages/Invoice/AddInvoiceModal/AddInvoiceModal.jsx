@@ -168,75 +168,63 @@ const AddInvoiceModal = () => {
   };
 
   const initializeSelectedItems = (tenancy) => {
-    try {
-      const paymentSchedules = [];
-      const additionalCharges = [];
+  try {
+    const paymentSchedules = [];
+    const additionalCharges = [];
 
-      if (
-        tenancy?.payment_schedules &&
-        Array.isArray(tenancy.payment_schedules)
-      ) {
-        tenancy.payment_schedules.forEach((schedule) => {
-          if (
-            schedule.status === "pending" ||
-            schedule.status === "partially_paid"
-          ) {
-            paymentSchedules.push({
-              id: schedule.id,
-              charge_type: schedule.charge_type?.name || "Unknown",
-              description:
-                schedule.reason ||
-                `Payment - Due ${schedule.due_date || "No Due Date"}`,
-              due_date: schedule.due_date || "",
-              amount: schedule.amount
-                ? parseFloat(schedule.amount).toFixed(2)
-                : "0.00",
-              tax: schedule.tax ? parseFloat(schedule.tax).toFixed(2) : "0.00",
-              total: schedule.balance
-                ? parseFloat(schedule.balance).toFixed(2)
-                : "0.00",
-              amount_paid: schedule.amount_paid
-                ? parseFloat(schedule.amount_paid).toFixed(2)
-                : "0.00",
-              status: schedule.status,
-              selected: schedule.status === "partially_paid",
-            });
-          }
-        });
-      }
+    if (tenancy?.payment_schedules && Array.isArray(tenancy.payment_schedules)) {
+      tenancy.payment_schedules.forEach((schedule) => {
+        if (schedule.status === "pending" || schedule.status === "partially_paid") {
+          paymentSchedules.push({
+            id: schedule.id,
+            charge_type: schedule.charge_type?.name || schedule.charge_type || "Unknown",
+            description:
+              schedule.reason ||
+              `Payment - Due ${schedule.due_date || "No Due Date"}`,
+            due_date: schedule.due_date || "",
+            amount: schedule.amount
+              ? parseFloat(schedule.amount).toFixed(2)
+              : "0.00",
+            tax: schedule.tax ? parseFloat(schedule.tax).toFixed(2) : "0.00",
+            total: schedule.balance
+              ? parseFloat(schedule.balance).toFixed(2)
+              : "0.00",
+            amount_paid: schedule.amount_paid
+              ? parseFloat(schedule.amount_paid).toFixed(2)
+              : "0.00",
+            status: schedule.status,
+            selected: schedule.status === "partially_paid",
+          });
+        }
+      });
+    }
 
-      if (
-        tenancy?.additional_charges &&
-        Array.isArray(tenancy.additional_charges)
-      ) {
-        tenancy.additional_charges.forEach((charge) => {
-          if (
-            charge.status === "pending" ||
-            charge.status === "partially_paid"
-          ) {
-            additionalCharges.push({
-              id: charge.id,
-              charge_type: charge.charge_type?.name || "Unknown",
-              description:
-                charge.reason ||
-                `Additional Charge - Due ${charge.due_date || "No Due Date"}`,
-              due_date: charge.due_date || "",
-              amount: charge.amount
-                ? parseFloat(charge.amount).toFixed(2)
-                : "0.00",
-              tax: charge.tax ? parseFloat(charge.tax).toFixed(2) : "0.00",
-              total: charge.balance
-                ? parseFloat(charge.balance).toFixed(2)
-                : "0.00",
-              amount_paid: charge.amount_paid
-                ? parseFloat(charge.amount_paid).toFixed(2)
-                : "0.00",
-              status: charge.status,
-              selected: charge.status === "partially_paid",
-            });
-          }
-        });
-      }
+    if (tenancy?.additional_charges && Array.isArray(tenancy.additional_charges)) {
+      tenancy.additional_charges.forEach((charge) => {
+        if (charge.status === "pending" || charge.status === "partially_paid") {
+          additionalCharges.push({
+            id: charge.id,
+            charge_type: charge.charge_type?.name || charge.charge_type || "Unknown",
+            description:
+              charge.reason ||
+              `Additional Charge - Due ${charge.due_date || "No Due Date"}`,
+            due_date: charge.due_date || "",
+            amount: charge.amount
+              ? parseFloat(charge.amount).toFixed(2)
+              : "0.00",
+            tax: charge.tax ? parseFloat(charge.tax).toFixed(2) : "0.00",
+            total: charge.balance
+              ? parseFloat(charge.balance).toFixed(2)
+              : "0.00",
+            amount_paid: charge.amount_paid
+              ? parseFloat(charge.amount_paid).toFixed(2)
+              : "0.00",
+            status: charge.status,
+            selected: charge.status === "partially_paid",
+          });
+        }
+      });
+    }
 
       const sortedPaymentSchedules = paymentSchedules.sort((a, b) => {
         if (a.status === "partially_paid" && b.status !== "partially_paid")
@@ -409,36 +397,38 @@ const AddInvoiceModal = () => {
       }
 
       const selectedItems = [
-        ...selectedPaymentSchedules
-          .filter((item) => item.selected)
-          .map((item) => ({
-            charge_type: item.charge_type,
-            description:
-              item.description || `Payment - Due ${item.due_date || "N/A"}`, // Fallback description
-            due_date: item.due_date,
-            amount: parseFloat(item.amount) || 0,
-            tax: parseFloat(item.tax) || 0,
-            total: parseFloat(item.total) || 0,
-            amount_paid: parseFloat(item.amount_paid) || 0,
-            type: "payment_schedule",
-            schedule_id: item.id,
-          })),
-        ...selectedAdditionalCharges
-          .filter((item) => item.selected)
-          .map((item) => ({
-            charge_type: item.charge_type,
-            description:
-              item.description ||
-              `Additional Charge - Due ${item.due_date || "N/A"}`, // Fallback description
-            due_date: item.due_date,
-            amount: parseFloat(item.amount) || 0,
-            tax: parseFloat(item.tax) || 0,
-            total: parseFloat(item.total) || 0,
-            amount_paid: parseFloat(item.amount_paid) || 0,
-            type: "additional_charge",
-            charge_id: item.id,
-          })),
-      ];
+  ...selectedPaymentSchedules
+    .filter((item) => item.selected)
+    .map((item) => ({
+      charge_type: item.charge_type,
+      description:
+        item.description || `Payment - Due ${item.due_date || "N/A"}`,
+      due_date: item.due_date,
+      amount: parseFloat(item.amount) || 0,
+      tax: parseFloat(item.tax) || 0,
+      total: parseFloat(item.total) || 0,
+      amount_paid: parseFloat(item.amount_paid) || 0,
+      type: "payment_schedule",
+      schedule_id: item.id,
+    })),
+  ...selectedAdditionalCharges
+    .filter((item) => item.selected)
+    .map((item) => ({
+      charge_type: item.charge_type,
+      description:
+        item.description ||
+        `Additional Charge - Due ${item.due_date || "N/A"}`,
+      due_date: item.due_date,
+      amount: parseFloat(item.amount) || 0,
+      tax: parseFloat(item.tax) || 0,
+      total: parseFloat(item.total) || 0,
+      amount_paid: parseFloat(item.amount_paid) || 0,
+      type: "additional_charge",
+      charge_id: item.id,
+    })),
+];
+
+console.log("Selected Items:", selectedItems); 
 
       if (selectedItems.length === 0) {
         toast.error("Please select at least one item to invoice.");
