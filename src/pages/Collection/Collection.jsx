@@ -443,7 +443,7 @@ const Collection = () => {
                             ? "bg-[#FFF3E0] text-[#F57C00]"
                             : collection.invoice_status === "paid"
                             ? "bg-[#28C76F29] text-[#28C76F]"
-                            : "bg-[#FFE1E1] text-[#C72828]"
+                            : "bg-[#E8EFF6] text-[#1458A2]"
                         }`}
                       >
                         {collection.invoice_status === "pending"
