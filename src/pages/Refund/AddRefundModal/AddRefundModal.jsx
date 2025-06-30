@@ -4,7 +4,7 @@ import { ChevronDown, X } from "lucide-react";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 import axios from "axios";
-import toast, { Toaster } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
 
 const AddRefundModal = () => {
   const { modalState, closeModal } = useModal();
@@ -36,6 +36,8 @@ const AddRefundModal = () => {
   const [units, setUnits] = useState([]);
   const [tenancies, setTenancies] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const [isSelectOpenCompany, setIsSelectOpenCompany] = useState(false);
   const [isSelectOpenBuilding, setIsSelectOpenBuilding] = useState(false);
   const [isSelectOpenUnit, setIsSelectOpenUnit] = useState(false);
@@ -62,6 +64,8 @@ const AddRefundModal = () => {
   const fetchCompanies = async () => {
     try {
       setLoading(true);
+      setError("");
+      setError("");
       const role = localStorage.getItem("role")?.toLowerCase();
       if (role === "company") {
         const companyId = getUserCompanyId();
@@ -75,11 +79,13 @@ const AddRefundModal = () => {
           setCompanies(response.data);
         } else {
           setCompanies([]);
+          setError("No companies found");
           toast.error("No companies found");
         }
       }
     } catch (err) {
       console.error("Error fetching companies:", err);
+      setError("Failed to fetch companies");
       toast.error("Failed to fetch companies");
     } finally {
       setLoading(false);
@@ -90,10 +96,13 @@ const AddRefundModal = () => {
     try {
       const companyId = form.selectCompany || getUserCompanyId();
       if (!companyId) {
+        setError("No company selected");
         toast.error("No company selected");
         return;
       }
       setLoading(true);
+      setError("");
+      setError("");
       const response = await axios.get(
         `${BASE_URL}/company/buildings/occupied/${companyId}/`
       );
@@ -102,10 +111,12 @@ const AddRefundModal = () => {
         setBuildings(sortedBuildings);
       } else {
         setBuildings([]);
+        setError("No buildings found");
         toast.error("No buildings found");
       }
     } catch (err) {
       console.error("Error fetching buildings:", err);
+      setError("Failed to fetch buildings");
       toast.error("Failed to fetch buildings");
       setBuildings([]);
     } finally {
@@ -117,10 +128,13 @@ const AddRefundModal = () => {
     try {
       const companyId = form.selectCompany || getUserCompanyId();
       if (!companyId || !buildingId) {
+        setError("Company or Building not selected");
         toast.error("Company or Building not selected");
         return;
       }
       setLoading(true);
+      setError("");
+      setError("");
       const response = await axios.get(
         `${BASE_URL}/company/units/${buildingId}/occupied-units/`
       );
@@ -129,10 +143,12 @@ const AddRefundModal = () => {
         setUnits(sortedUnits);
       } else {
         setUnits([]);
+        setError("No units found");
         toast.error("No units found");
       }
     } catch (err) {
       console.error("Error fetching units:", err);
+      setError("Failed to fetch units");
       toast.error("Failed to fetch units");
       setUnits([]);
     } finally {
@@ -144,10 +160,13 @@ const AddRefundModal = () => {
     try {
       const companyId = form.selectCompany || getUserCompanyId();
       if (!companyId || !unitId) {
+        setError("Company or Unit not selected");
         toast.error("Company or Unit not selected");
         return;
       }
       setLoading(true);
+      setError("");
+      setError("");
       const response = await axios.get(
         `${BASE_URL}/company/tenancies/company/${companyId}/${unitId}/`
       );
@@ -158,10 +177,12 @@ const AddRefundModal = () => {
         setTenancies(sortedTenancies);
       } else {
         setTenancies([]);
+        setError("No tenancies found");
         toast.error("No tenancies found");
       }
     } catch (err) {
       console.error("Error fetching tenancies:", err);
+      setError("Failed to fetch tenancies");
       toast.error("Failed to fetch tenancies");
       setTenancies([]);
     } finally {
@@ -172,6 +193,8 @@ const AddRefundModal = () => {
   const fetchExcessDeposits = async (tenancyId) => {
     try {
       setLoading(true);
+      setError("");
+      setError("");
       const response = await axios.get(
         `${BASE_URL}/finance/${tenancyId}/excess-deposits/`
       );
@@ -192,10 +215,12 @@ const AddRefundModal = () => {
           alreadyRefunded: 0,
           refundItems: [],
         });
+        setError("No refundable items found for this tenancy");
         toast.error("No refundable items found for this tenancy");
       }
     } catch (err) {
       console.error("Error fetching refundable items:", err);
+      setError("Failed to load refundable items");
       toast.error("Failed to load refundable items");
     } finally {
       setLoading(false);
@@ -298,6 +323,8 @@ const AddRefundModal = () => {
         alreadyRefunded: 0,
         refundItems: [],
       });
+      setError("");
+      setError("");
       setBuildings([]);
       setUnits([]);
       setTenancies([]);
@@ -352,17 +379,24 @@ const AddRefundModal = () => {
     }
 
     if (!requiredFields.every((field) => field)) {
+      setError("Please fill all required fields.");
       toast.error("Please fill all required fields.");
       return;
     }
 
     if (!/^\d{4}-\d{2}-\d{2}$/.test(paymentDate)) {
+      setError(
+        "Invalid payment date format. Please select a valid date (YYYY-MM-DD)."
+      );
       toast.error(
         "Invalid payment date format. Please select a valid date (YYYY-MM-DD)."
       );
       return;
     }
     if (paymentMethod === "cheque" && !/^\d{4}-\d{2}-\d{2}$/.test(chequeDate)) {
+      setError(
+        "Invalid cheque date format. Please select a valid date (YYYY-MM-DD)."
+      );
       toast.error(
         "Invalid cheque date format. Please select a valid date (YYYY-MM-DD)."
       );
@@ -373,13 +407,15 @@ const AddRefundModal = () => {
       parseFloat(amountToRefund) <= 0 ||
       parseFloat(amountToRefund) > totalRefundable - alreadyRefunded
     ) {
+      setError("Please enter a valid refund amount");
       toast.error("Please enter a valid refund amount");
       return;
     }
 
     try {
       setLoading(true);
-      const loadingToast = toast.loading("Processing refund...");
+      setError("");
+      setError("");
       const payload = {
         tenancy_id: parseInt(selectTenancy),
         amount_refunded: parseFloat(amountToRefund),
@@ -405,13 +441,13 @@ const AddRefundModal = () => {
         `${BASE_URL}/finance/create/refund/`,
         payload
       );
-      toast.dismiss(loadingToast);
-      toast.success("Refund created successfully!");
       console.log("Refund created:", response.data);
+      toast.success("Refund created successfully!");
+      toast.success("Refund created successfully!");
       closeModal();
     } catch (err) {
       console.error("Failed to create refund:", err);
-      toast.dismiss();
+      setError("Failed to create refund. Please try again.");
       toast.error("Failed to create refund. Please try again.");
     } finally {
       setLoading(false);
@@ -441,6 +477,13 @@ const AddRefundModal = () => {
               <X size={20} />
             </button>
           </div>
+
+          {/* Loading Indicator */}
+          {loading && (
+            <div className="px-6 py-2 bg-blue-100 text-blue-700 text-sm">
+              Loading...
+            </div>
+          )}
 
           {/* Scrollable Content */}
           <div className="md:p-6 md:mt-[-15px]">
@@ -613,7 +656,7 @@ const AddRefundModal = () => {
                 </div>
               </div>
 
-              {/* Summary Section */}
+              {/* Refund Summary Section */}
               <div className="add-refund-modal-table-wrapper">
                 <div className="mt-[5px]">
                   <h3 className="mb-5 -mt-3 refund-section-title">
@@ -623,13 +666,13 @@ const AddRefundModal = () => {
                     <div>
                       <p className="mb-1.5 add-refund-label">Deposit Amount</p>
                       <p className="text-[#1458A2] refund-amount-value">
-                        {refundData.depositAmount.toFixed(2)} INR
+                        ${refundData.depositAmount.toFixed(2)}
                       </p>
                     </div>
                     <div>
                       <p className="mb-1.5 add-refund-label">Excess Amount</p>
                       <p className="text-[#1458A2] refund-amount-value">
-                        {refundData.excessAmount.toFixed(2)} INR
+                        ${refundData.excessAmount.toFixed(2)}
                       </p>
                     </div>
                   </div>
@@ -648,7 +691,7 @@ const AddRefundModal = () => {
                         Total Refundable
                       </p>
                       <p className="text-[#1458A2] refund-amount-value">
-                        {refundData.totalRefundable.toFixed(2)} INR
+                        ${refundData.totalRefundable.toFixed(2)}
                       </p>
                     </div>
                     <div>
@@ -656,7 +699,7 @@ const AddRefundModal = () => {
                         Already Refunded
                       </p>
                       <p className="text-[#1458A2] refund-amount-value">
-                        {refundData.alreadyRefunded.toFixed(2)} INR
+                        ${refundData.alreadyRefunded.toFixed(2)}
                       </p>
                     </div>
                   </div>
@@ -835,7 +878,170 @@ const AddRefundModal = () => {
                   </div>
                 </>
               )}
+
+              {/* Detailed Refund Items Table */}
+              {refundData.refundItems.length > 0 && (
+                <div className="add-refund-modal-table-wrapper">
+                  <div className="mt-[10px]">
+                    <h3 className="mb-5 -mt-3 refund-section-title">
+                      Detailed Breakdown
+                    </h3>
+                    <div className="overflow-x-auto border border-[#E9E9E9] rounded-md add-refund-modal-overflow-x-auto">
+                      <div className="add-refund-modal-desktop-table">
+                        <table className="w-full border-collapse add-refund-modal-table">
+                          <thead>
+                            <tr className="border-b border-[#E9E9E9] h-[57px]">
+                              <th className="!pl-[10px] text-left refund-modal-thead uppercase w-[100px] last:border-r-0">
+                                Charge
+                              </th>
+                              <th className="text-left refund-modal-thead uppercase w-[100px]">
+                                Date
+                              </th>
+                              <th className="text-left refund-modal-thead uppercase w-[100px] ">
+                                Amount
+                              </th>
+                              <th className="text-left refund-modal-thead uppercase w-[80px]">
+                                Tax
+                              </th>
+                              <th className="text-left refund-modal-thead uppercase w-[80px]">
+                                Total
+                              </th>
+                              <th className="text-left refund-modal-thead uppercase w-[80px]">
+                                Excess
+                              </th>
+                              <th className="text-left refund-modal-thead uppercase w-[140px]">
+                                Total Refundable
+                              </th>
+                              <th className="text-left refund-modal-thead uppercase w-[150px]">
+                                Invoice Collections
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {refundData.refundItems.map((item, index) => (
+                              <tr
+                                key={`${item.type}-${item.id}`}
+                                className="border-b h-[57px] last:border-0 hover:bg-gray-100"
+                              >
+                                <td className="!pl-[10px] text-left text-[#201D1E]">
+                                  {item.charge_type}
+                                </td>
+                                <td className="text-left text-[#201D1E]">
+                                  {item.due_date}
+                                </td>
+                                <td className="text-left text-[#201D1E]">
+                                  ${Number(item.original_amount).toFixed(2)}
+                                </td>
+                                <td className="text-left text-[#201D1E]">
+                                  ${Number(item.tax).toFixed(2)}
+                                </td>
+                                <td className="text-left text-[#201D1E]">
+                                  ${Number(item.total).toFixed(2)}
+                                </td>
+                                <td className="text-left text-[#201D1E]">
+                                  ${Number(item.excess_amount).toFixed(2)}
+                                </td>
+                                <td className="text-left text-[#201D1E]">
+                                  ${Number(item.total_refundable).toFixed(2)}
+                                </td>
+                                <td className="text-left text-[#201D1E] last:border-r-0">
+                                  {Object.entries(
+                                    item.collections_per_invoice
+                                  ).map(([invoice, amount]) => (
+                                    <div key={invoice}>{`${invoice}: $${Number(
+                                      amount
+                                    ).toFixed(2)}`}</div>
+                                  ))}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div className="add-refund-modal-mobile-table">
+                        {refundData.refundItems.map((item, index) => (
+                          <div
+                            key={`${item.type}-${item.id}`}
+                            className="add-refund-modal-mobile-section"
+                          >
+                            <div className="add-refund-modal-mobile-header flex justify-start border-b border-[#E9E9E9] h-[50px]">
+                              <div className="px-[10px] flex w-[51%] items-center add-refund-modal-mobile-thead uppercase">
+                                Charge
+                              </div>
+                            </div>
+                            <div className="flex justify-between border-b border-[#E9E9E9]">
+                              <div className="px-[10px] py-[10px] w-full text-[14px] font-normal text-[#201D1E]">
+                                {item.charge_type}
+                              </div>
+                            </div>
+
+                            <div className="add-refund-modal-mobile-header flex justify-between border-b border-[#E9E9E9] h-[50px]">
+                              <div className="px-[10px] w-[20%] flex items-center add-refund-modal-mobile-thead uppercase">
+                                Date
+                              </div>
+                              <div className="px-[10px] flex items-center add-refund-modal-mobile-thead uppercase">
+                                Amount
+                              </div>
+                              <div className="px-[10px] w-[15%] flex items-center add-refund-modal-mobile-thead uppercase">
+                                Tax
+                              </div>
+                            </div>
+                            <div className="flex justify-between border-b border-[#E9E9E9]">
+                              <div className="px-[10px] py-[10px] w-full text-[14px] font-normal text-[#201D1E]">
+                                {item.due_date}
+                              </div>
+                              <div className="px-[10px] py-[10px] w-full text-[14px] font-normal text-[#201D1E]">
+                                ${Number(item.original_amount).toFixed(2)}
+                              </div>
+                              <div className="px-[10px] py-[5px] w-[20%] flex items-center text-[14px] font-normal text-[#201D1E]">
+                                ${Number(item.tax).toFixed(2)}
+                              </div>
+                            </div>
+
+                            <div className="add-refund-modal-mobile-header flex justify-between border-b border-[#E9E9E9] h-[50px]">
+                              <div className="px-[10px] w-[16%] flex items-center add-refund-modal-mobile-thead uppercase">
+                                Total
+                              </div>
+                              <div className="px-[10px] w-[22%] flex items-center add-refund-modal-mobile-thead uppercase">
+                                Excess
+                              </div>
+                              <div className="px-[10px] w-[42%] flex items-center add-refund-modal-mobile-thead uppercase">
+                                Total Refundable
+                              </div>
+                              <div className="px-[10px] w-[19%] flex items-center add-refund-modal-mobile-thead uppercase">
+                                Collections
+                              </div>
+                            </div>
+                            <div className="flex justify-between">
+                              <div className="px-[10px] py-[5px] w-[18%] flex items-center text-[14px] font-normal text-[#201D1E]">
+                                ${Number(item.total).toFixed(2)}
+                              </div>
+                              <div className="px-[10px] py-[5px] w-[20%] flex items-center text-[14px] font-normal text-[#201D1E]">
+                                ${Number(item.excess_amount).toFixed(2)}
+                              </div>
+                              <div className="px-[10px] py-[5px] w-[42%] flex items-center text-[14px] font-normal text-[#201D1E]">
+                                ${Number(item.total_refundable).toFixed(2)}
+                              </div>
+                              <div className="px-[10px] py-[5px] flex items-center text-[14px] font-normal text-[#201D1E]">
+                                {Object.entries(
+                                  item.collections_per_invoice
+                                ).map(([invoice, amount]) => (
+                                  <div key={invoice}>{`${invoice}: $${Number(
+                                    amount
+                                  ).toFixed(2)}`}</div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
+            {/* Save Button */}
             <div className="flex mt-5 items-end justify-end mb-1">
               <button
                 type="button"

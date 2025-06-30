@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./IncomeExpenseReport.css";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Filter } from "lucide-react";
 import downarrow from "../../assets/Images/IncomeExpenseReport/downarrow.svg";
+import downloadicon from "../../assets/Images/Admin Tenancy/download-icon.svg";
 import CustomDropDown from "../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
@@ -11,8 +12,9 @@ const IncomeExpenseReport = () => {
   const [openSelectKey, setOpenSelectKey] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
-    view_type: "building", // Default to building
+    view_type: "building",
     start_date: "",
     end_date: "",
   });
@@ -26,8 +28,8 @@ const IncomeExpenseReport = () => {
   const [companyName, setCompanyName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
   const dateRangeRef = useRef(null);
+
   const getUserCompanyId = () => {
     try {
       const role = localStorage.getItem("role")?.toLowerCase();
@@ -68,14 +70,17 @@ const IncomeExpenseReport = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${BASE_URL}/finance/income-expenses/${companyId}/`, {
-          params: {
-            company_id: companyId,
-            view_type: filters.view_type,
-            start_date: filters.start_date || undefined,
-            end_date: filters.end_date || undefined,
-          },
-        });
+        const response = await axios.get(
+          `${BASE_URL}/finance/income-expenses/${companyId}/`,
+          {
+            params: {
+              company_id: companyId,
+              view_type: filters.view_type,
+              start_date: filters.start_date || undefined,
+              end_date: filters.end_date || undefined,
+            },
+          }
+        );
         setData(response.data.data);
         setCompanyName(response.data.company_name);
         setError(null);
@@ -88,7 +93,7 @@ const IncomeExpenseReport = () => {
     };
 
     fetchData();
-  }, [filters.view_type, filters.start_date, filters.end_date]);
+  }, [filters.view_type, filters.start_date, filters.end_date, companyId]);
 
   const itemsPerPage = 10;
 
@@ -111,11 +116,40 @@ const IncomeExpenseReport = () => {
     setCurrentPage(1);
   };
 
+  const handleDownloadCSV = async () => {
+    try {
+      const params = {
+        company_id: companyId,
+        view_type: filters.view_type,
+        start_date: filters.start_date || undefined,
+        end_date: filters.end_date || undefined,
+      };
+
+      const response = await axios.get(
+        `${BASE_URL}/finance/income-expenses/${companyId}/export/`,
+        {
+          params,
+          responseType: "blob",
+        }
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "income_expense_report.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error downloading CSV:", error);
+      alert("Failed to download CSV. Please try again.");
+    }
+  };
+
   const filteredData = data.filter((item) => {
     const matchesSearch = Object.values(item).some(
       (val) =>
-        val &&
-        val.toString().toLowerCase().includes(searchTerm.toLowerCase())
+        val && val.toString().toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return matchesSearch;
@@ -135,11 +169,34 @@ const IncomeExpenseReport = () => {
     setOpenSelectKey(openSelectKey === "date_range" ? null : "date_range");
   };
 
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
+  };
+
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => ({
       ...prev,
       [id]: !prev[id],
     }));
+  };
+
+  const filterVariants = {
+    hidden: {
+      opacity: 0,
+      scale: 0.95,
+      transition: {
+        duration: 0.2,
+        ease: "easeOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.2,
+        ease: "easeOut",
+      },
+    },
   };
 
   const dropdownVariants = {
@@ -187,10 +244,12 @@ const IncomeExpenseReport = () => {
 
   return (
     <div className="border border-[#E9E9E9] rounded-md income-expense-table">
-      <div className="flex justify-between items-center p-5 income-expense-table-header">
-        <h1 className="income-expense-head">Income-Expense Report - {companyName}</h1>
+      <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] income-expense-table-header">
+        <h1 className="income-expense-head">
+          Income-Expense Report - {companyName}
+        </h1>
         <div className="flex flex-col md:flex-row gap-[10px] income-expense-inputs-container">
-          <div className="flex flex-col md:flex-row gap-[10px] w-full">
+          <div className="flex flex-col md:flex-row gap-[10px] w-full items-center">
             <input
               type="text"
               placeholder="Search"
@@ -198,92 +257,129 @@ const IncomeExpenseReport = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 income-expense-search"
             />
-            <div className="relative w-[45%] md:w-auto">
-              <CustomDropDown
-                options={viewTypeOptions}
-                value={tempFilters.view_type}
-                onChange={(value) =>
-                  setTempFilters((prev) => ({
-                    ...prev,
-                    view_type: value,
-                  }))
-                }
-                className="w-full md:w-[150px]"
-                dropdownClassName="px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 income-expense-selection"
-              />
-            </div>
+            <motion.button
+              className={`hidden md:flex items-center justify-center gap-2 px-4 py-2 h-[38px] rounded-md duration-200 ${
+                showFilters
+                  ? "bg-[#201D1E] text-white"
+                  : "bg-[#F0F0F0] text-[#201D1E] hover:bg-[#201D1E] hover:text-[#F0F0F0]"
+              }`}
+              onClick={toggleFilters}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Filter size={16} />
+              Filters
+            </motion.button>
           </div>
           <div className="flex gap-[10px] income-expense-action-buttons-container">
             <button
-              onClick={() => {
-                setFilters(tempFilters);
-                setCurrentPage(1);
-              }}
-              className="bg-[#201D1E] text-white w-[105px] h-[38px] rounded-md hover:bg-[#F0F0F0] hover:text-[#201D1E] duration-200 filter-btn"
+              className="flex items-center justify-center gap-2 w-[45%] md:w-[122px] h-[38px] rounded-md duration-200 income-expense-download-btn"
+              onClick={handleDownloadCSV}
             >
-              Apply
-            </button>
-            <button
-              onClick={clearFilters}
-              className="w-[105px] h-[38px] bg-[#F0F0F0] text-[#4D4E4D] rounded-md clear-btn hover:bg-[#201D1E] hover:text-white duration-200"
-            >
-              Clear
+              Download
+              <img
+                src={downloadicon}
+                alt="Download"
+                className="w-[15px] h-[15px] income-expense-download-img"
+              />
             </button>
           </div>
         </div>
       </div>
 
-      <div className="p-5 border-b border-[#E9E9E9] mt-[-20px] income-expense-desktop-only">
-        <div className="flex items-center justify-between">
-          <div className="flex gap-[10px] flex-wrap">
-            <div className="relative" ref={dateRangeRef}>
-              <div
-                className="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer flex items-center justify-between income-expense-selection"
-                onClick={toggleDateRange}
-              >
-                Date Range
-                <ChevronDown
-                  className={`absolute right-2 top-[10px] w-[20px] h-[20px] transition-transform duration-300 ${
-                    openSelectKey === "date_range" ? "rotate-180" : "rotate-0"
-                  }`}
-                />
-              </div>
-              {openSelectKey === "date_range" && (
-                <div className="absolute z-10 bg-white p-4 mt-1 border border-gray-300 rounded-md shadow-md w-[250px]">
-                  <label className="block text-sm mb-1 filter-btn">
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    value={tempFilters.start_date}
-                    onChange={(e) =>
+      <AnimatePresence>
+        {showFilters && (
+          <motion.div
+            className="p-5 border-b border-[#E9E9E9] income-expense-desktop-only income-expense-filter-container"
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            variants={filterVariants}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex gap-[10px] flex-wrap">
+                <div className="relative">
+                  <CustomDropDown
+                    options={viewTypeOptions}
+                    value={tempFilters.view_type}
+                    onChange={(value) =>
                       setTempFilters((prev) => ({
                         ...prev,
-                        start_date: e.target.value,
+                        view_type: value,
                       }))
                     }
-                    className="w-full border border-gray-300 rounded-md px-2 py-1 mb-3 outline-none"
-                  />
-                  <label className="block text-sm mb-1 filter-btn">
-                    End Date
-                  </label>
-                  <input
-                    type="date"
-                    value={tempFilters.end_date}
-                    onChange={(e) =>
-                      setTempFilters((prev) => ({
-                        ...prev,
-                        end_date: e.target.value,
-                      }))
-                    }
-                    className="w-full border border-gray-300 rounded-md px-2 py-1 outline-none"
+                    className="w-[130px]"
+                    dropdownClassName="px-[7px] py-[7px] border-[#201D1E20] focus:border-gray-300 income-expense-selection h-[38px]"
                   />
                 </div>
-              )}
+                <div className="relative" ref={dateRangeRef}>
+                  <div
+                    className="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer flex items-center justify-between income-expense-selection"
+                    onClick={toggleDateRange}
+                  >
+                    Date Range
+                    <ChevronDown
+                      className={`ml-2 transition-transform duration-300 ${
+                        openSelectKey === "date_range"
+                          ? "rotate-180"
+                          : "rotate-0"
+                      }`}
+                    />
+                  </div>
+                  {openSelectKey === "date_range" && (
+                    <div className="absolute z-10 bg-white p-4 mt-1 border border-gray-300 rounded-md shadow-md w-[250px]">
+                      <label className="block text-sm mb-1 filter-btn">
+                        Start Date
+                      </label>
+                      <input
+                        type="date"
+                        value={tempFilters.start_date}
+                        onChange={(e) =>
+                          setTempFilters((prev) => ({
+                            ...prev,
+                            start_date: e.target.value,
+                          }))
+                        }
+                        className="w-full border border-gray-300 rounded-md px-2 py-1 mb-3 outline-none"
+                      />
+                      <label className="block text-sm mb-1 filter-btn">
+                        End Date
+                      </label>
+                      <input
+                        type="date"
+                        value={tempFilters.end_date}
+                        onChange={(e) =>
+                          setTempFilters((prev) => ({
+                            ...prev,
+                            end_date: e.target.value,
+                          }))
+                        }
+                        className="w-full border border-gray-300 rounded-md px-2 py-1 outline-none"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex gap-[10px]">
+                <button
+                  onClick={() => {
+                    setFilters(tempFilters);
+                    setCurrentPage(1);
+                  }}
+                  className="bg-[#201D1E] text-white w-[105px] h-[38px] rounded-md hover:bg-[#F0F0F0] hover:text-[#201D1E] duration-200 filter-btn"
+                >
+                  Apply
+                </button>
+                <button
+                  onClick={clearFilters}
+                  className="w-[105px] h-[38px] bg-[#F0F0F0] text-[#4D4E4D] rounded-md clear-btn hover:bg-[#201D1E] hover:text-white duration-200"
+                >
+                  Clear
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {loading && <div className="p-5 text-center">Loading...</div>}
       {error && <div className="p-5 text-center text-red-500">{error}</div>}
@@ -291,14 +387,14 @@ const IncomeExpenseReport = () => {
         <div className="income-expense-desktop-only overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="h-[57px]">
+              <tr className="h-[57px] border-b border-[#E9E9E9]">
                 <th
                   colSpan="2"
                   className="border-b border-[#E9E9E9] income-expense-header"
                 ></th>
                 <th
                   colSpan="3"
-                  className="px-5 text-center border-b bg-[#F2FCF7] text-[#28C76F] income-expense-header"
+                  className="px-5 text-center border-b border-[#E9E9E9] bg-[#F2FCF7] text-[#28C76F] income-expense-header"
                 >
                   INCOME
                 </th>
@@ -336,10 +432,14 @@ const IncomeExpenseReport = () => {
               {paginatedData.map((item) => (
                 <tr
                   key={item[`${filters.view_type}_id`]}
-                  className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
+                  className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer last:border-0"
                 >
-                  <td className="px-5 income-expense-data">{getEntityName(item)}</td>
-                  <td className="px-5 income-expense-data">{getSecondaryInfo(item)}</td>
+                  <td className="px-5 income-expense-data">
+                    {getEntityName(item)}
+                  </td>
+                  <td className="px-5 income-expense-data">
+                    {getSecondaryInfo(item)}
+                  </td>
                   <td className="px-5 text-center income-expense-data bg-[#F2FCF7] !text-[#28C76F]">
                     {item.total_income.toFixed(2)}
                   </td>
@@ -369,7 +469,7 @@ const IncomeExpenseReport = () => {
         <div className="block md:hidden">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="income-expense-table-row-head">
+              <tr className="income-expense-table-row-head border-b border-[#E9E9E9]">
                 <th className="px-5 pl-[1rem] w-[50%] text-left income-expense-thead income-expense-date-column">
                   ENTITY
                 </th>
@@ -386,8 +486,8 @@ const IncomeExpenseReport = () => {
                     className={`${
                       expandedRows[item[`${filters.view_type}_id`]]
                         ? "income-expense-mobile-no-border"
-                        : "income-expense-mobile-with-border"
-                    } border-b border-[#E9E9E9] h-[57px]`}
+                        : "income-expense-mobile-with-border border-b border-[#E9E9E9]"
+                    } h-[57px]`}
                   >
                     <td className="px-5 text-left income-expense-data income-expense-date-column w-[35%] pl-[16px]">
                       {getEntityName(item)}
@@ -398,15 +498,21 @@ const IncomeExpenseReport = () => {
                     <td className="py-4 flex items-center justify-end h-[57px]">
                       <div
                         className={`income-expense-dropdown-field ${
-                          expandedRows[item[`${filters.view_type}_id`]] ? "active" : ""
+                          expandedRows[item[`${filters.view_type}_id`]]
+                            ? "active"
+                            : ""
                         }`}
-                        onClick={() => toggleRowExpand(item[`${filters.view_type}_id`])}
+                        onClick={() =>
+                          toggleRowExpand(item[`${filters.view_type}_id`])
+                        }
                       >
                         <img
                           src={downarrow}
                           alt="drop-down-arrow"
                           className={`income-expense-dropdown-img ${
-                            expandedRows[item[`${filters.view_type}_id`]] ? "text-white" : ""
+                            expandedRows[item[`${filters.view_type}_id`]]
+                              ? "text-white"
+                              : ""
                           }`}
                         />
                       </div>
@@ -437,7 +543,7 @@ const IncomeExpenseReport = () => {
                           <div className="income-expense-table-container">
                             <table className="income-expense-dropdown-table">
                               <thead>
-                                <tr className="income-expense-dropdown-table-header">
+                                <tr className="income-expense-dropdown-table-header border-b border-[#E9E9E9]">
                                   <th
                                     colSpan="3"
                                     className="income-expense-income-header"
@@ -451,7 +557,7 @@ const IncomeExpenseReport = () => {
                                     EXPENSE
                                   </th>
                                 </tr>
-                                <tr className="income-expense-dropdown-table-subheader">
+                                <tr className="income-expense-dropdown-table-subheader border-b border-[#E9E9E9]">
                                   <th className="income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">
                                     TOTAL
                                   </th>
@@ -490,7 +596,9 @@ const IncomeExpenseReport = () => {
                                     {item.total_general_expense.toFixed(2)}
                                   </td>
                                   <td className="income-expense-data bg-[#FFF7F6] !text-[#FE7062]">
-                                    {(item.net_income - item.total_expense).toFixed(2)}
+                                    {(
+                                      item.net_income - item.total_expense
+                                    ).toFixed(2)}
                                   </td>
                                 </tr>
                               </tbody>
@@ -507,7 +615,7 @@ const IncomeExpenseReport = () => {
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 income-expense-pagination-container">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 border-t border-[#E9E9E9] income-expense-pagination-container">
         <span className="income-expense-pagination collection-list-pagination">
           Showing{" "}
           {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}

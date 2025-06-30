@@ -49,11 +49,6 @@
   box-sizing: border-box;
 }
 
-.inocome-expense-export-btn:hover {
-  background-color: #201d1e;
-  color: white;
-}
-
 .income-expense-header {
   font-family: "Inter Tight";
   font-weight: 500;
@@ -79,6 +74,28 @@
   font-weight: 400;
   line-height: 22px;
   color: #201d1e;
+}
+
+.income-expense-download-btn {
+  background-color: #f0f0f0;
+  font-family: "Inter Tight";
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+  color: #4d4e4d;
+  box-sizing: border-box;
+}
+
+.income-expense-download-btn:hover {
+  background-color: #201d1e;
+  color: white;
+}
+
+.income-expense-download-btn:hover .income-expense-download-img{
+  filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%)
+    hue-rotate(47deg) brightness(118%) contrast(100%);
 }
 
 .income-expense-collection-list-pagination {

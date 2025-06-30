@@ -7,6 +7,7 @@ import ReviewPage from "../ReviewPage/ReviewPage";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 import "./buildingformflow.css";
 import { useModal } from "../../../../../context/ModalContext";
+import { X } from "lucide-react";
 
 const BuildingFormFlow = ({ onClose, onPageChange, initialPageIndex = 0 }) => {
   const { triggerRefresh } = useModal();
@@ -164,9 +165,10 @@ const BuildingFormFlow = ({ onClose, onPageChange, initialPageIndex = 0 }) => {
           <h3 className="building-modal-title">{currentTitle}</h3>
           <button
             onClick={handleClose}
-            className="border border-[#E9E9E9] rounded-full p-[11px]"
+            className="border border-[#E9E9E9] rounded-full p-[11px] hover:bg-gray-100 duration-200"
           >
-            <img src={closeicon} alt="Close" className="w-[15px] h-[15px]" />
+            {/* <img src={closeicon} alt="Close" className="w-[15px] h-[15px]" /> */}
+            <X size={20} />
           </button>
         </div>
         <div

@@ -268,7 +268,7 @@ const TenantsMaster = () => {
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] tenant-status ${
                       tenant.status === "Active"
-                        ? "bg-[#E6F5EC] text-[#1C7D4D]"
+                        ? "bg-[#E1FFEA] text-[#28C76F]"
                         : tenant.status === "Inactive"
                         ? "bg-[#FDEAEA] text-[#D1293D]"
                         : "bg-[#FFF8E1] text-[#A67C00]"
@@ -397,7 +397,7 @@ const TenantsMaster = () => {
                                 <span
                                   className={`px-[10px] py-[5px] w-[65px] h-[24px] rounded-[4px] tenant-status ${
                                     tenant.status === "Active"
-                                      ? "bg-[#E6F5EC] text-[#1C7D4D]"
+                                      ? "bg-[#E1FFEA] text-[#28C76F]"
                                       : tenant.status === "Inactive"
                                       ? "bg-[#FDEAEA] text-[#D1293D]"
                                       : "bg-[#FFF8E1] text-[#A67C00]"

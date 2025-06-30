@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import closeicon from "../../../../../assets/Images/Admin Units/close-icon.svg";
 import FormTimeline from "../FromTimeline";
 import BuildingInfoForm from "../Select Building/BuildingInfoForm";
 import UnitInfoForm from "../Create Unit/UnitInfoForm";
@@ -7,6 +6,7 @@ import DocumentsForm from "../Upload Documents/DocumentsForm";
 import UnitReview from "../Review/UnitReview";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 import { useModal } from "../../../../../context/ModalContext";
+import { X } from "lucide-react";
 
 const UnitFormFlow = ({
   onClose,
@@ -216,9 +216,9 @@ const UnitFormFlow = ({
           <h3 className="building-modal-title">{currentTitle}</h3>
           <button
             onClick={handleClose}
-            className="border border-[#E9E9E9] rounded-full p-[11px]"
+            className="border border-[#E9E9E9] rounded-full p-[11px] hover:bg-gray-100 duration-200"
           >
-            <img src={closeicon} alt="Close" className="w-[15px] h-[15px]" />
+            <X size={20} />
           </button>
         </div>
         <div
