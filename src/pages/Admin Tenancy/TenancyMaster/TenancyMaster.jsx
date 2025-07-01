@@ -66,42 +66,71 @@ const TenancyMaster = () => {
 
   const itemsPerPage = 10;
 
-  const getUnique = (key) => [...new Set(tenancies.map((item) => item[key]))];
+  const getUnique = (key, valueKey, labelKey) => {
+    const items = tenancies.map((item, index) => ({
+      value: item[key]
+        ? typeof item[key] === "object"
+          ? item[key][valueKey] || "N/A"
+          : item[key]
+        : "N/A",
+      label: item[key]
+        ? typeof item[key] === "object"
+          ? item[key][labelKey] || "N/A"
+          : item[key]
+        : "N/A",
+      key: `${item[key]?.[valueKey] || item[key] || "N/A"}-${item.id || index}`,
+    }));
+    return [...new Map(items.map((item) => [item.value, item])).values()];
+  };
 
-  const uniqueIds = getUnique("tenancy_code");
-  const uniqueTenants = getUnique("tenant")?.map(
-    (t) => t?.tenant_name || "N/A"
+  const uniqueIds = getUnique("tenancy_code", "tenancy_code", "tenancy_code");
+  const uniqueTenants = getUnique("tenant", "tenant_name", "tenant_name");
+  const uniqueBuildings = getUnique(
+    "building",
+    "building_name",
+    "building_name"
   );
-  const uniqueBuildings = getUnique("building")?.map(
-    (b) => b?.building_name || "N/A"
-  );
-  const uniqueUnits = getUnique("unit")?.map((u) => u?.unit_name || "N/A");
-  const uniqueStatuses = getUnique("status");
+  const uniqueUnits = getUnique("unit", "unit_name", "unit_name");
+  const uniqueStatuses = getUnique("status", "status", "status");
 
   const idOptions = [
-    { value: "", label: "All Tenancy" },
-    ...uniqueIds.map((id) => ({ value: id, label: id })),
+    { value: "", label: "All Tenancy", key: "all-tenancy" },
+    ...uniqueIds.map((item) => ({
+      value: item.value,
+      label: item.label,
+      key: item.key,
+    })),
   ];
   const tenantOptions = [
-    { value: "", label: "All Tenants" },
-    ...uniqueTenants.map((tenant) => ({ value: tenant, label: tenant })),
+    { value: "", label: "All Tenants", key: "all-tenants" },
+    ...uniqueTenants.map((item) => ({
+      value: item.value,
+      label: item.label,
+      key: item.key,
+    })),
   ];
   const buildingOptions = [
-    { value: "", label: "All Buildings" },
-    ...uniqueBuildings.map((building) => ({
-      value: building,
-      label: building,
+    { value: "", label: "All Buildings", key: "all-buildings" },
+    ...uniqueBuildings.map((item) => ({
+      value: item.value,
+      label: item.label,
+      key: item.key,
     })),
   ];
   const unitOptions = [
-    { value: "", label: "All Units" },
-    ...uniqueUnits.map((unit) => ({ value: unit, label: unit })),
+    { value: "", label: "All Units", key: "all-units" },
+    ...uniqueUnits.map((item) => ({
+      value: item.value,
+      label: item.label,
+      key: item.key,
+    })),
   ];
   const statusOptions = [
-    { value: "", label: "All Statuses" },
-    ...uniqueStatuses.map((status) => ({
-      value: status,
-      label: status.charAt(0).toUpperCase() + status.slice(1),
+    { value: "", label: "All Statuses", key: "all-statuses" },
+    ...uniqueStatuses.map((item) => ({
+      value: item.value,
+      label: item.value.charAt(0).toUpperCase() + item.value.slice(1),
+      key: item.key,
     })),
   ];
 
@@ -279,7 +308,7 @@ const TenancyMaster = () => {
       scale: 0.95,
       transition: {
         duration: 0.2,
-        ease治: "easeOut",
+        ease: "easeOut",
       },
     },
     visible: {
@@ -288,6 +317,25 @@ const TenancyMaster = () => {
       transition: {
         duration: 0.2,
         ease: "easeOut",
+      },
+    },
+  };
+
+  const dropdownVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut",
+      },
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut",
       },
     },
   };
@@ -401,7 +449,9 @@ const TenancyMaster = () => {
                     Date Range
                     <ChevronDown
                       className={`ml-2 transition-transform duration-300 ${
-                        openSelectKey === "date_range" ? "rotate-180" : "rotate-0"
+                        openSelectKey === "date_range"
+                          ? "rotate-180"
+                          : "rotate-0"
                       }`}
                     />
                   </div>
@@ -486,7 +536,7 @@ const TenancyMaster = () => {
           <tbody>
             {tenancies.map((tenancy) => (
               <tr
-                key={tenancy.tenancy_code}
+                key={tenancy.id}
                 className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
               >
                 <td className="px-5 text-left tenancy-data">
@@ -590,10 +640,10 @@ const TenancyMaster = () => {
           </thead>
           <tbody>
             {tenancies.map((tenancy) => (
-              <React.Fragment key={tenancy.tenancy_code}>
+              <React.Fragment key={tenancy.id}>
                 <tr
                   className={`${
-                    expandedRows[tenancy.tenancy_code]
+                    expandedRows[tenancy.id]
                       ? "tenancy-mobile-no-border"
                       : "tenancy-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
@@ -607,28 +657,28 @@ const TenancyMaster = () => {
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`tenancy-dropdown-field ${
-                        expandedRows[tenancy.tenancy_code] ? "active" : ""
+                        expandedRows[tenancy.id] ? "active" : ""
                       }`}
-                      onClick={() => toggleRowExpand(tenancy.tenancy_code)}
+                      onClick={() => toggleRowExpand(tenancy.id)}
                     >
                       <img
                         src={downarrow}
                         alt="drop-down-arrow"
                         className={`tenancy-dropdown-img ${
-                          expandedRows[tenancy.tenancy_code] ? "text-white" : ""
+                          expandedRows[tenancy.id] ? "text-white" : ""
                         }`}
                       />
                     </div>
                   </td>
                 </tr>
                 <AnimatePresence>
-                  {expandedRows[tenancy.tenancy_code] && (
+                  {expandedRows[tenancy.id] && (
                     <motion.tr
                       className="tenancy-mobile-with-border border-b border-[#E9E9E9]"
                       initial="hidden"
                       animate="visible"
                       exit="hidden"
-                      variants={filterVariants}
+                      variants={dropdownVariants}
                     >
                       <td colSpan={3} className="px-5">
                         <div className="tenancy-dropdown-content">

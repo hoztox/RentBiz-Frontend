@@ -34,6 +34,24 @@
   color: #201d1e;
   height: 38px;
   box-sizing: border-box;
+  width: 130px !important;
+  min-width: 130px;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Ensure the dropdown menu respects the fixed width */
+.collection-selection select,
+.collection-selection option,
+.collection-selection .dropdown-menu {
+  width: 130px;
+  min-width: 130px;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .add-collection {
@@ -140,9 +158,6 @@
     padding: 16px;
   }
   .collection-search {
-    width: 60%;
-  }
-  .collection-selection {
     width: 100%;
   }
   .collection-thead.collection-date-column {
@@ -186,9 +201,6 @@
     padding-left: 14px;
     padding-right: 0;
   }
-  .collection-selection {
-    width: 100%;
-  }
   .collection-download-btn {
     width: 40%;
   }
@@ -205,9 +217,6 @@
   .collection-data.collection-date-column {
     padding-left: 14px;
     padding-right: 0;
-  }
-  .collection-selection {
-    width: 120px;
   }
   .collection-download-btn {
     width: 40%;
@@ -253,9 +262,6 @@
     flex-wrap: nowrap;
   }
   .collection-search {
-    width: 60%;
-  }
-  .collection-selection {
     width: 100%;
   }
   .collection-action-buttons {
