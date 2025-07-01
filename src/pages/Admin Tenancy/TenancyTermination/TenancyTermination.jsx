@@ -14,8 +14,6 @@ import { motion, AnimatePresence } from "framer-motion";
 const TenancyTermination = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [terminateModalOpen, setTerminateModalOpen] = useState(false);
-  const [selectedTenancy, setSelectedTenancy] = useState(null);
   const [expandedRows, setExpandedRows] = useState({});
   const [tenancies, setTenancies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -74,21 +72,16 @@ const TenancyTermination = () => {
     openModal("tenancy-update", "Update Tenancy", tenancy);
   };
 
-  const openTerminateModal = (tenancy) => {
-    if (tenancy) {
-      setSelectedTenancy(tenancy);
-      setTerminateModalOpen(true);
-    }
-  };
-
-  const handleTerminateSuccess = (updatedTenancy) => {
-    setTenancies((prev) =>
-      prev.map((t) =>
-        t.id === updatedTenancy.id ? { ...t, ...updatedTenancy } : t
-      )
-    );
-    setTerminateModalOpen(false);
-    setSelectedTenancy(null);
+  const handleTerminateClick = (tenancy) => {
+    openModal("tenancy-terminate", "Terminate Tenancy", tenancy, {
+      onTerminate: (updatedTenancy) => {
+        setTenancies((prev) =>
+          prev.map((t) =>
+            t.id === updatedTenancy.id ? { ...t, ...updatedTenancy } : t
+          )
+        );
+      },
+    });
   };
 
   const toggleRowExpand = (tenancy_code) => {
@@ -195,10 +188,10 @@ const TenancyTermination = () => {
               <th className="px-4 text-left tenancy-thead whitespace-nowrap">
                 ID
               </th>
-              <th className="px-4 text-left tenancy-thead whitespace-nowrap">
+              <th className="px-4 text-left tenancy-thead whitespace-nowrap w-[20%]">
                 NAME
               </th>
-              <th className="px-4 text-left tenancy-thead whitespace-nowrap">
+              <th className="px-4 text-left tenancy-thead whitespace-nowrap w-[20%]">
                 BUILDING NAME
               </th>
               <th className="px-4 text-left tenancy-thead whitespace-nowrap w-[20%]">
@@ -242,7 +235,7 @@ const TenancyTermination = () => {
                         className="w-[18px] h-[18px] tterm-action-btn duration-200"
                       />
                     </button>
-                    <button onClick={() => openTerminateModal(tenancy)}>
+                    <button onClick={() => handleTerminateClick(tenancy)}>
                       <img
                         src={terminateicon}
                         alt="Terminate"
@@ -353,7 +346,7 @@ const TenancyTermination = () => {
                                   />
                                 </button>
                                 <button
-                                  onClick={() => openTerminateModal(tenancy)}
+                                  onClick={() => handleTerminateClick(tenancy)}
                                 >
                                   <img
                                     src={terminateicon}
@@ -431,12 +424,6 @@ const TenancyTermination = () => {
           </button>
         </div>
       </div>
-      <TenancyTerminateModal
-        isOpen={terminateModalOpen}
-        onCancel={() => setTerminateModalOpen(false)}
-        onTerminate={handleTerminateSuccess}
-        tenancy={selectedTenancy}
-      />
     </div>
   );
 };

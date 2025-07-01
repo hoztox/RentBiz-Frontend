@@ -148,7 +148,6 @@
     margin: 0;
     height: 100vh;
     border-radius: 0;
-    background-color: #F8F9FA;
     max-height: calc(100vh - 90px) !important;
     overflow-y: auto;
     padding: 20px;
