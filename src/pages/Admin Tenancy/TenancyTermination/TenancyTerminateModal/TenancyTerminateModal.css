@@ -1,0 +1,196 @@
+.tenancy-terminate-head {
+  font-family: "Inter Tight";
+  font-weight: 500;
+  font-size: 21px;
+  line-height: 24px;
+  letter-spacing: 0px;
+  color: #201d1e;
+}
+
+.tenancy-terminate-close-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 60px;
+  border: 1px solid #e9e9e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+}
+
+.tenancy-terminate-close-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.tenancy-terminate-label {
+  font-family: "Inter Tight";
+  font-weight: 400;
+  font-size: 13px;
+  letter-spacing: 0.43px;
+  color: #201d1e;
+}
+
+.tenancy-terminate-input-style {
+  width: 100%;
+  height: 38px;
+  border-radius: 6px;
+  border: 1px solid #e9e9e9;
+  padding: 0 12px;
+  font-size: 14px;
+  color: #111827;
+  background-color: #ffffff;
+  outline: none;
+  display: flex;
+  align-items: center;
+  line-height: 1.4;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+
+.tenancy-terminate-helper-text {
+  font-family: "Inter Tight";
+  font-size: 13px;
+  font-weight: 400;
+  color: #999999;
+  letter-spacing: 0.3px;
+}
+
+.tenancy-terminate-checkbox {
+  appearance: none;
+  width: 19px;
+  height: 19px;
+  border: 2px solid #e9e9e9;
+  border-radius: 4px;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+}
+
+.tenancy-terminate-checkbox:checked {
+  background-color: transparent;
+  border-color: #2892CE;
+}
+
+.tenancy-terminate-checkbox:checked::after {
+  content: url('../../../../assets/Images/Admin Masters/tickmark.svg');
+  position: absolute;
+  top: 38%;
+  left: 52%;
+  transform: translate(-50%, -50%);
+  filter: brightness(0) saturate(100%) invert(46%) sepia(54%) saturate(906%) hue-rotate(161deg) brightness(96%) contrast(80%);
+}
+
+.tenancy-terminate-save-btn {
+  font-family: "Inter Tight";
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: 0.43px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 199px;
+  height: 38px;
+}
+
+.tenancy-terminate-error {
+  font-family: "Inter Tight";
+  font-size: 13px;
+  color: #dc2626;
+  background-color: #fee2e2;
+  letter-spacing: 0.43px;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+/* Responsive Styles */
+.tenancy-terminate-wrapper {
+  width: 100%;
+  max-width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .tenancy-terminate-wrapper {
+    width: 522px;
+    max-width: 522px;
+    height: auto;
+    border-radius: 6px;
+    background-color: #ffffff;
+  }
+}
+
+@media (max-width: 480px) {
+  .tenancy-terminate-wrapper {
+    position: absolute;
+    top: 90px;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    margin: 0;
+    height: 100vh;
+    padding: 20px;
+  }
+}
+
+.tenancy-terminate-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 480px) {
+  .tenancy-terminate-overlay {
+    position: static;
+    inset: auto;
+    display: block;
+    background-color: transparent;
+    opacity: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .tenancy-terminate-head {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .tenancy-terminate-close-btn {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .tenancy-terminate-input-style {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .tenancy-terminate-input-style {
+    max-width: calc(100vw - 40px);
+  }
+}
+
+@media (max-width: 480px) {
+  .tenancy-terminate-save-btn {
+    max-width: calc(100vw - 40px);
+    width: 100%;
+  }
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
