@@ -25,6 +25,7 @@ const TenancyConfirm = () => {
   const [selectedTenancy, setSelectedTenancy] = useState(null);
   const [tenancies, setTenancies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
   const itemsPerPage = 10;
 
   const dropdownOptions = [
@@ -85,7 +86,7 @@ const TenancyConfirm = () => {
       }
     };
     fetchTenancies();
-  }, [refreshCounter]);
+  }, [refreshCounter, refreshTrigger]);
 
   const openConfirmModal = (tenancy) => {
     setSelectedTenancy(tenancy);
@@ -118,6 +119,7 @@ const TenancyConfirm = () => {
 
       console.log("Confirmed Tenancy:", tenancyData);
       setConfirmModalOpen(false);
+      setRefreshTrigger((prev) => prev + 1);
     } catch (error) {
       console.error("Error confirming tenancy:", error);
       if (error.response?.data?.errors) {
