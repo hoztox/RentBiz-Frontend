@@ -783,7 +783,7 @@ const UpdateExpenseModal = () => {
                   value={formData.tax}
                   readOnly
                   placeholder="Auto-calculated"
-                  className="block w-full px-3 py-2 border border-gray-200 bg-gray-50 financial-expense-update-input"
+                  className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-update-input"
                 />
               </div>
 
@@ -796,7 +796,7 @@ const UpdateExpenseModal = () => {
                   value={formData.total_amount}
                   readOnly
                   placeholder="Auto-calculated"
-                  className="block w-full px-3 py-2 border border-gray-200 bg-gray-50 financial-expense-update-input"
+                  className="block w-full px-3 py-2 border border-gray-200 focus:outline-none focus:ring-gray-500 focus:border-gray-500 financial-expense-update-input"
                 />
               </div>
 
