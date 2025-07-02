@@ -93,7 +93,7 @@
   color: white;
 }
 
-.income-expense-download-btn:hover .income-expense-download-img{
+.income-expense-download-btn:hover .income-expense-download-img {
   filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%)
     hue-rotate(47deg) brightness(118%) contrast(100%);
 }
@@ -148,7 +148,7 @@
     margin-bottom: 50px;
   }
   .income-expense-search {
-    width: 55%;
+    width: 100%;
   }
   .income-expense-selection {
     width: 100%;
@@ -175,6 +175,17 @@
     padding: 0px 10px;
     height: 28px;
   }
+  .income-expense-dropdown-table-subheader .income-expense-thead {
+    font-size: 10px;
+    padding: 5px 4px;
+  }
+  .income-expense-dropdown-table-row .income-expense-data {
+    font-size: 11px;
+    padding: 5px 4px;
+  }
+  .income-expense-dropdown-label {
+    font-size: 10.6px;
+  }
 }
 
 @media (min-width: 361px) and (max-width: 375px) {
@@ -186,11 +197,15 @@
     padding-left: 14px;
     padding-right: 0;
   }
-   .income-expense-dropdown-table-subheader .income-expense-thead{
-     font-size: 11px !important;
-    padding: 5px 8px;
+  .income-expense-dropdown-table-subheader .income-expense-thead {
+    font-size: 11px;
+    padding: 5px 6px;
     text-align: center;
-   }
+  }
+  .income-expense-dropdown-table-row .income-expense-data {
+    font-size: 12px;
+    padding: 5px 6px;
+  }
 }
 
 @media (max-width: 390px) {
@@ -207,6 +222,18 @@
   }
 }
 
+@media (max-width: 394px) {
+  .income-expense-thead {
+    font-size: 12px;
+  }
+  .income-expense-dropdown-label {
+    font-size: 10.6px;
+  }
+  .income-expense-data {
+    font-size: 13px;
+  }
+}
+
 @media (max-width: 414px) {
   .income-expense-thead {
     font-size: 11px;
@@ -217,7 +244,9 @@
   }
   .income-expense-data.income-expense-tenant-column {
     padding-left: 14px;
-    padding-right: 0;
+    padding-right:
+
+ 0;
   }
   .income-expense-selection {
     width: 100%;
@@ -237,8 +266,10 @@
 
 @media (max-width: 480px) {
   .income-expense-table {
-    max-width: calc(100vw - 40px);
+    max-width: 100%;
+    width: 100%;
     margin-bottom: 50px;
+    box-sizing: border-box;
   }
   .income-expense-table-header {
     flex-direction: column;
@@ -262,14 +293,17 @@
     flex-wrap: nowrap;
   }
   .income-expense-search {
-    width: 55%;
+    width: 100%;
+  }
+  .income-expense-action-button{
+    width: 60%;
   }
   .income-expense-selection {
     width: 100%;
     margin-left: 0px;
   }
-  .income-expense-export-btn {
-    width: 45%;
+  .income-expense-download-btn {
+    width: 40%;
   }
   .income-expense-action-buttons-container {
     margin-top: 5px;
@@ -334,17 +368,16 @@
   }
   .income-expense-grid-container {
     width: 100%;
+    max-width: 100%;
     padding: 15px;
     padding-top: 5px;
+    box-sizing: border-box;
   }
   .income-expense-grid {
     display: flex;
     justify-content: space-between;
     margin-bottom: 24px;
   }
-  /* .income-expense-grid-item {
-    padding-right: 15px;
-  } */
   .income-expense-dropdown-label {
     font-family: "Inter Tight";
     font-size: 12px;
@@ -374,11 +407,15 @@
   }
   .income-expense-table-container {
     width: 100%;
+    max-width: 100%;
     margin-bottom: 24px;
     margin-top: -14px;
+    box-sizing: border-box;
   }
   .income-expense-dropdown-table {
     width: 100%;
+    max-width: 100%;
+    table-layout: auto;
     border-collapse: collapse;
     border-top: 1px solid #E9E9E9;
     border-bottom: 1px solid #E9E9E9;
@@ -416,10 +453,12 @@
   }
   .income-expense-dropdown-table-subheader th {
     width: 16.67%;
+    white-space: normal;
+    word-wrap: break-word;
+    padding: 5px 4px;
   }
   .income-expense-dropdown-table-subheader .income-expense-thead {
     font-size: 12px;
-    padding: 5px 8px;
     text-align: center;
   }
   .income-expense-dropdown-table-row {
@@ -427,25 +466,38 @@
   }
   .income-expense-dropdown-table-row td {
     width: 16.67%;
+    white-space: normal;
+    word-wrap: break-word;
+    padding: 5px 4px;
   }
   .income-expense-dropdown-table-row .income-expense-data {
     font-size: 13px;
-    padding: 5px 8px;
     text-align: center;
   }
 }
 
 @media (max-width: 360px) {
   .income-expense-dropdown-table-subheader .income-expense-thead {
-    font-size: 12px;
-    padding: 5px 4px;
+    font-size: 10px;
+    padding: 5px 2px;
   }
   .income-expense-dropdown-table-row .income-expense-data {
-    font-size: 13px;
-    padding: 5px 4px;
+    font-size: 11px;
+    padding: 5px 2px;
   }
   .income-expense-dropdown-label {
     font-size: 10.6px;
+  }
+}
+
+@media (min-width: 361px) and (max-width: 375px) {
+  .income-expense-dropdown-table-subheader .income-expense-thead {
+    font-size: 11px;
+    padding: 5px 4px;
+  }
+  .income-expense-dropdown-table-row .income-expense-data {
+    font-size: 12px;
+    padding: 5px 4px;
   }
 }
 
@@ -454,17 +506,5 @@
   .income-expense-grid-container,
   .income-expense-table-container {
     display: none;
-  }
-}
-
-@media (max-width: 394px) {
-  .income-expense-thead {
-    font-size: 12px;
-  }
-   .income-expense-dropdown-label {
-    font-size: 10.6px;
-  }
-  .income-expense-data {
-    font-size: 13px;
   }
 }

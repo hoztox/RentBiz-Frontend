@@ -257,8 +257,10 @@ const IncomeExpenseReport = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 income-expense-search"
             />
+          </div>
+          <div className="flex gap-[10px] income-expense-action-buttons-container">
             <motion.button
-              className={`hidden md:flex items-center justify-center gap-2 px-4 py-2 h-[38px] rounded-md duration-200 ${
+              className={`flex items-center justify-center gap-2 px-4 py-2 h-[38px] income-expense-action-button rounded-md duration-200 ${
                 showFilters
                   ? "bg-[#201D1E] text-white"
                   : "bg-[#F0F0F0] text-[#201D1E] hover:bg-[#201D1E] hover:text-[#F0F0F0]"
@@ -269,10 +271,8 @@ const IncomeExpenseReport = () => {
               <Filter size={16} />
               Filters
             </motion.button>
-          </div>
-          <div className="flex gap-[10px] income-expense-action-buttons-container">
             <button
-              className="flex items-center justify-center gap-2 w-[45%] md:w-[122px] h-[38px] rounded-md duration-200 income-expense-download-btn"
+              className="flex items-center justify-center gap-2 w-[40%] md:w-[122px] h-[38px] rounded-md duration-200 income-expense-download-btn"
               onClick={handleDownloadCSV}
             >
               Download
@@ -289,15 +289,15 @@ const IncomeExpenseReport = () => {
       <AnimatePresence>
         {showFilters && (
           <motion.div
-            className="p-5 border-b border-[#E9E9E9] income-expense-desktop-only income-expense-filter-container"
+            className="p-5 border-b border-[#E9E9E9] income-expense-filter-container"
             initial="hidden"
             animate="visible"
             exit="hidden"
             variants={filterVariants}
           >
-            <div className="flex items-center justify-between">
-              <div className="flex gap-[10px] flex-wrap">
-                <div className="relative">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div className="flex flex-col md:flex-row gap-[10px] flex-wrap w-full md:w-auto">
+                <div className="relative w-full md:w-[130px]">
                   <CustomDropDown
                     options={viewTypeOptions}
                     value={tempFilters.view_type}
@@ -307,13 +307,16 @@ const IncomeExpenseReport = () => {
                         view_type: value,
                       }))
                     }
-                    className="w-[130px]"
+                    className="w-full md:w-[130px]"
                     dropdownClassName="px-[7px] py-[7px] border-[#201D1E20] focus:border-gray-300 income-expense-selection h-[38px]"
                   />
                 </div>
-                <div className="relative" ref={dateRangeRef}>
+                <div
+                  className="relative w-full md:w-[130px]"
+                  ref={dateRangeRef}
+                >
                   <div
-                    className="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-[130px] h-[38px] cursor-pointer flex items-center justify-between income-expense-selection"
+                    className="appearance-none px-[7px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full h-[38px] cursor-pointer flex items-center justify-between income-expense-selection"
                     onClick={toggleDateRange}
                   >
                     Date Range
@@ -326,7 +329,7 @@ const IncomeExpenseReport = () => {
                     />
                   </div>
                   {openSelectKey === "date_range" && (
-                    <div className="absolute z-10 bg-white p-4 mt-1 border border-gray-300 rounded-md shadow-md w-[250px]">
+                    <div className="absolute z-10 bg-white p-4 mt-1 border border-gray-300 rounded-md shadow-md w-full md:w-[250px]">
                       <label className="block text-sm mb-1 filter-btn">
                         Start Date
                       </label>
@@ -359,19 +362,19 @@ const IncomeExpenseReport = () => {
                   )}
                 </div>
               </div>
-              <div className="flex gap-[10px]">
+              <div className="flex gap-[10px] w-full md:w-auto">
                 <button
                   onClick={() => {
                     setFilters(tempFilters);
                     setCurrentPage(1);
                   }}
-                  className="bg-[#201D1E] text-white w-[105px] h-[38px] rounded-md hover:bg-[#F0F0F0] hover:text-[#201D1E] duration-200 filter-btn"
+                  className="bg-[#201D1E] text-white w-full md:w-[105px] h-[38px] rounded-md hover:bg-[#F0F0F0] hover:text-[#201D1E] duration-200 filter-btn"
                 >
                   Apply
                 </button>
                 <button
                   onClick={clearFilters}
-                  className="w-[105px] h-[38px] bg-[#F0F0F0] text-[#4D4E4D] rounded-md clear-btn hover:bg-[#201D1E] hover:text-white duration-200"
+                  className="w-full md:w-[105px] h-[38px] bg-[#F0F0F0] text-[#4D4E4D] rounded-md clear-btn hover:bg-[#201D1E] hover:text-white duration-200"
                 >
                   Clear
                 </button>
@@ -474,7 +477,7 @@ const IncomeExpenseReport = () => {
                   ENTITY
                 </th>
                 <th className="px-3 w-[33.33%] text-left income-expense-thead income-expense-tenant-column">
-                  NET BALANCE
+                  DETAILS
                 </th>
                 <th className="text-right income-expense-thead"></th>
               </tr>
@@ -493,7 +496,7 @@ const IncomeExpenseReport = () => {
                       {getEntityName(item)}
                     </td>
                     <td className="px-3 text-left income-expense-data income-expense-tenant-column w-[30%]">
-                      {(item.net_income - item.total_expense).toFixed(2)}
+                      {getSecondaryInfo(item)}
                     </td>
                     <td className="py-4 flex items-center justify-end h-[57px]">
                       <div
@@ -529,16 +532,6 @@ const IncomeExpenseReport = () => {
                       >
                         <td colSpan={3} className="p-0">
                           <div className="income-expense-grid-container">
-                            <div className="income-expense-grid">
-                              <div className="income-expense-grid-item">
-                                <div className="income-expense-dropdown-label w-[50%]">
-                                  DETAILS
-                                </div>
-                                <div className="income-expense-dropdown-value">
-                                  {getSecondaryInfo(item)}
-                                </div>
-                              </div>
-                            </div>
                           </div>
                           <div className="income-expense-table-container">
                             <table className="income-expense-dropdown-table">
@@ -565,7 +558,7 @@ const IncomeExpenseReport = () => {
                                     REFUNDED
                                   </th>
                                   <th className="income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">
-                                    NET
+                                    INCOME
                                   </th>
                                   <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
                                     TOTAL
@@ -574,7 +567,7 @@ const IncomeExpenseReport = () => {
                                     GENERAL
                                   </th>
                                   <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
-                                    NET BALANCE
+                                    BALANCE
                                   </th>
                                 </tr>
                               </thead>
