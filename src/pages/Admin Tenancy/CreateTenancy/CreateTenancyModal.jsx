@@ -5,6 +5,7 @@ import { X, Trash2, Plus, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
+import toast from "react-hot-toast";
 
 const CreateTenancyModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
@@ -434,6 +435,7 @@ const CreateTenancyModal = () => {
         payload
       );
       console.log("Tenancy created successfully:", response.data);
+      toast.success("Tenancy created successfully")
       triggerRefresh();
       closeModal();
       navigate("/admin/tenancy-master");
@@ -442,7 +444,7 @@ const CreateTenancyModal = () => {
         "Error submitting tenancy:",
         error.response?.data || error.message
       );
-      alert("Failed to create tenancy. Please try again.");
+      toast.error("Failed to create tenancy. Please try again.");
     }
   };
 

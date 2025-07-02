@@ -8,10 +8,10 @@ import viewicon from "../../../assets/Images/Admin Tenancy/view-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenants/downarrow.svg";
 import { BASE_URL } from "../../../utils/config";
 import { useModal } from "../../../context/ModalContext";
-import TenancyRenewalModal from "./TenancyRenewalModal/TenancyRenewalModal";
 import CustomDropDown from "../../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
 import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
+import toast, { Toaster } from "react-hot-toast";
 
 const TenancyRenewal = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -112,9 +112,10 @@ const TenancyRenewal = () => {
         setTenancies(
           tenancies.filter((tenancy) => tenancy.id !== tenancyToDelete)
         );
+        toast.success("Tenancy deleted successfully")
       } catch (error) {
         console.error("Error deleting tenancy:", error);
-        alert("Failed to delete tenancy. Please try again.");
+        toast.error("Failed to delete tenancy. Please try again.");
       }
     }
     setShowDeleteModal(false);
@@ -193,6 +194,7 @@ const TenancyRenewal = () => {
 
   return (
     <div className="border border-[#E9E9E9] rounded-md tenancy-table">
+      <Toaster />
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] tenancy-table-header">
         <h1 className="tenancy-head">Tenancy Renewal</h1>
         <div className="flex flex-col md:flex-row gap-[10px] tenancy-inputs-container">
@@ -540,8 +542,6 @@ const TenancyRenewal = () => {
           </button>
         </div>
       </div>
-      <TenancyRenewalModal />
-
       {/* Confirmation Modal */}
       <ConfirmationModal
         isOpen={showDeleteModal}

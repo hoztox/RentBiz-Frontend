@@ -4,7 +4,7 @@ import "./TenancyRenewalModal.css";
 import closeicon from "../../../../assets/Images/Admin Tenancy/Tenenacy Modal/close-icon.svg";
 import deleteicon from "../../../../assets/Images/Admin Tenancy/Tenenacy Modal/delete-icon.svg";
 import plusicon from "../../../../assets/Images/Admin Tenancy/Tenenacy Modal/plus-icon.svg";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
@@ -104,63 +104,61 @@ const TenancyRenewalModal = () => {
 
   // Fetch tenants, buildings, units, and charge types
   useEffect(() => {
-    const fetchData = async () => {
-      const companyId = getUserCompanyId();
-      if (!companyId) {
-        setError("Company ID not found. Please log in again.");
-        toast.error("Company ID not found. Please log in again.");
-        return;
-      }
-
-      try {
-        setLoading(true);
-        setError(null);
-
-        const [tenantsRes, buildingsRes, buildingsVacant, chargeTypesRes] = await Promise.all([
-          axios.get(`${BASE_URL}/company/tenant/company/${companyId}/`),
-          axios.get(`${BASE_URL}/company/buildings/company/${companyId}/`),
-          axios.get(`${BASE_URL}/company/buildings/vacant/${companyId}/`),
-          axios.get(`${BASE_URL}/company/charges/company/${companyId}/`),
-        ]);
-
-        setTenants(tenantsRes.data);
-        setBuildings(buildingsRes.data);
-        setVacantBuildings(buildingsVacant.data);
-
-        setChargeTypes(chargeTypesRes.data);
-
-        // Combine vacant buildings with the current tenancy's building
-        const tenancyBuilding = modalState.data?.building;
-        if (tenancyBuilding) {
-          const combinedBuildings = [...buildingsVacant.data];
-          const isTenancyBuildingInVacant = buildingsVacant.data.some(
-            (building) => building.id === tenancyBuilding.id
-          );
-          if (!isTenancyBuildingInVacant) {
-            combinedBuildings.push(tenancyBuilding);
-          }
-          const uniqueBuildings = Array.from(
-            new Map(combinedBuildings.map((building) => [building.id, building])).values()
-          );
-          setDisplayBuildings(uniqueBuildings);
-        } else {
-          setDisplayBuildings(buildingsVacant.data);
-        }
-
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        const errorMessage = error.response?.data?.message || "Failed to load data. Please try again.";
-        setError(errorMessage);
-        toast.error(errorMessage);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (modalState.isOpen && modalState.type === "tenancy-renew") {
-      fetchData();
+  const fetchData = async () => {
+    const companyId = getUserCompanyId();
+    if (!companyId) {
+      setError("Company ID not found. Please log in again.");
+      toast.error("Company ID not found. Please log in again.");
+      return;
     }
-  }, [modalState.isOpen, modalState.type, modalState.data]);
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      const [tenantsRes, buildingsRes, buildingsVacant, chargeTypesRes] = await Promise.all([
+        axios.get(`${BASE_URL}/company/tenant/company/${companyId}/`),
+        axios.get(`${BASE_URL}/company/buildings/company/${companyId}/`),
+        axios.get(`${BASE_URL}/company/buildings/vacant/${companyId}/`),
+        axios.get(`${BASE_URL}/company/charges/company/${companyId}/`),
+      ]);
+
+      setTenants(Array.isArray(tenantsRes.data.results) ? tenantsRes.data.results : []);
+      setBuildings(buildingsRes.data);
+      setVacantBuildings(buildingsVacant.data);
+      setChargeTypes(chargeTypesRes.data);
+
+      // Combine vacant buildings with the current tenancy's building
+      const tenancyBuilding = modalState.data?.building;
+      if (tenancyBuilding) {
+        const combinedBuildings = [...buildingsVacant.data];
+        const isTenancyBuildingInVacant = buildingsVacant.data.some(
+          (building) => building.id === tenancyBuilding.id
+        );
+        if (!isTenancyBuildingInVacant) {
+          combinedBuildings.push(tenancyBuilding);
+        }
+        const uniqueBuildings = Array.from(
+          new Map(combinedBuildings.map((building) => [building.id, building])).values()
+        );
+        setDisplayBuildings(uniqueBuildings);
+      } else {
+        setDisplayBuildings(buildingsVacant.data);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      const errorMessage = error.response?.data?.message || "Failed to load data. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (modalState.isOpen && modalState.type === "tenancy-renew") {
+    fetchData();
+  }
+}, [modalState.isOpen, modalState.type, modalState.data]);
 
 
   useEffect(() => {
@@ -581,7 +579,7 @@ const TenancyRenewalModal = () => {
             aria-label="Close modal"
             disabled={loading}
           >
-            <img src={closeicon} alt="close-button" className="w-4 h-4" />
+            <X size={20} />
           </button>
         </div>
 

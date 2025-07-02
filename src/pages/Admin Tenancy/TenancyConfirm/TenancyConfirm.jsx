@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./TenancyConfirm.css";
 import plusicon from "../../../assets/Images/Admin Tenancy/plus-icon.svg";
-import downloadicon from "../../../assets/Images/Admin Tenancy/download-icon.svg";
 import editicon from "../../../assets/Images/Admin Tenancy/edit-icon.svg";
-import cancelicon from "../../../assets/Images/Admin Tenancy/terminate-icon.svg";
 import viewicon from "../../../assets/Images/Admin Tenancy/view-icon.svg";
 import confirmicon from "../../../assets/Images/Admin Tenancy/confirm-icon.svg";
 import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
@@ -12,8 +10,8 @@ import TenancyConfirmModal from "./TenancyConfirmModal/TenancyConfirmModal";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 import CustomDropDown from "../../../components/CustomDropDown";
-import TenancyCancelModal from "./TenancyCancelModal/TenancyCancelModal";
 import { motion, AnimatePresence } from "framer-motion";
+import toast, { Toaster } from "react-hot-toast";
 
 const TenancyConfirm = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -21,11 +19,10 @@ const TenancyConfirm = () => {
   const [expandedRows, setExpandedRows] = useState({});
   const { openModal, refreshCounter } = useModal();
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [openCancelModal, setOpenCancelModal] = useState(false);
   const [selectedTenancy, setSelectedTenancy] = useState(null);
   const [tenancies, setTenancies] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [refreshTrigger, setRefreshTrigger] = useState(0)
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const itemsPerPage = 10;
 
   const dropdownOptions = [
@@ -81,6 +78,7 @@ const TenancyConfirm = () => {
         console.log("Fetched and sorted Pending Tenancies:", sortedTenancies);
       } catch (error) {
         console.error("Error fetching tenancies:", error);
+        toast.error("Failed to fetch tenancies. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -91,11 +89,6 @@ const TenancyConfirm = () => {
   const openConfirmModal = (tenancy) => {
     setSelectedTenancy(tenancy);
     setConfirmModalOpen(true);
-  };
-
-  const cancelModalOpen = (tenancy) => {
-    setSelectedTenancy(tenancy);
-    setOpenCancelModal(true);
   };
 
   const handleConfirmAction = async () => {
@@ -118,12 +111,16 @@ const TenancyConfirm = () => {
       );
 
       console.log("Confirmed Tenancy:", tenancyData);
+      toast.success("Tenancy confirmed successfully");
       setConfirmModalOpen(false);
       setRefreshTrigger((prev) => prev + 1);
     } catch (error) {
       console.error("Error confirming tenancy:", error);
       if (error.response?.data?.errors) {
         console.error("Validation errors:", error.response.data.errors);
+        toast.error(`Failed to confirm tenancy: ${error.response.data.errors.join(", ")}`);
+      } else {
+        toast.error("Failed to confirm tenancy. Please try again.");
       }
     }
   };
@@ -181,6 +178,7 @@ const TenancyConfirm = () => {
 
   return (
     <div className="border border-[#E9E9E9] rounded-md tenancy-table">
+      <Toaster />
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] tenancy-table-header">
         <h1 className="tenancy-head">Tenancy Confirm</h1>
         <div className="flex flex-col md:flex-row gap-[10px] tenancy-inputs-container">
@@ -212,14 +210,6 @@ const TenancyConfirm = () => {
                 src={plusicon}
                 alt="plus icon"
                 className="relative right-[5px] w-[15px] h-[15px]"
-              />
-            </button>
-            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 tconfirm-download-btn">
-              Download
-              <img
-                src={downloadicon}
-                alt="Download Icon"
-                className="w-[15px] h-[15px] tconfirm-download-img"
               />
             </button>
           </div>
@@ -320,13 +310,6 @@ const TenancyConfirm = () => {
                           className="w-[26px] h-[26px] tconfirm-confirm-btn duration-200"
                         />
                       </button>
-                      <button onClick={() => cancelModalOpen(tenancy)}>
-                        <img
-                          src={cancelicon}
-                          alt="Cancel"
-                          className="w-[26px] h-[26px] tconfirm-cancel-btn duration-200"
-                        />
-                      </button>
                     </td>
                   </tr>
                 ))}
@@ -380,119 +363,110 @@ const TenancyConfirm = () => {
                       </td>
                     </tr>
                     <AnimatePresence>
-                    {expandedRows[tenancy.id] && (
-                      <motion.tr
-                        className="tconfirm-mobile-with-border border-b border-[#E9E9E9]"
-                        initial="hidden"
-                        animate="visible"
-                        exit="hidden"
-                        variants={dropdownVariants}
-                      >
-                        <td colSpan={3} className="px-5">
-                          <div className="tenancy-dropdown-content">
-                            <div className="tconfirm-grid">
-                              <div className="tconfirm-grid-item">
-                                <div className="tconfirm-dropdown-label">
-                                  BUILDING NAME
+                      {expandedRows[tenancy.id] && (
+                        <motion.tr
+                          className="tconfirm-mobile-with-border border-b border-[#E9E9E9]"
+                          initial="hidden"
+                          animate="visible"
+                          exit="hidden"
+                          variants={dropdownVariants}
+                        >
+                          <td colSpan={3} className="px-5">
+                            <div className="tenancy-dropdown-content">
+                              <div className="tconfirm-grid">
+                                <div className="tconfirm-grid-item">
+                                  <div className="tconfirm-dropdown-label">
+                                    BUILDING NAME
+                                  </div>
+                                  <div className="tconfirm-dropdown-value">
+                                    {tenancy.building?.building_name || "N/A"}
+                                  </div>
                                 </div>
-                                <div className="tconfirm-dropdown-value">
-                                  {tenancy.building?.building_name || "N/A"}
-                                </div>
-                              </div>
-                              <div className="tconfirm-grid-item">
-                                <div className="tconfirm-dropdown-label">
-                                  UNIT NAME
-                                </div>
-                                <div className="tconfirm-dropdown-value">
-                                  {tenancy.unit?.unit_name || "N/A"}
-                                </div>
-                              </div>
-                            </div>
-                            <div className="tconfirm-grid">
-                              <div className="tconfirm-grid-item">
-                                <div className="tconfirm-dropdown-label">
-                                  RENTAL MONTHS
-                                </div>
-                                <div className="tconfirm-dropdown-value">
-                                  {tenancy.rental_months}
+                                <div className="tconfirm-grid-item">
+                                  <div className="tconfirm-dropdown-label">
+                                    UNIT NAME
+                                  </div>
+                                  <div className="tconfirm-dropdown-value">
+                                    {tenancy.unit?.unit_name || "N/A"}
+                                  </div>
                                 </div>
                               </div>
-                              <div className="tconfirm-grid-item">
-                                <div className="tconfirm-dropdown-label">
-                                  STATUS
+                              <div className="tconfirm-grid">
+                                <div className="tconfirm-grid-item">
+                                  <div className="tconfirm-dropdown-label">
+                                    RENTAL MONTHS
+                                  </div>
+                                  <div className="tconfirm-dropdown-value">
+                                    {tenancy.rental_months}
+                                  </div>
                                 </div>
-                                <div className="tconfirm-dropdown-value">
-                                  <span
-                                    className={`px-[10px] py-[5px] h-[24px] rounded-[4px] tenancy-status ${
-                                      tenancy.status === "pending"
-                                        ? "bg-[#E8EFF6] text-[#1458A2]"
-                                        : tenancy.status === "active"
-                                        ? "bg-[#E6F3E6] text-[#28A745]"
-                                        : "bg-[#FFE6E6] text-[#DC3545]"
-                                    }`}
-                                  >
-                                    {tenancy.status.charAt(0).toUpperCase() +
-                                      tenancy.status.slice(1)}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="tconfirm-grid">
-                              <div className="tconfirm-grid-item">
-                                <div className="tconfirm-dropdown-label">
-                                  VIEW
-                                </div>
-                                <div className="tconfirm-dropdown-value">
-                                  <button
-                                    onClick={() => handleViewClick(tenancy)}
-                                  >
-                                    <img
-                                      src={viewicon}
-                                      alt="View"
-                                      className="w-[30px] h-[24px] tconfirm-action-btn duration-200"
-                                    />
-                                  </button>
+                                <div className="tconfirm-grid-item">
+                                  <div className="tconfirm-dropdown-label">
+                                    STATUS
+                                  </div>
+                                  <div className="tconfirm-dropdown-value">
+                                    <span
+                                      className={`px-[10px] py-[5px] h-[24px] rounded-[4px] tenancy-status ${
+                                        tenancy.status === "pending"
+                                          ? "bg-[#FFF3E0] text-[#F57C00]"
+                                          : tenancy.status === "active"
+                                          ? "bg-[#E6F3E6] text-[#28A745]"
+                                          : "bg-[#FFE6E6] text-[#DC3545]"
+                                      }`}
+                                    >
+                                      {tenancy.status.charAt(0).toUpperCase() +
+                                        tenancy.status.slice(1)}
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
-                              <div className="tconfirm-grid-item tconfirm-action-column">
-                                <div className="tconfirm-dropdown-label">
-                                  ACTION
+                              <div className="tconfirm-grid">
+                                <div className="tconfirm-grid-item">
+                                  <div className="tconfirm-dropdown-label">
+                                    VIEW
+                                  </div>
+                                  <div className="tconfirm-dropdown-value">
+                                    <button
+                                      onClick={() => handleViewClick(tenancy)}
+                                    >
+                                      <img
+                                        src={viewicon}
+                                        alt="View"
+                                        className="w-[30px] h-[24px] tconfirm-action-btn duration-200"
+                                      />
+                                    </button>
+                                  </div>
                                 </div>
-                                <div className="tconfirm-dropdown-value tconfirm-flex tconfirm-items-center p-[5px]">
-                                  <button
-                                    onClick={() => handleEditClick(tenancy)}
-                                  >
-                                    <img
-                                      src={editicon}
-                                      alt="Edit"
-                                      className="w-[18px] h-[18px] tconfirm-action-btn duration-200"
-                                    />
-                                  </button>
-                                  <button
-                                    onClick={() => openConfirmModal(tenancy)}
-                                  >
-                                    <img
-                                      src={confirmicon}
-                                      alt="Confirm"
-                                      className="w-[24px] h-[20px] tconfirm-confirm-btn duration-200 ml-2"
-                                    />
-                                  </button>
-                                  <button
-                                    onClick={() => cancelModalOpen(tenancy)}
-                                  >
-                                    <img
-                                      src={cancelicon}
-                                      alt="Cancel"
-                                      className="w-[24px] h-[20px] tconfirm-cancel-btn duration-200 ml-2"
-                                    />
-                                  </button>
+                                <div className="tconfirm-grid-item tconfirm-action-column">
+                                  <div className="tconfirm-dropdown-label">
+                                    ACTION
+                                  </div>
+                                  <div className="tconfirm-dropdown-value tconfirm-flex tconfirm-items-center p-[5px]">
+                                    <button
+                                      onClick={() => handleEditClick(tenancy)}
+                                    >
+                                      <img
+                                        src={editicon}
+                                        alt="Edit"
+                                        className="w-[18px] h-[18px] tconfirm-action-btn duration-200"
+                                      />
+                                    </button>
+                                    <button
+                                      onClick={() => openConfirmModal(tenancy)}
+                                    >
+                                      <img
+                                        src={confirmicon}
+                                        alt="Confirm"
+                                        className="w-[24px] h-[20px] tconfirm-confirm-btn duration-200 ml-2"
+                                      />
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        </td>
-                      </motion.tr>
-                    )}
+                          </td>
+                        </motion.tr>
+                      )}
                     </AnimatePresence>
                   </React.Fragment>
                 ))}
@@ -567,11 +541,6 @@ const TenancyConfirm = () => {
             isOpen={confirmModalOpen}
             onCancel={() => setConfirmModalOpen(false)}
             onConfirm={handleConfirmAction}
-            tenancy={selectedTenancy}
-          />
-          <TenancyCancelModal
-            isOpen={openCancelModal}
-            onCancel={() => setOpenCancelModal(false)}
             tenancy={selectedTenancy}
           />
         </>

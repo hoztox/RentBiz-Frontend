@@ -1,13 +1,14 @@
 import React from "react";
 import "./modal.css";
 import confirmImage from "../../../../assets/Images/Admin Tenancy/modal-img.svg";
+import toast from "react-hot-toast";
 
-const TenancyConfirmModal = ({
-  isOpen,
-  onCancel,
-  onConfirm,
-}) => {
+const TenancyConfirmModal = ({ isOpen, onCancel, onConfirm, tenancy }) => {
   if (!isOpen) return null;
+
+  const handleConfirm = () => {
+    onConfirm();
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -23,7 +24,10 @@ const TenancyConfirmModal = ({
             <h2 className="text-2xl font-semibold text-[#28C76F]">
               Are You Sure?
             </h2>
-            <p className="text-gray-600 text-sm">Are you sure to confirm</p>
+            <p className="text-gray-600 text-sm">
+              Are you sure you want to confirm the tenancy for{" "}
+              {tenancy?.tenant?.tenant_name || "N/A"}?
+            </p>
           </div>
           <div className="flex gap-3">
             <button
@@ -34,7 +38,7 @@ const TenancyConfirmModal = ({
             </button>
 
             <button
-              onClick={onConfirm}
+              onClick={handleConfirm}
               className="flex-1 bg-[#2892CE] text-white hover:bg-[#1f709e] duration-200 focus:outline-none modal-confirm-btn"
             >
               Confirm
