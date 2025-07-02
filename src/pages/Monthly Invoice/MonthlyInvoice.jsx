@@ -186,37 +186,37 @@ const MonthlyInvoice = () => {
     <div className="border border-[#E9E9E9] rounded-md mi-table">
       <Toaster />
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] mi-table-header">
-  <h1 className="mi-head">Invoice List (Auto Generated)</h1>
-  <div className="flex flex-col md:flex-row gap-[10px] mi-inputs-container">
-    <input
-      type="text"
-      placeholder="Search"
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-      className="px-[14px] py-[7px] h-[38px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 mi-search"
-    />
-    <div className="flex flex-row gap-[10px] w-full md:w-auto mi-second-row-container">
-      <div className="relative flex-1 md:flex-none w-[60%] md:w-auto">
-        <CustomDropDown
-          options={dropdownOptions}
-          value={statusFilter}
-          onChange={setStatusFilter}
-          placeholder="Select Status"
-          className="w-full md:w-[121px]"
-          dropdownClassName="h-[38px] px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 mi-selection"
-        />
+        <h1 className="mi-head">Invoice List (Auto Generated)</h1>
+        <div className="flex flex-col md:flex-row gap-[10px] mi-inputs-container">
+          <input
+            type="text"
+            placeholder="Search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="px-[14px] py-[7px] h-[38px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 mi-search"
+          />
+          <div className="flex flex-row gap-[10px] w-full md:w-auto mi-second-row-container">
+            <div className="relative flex-1 md:flex-none w-[60%] md:w-auto">
+              <CustomDropDown
+                options={dropdownOptions}
+                value={statusFilter}
+                onChange={setStatusFilter}
+                placeholder="Select Status"
+                className="w-full md:w-[121px]"
+                dropdownClassName="h-[38px] px-[14px] py-[7px] border-[#201D1E20] focus:border-gray-300 mi-selection"
+              />
+            </div>
+            <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 mi-download-btn">
+              Download
+              <img
+                src={downloadicon}
+                alt="Download Icon"
+                className="w-[15px] h-[15px] mi-download-img"
+              />
+            </button>
+          </div>
+        </div>
       </div>
-      <button className="flex items-center justify-center gap-2 w-full md:w-[122px] h-[38px] rounded-md duration-200 mi-download-btn">
-        Download
-        <img
-          src={downloadicon}
-          alt="Download Icon"
-          className="w-[15px] h-[15px] mi-download-img"
-        />
-      </button>
-    </div>
-  </div>
-</div>
       <div className="mi-desktop-only">
         <table className="w-full border-collapse">
           <thead>
@@ -244,11 +244,21 @@ const MonthlyInvoice = () => {
                     year: "numeric",
                   })}
                 </td>
-                <td className="pl-5 text-left mi-data">{invoice.tenancy?.tenancy_code || "N/A"}</td>
-                <td className="pl-5 text-left mi-data">{invoice.tenancy?.tenant?.tenant_name || "N/A"}</td>
-                <td className="px-5 text-left mi-data">{invoice.total_amount}</td>
+                <td className="pl-5 text-left mi-data">
+                  {invoice.tenancy?.tenancy_code || "N/A"}
+                </td>
+                <td className="pl-5 text-left mi-data">
+                  {invoice.tenancy?.tenant?.tenant_name || "N/A"}
+                </td>
+                <td className="px-5 text-left mi-data">
+                  {invoice.total_amount}
+                </td>
                 <td className="pl-14 text-center pr-5 pt-2">
-                  <button onClick={() => openModal("view-monthly-invoice", null, invoice)}>
+                  <button
+                    onClick={() =>
+                      openModal("view-monthly-invoice", "View Invoice", invoice)
+                    }
+                  >
                     <img
                       src={viewicon}
                       alt="View"
@@ -275,43 +285,49 @@ const MonthlyInvoice = () => {
           <thead>
             <tr className="mi-table-row-head">
               <th className="px-5 text-left mi-thead mi-id-column">ID</th>
-              <th className="px-5 text-left mi-thead mi-date-column">TENANT NAME</th>
+              <th className="px-5 text-left mi-thead mi-date-column">
+                TENANT NAME
+              </th>
               <th className="px-5 text-right mi-thead"></th>
             </tr>
           </thead>
           <tbody>
-            {invoices.map((invoice, index) => (
-              <React.Fragment key={index}>
+            {invoices.map((invoice) => (
+              <React.Fragment key={invoice.id}>
+                {" "}
+                {/* Use invoice.id as the key */}
                 <tr
                   className={`${
-                    expandedRows[invoice.id + index]
+                    expandedRows[invoice.id]
                       ? "mi-mobile-no-border"
                       : "mi-mobile-with-border"
                   } border-b border-[#E9E9E9] h-[57px]`}
                 >
-                  <td className="px-5 text-left mi-data mi-id-column">{invoice.id}</td>
+                  <td className="px-5 text-left mi-data mi-id-column">
+                    {invoice.id}
+                  </td>
                   <td className="px-5 text-left mi-data mi-date-column">
                     {invoice.tenancy?.tenant?.tenant_name || "N/A"}
                   </td>
-                  <td className="py-4 flex items-center justify-end h-[57px]">
+                  <td className="py-4 flex items-center justify personally-end h-[57px]">
                     <div
                       className={`mi-dropdown-field ${
-                        expandedRows[invoice.id + index] ? "active" : ""
+                        expandedRows[invoice.id] ? "active" : ""
                       }`}
-                      onClick={() => toggleRowExpand(invoice.id + index)}
+                      onClick={() => toggleRowExpand(invoice.id)} // Pass only invoice.id
                     >
                       <img
                         src={downarrow}
                         alt="drop-down-arrow"
                         className={`mi-dropdown-img ${
-                          expandedRows[invoice.id + index] ? "text-white" : ""
+                          expandedRows[invoice.id] ? "text-white" : ""
                         }`}
                       />
                     </div>
                   </td>
                 </tr>
                 <AnimatePresence>
-                  {expandedRows[invoice.id + index] && (
+                  {expandedRows[invoice.id] && (
                     <motion.tr
                       className="mi-mobile-with-border border-b border-[#E9E9E9]"
                       initial="hidden"
@@ -323,29 +339,48 @@ const MonthlyInvoice = () => {
                         <div className="mi-dropdown-content">
                           <div className="mi-dropdown-content-grid">
                             <div className="mi-dropdown-content-item w-[50%]">
-                              <div className="mi-dropdown-label">TENANCY ID</div>
-                              <div className="mi-dropdown-value">{invoice.tenancy?.tenancy_code || "N/A"}</div>
+                              <div className="mi-dropdown-label">
+                                TENANCY ID
+                              </div>
+                              <div className="mi-dropdown-value">
+                                {invoice.tenancy?.tenancy_code || "N/A"}
+                              </div>
                             </div>
                             <div className="mi-dropdown-content-item w-[50%]">
                               <div className="mi-dropdown-label">DATE</div>
                               <div className="mi-dropdown-value">
-                                {new Date(invoice.in_date).toLocaleDateString("en-GB", {
-                                  day: "2-digit",
-                                  month: "short",
-                                  year: "numeric",
-                                })}
+                                {new Date(invoice.in_date).toLocaleDateString(
+                                  "en-GB",
+                                  {
+                                    day: "2-digit",
+                                    month: "short",
+                                    year: "numeric",
+                                  }
+                                )}
                               </div>
                             </div>
                           </div>
                           <div className="mi-dropdown-content-grid">
                             <div className="mi-dropdown-content-item w-[50%]">
-                              <div className="mi-dropdown-label">AMOUNT DUE</div>
-                              <div className="mi-dropdown-value">{invoice.total_amount}</div>
+                              <div className="mi-dropdown-label">
+                                AMOUNT DUE
+                              </div>
+                              <div className="mi-dropdown-value">
+                                {invoice.total_amount}
+                              </div>
                             </div>
                             <div className="mi-dropdown-content-item w-[25%]">
                               <div className="mi-dropdown-label">VIEW</div>
                               <div className="mi-dropdown-value">
-                                <button onClick={() => openModal("view-monthly-invoice", null, invoice)}>
+                                <button
+                                  onClick={() =>
+                                    openModal(
+                                      "view-monthly-invoice",
+                                      "View Invoice",
+                                      invoice
+                                    )
+                                  }
+                                >
                                   <img
                                     src={viewicon}
                                     alt="View"
@@ -356,12 +391,14 @@ const MonthlyInvoice = () => {
                             </div>
                             <div className="mi-dropdown-content-item w-[25%]">
                               <div className="mi-dropdown-label">ACTION</div>
-                              <div className="mi-dropdown-value flex items-center gap-4">
-                                <button onClick={() => handleDeleteClick(invoice)}>
+                              <div className="mi-dropdown-value flex items-center gap-4 ml-3">
+                                <button
+                                  onClick={() => handleDeleteClick(invoice)}
+                                >
                                   <img
                                     src={deleteicon}
                                     alt="Delete"
-                                    className="w-[18px] h-[18px] mi-action-btn duration-200"
+                                    className="w-[18px] h-[18px] mt-1 mi-action-btn duration-200"
                                   />
                                 </button>
                               </div>
@@ -380,9 +417,9 @@ const MonthlyInvoice = () => {
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
         <span className="collection-list-pagination">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, totalCount)} to{" "}
-          {Math.min(currentPage * itemsPerPage, totalCount)} of{" "}
-          {totalCount} entries
+          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, totalCount)}{" "}
+          to {Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount}{" "}
+          entries
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
           <button
