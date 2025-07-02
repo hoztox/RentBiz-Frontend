@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import "./UpdateUnitTypeModal.css";
-import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { useModal } from "../../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
 import { unitTypesApi } from "../../MastersApi"; // Updated import
+import { X } from "lucide-react";
 
 const UpdateUnitTypeModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
@@ -26,7 +26,11 @@ const UpdateUnitTypeModal = () => {
   }, [modalState.isOpen, modalState.type, modalState.data]);
 
   // Only render for "update-unit-type-master" type and valid data
-  if (!modalState.isOpen || modalState.type !== "update-unit-type-master" || !modalState.data) {
+  if (
+    !modalState.isOpen ||
+    modalState.type !== "update-unit-type-master" ||
+    !modalState.data
+  ) {
     return null;
   }
 
@@ -89,7 +93,7 @@ const UpdateUnitTypeModal = () => {
             aria-label="Close modal"
             disabled={loading}
           >
-            <img src={closeicon} alt="close" className="w-4 h-4" />
+            <X size={20} />
           </button>
         </div>
 

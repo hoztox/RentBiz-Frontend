@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "./CreateUnitTypeModal.css";
-import closeicon from "../../../../assets/Images/Admin Masters/close-icon.svg";
 import { toast, Toaster } from "react-hot-toast";
 import { useModal } from "../../../../context/ModalContext";
 import { unitTypesApi } from "../../MastersApi"; // Updated import
+import { X } from "lucide-react";
 
 const CreateUnitTypeModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
@@ -64,7 +64,7 @@ const CreateUnitTypeModal = () => {
             className="close-btn hover:bg-gray-100 duration-200"
             aria-label="Close modal"
           >
-            <img src={closeicon} alt="close" className="w-4 h-4" />
+            <X size={20} />
           </button>
         </div>
 
