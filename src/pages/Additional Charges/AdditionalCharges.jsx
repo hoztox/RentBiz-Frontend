@@ -31,6 +31,7 @@ const AdminAdditionalCharges = () => {
     { label: "All", value: "all" },
     { label: "Pending", value: "pending" },
     { label: "Paid", value: "paid" },
+    { label: "Invoiced", value: "invoiced" }, // Updated from "invoice" to "invoiced"
   ];
 
   const fetchAdditionalCharges = async (page = 1, search = "", status = "") => {
@@ -51,7 +52,12 @@ const AdminAdditionalCharges = () => {
       );
 
       if (response.data.results.success && response.data.results.data) {
-        setCharges(response.data.results.data);
+        // Normalize status from "invoice" to "invoiced"
+        const normalizedCharges = response.data.results.data.map((charge) => ({
+          ...charge,
+          status: charge.status === "invoice" ? "invoiced" : charge.status,
+        }));
+        setCharges(normalizedCharges);
         setTotalItems(response.data.count || 0);
         console.log(response, "Response from fetchAdditionalCharges");
       } else {
@@ -183,6 +189,18 @@ const AdminAdditionalCharges = () => {
       height: "auto",
       transition: { duration: 0.3, ease: "easeInOut" },
     },
+  };
+
+  const getStatusStyles = (status) => {
+    if (status === "paid") {
+      return "bg-[#28C76F29] text-[#28C76F]";
+    } else if (status === "invoiced") {
+      return "bg-[#E8EFF6] text-[#1458A2]";
+    } else if (status === "partially_paid") {
+      return "bg-[#FFF7E9] text-[#FBAD27]";
+    } else {
+      return "bg-[#FFE1E1] text-[#C72828]";
+    }
   };
 
   if (loading) return <div className="p-5">Loading...</div>;
@@ -320,13 +338,9 @@ const AdminAdditionalCharges = () => {
                 </td>
                 <td className="px-5 text-left admin-add-charges-data">
                   <span
-                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
-                      charge.status === "paid"
-                        ? "bg-[#28C76F29] text-[#28C76F]"
-                        : charge.status === "invoice"
-                        ? "bg-[#E8EFF6] text-[#1458A2]"
-                        : "bg-[#FFE1E1] text-[#C72828]"
-                    }`}
+                    className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${getStatusStyles(
+                      charge.status
+                    )}`}
                   >
                     {charge.status.charAt(0).toUpperCase() +
                       charge.status.slice(1)}
@@ -413,7 +427,9 @@ const AdminAdditionalCharges = () => {
                         <div className="admin-add-charges-dropdown-content">
                           <div className="admin-add-charges-dropdown-grid">
                             <div className="admin-add-charges-dropdown-item w-[50%]">
-                              <div className="admin-add-charges-dropdown-label">AMOUNT DUE</div>
+                              <div className="admin-add-charges-dropdown-label">
+                                AMOUNT DUE
+                              </div>
                               <div className="admin-add-charges-dropdown-value">
                                 {charge.amount
                                   ? parseFloat(charge.amount).toFixed(2)
@@ -421,7 +437,9 @@ const AdminAdditionalCharges = () => {
                               </div>
                             </div>
                             <div className="admin-add-charges-dropdown-item w-[50%]">
-                              <div className="admin-add-charges-dropdown-label">REASON</div>
+                              <div className="admin-add-charges-dropdown-label">
+                                REASON
+                              </div>
                               <div className="admin-add-charges-dropdown-value">
                                 {charge.reason || "N/A"}
                               </div>
@@ -429,7 +447,9 @@ const AdminAdditionalCharges = () => {
                           </div>
                           <div className="admin-add-charges-dropdown-grid">
                             <div className="admin-add-charges-dropdown-item w-[50%]">
-                              <div className="admin-add-charges-dropdown-label">IN DATE</div>
+                              <div className="admin-add-charges-dropdown-label">
+                                IN DATE
+                              </div>
                               <div className="admin-add-charges-dropdown-value">
                                 {charge.in_date
                                   ? new Date(charge.in_date).toLocaleDateString(
@@ -444,33 +464,32 @@ const AdminAdditionalCharges = () => {
                               </div>
                             </div>
                             <div className="admin-add-charges-dropdown-item w-[50%]">
-                              <div className="admin-add-charges-dropdown-label">DUE DATE</div>
+                              <div className="admin-add-charges-dropdown-label">
+                                DUE DATE
+                              </div>
                               <div className="admin-add-charges-dropdown-value">
                                 {charge.due_date
-                                  ? new Date(charge.due_date).toLocaleDateString(
-                                      "en-GB",
-                                      {
-                                        day: "2-digit",
-                                        month: "short",
-                                        year: "numeric",
-                                      }
-                                    )
+                                  ? new Date(
+                                      charge.due_date
+                                    ).toLocaleDateString("en-GB", {
+                                      day: "2-digit",
+                                      month: "short",
+                                      year: "numeric",
+                                    })
                                   : "N/A"}
                               </div>
                             </div>
                           </div>
                           <div className="admin-add-charges-dropdown-grid">
                             <div className="admin-add-charges-dropdown-item w-[50%]">
-                              <div className="admin-add-charges-dropdown-label">STATUS</div>
+                              <div className="admin-add-charges-dropdown-label">
+                                STATUS
+                              </div>
                               <div className="admin-add-charges-dropdown-value">
                                 <span
-                                  className={`admin-add-charges-status ${
-                                    charge.status === "paid"
-                                      ? "bg-[#28C76F29] text-[#28C76F]"
-                                      : charge.status === "invoice"
-                                      ? "bg-[#E8EFF6] text-[#1458A2]"
-                                      : "bg-[#FFE1E1] text-[#C72828]"
-                                  }`}
+                                  className={`admin-add-charges-status ${getStatusStyles(
+                                    charge.status
+                                  )}`}
                                 >
                                   {charge.status.charAt(0).toUpperCase() +
                                     charge.status.slice(1)}
@@ -478,7 +497,9 @@ const AdminAdditionalCharges = () => {
                               </div>
                             </div>
                             <div className="admin-add-charges-dropdown-item w-[50%]">
-                              <div className="admin-add-charges-dropdown-label">ACTION</div>
+                              <div className="admin-add-charges-dropdown-label">
+                                ACTION
+                              </div>
                               <div className="admin-add-charges-dropdown-value flex items-center gap-4 mt-[10px]">
                                 <button onClick={() => handleEditClick(charge)}>
                                   <img
@@ -487,7 +508,9 @@ const AdminAdditionalCharges = () => {
                                     className="w-[18px] h-[18px] admin-add-charges-action-btn duration-200"
                                   />
                                 </button>
-                                <button onClick={() => handleDeleteClick(charge)}>
+                                <button
+                                  onClick={() => handleDeleteClick(charge)}
+                                >
                                   <img
                                     src={deleteicon}
                                     alt="Delete"
