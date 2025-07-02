@@ -215,7 +215,7 @@
 
 @media (max-width: 428px) {
   .mi-thead.mi-date-column {
-    padding-left: 17px;
+    padding-left: 20px;
     padding-right: 0;
   }
   .mi-data.mi-date-column {
@@ -330,7 +330,7 @@
   }
   .mi-data.mi-date-column {
     white-space: nowrap;
-    padding-left: 17px;
+    padding-left: 20px;
     padding-right: 0;
   }
   .mi-dropdown-label {
