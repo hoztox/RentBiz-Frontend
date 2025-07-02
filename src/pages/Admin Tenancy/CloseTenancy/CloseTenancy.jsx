@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./CloseTenancy.css";
 import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 import downloadicon from "../../../assets/Images/Admin Tenancy/download-icon.svg";
 import deleteicon from "../../../assets/Images/Admin Tenancy/delete-icon.svg";
 import viewicon from "../../../assets/Images/Admin Tenancy/view-icon.svg";
@@ -42,11 +43,13 @@ const CloseTenancy = () => {
         companyId = localStorage.getItem("company_id");
         companyId = companyId ? JSON.parse(companyId) : null;
       } catch (e) {
-        console.error("Error parsing user company ID:", e);
+        toast.error("Error parsing user company ID");
       }
     }
 
-    console.log("Company ID:", companyId); // Debug log
+    if (!companyId) {
+      toast.error("No company ID found");
+    }
     return companyId;
   };
 
@@ -56,7 +59,6 @@ const CloseTenancy = () => {
       try {
         const companyId = getUserCompanyId();
         if (!companyId) {
-          console.error("No company ID found");
           return;
         }
         const response = await axios.get(
@@ -67,9 +69,9 @@ const CloseTenancy = () => {
         );
         const sortedTenancies = response.data.sort((a, b) => a.id - b.id);
         setTenancies(sortedTenancies);
-        console.log("Fetched Tenancies:", response.data);
+        console.log("Tenancies fetched successfully");
       } catch (error) {
-        console.error("Error fetching tenancies:", error);
+        toast.error("Error fetching tenancies");
       }
     };
     fetchTenancies();
@@ -89,7 +91,6 @@ const CloseTenancy = () => {
       isClose: tenancy.is_close || false,
       tenancy_code: tenancy.tenancy_code,
     };
-    console.log("Formatted Tenancy:", formatted);
     return formatted;
   });
 
@@ -108,15 +109,11 @@ const CloseTenancy = () => {
       (tenancy.renew || "N/A").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  console.log("Filtered Data:", filteredData); // Debug log
-
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const paginatedData = filteredData.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
-  console.log("Paginated Data:", paginatedData); // Debug log
 
   useEffect(() => {
     if (filteredData.length === 0) {
@@ -133,7 +130,6 @@ const CloseTenancy = () => {
   const toggleRowExpand = (id) => {
     setExpandedRows((prev) => {
       const newState = { ...prev, [id]: !prev[id] };
-      console.log("Expanded Rows:", newState); // Debug log
       return newState;
     });
   };
@@ -167,12 +163,12 @@ const CloseTenancy = () => {
     try {
       await axios.delete(`${BASE_URL}/company/tenancies/${id}/`);
       setTenancies(tenancies.filter((tenancy) => tenancy.id !== id));
-      console.log("Deleted Tenancy ID:", id);
-      setShowConfirmationModal(false); // Close modal
-      setSelectedTenancyId(null); // Clear selected tenancy ID
-      setConfirmationAction(null); // Clear action
+      toast.success("Tenancy deleted successfully");
+      setShowConfirmationModal(false);
+      setSelectedTenancyId(null);
+      setConfirmationAction(null);
     } catch (error) {
-      console.error("Error deleting tenancy:", error);
+      toast.error("Error deleting tenancy");
     }
   };
 
@@ -182,13 +178,9 @@ const CloseTenancy = () => {
     );
 
     if (originalTenancy) {
-      console.log("View Original Tenancy Data:", originalTenancy);
       openModal("tenancy-view", "View Tenancy", originalTenancy);
     } else {
-      console.error(
-        "Original tenancy data not found for:",
-        formattedTenancy.tenancy_code
-      );
+      toast.error("Original tenancy data not found");
       openModal("tenancy-view", "View Tenancy", formattedTenancy);
     }
   };
@@ -207,16 +199,18 @@ const CloseTenancy = () => {
             : tenancy
         )
       );
-      setShowConfirmationModal(false); // Close modal
-      setSelectedTenancyId(null); // Clear selected tenancy ID
-      setConfirmationAction(null); // Clear action
+      toast.success("Tenancy closed successfully");
+      setShowConfirmationModal(false);
+      setSelectedTenancyId(null);
+      setConfirmationAction(null);
     } catch (error) {
-      console.error("Error closing tenancy:", error);
+      toast.error("Error closing tenancy");
     }
   };
 
   return (
     <div className="border border-[#E9E9E9] rounded-md tenancy-table">
+      <Toaster position="top-right" reverseOrder={false} />
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] tenancy-table-header">
         <h1 className="tenancy-head">Tenancy Closing</h1>
         <div className="flex flex-col md:flex-row gap-[10px] tenancy-inputs-container">
@@ -226,7 +220,6 @@ const CloseTenancy = () => {
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
-              console.log("Search Term:", e.target.value); // Debug log
             }}
             className="px-[14px] py-[7px] h-[38px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 tclose-search"
           />
@@ -447,7 +440,7 @@ const CloseTenancy = () => {
                               </div>
                             </div>
                             <div className="tclose-grid">
-                              <div className="tclose-grid-item">
+                              <div className="tclose-Grok grid-item">
                                 <div className="tclose-dropdown-label">
                                   VIEW
                                 </div>

@@ -11,6 +11,7 @@ import { useModal } from "../../../context/ModalContext";
 import { motion, AnimatePresence } from "framer-motion";
 import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
 import CustomDropDown from "../../../components/CustomDropDown";
+import { toast, Toaster } from "react-hot-toast"
 
 const Buildings = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -132,9 +133,11 @@ const Buildings = () => {
           "Buildings: Successfully deleted building",
           buildingToDelete
         );
+        toast.success("Successfully deleted building")
       }
     } catch (err) {
       console.error("Failed to delete building", err);
+      toast.error("Failed to delete building")
       setError(
         "Failed to delete building: " +
           (err.response?.data?.message || err.message)
@@ -174,6 +177,7 @@ const Buildings = () => {
 
   return (
     <div className="border border-[#E9E9E9] rounded-md bldg-table">
+      <Toaster />
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] bldg-table-header">
         <h1 className="bldg-head">Buildings</h1>
         <div className="flex flex-col md:flex-row gap-[10px] bldg-inputs-container">

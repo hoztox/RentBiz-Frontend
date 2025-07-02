@@ -8,7 +8,6 @@ import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 import CustomDropDown from "../../../components/CustomDropDown";
-import TenancyTerminateModal from "./TenancyTerminateModal/TenancyTerminateModal";
 import { motion, AnimatePresence } from "framer-motion";
 
 const TenancyTermination = () => {

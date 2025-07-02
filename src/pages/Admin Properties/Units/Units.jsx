@@ -11,6 +11,7 @@ import { useModal } from "../../../context/ModalContext";
 import CustomDropDown from "../../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
 import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
+import toast, { Toaster } from "react-hot-toast";
 
 const Units = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,9 +33,6 @@ const Units = () => {
     {label: "Renovation",value: "renovation"},
     {label: "Vacant",value: "vacant"},
     {label: "Disputed",value: "Disputed"},
-
-
-
   ];
 
   const getUserCompanyId = () => {
@@ -97,8 +95,10 @@ const Units = () => {
       setUnits(units.filter((unit) => unit.id !== unitToDelete));
       setDeleteModalOpen(false);
       setUnitToDelete(null);
+      toast.success("Unit deleted successfully")
     } catch (error) {
       console.error("Error deleting unit:", error);
+      toast.error("Failed to delete unit")
     }
   };
 
@@ -144,6 +144,7 @@ const Units = () => {
 
   return (
     <div className="border border-[#E9E9E9] rounded-md unit-table">
+      <Toaster />
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] unit-table-header">
         <h1 className="unit-head">Units</h1>
         <div className="flex flex-col md:flex-row gap-[10px] unit-inputs-container">

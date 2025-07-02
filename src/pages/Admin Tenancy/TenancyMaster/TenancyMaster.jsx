@@ -14,6 +14,7 @@ import CustomDropDown from "../../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
 import ConfirmationModal from "../../../components/ConfirmationModal/ConfirmationModal";
 import { Edit, ChevronDown, Filter } from "lucide-react";
+import toast, { Toaster } from "react-hot-toast";
 
 const TenancyMaster = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -178,6 +179,7 @@ const TenancyMaster = () => {
         setTotalPages(Math.ceil(response.data.count / itemsPerPage));
       } catch (error) {
         console.error("Error fetching tenancies:", error);
+        toast.error("Failed to fetch tenancies. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -194,7 +196,7 @@ const TenancyMaster = () => {
       return response.data;
     } catch (error) {
       console.error("Error fetching payment schedules:", error);
-      alert("Failed to fetch payment schedules.");
+      toast.error("Failed to fetch payment schedules. Please try again.");
       return [];
     }
   };
@@ -211,9 +213,10 @@ const TenancyMaster = () => {
         setTenancies(
           tenancies.filter((tenancy) => tenancy.id !== tenancyToDelete)
         );
+        toast.success("Tenancy deleted successfully");
       } catch (error) {
         console.error("Error deleting tenancy:", error);
-        alert("Failed to delete tenancy. Please try again.");
+        toast.error("Failed to delete tenancy. Please try again.");
       }
     }
     setShowDeleteModal(false);
@@ -296,9 +299,10 @@ const TenancyMaster = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      toast.success("CSV downloaded successfully");
     } catch (error) {
       console.error("Error downloading CSV:", error);
-      alert("Failed to download CSV. Please try again.");
+      toast.error("Failed to download CSV. Please try again.");
     }
   };
 
@@ -358,6 +362,7 @@ const TenancyMaster = () => {
 
   return (
     <div className="border border-[#E9E9E9] rounded-md tenancy-table">
+      <Toaster />
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] tenancy-table-header">
         <h1 className="tenancy-head">Tenancy</h1>
         <div className="flex flex-col md:flex-row gap-[10px] tenancy-inputs-container">
