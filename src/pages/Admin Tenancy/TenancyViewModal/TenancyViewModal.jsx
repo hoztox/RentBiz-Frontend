@@ -11,7 +11,6 @@ const TenancyViewModal = () => {
   const { modalState, closeModal } = useModal();
   const [expandedStates, setExpandedStates] = useState({});
   const [tenancyData, setTenancyData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -22,12 +21,32 @@ const TenancyViewModal = () => {
     ) {
       console.log("Modal opened with data:", modalState.data); // Debug log
 
+      // Initialize with modalState.data
+      setTenancyData(modalState.data);
+
+      // Initialize expanded states for additional charges and payment schedules
+      const initialExpandedStates = {
+        ...modalState.data.additional_charges?.reduce(
+          (acc, charge) => ({
+            ...acc,
+            [`additional-${charge.id}`]: false,
+          }),
+          {}
+        ),
+        ...modalState.data.payment_schedules?.reduce(
+          (acc, schedule) => ({
+            ...acc,
+            [`schedule-${schedule.id}`]: false,
+          }),
+          {}
+        ),
+      };
+      setExpandedStates(initialExpandedStates);
+
+      // Optional: Fetch additional data if needed
       const fetchTenancyData = async () => {
         try {
-          setLoading(true);
           setError(null);
-
-          // Use the tenancy_code or id from the passed data
           const tenancyId = modalState.data.tenancy_code || modalState.data.id;
           console.log("Fetching tenancy with ID:", tenancyId); // Debug log
 
@@ -36,9 +55,10 @@ const TenancyViewModal = () => {
           );
           const data = response.data;
           console.log("Fetched tenancy data:", data); // Debug log
+          setTenancyData(data);
 
-          // Initialize expanded states for additional charges and payment schedules
-          const initialExpandedStates = {
+          // Update expanded states with fetched data
+          const updatedExpandedStates = {
             ...data.additional_charges?.reduce(
               (acc, charge) => ({
                 ...acc,
@@ -54,23 +74,16 @@ const TenancyViewModal = () => {
               {}
             ),
           };
-
-          setExpandedStates(initialExpandedStates);
-          setTenancyData(data);
-          setLoading(false);
+          setExpandedStates(updatedExpandedStates);
         } catch (err) {
           console.error("Error fetching tenancy data:", err);
           setError("Failed to fetch tenancy data");
-          setLoading(false);
-
-          // Fallback: use the data that was passed directly
-          console.log("Using fallback data:", modalState.data);
-          setTenancyData(modalState.data);
-          setLoading(false);
+          // Keep modalState.data as fallback
         }
       };
 
-      fetchTenancyData();
+      // Uncomment the following line if you still want to fetch additional data
+      // fetchTenancyData();
     }
   }, [modalState.isOpen, modalState.type, modalState.data]);
 
@@ -87,11 +100,10 @@ const TenancyViewModal = () => {
       const response = await axios.get(
         `${BASE_URL}/company/tenancy/${tenancyId}/download-pdf/`,
         {
-          responseType: "blob", // Important for handling binary data (PDF)
+          responseType: "blob",
         }
       );
 
-      // Create a blob URL and trigger download
       const blob = new Blob([response.data], { type: "application/pdf" });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -100,7 +112,7 @@ const TenancyViewModal = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      window.URL.revokeObjectURL(url); // Clean up
+      window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Error downloading PDF:", err);
       alert("Failed to download PDF. Please try again.");
@@ -109,15 +121,6 @@ const TenancyViewModal = () => {
 
   // Only render for "tenancy-view" type
   if (!modalState.isOpen || modalState.type !== "tenancy-view") return null;
-
-  if (loading)
-    return (
-      <div className="view-modal-overlay fixed inset-0 flex items-center justify-center transition-colors z-50">
-        <div className="view-modal-container bg-white rounded-md p-6 transition-all">
-          <div className="text-center">Loading...</div>
-        </div>
-      </div>
-    );
 
   if (error && !tenancyData)
     return (
