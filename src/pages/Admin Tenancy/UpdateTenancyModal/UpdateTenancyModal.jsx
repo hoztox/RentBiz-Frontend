@@ -105,8 +105,8 @@ const UpdateTenancyModal = () => {
       };
       setFormData(newFormData);
 
-      const newAdditionalCharges = tenancy.additional_charges?.map(
-        (charge, index) => ({
+      const newAdditionalCharges =
+        tenancy.additional_charges?.map((charge, index) => ({
           id: (index + 1).toString().padStart(2, "0"),
           charge_type: charge.charge_type?.id?.toString() || "",
           reason: charge.reason || "",
@@ -116,12 +116,11 @@ const UpdateTenancyModal = () => {
           tax: charge.tax ? parseFloat(charge.tax).toFixed(2) : "0.00",
           total: charge.total ? parseFloat(charge.total).toFixed(2) : "0.00",
           tax_details: charge.tax_details || [],
-        })
-      ) || [];
+        })) || [];
       setAdditionalCharges(newAdditionalCharges);
 
-      const newPaymentSchedule = tenancy.payment_schedules?.map(
-        (item, index) => ({
+      const newPaymentSchedule =
+        tenancy.payment_schedules?.map((item, index) => ({
           id: (index + 1).toString().padStart(2, "0"),
           charge_type: item.charge_type?.id?.toString() || "",
           charge_type_name: item.charge_type?.name || "",
@@ -132,17 +131,17 @@ const UpdateTenancyModal = () => {
           tax: item.tax ? parseFloat(item.tax).toFixed(2) : "0.00",
           total: item.total ? parseFloat(item.total).toFixed(2) : "",
           tax_details: item.tax_details || [],
-        })
-      ) || [];
+        })) || [];
       setPaymentSchedule(newPaymentSchedule);
 
-      const newExpandedStates = tenancy.payment_schedules?.reduce(
-        (acc, item, index) => ({
-          ...acc,
-          [(index + 1).toString().padStart(2, "0")]: false,
-        }),
-        {}
-      ) || {};
+      const newExpandedStates =
+        tenancy.payment_schedules?.reduce(
+          (acc, item, index) => ({
+            ...acc,
+            [(index + 1).toString().padStart(2, "0")]: false,
+          }),
+          {}
+        ) || {};
       setExpandedStates(newExpandedStates);
 
       setError(null);
@@ -151,107 +150,130 @@ const UpdateTenancyModal = () => {
 
   // Fetch data from APIs
   useEffect(() => {
-  const fetchData = async () => {
-    const companyId = getUserCompanyId();
-    if (!companyId) {
-      setError("Company ID not found. Please log in again.");
-      toast.error("Company ID invalid.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      const [tenantsRes, buildingsRes, buildingsVacant, chargeTypesRes] =
-        await Promise.all([
-          axios.get(`${BASE_URL}/company/tenant/company/${companyId}/`),
-          axios.get(`${BASE_URL}/company/buildings/company/${companyId}/`),
-          axios.get(`${BASE_URL}/company/buildings/vacant/${companyId}/`),
-          axios.get(`${BASE_URL}/company/charges/company/${companyId}/`),
-        ]);
-
-      // Normalize API responses to arrays
-      setTenants(Array.isArray(tenantsRes.data) ? tenantsRes.data : tenantsRes.data.results || []);
-      setBuildings(Array.isArray(buildingsRes.data) ? buildingsRes.data : buildingsRes.data.results || []);
-      setChargeTypes(Array.isArray(chargeTypesRes.data) ? chargeTypesRes.data : chargeTypesRes.data.results || []);
-
-      // Combine vacant buildings with the current tenancy's building
-      const tenancyBuilding = modalState.data?.building;
-      if (tenancyBuilding) {
-        const combinedBuildings = [...buildingsVacant.data];
-        const isTenancyBuildingInVacant = buildingsVacant.data.some(
-          (building) => building.id === tenancyBuilding.id
-        );
-        if (!isTenancyBuildingInVacant) {
-          combinedBuildings.push(tenancyBuilding);
-        }
-        const uniqueBuildings = Array.from(
-          new Map(combinedBuildings.map((building) => [building.id, building])).values()
-        );
-        setDisplayBuildings(uniqueBuildings);
-      } else {
-        setDisplayBuildings(Array.isArray(buildingsVacant.data) ? buildingsVacant.data : buildingsVacant.data.results || []);
+    const fetchData = async () => {
+      const companyId = getUserCompanyId();
+      if (!companyId) {
+        setError("Company ID not found. Please log in again.");
+        toast.error("Company ID invalid.");
+        return;
       }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      const errorMessage =
-        error.response?.data?.message ||
-        "Failed to load tenancy data. Please try again.";
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  if (modalState.isOpen && modalState.type === "tenancy-update") {
-    fetchData();
-  }
-}, [modalState.isOpen, modalState.type, modalState.data]);
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [tenantsRes, buildingsRes, buildingsVacant, chargeTypesRes] =
+          await Promise.all([
+            axios.get(`${BASE_URL}/company/tenant/company/${companyId}/`),
+            axios.get(`${BASE_URL}/company/buildings/company/${companyId}/`),
+            axios.get(`${BASE_URL}/company/buildings/vacant/${companyId}/`),
+            axios.get(`${BASE_URL}/company/charges/company/${companyId}/`),
+          ]);
+
+        // Normalize API responses to arrays
+        setTenants(
+          Array.isArray(tenantsRes.data)
+            ? tenantsRes.data
+            : tenantsRes.data.results || []
+        );
+        setBuildings(
+          Array.isArray(buildingsRes.data)
+            ? buildingsRes.data
+            : buildingsRes.data.results || []
+        );
+        setChargeTypes(
+          Array.isArray(chargeTypesRes.data)
+            ? chargeTypesRes.data
+            : chargeTypesRes.data.results || []
+        );
+
+        // Combine vacant buildings with the current tenancy's building
+        const tenancyBuilding = modalState.data?.building;
+        if (tenancyBuilding) {
+          const combinedBuildings = [...buildingsVacant.data];
+          const isTenancyBuildingInVacant = buildingsVacant.data.some(
+            (building) => building.id === tenancyBuilding.id
+          );
+          if (!isTenancyBuildingInVacant) {
+            combinedBuildings.push(tenancyBuilding);
+          }
+          const uniqueBuildings = Array.from(
+            new Map(
+              combinedBuildings.map((building) => [building.id, building])
+            ).values()
+          );
+          setDisplayBuildings(uniqueBuildings);
+        } else {
+          setDisplayBuildings(
+            Array.isArray(buildingsVacant.data)
+              ? buildingsVacant.data
+              : buildingsVacant.data.results || []
+          );
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        const errorMessage =
+          error.response?.data?.message ||
+          "Failed to load tenancy data. Please try again.";
+        setError(errorMessage);
+        toast.error(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (modalState.isOpen && modalState.type === "tenancy-update") {
+      fetchData();
+    }
+  }, [modalState.isOpen, modalState.type, modalState.data]);
 
   // Fetch units when building changes
   useEffect(() => {
-  const fetchUnits = async () => {
-    if (formData.building) {
-      try {
-        const response = await axios.get(
-          `${BASE_URL}/company/units/${formData.building}/vacant-units/`
-        );
-        const vacantUnits = Array.isArray(response.data) ? response.data : response.data.results || [];
-        setUnits(vacantUnits);
+    const fetchUnits = async () => {
+      if (formData.building) {
+        try {
+          const response = await axios.get(
+            `${BASE_URL}/company/units/${formData.building}/vacant-units/`
+          );
+          const vacantUnits = Array.isArray(response.data)
+            ? response.data
+            : response.data.results || [];
+          setUnits(vacantUnits);
 
-        // Combine vacant units with the current tenancy's unit
-        const tenancyUnit = modalState.data?.unit;
-        const tenancyBuildingId = modalState.data?.building?.id;
-        if (tenancyUnit && parseInt(formData.building) === tenancyBuildingId) {
-          const combinedUnits = [...vacantUnits];
-          const isTenancyUnitInVacant = vacantUnits.some(
-            (unit) => unit.id === tenancyUnit.id
-          );
-          if (!isTenancyUnitInVacant) {
-            combinedUnits.push(tenancyUnit);
+          // Combine vacant units with the current tenancy's unit
+          const tenancyUnit = modalState.data?.unit;
+          const tenancyBuildingId = modalState.data?.building?.id;
+          if (
+            tenancyUnit &&
+            parseInt(formData.building) === tenancyBuildingId
+          ) {
+            const combinedUnits = [...vacantUnits];
+            const isTenancyUnitInVacant = vacantUnits.some(
+              (unit) => unit.id === tenancyUnit.id
+            );
+            if (!isTenancyUnitInVacant) {
+              combinedUnits.push(tenancyUnit);
+            }
+            const uniqueUnits = Array.from(
+              new Map(combinedUnits.map((unit) => [unit.id, unit])).values()
+            );
+            setDisplayUnits(uniqueUnits);
+          } else {
+            setDisplayUnits(vacantUnits);
           }
-          const uniqueUnits = Array.from(
-            new Map(combinedUnits.map((unit) => [unit.id, unit])).values()
-          );
-          setDisplayUnits(uniqueUnits);
-        } else {
-          setDisplayUnits(vacantUnits);
+        } catch (error) {
+          console.error("Error fetching units:", error);
+          setUnits([]);
+          setDisplayUnits([]);
+          toast.error("Failed to load units.");
         }
-      } catch (error) {
-        console.error("Error fetching units:", error);
+      } else {
         setUnits([]);
         setDisplayUnits([]);
-        toast.error("Failed to load units.");
       }
-    } else {
-      setUnits([]);
-      setDisplayUnits([]);
-    }
-  };
-  fetchUnits();
-}, [formData.building, modalState.data]);
+    };
+    fetchUnits();
+  }, [formData.building, modalState.data]);
 
   // Update end_date and total_rent_receivable
   useEffect(() => {
@@ -269,7 +291,8 @@ const UpdateTenancyModal = () => {
 
     if (formData.rent_per_frequency && formData.rental_months) {
       const total = (
-        parseFloat(formData.rent_per_frequency) * parseInt(formData.rental_months)
+        parseFloat(formData.rent_per_frequency) *
+        parseInt(formData.rental_months)
       ).toFixed(2);
       setFormData((prev) => ({
         ...prev,
@@ -328,10 +351,12 @@ const UpdateTenancyModal = () => {
             `${BASE_URL}/company/tenancies/preview-payment-schedule/`,
             previewPayload
           );
-          const schedules = response.data.payment_schedules.map((item, index) => ({
-            ...item,
-            id: (index + 1).toString().padStart(2, "0"),
-          }));
+          const schedules = response.data.payment_schedules.map(
+            (item, index) => ({
+              ...item,
+              id: (index + 1).toString().padStart(2, "0"),
+            })
+          );
           setPaymentSchedule(schedules);
           setExpandedStates(
             schedules.reduce((acc, item) => ({ ...acc, [item.id]: false }), {})
@@ -388,11 +413,19 @@ const UpdateTenancyModal = () => {
             )
           );
         } catch (error) {
-          console.error("Error fetching tax preview for additional charge:", error);
+          console.error(
+            "Error fetching tax preview for additional charge:",
+            error
+          );
           setAdditionalCharges((prev) =>
             prev.map((c) =>
               c.id === charge.id
-                ? { ...c, tax: "0.00", total: c.amount || "0.00", tax_details: [] }
+                ? {
+                    ...c,
+                    tax: "0.00",
+                    total: c.amount || "0.00",
+                    tax_details: [],
+                  }
                 : c
             )
           );
@@ -401,7 +434,12 @@ const UpdateTenancyModal = () => {
         setAdditionalCharges((prev) =>
           prev.map((c) =>
             c.id === charge.id
-              ? { ...c, tax: "0.00", total: c.amount || "0.00", tax_details: [] }
+              ? {
+                  ...c,
+                  tax: "0.00",
+                  total: c.amount || "0.00",
+                  tax_details: [],
+                }
               : c
           )
         );
@@ -490,7 +528,9 @@ const UpdateTenancyModal = () => {
   };
 
   const removeRow = (id) => {
-    setAdditionalCharges(additionalCharges.filter((charge) => charge.id !== id));
+    setAdditionalCharges(
+      additionalCharges.filter((charge) => charge.id !== id)
+    );
   };
 
   const togglePaymentSchedule = () => {
@@ -592,7 +632,9 @@ const UpdateTenancyModal = () => {
       end_date: formData.end_date,
       no_payments: parseInt(formData.no_payments),
       first_rent_due_on: formData.first_rent_due_on,
-      rent_per_frequency: parseFloat(formData.rent_per_frequency || 0).toFixed(2),
+      rent_per_frequency: parseFloat(formData.rent_per_frequency || 0).toFixed(
+        2
+      ),
       deposit: parseFloat(formData.deposit || 0).toFixed(2),
       commission: parseFloat(formData.commission || 0).toFixed(2),
       remarks: formData.remarks,
@@ -641,7 +683,10 @@ const UpdateTenancyModal = () => {
       triggerRefresh();
       closeModal();
     } catch (error) {
-      console.error("Error updating tenancy:", error.response?.data || error.message);
+      console.error(
+        "Error updating tenancy:",
+        error.response?.data || error.message
+      );
       const errorMessage =
         error.response?.data?.detail ||
         error.response?.data?.message ||
@@ -678,60 +723,62 @@ const UpdateTenancyModal = () => {
 
         <div className="update-tenancy-modal-grid gap-6">
           <div>
-  <label className="block update-tenancy-modal-label">Tenant*</label>
-  <div className="relative">
-    <select
-      name="tenant"
-      value={formData.tenant}
-      onChange={handleInputChange}
-      className="w-full p-2 appearance-none update-tenancy-input-box"
-      onFocus={() => toggleSelectOpen("tenant")}
-      onBlur={() => toggleSelectOpen("tenant")}
-      disabled={loading}
-    >
-      <option value="">Choose</option>
-      {Array.isArray(tenants) ? (
-        tenants.map((tenant) => (
-          <option key={tenant.id} value={tenant.id}>
-            {tenant.tenant_name || "Unnamed Tenant"}
-          </option>
-        ))
-      ) : (
-        <option disabled>No tenants available</option>
-      )}
-    </select>
-    <ChevronDown
-      className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
-        selectOpenStates["tenant"] ? "rotate-180" : "rotate-0"
-      }`}
-      size={22}
-      color="#201D1E"
-    />
-  </div>
-</div>
-          <div>
-            <label className="block update-tenancy-modal-label">Building*</label>
+            <label className="block update-tenancy-modal-label">Tenant*</label>
             <div className="relative">
               <select
-  name="building"
-  value={formData.building}
-  onChange={handleInputChange}
-  className="w-full p-2 appearance-none update-tenancy-input-box"
-  onFocus={() => toggleSelectOpen("building")}
-  onBlur={() => toggleSelectOpen("building")}
-  disabled={loading}
->
-  <option value="">Choose</option>
-  {Array.isArray(displayBuildings) ? (
-    displayBuildings.map((building) => (
-      <option key={building.id} value={building.id}>
-        {building.building_name || "Unnamed Building"}
-      </option>
-    ))
-  ) : (
-    <option disabled>No buildings available</option>
-  )}
-</select>
+                name="tenant"
+                value={formData.tenant}
+                onChange={handleInputChange}
+                className="w-full p-2 appearance-none update-tenancy-input-box"
+                onFocus={() => toggleSelectOpen("tenant")}
+                onBlur={() => toggleSelectOpen("tenant")}
+                disabled={true} // Disable tenant selection for update
+              >
+                <option value="">Choose</option>
+                {Array.isArray(tenants) ? (
+                  tenants.map((tenant) => (
+                    <option key={tenant.id} value={tenant.id}>
+                      {tenant.tenant_name || "Unnamed Tenant"}
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>No tenants available</option>
+                )}
+              </select>
+              <ChevronDown
+                className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
+                  selectOpenStates["tenant"] ? "rotate-180" : "rotate-0"
+                }`}
+                size={22}
+                color="#201D1E"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block update-tenancy-modal-label">
+              Building*
+            </label>
+            <div className="relative">
+              <select
+                name="building"
+                value={formData.building}
+                onChange={handleInputChange}
+                className="w-full p-2 appearance-none update-tenancy-input-box"
+                onFocus={() => toggleSelectOpen("building")}
+                onBlur={() => toggleSelectOpen("building")}
+                disabled={true} // Disable building selection for update
+              >
+                <option value="">Choose</option>
+                {Array.isArray(displayBuildings) ? (
+                  displayBuildings.map((building) => (
+                    <option key={building.id} value={building.id}>
+                      {building.building_name || "Unnamed Building"}
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>No buildings available</option>
+                )}
+              </select>
               <ChevronDown
                 className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
                   selectOpenStates["building"] ? "rotate-180" : "rotate-0"
@@ -747,28 +794,30 @@ const UpdateTenancyModal = () => {
               <label className="block update-tenancy-modal-label">Unit*</label>
               <div className="relative">
                 <select
-  name="unit"
-  value={formData.unit}
-  onChange={handleInputChange}
-  className="w-full p-2 appearance-none update-tenancy-input-box"
-  onFocus={() => toggleSelectOpen("unit-selection")}
-  onBlur={() => toggleSelectOpen("unit-selection")}
-  disabled={loading}
->
-  <option value="">Choose</option>
-  {Array.isArray(displayUnits) ? (
-    displayUnits.map((unit) => (
-      <option key={unit.id} value={unit.id}>
-        {unit.unit_name || "Unnamed Unit"}
-      </option>
-    ))
-  ) : (
-    <option disabled>No units available</option>
-  )}
-</select>
+                  name="unit"
+                  value={formData.unit}
+                  onChange={handleInputChange}
+                  className="w-full p-2 appearance-none update-tenancy-input-box"
+                  onFocus={() => toggleSelectOpen("unit-selection")}
+                  onBlur={() => toggleSelectOpen("unit-selection")}
+                  disabled={true} // Disable unit selection for update
+                >
+                  <option value="">Choose</option>
+                  {Array.isArray(displayUnits) ? (
+                    displayUnits.map((unit) => (
+                      <option key={unit.id} value={unit.id}>
+                        {unit.unit_name || "Unnamed Unit"}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>No units available</option>
+                  )}
+                </select>
                 <ChevronDown
                   className={`absolute right-[11px] top-[11px] text-gray-400 pointer-events-none transition-transform duration-300 ${
-                    selectOpenStates["unit-selection"] ? "rotate-180" : "rotate-0"
+                    selectOpenStates["unit-selection"]
+                      ? "rotate-180"
+                      : "rotate-0"
                   }`}
                   size={22}
                   color="#201D1E"
@@ -808,7 +857,9 @@ const UpdateTenancyModal = () => {
               </div>
             </div>
             <div className="w-1/2">
-              <label className="block update-tenancy-modal-label">End Date*</label>
+              <label className="block update-tenancy-modal-label">
+                End Date*
+              </label>
               <div className="relative">
                 <input
                   type="date"
@@ -984,30 +1035,32 @@ const UpdateTenancyModal = () => {
                       </td>
                       <td className="px-[10px] py-[5px] w-[138px] relative">
                         <select
-  value={charge.charge_type}
-  onChange={(e) =>
-    handleAdditionalChargeChange(
-      charge.id,
-      "charge_type",
-      e.target.value
-    )
-  }
-  className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-700 focus:border-gray-700 bg-white update-tenancy-modal-table-select"
-  onFocus={() => toggleSelectOpen(`charge-${charge.id}`)}
-  onBlur={() => toggleSelectOpen(`charge-${charge.id}`)}
-  disabled={loading}
->
-  <option value="">Choose</option>
-  {Array.isArray(chargeTypes) ? (
-    chargeTypes.map((type) => (
-      <option key={type.id} value={type.id}>
-        {type.name || "Unnamed Charge"}
-      </option>
-    ))
-  ) : (
-    <option disabled>No charge types available</option>
-  )}
-</select>
+                          value={charge.charge_type}
+                          onChange={(e) =>
+                            handleAdditionalChargeChange(
+                              charge.id,
+                              "charge_type",
+                              e.target.value
+                            )
+                          }
+                          className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-700 focus:border-gray-700 bg-white update-tenancy-modal-table-select"
+                          onFocus={() =>
+                            toggleSelectOpen(`charge-${charge.id}`)
+                          }
+                          onBlur={() => toggleSelectOpen(`charge-${charge.id}`)}
+                          disabled={loading}
+                        >
+                          <option value="">Choose</option>
+                          {Array.isArray(chargeTypes) ? (
+                            chargeTypes.map((type) => (
+                              <option key={type.id} value={type.id}>
+                                {type.name || "Unnamed Charge"}
+                              </option>
+                            ))
+                          ) : (
+                            <option disabled>No charge types available</option>
+                          )}
+                        </select>
                         <ChevronDown
                           className={`absolute right-[18px] top-1/2 transform -translate-y-1/2 duration-200 h-4 w-4 text-[#201D1E] pointer-events-none ${
                             selectOpenStates[`charge-${charge.id}`]
@@ -1073,7 +1126,10 @@ const UpdateTenancyModal = () => {
                         <button
                           onClick={() => showTaxDetails(charge.id, true)}
                           className="text-[#2892CE] underline"
-                          disabled={parseFloat(charge.tax) === 0 && !charge.tax_details.length}
+                          disabled={
+                            parseFloat(charge.tax) === 0 &&
+                            !charge.tax_details.length
+                          }
                         >
                           {charge.tax}
                         </button>
@@ -1231,7 +1287,10 @@ const UpdateTenancyModal = () => {
                       <button
                         onClick={() => showTaxDetails(charge.id, true)}
                         className="text-[#2892CE] underline"
-                        disabled={parseFloat(charge.tax) === 0 && !charge.tax_details.length}
+                        disabled={
+                          parseFloat(charge.tax) === 0 &&
+                          !charge.tax_details.length
+                        }
                       >
                         {charge.tax}
                       </button>
@@ -1240,7 +1299,10 @@ const UpdateTenancyModal = () => {
                       {charge.total}
                     </div>
                     <div className="px-[10px] py-[3px] flex justify-center">
-                      <button onClick={() => removeRow(charge.id)} disabled={loading}>
+                      <button
+                        onClick={() => removeRow(charge.id)}
+                        disabled={loading}
+                      >
                         <Trash2 size={20} color="#201D1E" />
                       </button>
                     </div>
@@ -1271,7 +1333,9 @@ const UpdateTenancyModal = () => {
             }
             disabled={loading}
           >
-            {showPaymentSchedule ? "Hide Payment Schedule" : "Show Payment Schedule"}
+            {showPaymentSchedule
+              ? "Hide Payment Schedule"
+              : "Show Payment Schedule"}
           </button>
 
           {showPaymentSchedule && (
@@ -1317,28 +1381,30 @@ const UpdateTenancyModal = () => {
                         </td>
                         <td className="px-[10px] py-[5px] w-[138px] relative">
                           <select
-  value={item.charge_type}
-  onChange={(e) =>
-    handlePaymentScheduleChange(
-      item.id,
-      "charge_type",
-      e.target.value
-    )
-  }
-  className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-700 focus:border-gray-700 bg-white update-tenancy-modal-table-select cursor-not-allowed"
-  disabled
->
-  <option value="">Choose</option>
-  {Array.isArray(chargeTypes) ? (
-    chargeTypes.map((type) => (
-      <option key={type.id} value={type.id}>
-        {type.name || "Unnamed Charge"}
-      </option>
-    ))
-  ) : (
-    <option disabled>No charge types available</option>
-  )}
-</select>
+                            value={item.charge_type}
+                            onChange={(e) =>
+                              handlePaymentScheduleChange(
+                                item.id,
+                                "charge_type",
+                                e.target.value
+                              )
+                            }
+                            className="w-full h-[38px] border text-gray-700 appearance-none focus:outline-none focus:ring-gray-700 focus:border-gray-700 bg-white update-tenancy-modal-table-select cursor-not-allowed"
+                            disabled
+                          >
+                            <option value="">Choose</option>
+                            {Array.isArray(chargeTypes) ? (
+                              chargeTypes.map((type) => (
+                                <option key={type.id} value={type.id}>
+                                  {type.name || "Unnamed Charge"}
+                                </option>
+                              ))
+                            ) : (
+                              <option disabled>
+                                No charge types available
+                              </option>
+                            )}
+                          </select>
                         </td>
                         <td className="px-[10px] py-[5px] w-[162px]">
                           <input
@@ -1396,7 +1462,10 @@ const UpdateTenancyModal = () => {
                           <button
                             onClick={() => showTaxDetails(item.id, false)}
                             className="text-[#2892CE] underline"
-                            disabled={parseFloat(item.tax) === 0 && !item.tax_details.length}
+                            disabled={
+                              parseFloat(item.tax) === 0 &&
+                              !item.tax_details.length
+                            }
                           >
                             {item.tax}
                           </button>
@@ -1432,7 +1501,9 @@ const UpdateTenancyModal = () => {
                     </div>
                     <div
                       className={`flex justify-between h-[67px] cursor-pointer ${
-                        expandedStates[item.id] ? "border-b border-[#E9E9E9]" : ""
+                        expandedStates[item.id]
+                          ? "border-b border-[#E9E9E9]"
+                          : ""
                       }`}
                       onClick={() => toggleExpand(item.id)}
                     >
@@ -1514,7 +1585,10 @@ const UpdateTenancyModal = () => {
                             <button
                               onClick={() => showTaxDetails(item.id, false)}
                               className="text-[#2892CE] underline"
-                              disabled={parseFloat(item.tax) === 0 && !item.tax_details.length}
+                              disabled={
+                                parseFloat(item.tax) === 0 &&
+                                !item.tax_details.length
+                              }
                             >
                               {item.tax}
                             </button>

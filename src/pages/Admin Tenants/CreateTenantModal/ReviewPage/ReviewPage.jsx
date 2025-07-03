@@ -3,7 +3,7 @@ import axios from "axios";
 import { BASE_URL } from "../../../../utils/config";
 import DocumentsView from "./DocumentView";
 import "./ReviewPage.css";
-import toast, { Toaster } from "react-hot-toast"; // Import react-hot-toast
+import toast, { Toaster } from "react-hot-toast";
 
 const ReviewPage = ({ formData, onBack, onNext }) => {
   const [loading, setLoading] = useState(false);
@@ -14,7 +14,6 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
     ? formData.documents.tenant_comp
     : [];
 
-  // Fetch ID types to display titles instead of IDs
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
     const storedCompanyId = localStorage.getItem("company_id");
@@ -47,7 +46,7 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
         setIdTypes(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error("Error fetching ID types:", error);
-        toast.error("Failed to load ID types."); // Use toast for error
+        toast.error("Failed to load ID types.");
         setIdTypes([]);
       }
     };
@@ -55,7 +54,6 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
     fetchIdTypes();
   }, []);
 
-  // Function to get ID type title by ID
   const getIdTypeTitle = (idTypeId) => {
     if (!idTypeId) return "N/A";
     const idType = idTypes.find((type) => type.id === parseInt(idTypeId));
@@ -83,7 +81,7 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
     ];
     const missingFields = requiredFields.filter((field) => !tenant[field]);
     if (missingFields.length > 0) {
-      toast.error(`Please fill required fields: ${missingFields.join(", ")}`); // Use toast for error
+      toast.error(`Please fill required fields: ${missingFields.join(", ")}`);
       setLoading(false);
       return;
     }
@@ -93,7 +91,6 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
         return value === null || value === undefined ? "" : value;
       };
       const formDataWithFiles = new FormData();
-      // Add tenant data
       formDataWithFiles.append("company", tenant.company);
       formDataWithFiles.append("user", getValueOrEmpty(tenant.user));
       formDataWithFiles.append("tenant_name", tenant.tenant_name);
@@ -124,21 +121,18 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
       formDataWithFiles.append("status", tenant.status);
       formDataWithFiles.append("remarks", getValueOrEmpty(tenant.remarks));
 
-      // Prepare documents in the format backend expects
       if (documents.length > 0) {
         const documentData = documents.map((doc, index) => ({
           doc_type: doc.doc_type,
           number: doc.number,
           issued_date: doc.issued_date,
           expiry_date: doc.expiry_date,
-          file_index: index, // This tells backend which file corresponds to this document
+          file_index: index,
         }));
-        // Add document JSON data
         formDataWithFiles.append(
           "document_comp_json",
           JSON.stringify(documentData)
         );
-        // Add document files with the expected naming convention
         documents.forEach((doc, index) => {
           if (doc.upload_file && doc.upload_file[0]) {
             formDataWithFiles.append(
@@ -169,12 +163,15 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
       );
 
       console.log("Successfully created tenant:", response.data);
-      onNext({ formData, response: response.data }); // Success toast removed
+      onNext({ formData, response: response.data });
     } catch (err) {
       console.error("Error creating tenant:", err);
       const errorMessage =
-        err.response?.data?.message || err.message || "Failed to save tenant.";
-      toast.error(`Failed to save tenant: ${errorMessage}`); // Use toast for error
+        err.response?.data?.email?.[0] ||
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to save tenant.";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -191,7 +188,6 @@ const ReviewPage = ({ formData, onBack, onNext }) => {
 
   return (
     <div className="flex flex-col h-full">
-      <Toaster position="top-right" reverseOrder={false} /> {/* Add Toaster */}
       <div className="border rounded-md border-[#E9E9E9] p-5">
         <h2 className="review-page-head">Tenant</h2>
         <div className="grid grid-cols-1 md:grid-cols-2">

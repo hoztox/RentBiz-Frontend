@@ -180,9 +180,8 @@ const Collection = () => {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  const handleEditClick = (collection) => {
-    console.log("Collection ID:", collection);
-    openModal("update-collection", "Update Collection", collection);
+  const handleEditClick = (collectionId) => {
+    openModal("update-collection", "Update Collection", { id: collectionId });
   };
 
   const toggleRowExpand = (id) => {
@@ -454,7 +453,7 @@ const Collection = () => {
                       </span>
                     </td>
                     <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                      <button onClick={() => handleEditClick(collection)}>
+                      <button onClick={() => handleEditClick(collection.id)}>
                         <img
                           src={editicon}
                           alt="Edit"
@@ -584,7 +583,7 @@ const Collection = () => {
                                 <div className="collection-dropdown-item w-[50%]">
                                   <div className="collection-dropdown-label">ACTION</div>
                                   <div className="collection-dropdown-value flex items-center gap-4 mt-2">
-                                    <button onClick={() => handleEditClick(collection)}>
+                                    <button onClick={() => handleEditClick(collection.id)}>
                                       <img src={editicon} alt="Edit" className="w-[18px] h-[18px] action-btn duration-200" />
                                     </button>
                                     <button>
