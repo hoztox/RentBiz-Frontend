@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import closeicon from "../../../../../assets/Images/Admin Buildings/close-icon.svg";
 import FormTimeline from "../FormTimeline";
 import BuildingInfoForm from "../UpdateBuilding/BuildingInfoForm";
 import DocumentsForm from "../Upload Documents/DocumentsForm";
@@ -8,6 +7,7 @@ import ReviewPage from "../ReviewPage/ReviewPage";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 import { BASE_URL } from "../../../../../utils/config";
 import { useModal } from "../../../../../context/ModalContext";
+import { X } from "lucide-react";
 
 const BuildingFormFlow = ({
   onClose,
@@ -68,7 +68,6 @@ const BuildingFormFlow = ({
           }
         );
         const buildingData = response.data;
-        console.log("Fetched building data:", buildingData);
         setFormData({
           building: {
             building_no: buildingData.building_no || "",
@@ -100,7 +99,6 @@ const BuildingFormFlow = ({
         });
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching building data:", error);
         setError("Failed to load building data.");
         setLoading(false);
       }
@@ -212,9 +210,9 @@ const BuildingFormFlow = ({
           <h3 className="building-modal-title">{currentTitle}</h3>
           <button
             onClick={handleClose}
-            className="border border-[#E9E9E9] rounded-full p-[11px]"
+            className="border border-[#E9E9E9] rounded-full p-[11px] hover:bg-gray-100 duration-200"
           >
-            <img src={closeicon} alt="Close" className="w-[15px] h-[15px]" />
+            <X size={20} />
           </button>
         </div>
         <div
