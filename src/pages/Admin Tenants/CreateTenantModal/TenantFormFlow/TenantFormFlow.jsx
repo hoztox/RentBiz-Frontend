@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import closeicon from "../../../../assets/Images/Admin Tenants/close-icon.svg";
 import FormTimeline from "../FormTimeline";
 import TenantInfoForm from "../CreateTenant/TenantInfoForm";
 import DocumentsForm from "../UploadDocuments/DocumentsForm";
@@ -7,6 +6,7 @@ import ReviewPage from "../ReviewPage/ReviewPage";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 import "./tenantformflow.css";
 import { useModal } from "../../../../context/ModalContext";
+import { X } from "lucide-react";
 
 const TenantFormFlow = ({ onClose, onPageChange, initialPageIndex = 0 }) => {
   const { modalState, triggerRefresh } = useModal();
@@ -178,9 +178,9 @@ const TenantFormFlow = ({ onClose, onPageChange, initialPageIndex = 0 }) => {
           <h3 className="tenant-modal-title">{currentTitle}</h3>
           <button
             onClick={handleClose}
-            className="border border-[#E9E9E9] rounded-full p-[11px]"
+            className="border border-[#E9E9E9] rounded-full p-[11px] hover:bg-gray-100 duration-200"
           >
-            <img src={closeicon} alt="Close" className="w-[15px] h-[15px]" />
+            <X size={20} />
           </button>
         </div>
 

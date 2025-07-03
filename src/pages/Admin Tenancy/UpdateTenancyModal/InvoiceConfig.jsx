@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import { BASE_URL } from "../../../utils/config";
 import { useModal } from "../../../context/ModalContext";
 import "./InvoiceConfig.css";
+import toast from "react-hot-toast";
 
 const InvoiceConfig = () => {
   const { modalState, closeModal } = useModal();
@@ -58,7 +59,7 @@ const InvoiceConfig = () => {
           is_active: isActive,
         }
       );
-      alert(
+      toast.success(
         `Invoice configuration ${
           hasConfig ? "updated" : "created"
         } successfully!`
@@ -67,7 +68,7 @@ const InvoiceConfig = () => {
       setError(null);
       closeModal();
     } catch (err) {
-      console.error("Error saving invoice config:", err);
+      toast.error("Error saving invoice config:", err);
       setError("Failed to save invoice configuration. Please try again.");
     } finally {
       setLoading(false);

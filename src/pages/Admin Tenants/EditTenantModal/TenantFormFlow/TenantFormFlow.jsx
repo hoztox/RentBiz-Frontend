@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import closeicon from "../../../../assets/Images/Admin Tenants/close-icon.svg";
 import FormTimeline from "../FormTimeline";
 import TenantInfoForm from "../UpdateTenant/TenantInfoForm";
 import DocumentsForm from "../UploadDocuments/DocumentsForm";
@@ -8,6 +7,7 @@ import ReviewPage from "../ReviewPage/ReviewPage";
 import SubmissionConfirmation from "../Submit/SubmissionConfirmation";
 import { BASE_URL } from "../../../../utils/config";
 import { useModal } from "../../../../context/ModalContext";
+import { X } from "lucide-react";
 
 const TenantFormFlow = ({
   onClose,
@@ -111,7 +111,6 @@ const TenantFormFlow = ({
         });
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching tenant data:", error);
         setError("Failed to load tenant data.");
         setLoading(false);
       }
@@ -235,9 +234,9 @@ const TenantFormFlow = ({
           </h3>
           <button
             onClick={handleClose}
-            className="border border-[#E9E9E9] rounded-full p-[11px]"
+            className="border border-[#E9E9E9] rounded-full p-[11px] hover:bg-gray-100 duration-200"
           >
-            <img src={closeicon} alt="Close" className="w-[15px] h-[15px]" />
+            <X size={20} />
           </button>
         </div>
         <div
