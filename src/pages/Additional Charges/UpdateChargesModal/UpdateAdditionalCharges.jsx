@@ -35,7 +35,6 @@ const UpdateAdditionalCharges = () => {
 
   useEffect(() => {
     if (modalState.isOpen && modalState.type === "update-additional-charges" && modalState.data) {
-      console.log("Modal State:", modalState);
       setBuilding(modalState.data.tenancy_detail?.unit?.building?.id || "");
       setUnit(modalState.data.tenancy_detail?.unit?.id || "");
       setTenancyContract(String(modalState.data.tenancy || ""));

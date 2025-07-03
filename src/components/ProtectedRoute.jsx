@@ -14,41 +14,33 @@ const LoadingSpinner = () => (
 export const ProtectedRoute = ({ children }) => {
   const { isLoggedIn, isLoading } = useAuth();
   
-  console.log('ProtectedRoute - isLoading:', isLoading, 'isLoggedIn:', isLoggedIn);
   
   // Show loading while checking authentication
   if (isLoading) {
-    console.log('ProtectedRoute - Showing loading spinner');
     return <LoadingSpinner />;
   }
   
   // Only redirect if not loading and not logged in
   if (!isLoggedIn) {
-    console.log('ProtectedRoute - User not logged in, redirecting to login');
     return <Navigate to="/" replace />;
   }
   
-  console.log('ProtectedRoute - User is logged in, showing protected content');
   return children;
 };
 
 export const PublicRoute = ({ children }) => {
   const { isLoggedIn, isLoading } = useAuth();
   
-  console.log('PublicRoute - isLoading:', isLoading, 'isLoggedIn:', isLoggedIn);
   
   // Show loading while checking authentication
   if (isLoading) {
-    console.log('PublicRoute - Showing loading spinner');
     return <LoadingSpinner />;
   }
   
   // Only redirect if not loading and logged in
   if (isLoggedIn) {
-    console.log('PublicRoute - User is logged in, redirecting to dashboard');
     return <Navigate to="/admin/dashboard" replace />;
   }
   
-  console.log('PublicRoute - User not logged in, showing public content');
   return children;
 };
