@@ -36,7 +36,7 @@
   box-sizing: border-box;
 }
 
-.income-expense-export-btn {
+.income-expense-download-btn {
   background-color: #f0f0f0;
   font-family: "Inter Tight";
   font-size: 15px;
@@ -47,6 +47,16 @@
   color: #4d4e4d;
   height: 38px;
   box-sizing: border-box;
+}
+
+.income-expense-download-btn:hover {
+  background-color: #201d1e;
+  color: white;
+}
+
+.income-expense-download-btn:hover .income-expense-download-img {
+  filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%)
+    hue-rotate(47deg) brightness(118%) contrast(100%);
 }
 
 .income-expense-header {
@@ -74,28 +84,6 @@
   font-weight: 400;
   line-height: 22px;
   color: #201d1e;
-}
-
-.income-expense-download-btn {
-  background-color: #f0f0f0;
-  font-family: "Inter Tight";
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 18px;
-  letter-spacing: 0.43px;
-  color: #4d4e4d;
-  box-sizing: border-box;
-}
-
-.income-expense-download-btn:hover {
-  background-color: #201d1e;
-  color: white;
-}
-
-.income-expense-download-btn:hover .income-expense-download-img {
-  filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%)
-    hue-rotate(47deg) brightness(118%) contrast(100%);
 }
 
 .income-expense-collection-list-pagination {
@@ -146,6 +134,9 @@
 @media (max-width: 360px) {
   .income-expense-table {
     margin-bottom: 50px;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
   }
   .income-expense-search {
     width: 100%;
@@ -153,8 +144,11 @@
   .income-expense-selection {
     width: 100%;
   }
-  .income-expense-export-btn {
-    width: 45%;
+  .income-expense-download-btn {
+    width: 50%;
+  }
+  .income-expense-filters-btn {
+    width: 50%;
   }
   .income-expense-thead.income-expense-tenant-column {
     padding-left: 14px;
@@ -176,7 +170,7 @@
     height: 28px;
   }
   .income-expense-dropdown-table-subheader .income-expense-thead {
-    font-size: 10px;
+    font-size: 11px;
     padding: 5px 4px;
   }
   .income-expense-dropdown-table-row .income-expense-data {
@@ -198,13 +192,13 @@
     padding-right: 0;
   }
   .income-expense-dropdown-table-subheader .income-expense-thead {
-    font-size: 11px;
-    padding: 5px 6px;
+    font-size: 11px !important;
+    padding: 5px 8px;
     text-align: center;
   }
   .income-expense-dropdown-table-row .income-expense-data {
-    font-size: 12px;
-    padding: 5px 6px;
+    font-size: 11px;
+    padding: 5px 8px;
   }
 }
 
@@ -244,9 +238,7 @@
   }
   .income-expense-data.income-expense-tenant-column {
     padding-left: 14px;
-    padding-right:
-
- 0;
+    padding-right: 0;
   }
   .income-expense-selection {
     width: 100%;
@@ -268,7 +260,7 @@
   .income-expense-table {
     max-width: 100%;
     width: 100%;
-    margin-bottom: 50px;
+    margin-bottom: 100px;
     box-sizing: border-box;
   }
   .income-expense-table-header {
@@ -295,15 +287,15 @@
   .income-expense-search {
     width: 100%;
   }
-  .income-expense-action-button{
-    width: 60%;
-  }
   .income-expense-selection {
     width: 100%;
     margin-left: 0px;
   }
   .income-expense-download-btn {
-    width: 40%;
+    width: 50%;
+  }
+  .income-expense-filters-btn {
+    width: 50%;
   }
   .income-expense-action-buttons-container {
     margin-top: 5px;
@@ -368,10 +360,8 @@
   }
   .income-expense-grid-container {
     width: 100%;
-    max-width: 100%;
     padding: 15px;
     padding-top: 5px;
-    box-sizing: border-box;
   }
   .income-expense-grid {
     display: flex;
@@ -407,21 +397,19 @@
   }
   .income-expense-table-container {
     width: 100%;
-    max-width: 100%;
     margin-bottom: 24px;
     margin-top: -14px;
-    box-sizing: border-box;
   }
   .income-expense-dropdown-table {
     width: 100%;
     max-width: 100%;
-    table-layout: auto;
+    table-layout: fixed;
     border-collapse: collapse;
-    border-top: 1px solid #E9E9E9;
-    border-bottom: 1px solid #E9E9E9;
+    border-top: 1px solid #e9e9e9;
+    border-bottom: 1px solid #e9e9e9;
   }
   .income-expense-dropdown-table-header {
-    height: 57px;
+    height: 40px;
   }
   .income-expense-income-header {
     font-family: "Inter Tight";
@@ -429,11 +417,11 @@
     font-size: 12px;
     line-height: 100%;
     letter-spacing: 1px;
-    background-color: #F2FCF7;
-    color: #28C76F;
+    background-color: #f2fcf7;
+    color: #28c76f;
     text-align: center;
-    border-bottom: 1px solid #E9E9E9;
-    width: 50%;
+    height: 50px;
+    border-bottom: 1px solid #e9e9e9;
   }
   .income-expense-expense-header {
     font-family: "Inter Tight";
@@ -441,63 +429,55 @@
     font-size: 12px;
     line-height: 100%;
     letter-spacing: 1px;
-    background-color: #FFF7F6;
-    color: #FE7062;
+    background-color: #fff7f6;
+    color: #fe7062;
     text-align: center;
-    border-bottom: 1px solid #E9E9E9;
-    width: 50%;
+    height: 50px;
+    border-bottom: 1px solid #e9e9e9;
   }
   .income-expense-dropdown-table-subheader {
-    height: 57px;
-    border-bottom: 1px solid #E9E9E9;
+    height: 50px;
+    border-bottom: 1px solid #e9e9e9;
   }
   .income-expense-dropdown-table-subheader th {
-    width: 16.67%;
-    white-space: normal;
-    word-wrap: break-word;
-    padding: 5px 4px;
+    width: 33.33%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .income-expense-dropdown-table-subheader .income-expense-thead {
     font-size: 12px;
+    padding: 5px 8px;
     text-align: center;
   }
   .income-expense-dropdown-table-row {
-    height: 57px;
+    height: 40px;
   }
   .income-expense-dropdown-table-row td {
-    width: 16.67%;
-    white-space: normal;
-    word-wrap: break-word;
-    padding: 5px 4px;
+    width: 33.33%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .income-expense-dropdown-table-row .income-expense-data {
-    font-size: 13px;
+    font-size: 12px;
+    padding: 5px 8px;
     text-align: center;
+    height: 50px;
   }
 }
 
 @media (max-width: 360px) {
   .income-expense-dropdown-table-subheader .income-expense-thead {
-    font-size: 10px;
-    padding: 5px 2px;
+    font-size: 12px;
+    padding: 5px 4px;
   }
   .income-expense-dropdown-table-row .income-expense-data {
-    font-size: 11px;
-    padding: 5px 2px;
+    font-size: 13px;
+    padding: 5px 4px;
   }
   .income-expense-dropdown-label {
     font-size: 10.6px;
-  }
-}
-
-@media (min-width: 361px) and (max-width: 375px) {
-  .income-expense-dropdown-table-subheader .income-expense-thead {
-    font-size: 11px;
-    padding: 5px 4px;
-  }
-  .income-expense-dropdown-table-row .income-expense-data {
-    font-size: 12px;
-    padding: 5px 4px;
   }
 }
 

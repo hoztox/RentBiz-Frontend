@@ -7,6 +7,7 @@ import CustomDropDown from "../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
 import { BASE_URL } from "../../utils/config";
+import toast, { Toaster } from "react-hot-toast";
 
 const IncomeExpenseReport = () => {
   const [openSelectKey, setOpenSelectKey] = useState(null);
@@ -43,7 +44,7 @@ const IncomeExpenseReport = () => {
 
       return companyId ? parseInt(companyId) : null;
     } catch (e) {
-      console.error("Error getting user company ID:", e);
+      toast.error("Error retrieving company information");
       return null;
     }
   };
@@ -86,13 +87,15 @@ const IncomeExpenseReport = () => {
         setError(null);
       } catch (err) {
         setError("Failed to fetch data. Please try again.");
-        console.error(err);
+        toast.error("Failed to fetch data. Please try again.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    if (companyId) {
+      fetchData();
+    }
   }, [filters.view_type, filters.start_date, filters.end_date, companyId]);
 
   const itemsPerPage = 10;
@@ -114,9 +117,11 @@ const IncomeExpenseReport = () => {
     setTempFilters(cleared);
     setSearchTerm("");
     setCurrentPage(1);
+    toast.success("Filters cleared successfully");
   };
 
   const handleDownloadCSV = async () => {
+    const downloadToast = toast.loading("Downloading CSV...");
     try {
       const params = {
         company_id: companyId,
@@ -140,9 +145,11 @@ const IncomeExpenseReport = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      toast.success("CSV downloaded successfully", { id: downloadToast });
     } catch (error) {
-      console.error("Error downloading CSV:", error);
-      alert("Failed to download CSV. Please try again.");
+      toast.error("Failed to download CSV. Please try again.", {
+        id: downloadToast,
+      });
     }
   };
 
@@ -244,6 +251,7 @@ const IncomeExpenseReport = () => {
 
   return (
     <div className="border border-[#E9E9E9] rounded-md income-expense-table">
+      <Toaster />
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] income-expense-table-header">
         <h1 className="income-expense-head">
           Income-Expense Report - {companyName}
@@ -260,7 +268,7 @@ const IncomeExpenseReport = () => {
           </div>
           <div className="flex gap-[10px] income-expense-action-buttons-container">
             <motion.button
-              className={`flex items-center justify-center gap-2 px-4 py-2 h-[38px] income-expense-action-button rounded-md duration-200 ${
+              className={`flex items-center justify-center gap-2 px-4 py-2 h-[38px] income-expense-action-button rounded-md duration-200 income-expense-filters-btn ${
                 showFilters
                   ? "bg-[#201D1E] text-white"
                   : "bg-[#F0F0F0] text-[#201D1E] hover:bg-[#201D1E] hover:text-[#F0F0F0]"
@@ -367,6 +375,7 @@ const IncomeExpenseReport = () => {
                   onClick={() => {
                     setFilters(tempFilters);
                     setCurrentPage(1);
+                    toast.success("Filters applied successfully");
                   }}
                   className="bg-[#201D1E] text-white w-full md:w-[105px] h-[38px] rounded-md hover:bg-[#F0F0F0] hover:text-[#201D1E] duration-200 filter-btn"
                 >
@@ -435,7 +444,7 @@ const IncomeExpenseReport = () => {
               {paginatedData.map((item) => (
                 <tr
                   key={item[`${filters.view_type}_id`]}
-                  className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer last:border-0"
+                  className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
                 >
                   <td className="px-5 income-expense-data">
                     {getEntityName(item)}
@@ -472,7 +481,7 @@ const IncomeExpenseReport = () => {
         <div className="block md:hidden">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="income-expense-table-row-head border-b border-[#E9E9E9]">
+              <tr className="income-expense-table-row-head">
                 <th className="px-5 pl-[1rem] w-[50%] text-left income-expense-thead income-expense-date-column">
                   ENTITY
                 </th>
@@ -531,8 +540,7 @@ const IncomeExpenseReport = () => {
                         variants={dropdownVariants}
                       >
                         <td colSpan={3} className="p-0">
-                          <div className="income-expense-grid-container">
-                          </div>
+                          <div className="income-expense-grid-container"></div>
                           <div className="income-expense-table-container">
                             <table className="income-expense-dropdown-table">
                               <thead>
@@ -543,12 +551,6 @@ const IncomeExpenseReport = () => {
                                   >
                                     INCOME
                                   </th>
-                                  <th
-                                    colSpan="3"
-                                    className="income-expense-expense-header"
-                                  >
-                                    EXPENSE
-                                  </th>
                                 </tr>
                                 <tr className="income-expense-dropdown-table-subheader border-b border-[#E9E9E9]">
                                   <th className="income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">
@@ -558,21 +560,12 @@ const IncomeExpenseReport = () => {
                                     REFUNDED
                                   </th>
                                   <th className="income-expense-thead bg-[#F2FCF7] !text-[#28C76F]">
-                                    INCOME
-                                  </th>
-                                  <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
-                                    TOTAL
-                                  </th>
-                                  <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
-                                    GENERAL
-                                  </th>
-                                  <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
-                                    BALANCE
+                                    NET INCOME
                                   </th>
                                 </tr>
                               </thead>
                               <tbody>
-                                <tr className="income-expense-dropdown-table-row">
+                                <tr className="income-expense-dropdown-table-row border-b border-[#E9E9E9]">
                                   <td className="income-expense-data bg-[#F2FCF7] !text-[#28C76F]">
                                     {item.total_income.toFixed(2)}
                                   </td>
@@ -582,6 +575,27 @@ const IncomeExpenseReport = () => {
                                   <td className="income-expense-data bg-[#F2FCF7] !text-[#28C76F]">
                                     {item.net_income.toFixed(2)}
                                   </td>
+                                </tr>
+                                <tr className="income-expense-dropdown-table-header">
+                                  <th
+                                    colSpan="3"
+                                    className="income-expense-expense-header"
+                                  >
+                                    EXPENSE
+                                  </th>
+                                </tr>
+                                <tr className="income-expense-dropdown-table-subheader border-b border-[#E9E9E9]">
+                                  <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
+                                    TOTAL
+                                  </th>
+                                  <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
+                                    GENERAL
+                                  </th>
+                                  <th className="income-expense-thead bg-[#FFF7F6] !text-[#FE7062]">
+                                    NET BALANCE
+                                  </th>
+                                </tr>
+                                <tr className="income-expense-dropdown-table-row last:border-0">
                                   <td className="income-expense-data bg-[#FFF7F6] !text-[#FE7062]">
                                     {item.total_expense.toFixed(2)}
                                   </td>
@@ -589,9 +603,7 @@ const IncomeExpenseReport = () => {
                                     {item.total_general_expense.toFixed(2)}
                                   </td>
                                   <td className="income-expense-data bg-[#FFF7F6] !text-[#FE7062]">
-                                    {(
-                                      item.net_income - item.total_expense
-                                    ).toFixed(2)}
+                                    {(item.net_income - item.total_expense).toFixed(2)}
                                   </td>
                                 </tr>
                               </tbody>
@@ -608,7 +620,7 @@ const IncomeExpenseReport = () => {
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 border-t border-[#E9E9E9] income-expense-pagination-container">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 income-expense-pagination-container">
         <span className="income-expense-pagination collection-list-pagination">
           Showing{" "}
           {Math.min((currentPage - 1) * itemsPerPage + 1, filteredData.length)}{" "}
