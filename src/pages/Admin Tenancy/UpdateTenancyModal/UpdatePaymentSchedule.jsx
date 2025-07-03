@@ -8,6 +8,7 @@ import downarrow from "../../../assets/Images/Admin Tenancy/downarrow.svg";
 import { motion, AnimatePresence } from "framer-motion";
 import { useModal } from "../../../context/ModalContext";
 import "./UpdatePaymentScheduleModal.css";
+import toast from "react-hot-toast";
 
 const UpdatePaymentScheduleModal = () => {
   const { modalState, closeModal } = useModal();
@@ -58,11 +59,10 @@ const UpdatePaymentScheduleModal = () => {
       setSelectedSchedule(null);
       setApplyToAllPending(false);
       setPaymentSchedule({ amount: "", dueDate: "", frequency: "monthly" });
-      alert("Payment schedule updated successfully!");
+      toast.success("Payment schedule updated successfully");
       closeModal();
     } catch (error) {
-      console.error("Error updating payment schedule:", error);
-      alert("Failed to update payment schedule.");
+      toast.error("Error updating payment schedule")
     }
   };
 
