@@ -25,8 +25,9 @@ const UnitType = () => {
   const [error, setError] = useState(null);
   const { openModal, refreshCounter } = useModal();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [unitTypeIdToDelete, setUnitTypeIdToDelete] = useState(null);
   const itemsPerPage = 10;
+  const [unitTypeIdToDelete, setUnitTypeIdToDelete] = useState(null);
+  
 
   const dropdownOptions = [
     { value: "showing", label: "Showing" },
