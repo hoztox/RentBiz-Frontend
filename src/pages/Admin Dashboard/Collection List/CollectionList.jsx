@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTranslation } from 'react-i18next';
 import axios from "axios";
 import { BASE_URL } from "../../../utils/config";
 import "./collectionlist.css";
@@ -8,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
 
 const CollectionList = () => {
+  const { t } = useTranslation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("5");
   const [activeFilter, setActiveFilter] = useState("All");
@@ -36,10 +38,9 @@ const CollectionList = () => {
   };
   const companyId = getUserCompanyId();
 
-  // Function to convert frontend filter to backend parameter
   const getStatusParam = (filter) => {
-    if (filter === "All") return "";
-    if (filter === "Partially Paid") return "partially_paid"; 
+    if (filter === t('filters.all')) return "";
+    if (filter === t('filters.partially_paid')) return "partially_paid";
     return filter.toLowerCase();
   };
 
@@ -62,7 +63,7 @@ const CollectionList = () => {
         setData(response.data.results || []);
         setTotalCount(response.data.count || 0);
       } catch (err) {
-        toast.error("Error fetching collections:", err);
+        toast.error(t('errors.fetch_collections_failed'));
       }
     };
 
@@ -115,21 +116,11 @@ const CollectionList = () => {
       textColor = "text-gray-600";
     }
 
-    const formatStatus = (status) => {
-      if (!status) return "";
-      return status
-        .toLowerCase()
-        .replace(/_/g, " ")
-        .split(" ")
-        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(" ");
-    };
-
     return (
       <span
         className={`px-[10px] py-[5px] rounded-[4px] collection-list-status ${bgColor} ${textColor} whitespace-nowrap`}
       >
-        {formatStatus(status)}
+        {t(`status.${normalizedStatus}`)}
       </span>
     );
   };
@@ -138,10 +129,9 @@ const CollectionList = () => {
     <div className="w-full rounded-md border border-[#E9E9E9] collection-list-table mb-[80px] md:mb-0">
       <Toaster />
       <h1 className="collection-list-head px-5 pt-5 pb-[18px]">
-        Collection List
+        {t('collection_list.title')}
       </h1>
 
-      {/* Filter tabs */}
       <div className="flex justify-between border-b border-[#E9E9E9] collection-list-tabs">
         <div className="px-5 pb-5 flex flex-wrap gap-[10px]">
           {["Paid", "Unpaid", "Overdue", "Partially Paid", "All"].map((filter) => (
@@ -152,9 +142,9 @@ const CollectionList = () => {
                   ? `${filter.toLowerCase().replace(" ", "_")}-active`
                   : `${filter.toLowerCase().replace(" ", "_")}-inactive`
               }`}
-              onClick={() => handleFilterChange(filter)}
+              onClick={() => handleFilterChange(t(`filters.${filter.toLowerCase().replace(" ", "_")}`))}
             >
-              {filter}
+              {t(`filters.${filter.toLowerCase().replace(" ", "_")}`)}
             </button>
           ))}
         </div>
@@ -162,7 +152,7 @@ const CollectionList = () => {
         <div className="flex mx-5 gap-[13.36px] inputs-drop">
           <input
             type="text"
-            placeholder="Search"
+            placeholder={t('actions.search')}
             className="border border-[#E9E9E9] rounded-md w-[253px] h-[38px] px-[14px] py-[7px] outline-none focus:border-gray-300 duration-150 search-input"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -207,27 +197,30 @@ const CollectionList = () => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white">
           <thead>
             <tr className="text-gray-500 text-left text-sm border-b border-[#E9E9E9] h-[57px] collection-list-theads">
               <th className="px-5 collection-list-thead md:w-[10%] w-[50%]">
-                ID
+                {t('table.id')}
               </th>
               <th className="px-5 collection-list-thead collection-list-tenet">
-                TENANT NAME
+                {t('table.tenant_name')}
               </th>
               <th className="px-5 collection-list-thead collection-list-building hidden-mobile">
-                BUILDING NAME
+                {t('table.building_name')}
               </th>
-              <th className="px-5 collection-list-thead list-mob">UNIT NAME</th>
+              <th className="px-5 collection-list-thead list-mob">
+                {t('table.unit_name')}
+              </th>
               <th className="px-5 collection-list-thead w-[13%] list-mob">
-                TOTAL
+                {t('table.total')}
               </th>
-              <th className="px-5 collection-list-thead list-mob">DUE DATE</th>
+              <th className="px-5 collection-list-thead list-mob">
+                {t('table.due_date')}
+              </th>
               <th className="px-5 collection-list-thead text-end w-[7%] list-mob">
-                STATUS
+                {t('table.status')}
               </th>
               <th className="collection-drop-down-fields w-[10%]"></th>
             </tr>
@@ -271,7 +264,7 @@ const CollectionList = () => {
                   >
                     <img
                       src={arrow}
-                      alt="drop-down arrow"
+                      alt={t('logo_alt.dropdown_arrow')}
                       className={`collection-dropdown-img w-[13px] ${
                         activeDropdowns[item.id] ? "rotated" : ""
                       }`}
@@ -293,11 +286,11 @@ const CollectionList = () => {
                         <div className="px-5 dropdown-content">
                           <div className="dropdown-grid hidden-mobile">
                             <div className="flex flex-col items-start">
-                              <h4 className="drop-down-head">UNIT NAME</h4>
+                              <h4 className="drop-down-head">{t('table.unit_name')}</h4>
                               <p className="drop-down-data">{item.unit_name}</p>
                             </div>
                             <div className="flex flex-col items-start pl-4">
-                              <h4 className="drop-down-head">TOTAL</h4>
+                              <h4 className="drop-down-head">{t('table.total')}</h4>
                               <p className="drop-down-data">
                                 {parseFloat(item.total_amount ?? 0).toFixed(2)}
                               </p>
@@ -305,48 +298,38 @@ const CollectionList = () => {
                           </div>
                           <div className="grid !grid-cols-3 px-5 mt-6 hidden-mobile">
                             <div>
-                              <h4 className="drop-down-head">DUE DATE</h4>
+                              <h4 className="drop-down-head">{t('table.due_date')}</h4>
                               <p className="drop-down-data">{item.due_date}</p>
                             </div>
                             <div>
-                              <h4 className="drop-down-head pb-1">STATUS</h4>
+                              <h4 className="drop-down-head pb-1">{t('table.status')}</h4>
                               <StatusBadge status={item.status} />
                             </div>
                           </div>
                           <div className="dropdown-flex mobile-only">
                             <div className="flex flex-row justify-between mb-4">
                               <div className="flex flex-col items-start">
-                                <h4 className="drop-down-head">
-                                  BUILDING NAME
-                                </h4>
-                                <p className="drop-down-data">
-                                  {item.building_name}
-                                </p>
+                                <h4 className="drop-down-head">{t('table.building_name')}</h4>
+                                <p className="drop-down-data">{item.building_name}</p>
                               </div>
                               <div className="flex flex-col items-start pl-2">
-                                <h4 className="drop-down-head">UNIT NAME</h4>
-                                <p className="drop-down-data">
-                                  {item.unit_name}
-                                </p>
+                                <h4 className="drop-down-head">{t('table.unit_name')}</h4>
+                                <p className="drop-down-data">{item.unit_name}</p>
                               </div>
                             </div>
                             <div className="flex flex-row justify-between">
                               <div className="flex flex-col items-start">
-                                <h4 className="drop-down-head">DUE DATE</h4>
-                                <p className="drop-down-data">
-                                  {item.due_date}
-                                </p>
+                                <h4 className="drop-down-head">{t('table.due_date')}</h4>
+                                <p className="drop-down-data">{item.due_date}</p>
                               </div>
                               <div className="flex flex-col items-start pl-7">
-                                <h4 className="drop-down-head">TOTAL</h4>
+                                <h4 className="drop-down-head">{t('table.total')}</h4>
                                 <p className="drop-down-data">
-                                  {parseFloat(item.total_amount ?? 0).toFixed(
-                                    2
-                                  )}
+                                  {parseFloat(item.total_amount ?? 0).toFixed(2)}
                                 </p>
                               </div>
                               <div className="flex flex-col items-start pl-4">
-                                <h4 className="drop-down-head pb-1">STATUS</h4>
+                                <h4 className="drop-down-head pb-1">{t('table.status')}</h4>
                                 <StatusBadge status={item.status} />
                               </div>
                             </div>
@@ -362,12 +345,13 @@ const CollectionList = () => {
         </table>
       </div>
 
-      {/* Pagination */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:py-[10px] md:px-5 pagination-container">
         <span className="pagination collection-list-pagination">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, totalCount)}{" "}
-          to {Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount}{" "}
-          entries
+          {t('pagination.showing', {
+            start: Math.min((currentPage - 1) * itemsPerPage + 1, totalCount),
+            end: Math.min(currentPage * itemsPerPage, totalCount),
+            total: totalCount,
+          })}
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
           <button
@@ -375,7 +359,7 @@ const CollectionList = () => {
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
-            Previous
+            {t('pagination.previous')}
           </button>
           {startPage > 1 && (
             <button
@@ -415,7 +399,7 @@ const CollectionList = () => {
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(currentPage + 1)}
           >
-            Next
+            {t('pagination.next')}
           </button>
         </div>
       </div>

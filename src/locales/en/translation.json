@@ -6,7 +6,19 @@
   "units": "Unit Overview",
   "admin_panel": "Admin Panel",
   "admin": "Admin",
-  "logo_alt": "RentBiz Logo",
+  "logo_alt": {
+    "plus_icon": "Plus Icon",
+    "download_icon": "Download Icon",
+    "edit_icon": "Edit Icon",
+    "delete_icon": "Delete Icon",
+    "dropdown_arrow": "Dropdown Arrow",
+    "total_properties": "Total Properties Icon",
+    "total_units": "Total Units Icon",
+    "total_acquired": "Total Acquired Icon",
+    "total_vacant": "Total Vacant Icon",
+    "money_in": "Money In Icon",
+    "money_out": "Money Out Icon"
+  },
   "back_arrow_alt": "Back Arrow",
   "menu_icon_alt": "Menu Icon",
   "navigate_dashboard": "Navigate to dashboard",
@@ -57,5 +69,240 @@
     "income_expense": "Income/Expense",
     "logout": "Logout",
     "footer": "Powered By RentBiz - 2025"
-  }
+  },
+  "status": {
+    "active": "Active",
+    "blocked": "Blocked",
+    "paid": "Paid",
+    "unpaid": "Unpaid",
+    "overdue": "Overdue",
+    "partially_paid": "Partially Paid"
+  },
+  "actions": {
+    "search": "Search",
+    "select_status": "Select Status",
+    "create_user": "Create User",
+    "download": "Download",
+    "edit_user": "Edit User",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "delete_user": "Delete User"
+  },
+  "table": {
+    "id": "ID",
+    "created_date": "Created Date",
+    "name": "Name",
+    "username": "Username",
+    "role": "Role",
+    "status": "Status",
+    "block": "Block",
+    "action": "Action",
+    "tenant_name": "Tenant Name",
+    "building_name": "Building Name",
+    "unit_name": "Unit Name",
+    "total": "Total",
+    "due_date": "Due Date"
+  },
+  "messages": {
+    "no_users_found": "No users found",
+    "na": "N/A",
+    "confirm_delete_user": "Are you sure you want to delete this user?",
+    "loading": "Loading..."
+  },
+  "errors": {
+    "company_id_not_found": "Company ID not found. Please log in again.",
+    "user_not_found": "User not found. Please try again.",
+    "fetch_users_failed": "Failed to load users. Please try again later.",
+    "status_update_failed": "Failed to update user status. Please try again.",
+    "delete_user_failed": "Failed to delete user. Please try again.",
+    "no_company_id": "No company ID found",
+    "fetch_properties_failed": "Failed to load properties data",
+    "fetch_rent_failed": "Failed to load rent data",
+    "fetch_collections_failed": "Failed to load collections data",
+    "fetch_tenancy_expiry_failed": "Failed to load tenancy expiry data",
+    "fetch_financial_failed": "Failed to load financial data"
+  },
+  "success": {
+    "user_status_updated": "User {{status}} successfully.",
+    "user_deleted": "User deleted successfully."
+  },
+  "pagination": {
+    "showing": "Showing {{start}} to {{end}} of {{total}} entries",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "properties": {
+    "total_properties": "Total Properties",
+    "total_units": "Total Units",
+    "total_acquired": "Total Acquired",
+    "total_vacant": "Total Vacant"
+  },
+  "collection_rent": {
+    "title": "Collection of Rent",
+    "total": "Total",
+    "collected": "Collected",
+    "pending": "Pending"
+  },
+  "periods": {
+    "this_month": "This Month",
+    "last_month": "Last Month",
+    "last_3_months": "Last 3 Months",
+    "this_year": "This Year"
+  },
+  "collection_list": {
+    "title": "Collection List"
+  },
+  "filters": {
+    "paid": "Paid",
+    "unpaid": "Unpaid",
+    "overdue": "Overdue",
+    "partially_paid": "Partially Paid",
+    "all": "All"
+  },
+  "charts": {
+    "chart1": "Chart 1",
+    "chart2": "Chart 2"
+  },
+  "chart1": {
+    "title": "Tenancy Expiring",
+    "properties": "Properties",
+    "days_0_30": "0-30 Days",
+    "days_31_60": "31-60 Days",
+    "days_61_90": "61-90 Days"
+  },
+  "chart2": {
+    "title": "Revenue Report",
+    "money_in": "Money In",
+    "money_out": "Money Out",
+    "earning": "Collections",
+    "expense": "Expenses",
+    "periods": {
+      "all_years": "All Years"
+    },
+    "months": {
+      "jan": "Jan",
+      "feb": "Feb",
+      "mar": "Mar",
+      "apr": "Apr",
+      "may": "May",
+      "jun": "Jun",
+      "jul": "Jul",
+      "aug": "Aug",
+      "sep": "Sep",
+      "oct": "Oct",
+      "nov": "Nov",
+      "dec": "Dec",
+      "unknown": "Unknown"
+    }
+  },
+  "admin_create_user": {
+    "title": "Create User",
+    "close_modal": "Close modal",
+    "image_alt": {
+      "profile_preview": "Profile preview",
+      "add_image": "Add image"
+    },
+    "labels": {
+      "name": "Name",
+      "username": "Username",
+      "email": "Email",
+      "role": "Role",
+      "password": "Password",
+      "confirm_password": "Confirm Password"
+    },
+    "placeholders": {
+      "name": "Enter Name",
+      "username": "Enter Username",
+      "email": "Enter Email",
+      "role": "Select Role",
+      "password": "Enter Password",
+      "confirm_password": "Enter Confirm Password"
+    },
+    "roles": {
+      "admin": "Admin",
+      "sales": "Sales",
+      "store": "Store"
+    },
+    "password_hint": "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*).",
+    "errors": {
+      "name_required": "Name is required",
+      "username_required": "Username is required",
+      "username_no_spaces": "Username cannot contain spaces",
+      "username_format": "Username must contain at least one letter and only letters, numbers, underscores, hyphens, or dots",
+      "email_required": "Email is required",
+      "email_invalid": "Please enter a valid email address with a recognized domain (e.g., user@domain.com)",
+      "email_too_long": "Email address is too long (max 254 characters)",
+      "email_consecutive_dots": "Email cannot contain consecutive dots",
+      "role_required": "Role is required",
+      "password_required": "Password is required",
+      "password_format": "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*)",
+      "confirm_password_required": "Please confirm your password",
+      "confirm_password_mismatch": "Passwords do not match",
+      "invalid_image": "Please select a valid image file",
+      "image_too_large": "File size should be less than 5MB",
+      "create_user_failed": "An error occurred while creating the user",
+      "username_taken": "This username is already taken",
+      "email_in_use": "This email is already in use",
+      "network_error": "Network error. Please check your connection and try again",
+      "unexpected_error": "An unexpected error occurred. Please try again"
+    },
+    "messages": {
+      "creating_user": "Creating user...",
+      "user_created": "User created successfully"
+    }
+  },
+  "edit_user_modal": {
+    "title": "Edit User",
+    "close_modal": "Close modal",
+    "image_alt": {
+      "profile_preview": "Profile preview",
+      "add_image": "Add image"
+    },
+    "labels": {
+      "name": "Name",
+      "username": "Username",
+      "email": "Email",
+      "role": "Role"
+    },
+    "placeholders": {
+      "name": "Enter Name",
+      "username": "Enter Username",
+      "email": "Enter Email",
+      "role": "Select Role"
+    },
+    "roles": {
+      "admin": "Admin",
+      "sales": "Sales",
+      "store": "Store"
+    },
+    "buttons": {
+      "change_password": "Change Password",
+      "edit_user": "Edit User",
+      "updating": "Updating..."
+    },
+    "errors": {
+      "name_required": "Name is required",
+      "username_required": "Username is required",
+      "username_no_spaces": "Username cannot contain spaces",
+      "username_format": "Username must contain at least one letter and only letters, numbers, underscores, hyphens, or dots",
+      "email_required": "Email is required",
+      "email_invalid": "Please enter a valid email address with a recognized domain (e.g., user@domain.com)",
+      "email_too_long": "Email address is too long (max 254 characters)",
+      "email_consecutive_dots": "Email cannot contain consecutive dots",
+      "role_required": "Role is required",
+      "invalid_image": "Please select a valid image file",
+      "image_too_large": "File size should be less than 5MB",
+      "update_user_failed": "An error occurred while updating the user",
+      "username_taken": "This username is already taken",
+      "email_in_use": "This email is already in use",
+      "network_error": "Network error. Please check your connection and try again",
+      "unexpected_error": "An unexpected error occurred. Please try again"
+    },
+    "messages": {
+      "updating_user": "Updating user...",
+      "user_updated": "User updated successfully",
+      "change_password_not_implemented": "Change Password functionality is not implemented yet"
+    }
+  },
+  "locale": "en-GB"
 }

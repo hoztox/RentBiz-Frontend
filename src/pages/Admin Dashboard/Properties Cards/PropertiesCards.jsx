@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import CountUp from 'react-countup';
 import properties from "../../../assets/Images/Dashboard/total properties.svg";
 import units from "../../../assets/Images/Dashboard/total units.svg";
@@ -8,9 +9,6 @@ import "./propertiescards.css";
 import axios from 'axios';
 import { BASE_URL } from '../../../utils/config';
 
-// Define BASE_URL (replace with your actual backend base URL)
-
-// Function to get user company ID from localStorage    
 const getUserCompanyId = () => {
   const role = localStorage.getItem("role")?.toLowerCase();
   if (role === "company") {
@@ -28,6 +26,7 @@ const getUserCompanyId = () => {
 };
 
 const PropertiesCards = () => {
+  const { t } = useTranslation();
   const [propertyData, setPropertyData] = useState({
     total_properties: 0,
     total_units: 0,
@@ -37,13 +36,11 @@ const PropertiesCards = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Get company ID
   const companyId = getUserCompanyId();
 
-  // Function to fetch data from API
   const fetchPropertiesData = async () => {
     if (!companyId) {
-      setError('No company ID found');
+      setError(t('errors.no_company_id'));
       setLoading(false);
       return;
     }
@@ -51,10 +48,10 @@ const PropertiesCards = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${BASE_URL}/company/dashboard/properties-summary/${companyId}/`, // Updated URL with companyId
+        `${BASE_URL}/company/dashboard/properties-summary/${companyId}/`,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`, // Add token if your API requires authentication
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         }
       );
@@ -63,44 +60,42 @@ const PropertiesCards = () => {
       setError(null);
     } catch (err) {
       console.error('Error fetching properties data:', err);
-      setError('Failed to load properties data');
+      setError(t('errors.fetch_properties_failed'));
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch data when component mounts or companyId changes
   useEffect(() => {
     fetchPropertiesData();
   }, [companyId]);
 
-  // Card configuration with dynamic data
   const cardConfig = [
     {
-      title: "Total Properties",
+      title: t('properties.total_properties'),
       value: propertyData.total_properties,
-      icon: <img src={properties} alt="Total Properties" />,
+      icon: <img src={properties} alt={t('logo_alt.total_properties')} />,
       backgroundColor: "bg-[#F1FDFB]",
       iconBackground: "bg-[#64C8BC]",
     },
     {
-      title: "Total Units",
+      title: t('properties.total_units'),
       value: propertyData.total_units,
-      icon: <img src={units} alt="Total Units" />,
+      icon: <img src={units} alt={t('logo_alt.total_units')} />,
       backgroundColor: "bg-[#F2FEED]",
       iconBackground: "bg-[#90E471]",
     },
     {
-      title: "Total Acquired",
+      title: t('properties.total_acquired'),
       value: propertyData.total_acquired,
-      icon: <img src={acquired} alt="Total Acquired" />,
+      icon: <img src={acquired} alt={t('logo_alt.total_acquired')} />,
       backgroundColor: "bg-[#FFF2FC]",
       iconBackground: "bg-[#FF93E7]",
     },
     {
-      title: "Total Vacant",
+      title: t('properties.total_vacant'),
       value: propertyData.total_vacant,
-      icon: <img src={vacant} alt="Total Vacant" />,
+      icon: <img src={vacant} alt={t('logo_alt.total_vacant')} />,
       backgroundColor: "bg-[#F0F8FF]",
       iconBackground: "bg-[#017EF4]",
     },
@@ -108,9 +103,9 @@ const PropertiesCards = () => {
 
   return (
     <div className="p-5 rounded-md border border-[#E9E9E9] w-[60%] properties-cards">
-      <h2 className="properties-head pb-[15px]">Properties</h2>
+      <h2 className="properties-head pb-[15px]">{t('sidebar.properties')}</h2>
 
-      {loading && <p>Loading...</p>}
+      {loading && <p>{t('messages.loading')}</p>}
       {error && <p className="text-red-500">{error}</p>}
 
       {!loading && !error && (
