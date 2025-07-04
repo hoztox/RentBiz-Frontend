@@ -11,7 +11,6 @@ const TenancyViewModal = () => {
   const { modalState, closeModal } = useModal();
   const [expandedStates, setExpandedStates] = useState({});
   const [tenancyData, setTenancyData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -24,29 +23,27 @@ const TenancyViewModal = () => {
 
       const fetchTenancyData = async () => {
         try {
-          setLoading(true);
           setError(null);
 
           // Use the tenancy_code or id from the passed data
           const tenancyId = modalState.data.tenancy_code || modalState.data.id;
           console.log("Fetching tenancy with ID:", tenancyId); // Debug log
 
-          const response = await axios.get(
-            `${BASE_URL}/company/tenancies/${tenancyId}/`
-          );
-          const data = response.data;
-          console.log("Fetched tenancy data:", data); // Debug log
+          // const response = await axios.get(
+          //   `${BASE_URL}/company/tenancies/${tenancyId}/`
+          // );
+          // const data = response.data;
+          // console.log("Fetched tenancy data:");
 
-          // Initialize expanded states for additional charges and payment schedules
           const initialExpandedStates = {
-            ...data.additional_charges?.reduce(
+            ...(modalState.data.additional_charges || []).reduce(
               (acc, charge) => ({
                 ...acc,
                 [`additional-${charge.id}`]: false,
               }),
               {}
             ),
-            ...data.payment_schedules?.reduce(
+            ...(modalState.data.payment_schedules || []).reduce(
               (acc, schedule) => ({
                 ...acc,
                 [`schedule-${schedule.id}`]: false,
@@ -56,17 +53,14 @@ const TenancyViewModal = () => {
           };
 
           setExpandedStates(initialExpandedStates);
-          setTenancyData(data);
-          setLoading(false);
+          setTenancyData(modalState.data);
         } catch (err) {
           console.error("Error fetching tenancy data:", err);
           setError("Failed to fetch tenancy data");
-          setLoading(false);
 
           // Fallback: use the data that was passed directly
           console.log("Using fallback data:", modalState.data);
           setTenancyData(modalState.data);
-          setLoading(false);
         }
       };
 
@@ -109,15 +103,6 @@ const TenancyViewModal = () => {
 
   // Only render for "tenancy-view" type
   if (!modalState.isOpen || modalState.type !== "tenancy-view") return null;
-
-  if (loading)
-    return (
-      <div className="view-modal-overlay fixed inset-0 flex items-center justify-center transition-colors z-50">
-        <div className="view-modal-container bg-white rounded-md p-6 transition-all">
-          <div className="text-center">Loading...</div>
-        </div>
-      </div>
-    );
 
   if (error && !tenancyData)
     return (

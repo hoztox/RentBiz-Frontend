@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import closeicon from "../../../../../assets/Images/Admin Units/close-icon.svg";
+import { X } from "lucide-react";
 import FormTimeline from "../FormTimeline";
 import BuildingInfoForm from "../Select Building/BuildingInfoForm";
 import UnitInfoForm from "../Update Unit/UnitInfoForm";
@@ -267,14 +267,14 @@ const UnitFormFlow = ({ onClose, unitId, onPageChange, initialPageIndex = 0 }) =
           progress={formProgress}
         />
       </div>
-      <div className="w-full h-[700px] desktop:h-[780px] px-[20px] sm:px-[26px] pt-[8px] sm:pt-[50px] pb-[285px] sm:pb-[40px] overflow-y-scroll">
+      <div className="w-full h-[700px] desktop:h-[780px] px-[20px] sm:px-[26px] pt-[8px] sm:pt-[30px] pb-[285px] sm:pb-[40px] overflow-y-scroll">
         <div className="building-modal-header flex justify-between items-center mb-[41px]">
           <h3 className="building-modal-title">{currentTitle}</h3>
           <button
             onClick={handleClose}
-            className="border border-[#E9E9E9] rounded-full p-[11px]"
+            className="border border-[#E9E9E9] rounded-full p-[11px] hover:bg-gray-100 duration-200"
           >
-            <img src={closeicon} alt="Close" className="w-[15px] h-[15px]" />
+            <X size={20} />
           </button>
         </div>
         <div
