@@ -97,8 +97,8 @@ const UpdateTenancyModal = () => {
           ? parseFloat(tenancy.total_rent_receivable).toFixed(2)
           : "",
         deposit: tenancy.deposit ? parseFloat(tenancy.deposit).toFixed(2) : "",
-        commission: tenancy.commision
-          ? parseFloat(tenancy.commision).toFixed(2)
+        commission: tenancy.commission
+          ? parseFloat(tenancy.commission).toFixed(2)
           : "",
         remarks: tenancy.remarks || "",
         status: tenancy.status || "pending",
@@ -106,17 +106,23 @@ const UpdateTenancyModal = () => {
       setFormData(newFormData);
 
       const newAdditionalCharges =
-        tenancy.additional_charges?.map((charge, index) => ({
-          id: (index + 1).toString().padStart(2, "0"),
-          charge_type: charge.charge_type?.id?.toString() || "",
-          reason: charge.reason || "",
-          due_date: charge.due_date || "",
-          status: charge.status || "pending",
-          amount: charge.amount ? parseFloat(charge.amount).toFixed(2) : "",
-          tax: charge.tax ? parseFloat(charge.tax).toFixed(2) : "0.00",
-          total: charge.total ? parseFloat(charge.total).toFixed(2) : "0.00",
-          tax_details: charge.tax_details || [],
-        })) || [];
+        tenancy.additional_charges?.map((charge, index) => {
+          const chargeType = chargeTypes.find(
+            (type) => type.name === charge.charge_type
+          );
+          return {
+            id: (index + 1).toString().padStart(2, "0"),
+            charge_type: chargeType?.id?.toString() || "", // Use the ID if found, else empty string
+            charge_type_name: charge.charge_type || "", // Store the original charge_type string
+            reason: charge.reason || "",
+            due_date: charge.due_date || "",
+            status: charge.status || "pending",
+            amount: charge.amount ? parseFloat(charge.amount).toFixed(2) : "",
+            tax: charge.tax ? parseFloat(charge.tax).toFixed(2) : "0.00",
+            total: charge.total ? parseFloat(charge.total).toFixed(2) : "0.00",
+            tax_details: charge.tax_details || [],
+          };
+        }) || [];
       setAdditionalCharges(newAdditionalCharges);
 
       const newPaymentSchedule =
@@ -146,7 +152,12 @@ const UpdateTenancyModal = () => {
 
       setError(null);
     }
-  }, [modalState.isOpen, modalState.type, modalState.data]);
+  }, [modalState.isOpen, modalState.type, modalState.data, chargeTypes]);
+
+  console.log(
+    "Additional Charges from modalState:",
+    modalState.data.additional_charges
+  );
 
   // Fetch data from APIs
   useEffect(() => {
@@ -678,7 +689,7 @@ const UpdateTenancyModal = () => {
       if (response.status !== 200 && response.status !== 201) {
         throw new Error("Failed to update tenancy");
       }
-
+      console.log("Tenancy Updated: ", response.data);
       toast.success("Tenancy updated successfully");
       triggerRefresh();
       closeModal();
@@ -1051,14 +1062,23 @@ const UpdateTenancyModal = () => {
                           disabled={loading}
                         >
                           <option value="">Choose</option>
-                          {Array.isArray(chargeTypes) ? (
+                          {charge.charge_type &&
+                          !chargeTypes.find(
+                            (type) => type.id === parseInt(charge.charge_type)
+                          ) ? (
+                            <option value={charge.charge_type} disabled>
+                              {charge.charge_type_name || "Unknown Charge"}
+                            </option>
+                          ) : null}
+                          {Array.isArray(chargeTypes) &&
+                          chargeTypes.length > 0 ? (
                             chargeTypes.map((type) => (
                               <option key={type.id} value={type.id}>
                                 {type.name || "Unnamed Charge"}
                               </option>
                             ))
                           ) : (
-                            <option disabled>No charge types available</option>
+                            <option disabled>Loading charge types...</option>
                           )}
                         </select>
                         <ChevronDown
