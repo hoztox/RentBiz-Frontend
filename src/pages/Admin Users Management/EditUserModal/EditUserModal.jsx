@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import axios from "axios";
 import "./EditUserModal.css";
 import addImageIcon from "../../../assets/Images/Admin Users Management/addImageIcon.svg";
@@ -9,6 +10,7 @@ import { toast } from "react-hot-toast";
 import { BASE_URL } from "../../../utils/config";
 
 const EditUserModal = () => {
+  const { t } = useTranslation();
   const { modalState, closeModal, triggerRefresh } = useModal();
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,7 +48,7 @@ const EditUserModal = () => {
       setFormData({
         name: userData.name || "",
         username: userData.username || "",
-        email: userData.email || "", // Use email if available, else empty string
+        email: userData.email || "",
         user_role: userData.user_role || "",
       });
       console.log("Setting formData:", {
@@ -89,13 +91,12 @@ const EditUserModal = () => {
       if (/\s/.test(value)) {
         setFieldErrors((prev) => ({
           ...prev,
-          username: "Username cannot contain spaces",
+          username: t("edit_user_modal.errors.username_no_spaces"),
         }));
       } else if (!/^(?=.*[a-z])[a-z0-9._-]*$/.test(value.toLowerCase())) {
         setFieldErrors((prev) => ({
           ...prev,
-          username:
-            "Username must contain at least one letter and only letters, numbers, underscores, hyphens, or dots",
+          username: t("edit_user_modal.errors.username_format"),
         }));
       } else {
         setFieldErrors((prev) => ({ ...prev, username: "" }));
@@ -112,18 +113,17 @@ const EditUserModal = () => {
       if (!emailRegex.test(formData.email)) {
         setFieldErrors((prev) => ({
           ...prev,
-          email:
-            "Please enter a valid email address with a recognized domain (e.g., user@domain.com)",
+          email: t("edit_user_modal.errors.email_invalid"),
         }));
       } else if (formData.email.length > 254) {
         setFieldErrors((prev) => ({
           ...prev,
-          email: "Email address is too long (max 254 characters)",
+          email: t("edit_user_modal.errors.email_too_long"),
         }));
       } else if (/\.\./.test(formData.email)) {
         setFieldErrors((prev) => ({
           ...prev,
-          email: "Email cannot contain consecutive dots",
+          email: t("edit_user_modal.errors.email_consecutive_dots"),
         }));
       } else {
         setFieldErrors((prev) => ({ ...prev, email: "" }));
@@ -139,12 +139,12 @@ const EditUserModal = () => {
     const file = e.target.files[0];
     if (file) {
       if (!file.type.startsWith("image/")) {
-        toast.error("Please select a valid image file");
+        toast.error(t("edit_user_modal.errors.invalid_image"));
         return;
       }
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSize) {
-        toast.error("File size should be less than 5MB");
+        toast.error(t("edit_user_modal.errors.image_too_large"));
         return;
       }
       setProfileImage(file);
@@ -162,46 +162,44 @@ const EditUserModal = () => {
 
     // Name validation
     if (!formData.name.trim()) {
-      errors.name = "Name is required";
+      errors.name = t("edit_user_modal.errors.name_required");
       isValid = false;
     }
 
     // Username validation
     if (!formData.username.trim()) {
-      errors.username = "Username is required";
+      errors.username = t("edit_user_modal.errors.username_required");
       isValid = false;
     } else if (/\s/.test(formData.username)) {
-      errors.username = "Username cannot contain spaces";
+      errors.username = t("edit_user_modal.errors.username_no_spaces");
       isValid = false;
     } else if (!/^(?=.*[a-z])[a-z0-9._-]*$/.test(formData.username)) {
-      errors.username =
-        "Username must contain at least one letter and only letters, numbers, underscores, hyphens, or dots";
+      errors.username = t("edit_user_modal.errors.username_format");
       isValid = false;
     }
 
     // Email validation
     if (!formData.email.trim()) {
-      errors.email = "Email is required";
+      errors.email = t("edit_user_modal.errors.email_required");
       isValid = false;
     } else {
       const emailRegex =
         /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|mil|biz|info|io|co|us|ca|uk|au|de|fr|jp|cn|in)$/;
       if (!emailRegex.test(formData.email)) {
-        errors.email =
-          "Please enter a valid email address with a recognized domain (e.g., user@domain.com)";
+        errors.email = t("edit_user_modal.errors.email_invalid");
         isValid = false;
       } else if (formData.email.length > 254) {
-        errors.email = "Email address is too long (max 254 characters)";
+        errors.email = t("edit_user_modal.errors.email_too_long");
         isValid = false;
       } else if (/\.\./.test(formData.email)) {
-        errors.email = "Email cannot contain consecutive dots";
+        errors.email = t("edit_user_modal.errors.email_consecutive_dots");
         isValid = false;
       }
     }
 
     // Role validation
     if (!formData.user_role) {
-      errors.user_role = "Role is required";
+      errors.user_role = t("edit_user_modal.errors.role_required");
       isValid = false;
     }
 
@@ -222,7 +220,7 @@ const EditUserModal = () => {
     }
 
     setIsLoading(true);
-    const toastId = toast.loading("Updating user...");
+    const toastId = toast.loading(t("edit_user_modal.messages.updating_user"));
 
     try {
       const formDataToSend = new FormData();
@@ -245,7 +243,7 @@ const EditUserModal = () => {
       );
 
       if (response.status === 200) {
-        toast.success("User updated successfully!", { id: toastId });
+        toast.success(t("edit_user_modal.messages.user_updated"), { id: toastId });
         triggerRefresh();
         closeModal();
         navigate("/admin/users-manage");
@@ -254,7 +252,7 @@ const EditUserModal = () => {
       }
     } catch (error) {
       console.error("Error updating user:", error);
-      let errorMessage = "An error occurred while updating the user.";
+      let errorMessage = t("edit_user_modal.errors.update_user_failed");
       if (error.response) {
         const errorData = error.response.data;
         if (error.response.status === 400) {
@@ -262,15 +260,15 @@ const EditUserModal = () => {
             setFieldErrors((prev) => ({
               ...prev,
               username:
-                errorData.username[0] || "This username is already taken.",
+                errorData.username[0] || t("edit_user_modal.errors.username_taken"),
             }));
-            errorMessage = "This username is already taken.";
+            errorMessage = t("edit_user_modal.errors.username_taken");
           } else if (errorData.email) {
             setFieldErrors((prev) => ({
               ...prev,
-              email: errorData.email[0] || "This email is already in use.",
+              email: errorData.email[0] || t("edit_user_modal.errors.email_in_use"),
             }));
-            errorMessage = "This email is already in use.";
+            errorMessage = t("edit_user_modal.errors.email_in_use");
           } else {
             errorMessage =
               errorData.message ||
@@ -285,16 +283,9 @@ const EditUserModal = () => {
         }
         toast.error(errorMessage, { id: toastId });
       } else if (error.request) {
-        toast.error(
-          "Network error. Please check your connection and try again.",
-          {
-            id: toastId,
-          }
-        );
+        toast.error(t("edit_user_modal.errors.network_error"), { id: toastId });
       } else {
-        toast.error("An unexpected error occurred. Please try again.", {
-          id: toastId,
-        });
+        toast.error(t("edit_user_modal.errors.unexpected_error"), { id: toastId });
       }
     } finally {
       setIsLoading(false);
@@ -302,7 +293,7 @@ const EditUserModal = () => {
   };
 
   const handleChangePassword = () => {
-    toast("Change Password functionality is not implemented yet.", {
+    toast(t("edit_user_modal.messages.change_password_not_implemented"), {
       icon: "ℹ️",
     });
   };
@@ -313,12 +304,12 @@ const EditUserModal = () => {
         {/* Header */}
         <div className="h-[100px] md:h-[133px] md:bg-[#F8F9FA] rounded-t-[6px] flex justify-between items-start px-4 md:px-6 pt-6">
           <h2 className="absolute top-[30px] md:top-[40px] left-4 md:left-[30px] heading-text">
-            Edit User
+            {t("edit_user_modal.title")}
           </h2>
           <button
             className="close-button hover:bg-gray-200 duration-200"
             onClick={closeModal}
-            aria-label="Close modal"
+            aria-label={t("edit_user_modal.close_modal")}
             disabled={isLoading}
           >
             <X size={20} />
@@ -331,7 +322,7 @@ const EditUserModal = () => {
             {imagePreview && (
               <img
                 src={imagePreview}
-                alt="Profile preview"
+                alt={t("edit_user_modal.image_alt.profile_preview")}
                 className="w-full h-full object-cover rounded-full"
               />
             )}
@@ -342,7 +333,7 @@ const EditUserModal = () => {
             >
               <img
                 src={addImageIcon}
-                alt="Add image"
+                alt={t("edit_user_modal.image_alt.add_image")}
                 className="h-[18px] md:h-[22px] w-[18px] md:w-[22px]"
               />
             </div>
@@ -361,14 +352,14 @@ const EditUserModal = () => {
           {/* Name */}
           <div className="mt-[50px]">
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
-              Name *
+              {t("edit_user_modal.labels.name")} *
             </label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              placeholder="Enter Name"
+              placeholder={t("edit_user_modal.placeholders.name")}
               className={`input-style ${
                 fieldErrors.name
                   ? "border-red-500 focus:border-red-500"
@@ -385,14 +376,14 @@ const EditUserModal = () => {
           {/* Username */}
           <div className="md:mt-[50px]">
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
-              Username *
+              {t("edit_user_modal.labels.username")} *
             </label>
             <input
               type="text"
               name="username"
               value={formData.username}
               onChange={handleInputChange}
-              placeholder="Enter Username"
+              placeholder={t("edit_user_modal.placeholders.username")}
               className={`input-style ${
                 fieldErrors.username
                   ? "border-red-500 focus:border-red-500"
@@ -411,17 +402,16 @@ const EditUserModal = () => {
           {/* Email */}
           <div>
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
-              Email *
+              {t("edit_user_modal.labels.email")} *
             </label>
             <input
-              // key={formData.email} // Force re-render when email changes
               type="email"
               name="email"
               value={formData.email}
               onChange={handleInputChange}
               onBlur={handleEmailBlur}
-              onFocus={() => console.log("Email input value:", formData.email)} // Debug log
-              placeholder="Enter Email"
+              onFocus={() => console.log("Email input value:", formData.email)}
+              placeholder={t("edit_user_modal.placeholders.email")}
               className={`input-style ${
                 fieldErrors.email
                   ? "border-red-500 focus:border-red-500"
@@ -441,7 +431,7 @@ const EditUserModal = () => {
           {/* Role */}
           <div className="relative">
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
-              Role *
+              {t("edit_user_modal.labels.role")} *
             </label>
             <select
               name="user_role"
@@ -456,10 +446,10 @@ const EditUserModal = () => {
               onBlur={() => setIsSelectOpen(false)}
               disabled={isLoading}
             >
-              <option value="">Select Role</option>
-              <option value="Admin">Admin</option>
-              <option value="Sales">Sales</option>
-              <option value="Store">Store</option>
+              <option value="">{t("edit_user_modal.placeholders.role")}</option>
+              <option value="Admin">{t("edit_user_modal.roles.admin")}</option>
+              <option value="Sales">{t("edit_user_modal.roles.sales")}</option>
+              <option value="Store">{t("edit_user_modal.roles.store")}</option>
             </select>
             <ChevronDown
               className={`absolute right-[20px] md:right-[15px] top-[36px] md:top-[33px] text-gray-400 pointer-events-none transition-transform duration-300 drop-down-icon ${
@@ -488,7 +478,7 @@ const EditUserModal = () => {
             onClick={handleChangePassword}
             disabled={isLoading}
           >
-            Change Password
+            {t("edit_user_modal.buttons.change_password")}
           </button>
 
           <button
@@ -500,7 +490,9 @@ const EditUserModal = () => {
             onClick={handleSubmit}
             disabled={isLoading}
           >
-            {isLoading ? "Updating..." : "Edit User"}
+            {isLoading
+              ? t("edit_user_modal.buttons.updating")
+              : t("edit_user_modal.buttons.edit_user")}
           </button>
         </div>
       </div>

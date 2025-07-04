@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from 'recharts';
@@ -9,7 +10,6 @@ import moneyout from '../../../../assets/Images/Dashboard/money-out.svg';
 import './chart2.css';
 import { BASE_URL } from '../../../../utils/config';
 
-// Function to get user company ID from localStorage
 const getUserCompanyId = () => {
   const role = localStorage.getItem('role')?.toLowerCase();
   if (role === 'company') {
@@ -26,16 +26,25 @@ const getUserCompanyId = () => {
   return null;
 };
 
-// Month mapping for display
 const monthMap = {
-  '01': 'Jan', '02': 'Feb', '03': 'Mar', '04': 'Apr',
-  '05': 'May', '06': 'Jun', '07': 'Jul', '08': 'Aug',
-  '09': 'Sep', '10': 'Oct', '11': 'Nov', '12': 'Dec'
+  '01': 'chart2.months.jan',
+  '02': 'chart2.months.feb',
+  '03': 'chart2.months.mar',
+  '04': 'chart2.months.apr',
+  '05': 'chart2.months.may',
+  '06': 'chart2.months.jun',
+  '07': 'chart2.months.jul',
+  '08': 'chart2.months.aug',
+  '09': 'chart2.months.sep',
+  '10': 'chart2.months.oct',
+  '11': 'chart2.months.nov',
+  '12': 'chart2.months.dec'
 };
 
-const FinancialReport = () => {
+const FinancialReport = ({ companyId, title }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedPeriod, setSelectedPeriod] = useState('All Years');
+  const [selectedPeriod, setSelectedPeriod] = useState('all'); // Use 'all' as default
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [data, setData] = useState([]);
   const [yAxisTicks, setYAxisTicks] = useState([]);
@@ -43,45 +52,38 @@ const FinancialReport = () => {
   const [totalMoneyIn, setTotalMoneyIn] = useState(0);
   const [totalMoneyOut, setTotalMoneyOut] = useState(0);
   const [yearlySummary, setYearlySummary] = useState({});
-  const [overallPercentage, setOverallPercentage] = useState(0); // New state for overall percentage
+  const [overallPercentage, setOverallPercentage] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Get company ID
-  const companyId = getUserCompanyId();
+  const companyIdLocal = companyId || getUserCompanyId();
 
-  // Responsive settings for bar chart
   const barSettings = {
     barGap: windowWidth < 390 ? -6 : windowWidth < 430 ? -8 : windowWidth < 480 ? -8 : windowWidth < 1600 ? -6 : -8,
     barCategoryGap: windowWidth < 390 ? '34%' : windowWidth < 430 ? '33%' : windowWidth < 480 ? '34%' : windowWidth < 1600 ? '41%' : '43%',
   };
 
-  // Available periods
-const currentYear = new Date().getFullYear();
-const startYear = 2023; // or your company start year
-const periods = ['All Years'];
+  const currentYear = new Date().getFullYear();
+  const startYear = 2023;
+  const periods = [{ value: 'all', label: t('chart2.periods.all_years') }]; // Use value/label pairs
+  for (let year = currentYear; year >= startYear; year--) {
+    periods.push({ value: year.toString(), label: year.toString() });
+  }
 
-for (let year = currentYear; year >= startYear; year--) {
-  periods.push(year.toString());
-}
-
-
-  // Format currency
   const formatCurrency = (value) => `$${Math.round(value).toLocaleString()}`;
 
-  // Custom tooltip component
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white p-2 border border-gray-200 shadow-md rounded">
-          <p className="label">{label}</p>
+          <p className="label">{t(monthMap[label.split('-')[1]] || 'chart2.months.unknown')}</p>
           {payload.map((entry, index) => (
             <div key={index} className="flex items-center gap-2">
               <div
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: entry.color }}
               ></div>
-              <span className="entry-name">{entry.name === 'earning' ? 'Collections' : 'Expenses'}: </span>
+              <span className="entry-name">{t(`chart2.${entry.name}`)}: </span>
               <span className="entry-amount">{formatCurrency(Math.abs(entry.value))}</span>
             </div>
           ))}
@@ -91,46 +93,35 @@ for (let year = currentYear; year >= startYear; year--) {
     return null;
   };
 
-  // Calculate dynamic Y-axis settings
   const calculateYAxisSettings = (currentData) => {
     const maxEarning = Math.max(...currentData.map((item) => item.earning || 0));
     const maxExpense = Math.max(...currentData.map((item) => Math.abs(item.expense || 0)));
     const overallMax = Math.max(maxEarning, maxExpense);
-
-    // Round up to the nearest 100
     const roundedMax = Math.ceil(overallMax / 100) * 100;
-
-    // Ensure domain is symmetrical and extends beyond max values
     const domainMax = Math.max(300, roundedMax * 1.2);
     const adjustedDomainMax = Math.ceil(domainMax / 100) * 100;
     const newDomain = [-adjustedDomainMax, adjustedDomainMax];
-
-    // Adjust Y-axis intervals based on screen size
     let interval = 100;
     if (windowWidth < 480) interval = 50;
-
-    // Generate Y-axis ticks
     const newTicks = [];
     for (let i = -adjustedDomainMax; i <= adjustedDomainMax; i += interval) {
       newTicks.push(i);
     }
-
     return { domain: newDomain, ticks: newTicks };
   };
 
-  // Fetch data from API
   const fetchFinancialData = async () => {
-    if (!companyId) {
-      setError('No company ID found');
+    if (!companyIdLocal) {
+      setError(t('errors.no_company_id'));
       setLoading(false);
       return;
     }
 
     setLoading(true);
     try {
-      const url = selectedPeriod === 'All Years'
-        ? `${BASE_URL}/company/dashboard/revenue-report/${companyId}/`
-        : `${BASE_URL}/company/dashboard/revenue-report/${companyId}/?year=${selectedPeriod}`;
+      const url = selectedPeriod === 'all'
+        ? `${BASE_URL}/company/dashboard/revenue-report/${companyIdLocal}/`
+        : `${BASE_URL}/company/dashboard/revenue-report/${companyIdLocal}/?year=${selectedPeriod}`;
       const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -139,11 +130,10 @@ for (let year = currentYear; year >= startYear; year--) {
 
       const { monthly_breakdown, total_money_in, total_money_out, yearly_summary, overall_percentage } = response.data;
 
-      // Transform monthly_breakdown for Recharts with month abbreviations
       const transformedData = monthly_breakdown.map((item) => {
         const [year, month] = item.month.split('-');
         return {
-          month: monthMap[month] || item.month, // Use 'Jan', 'Feb', etc., or fallback to original
+          month: t(monthMap[month] || 'chart2.months.unknown'),
           earning: item.collections || 0,
           expense: -Math.abs(item.expenses || 0),
         };
@@ -153,16 +143,14 @@ for (let year = currentYear; year >= startYear; year--) {
       setTotalMoneyIn(total_money_in || 0);
       setTotalMoneyOut(total_money_out || 0);
       setYearlySummary(yearly_summary || {});
-      setOverallPercentage(overall_percentage || 0); // Set the overall percentage
-
-      // Update Y-axis settings
+      setOverallPercentage(overall_percentage || 0);
       const { domain, ticks } = calculateYAxisSettings(transformedData);
       setYAxisDomain(domain);
       setYAxisTicks(ticks);
       setError(null);
     } catch (err) {
       console.error('Error fetching financial data:', err);
-      setError(err.response?.data?.error || 'Failed to load financial data');
+      setError(t('errors.fetch_financial_failed'));
       setData([]);
       setTotalMoneyIn(0);
       setTotalMoneyOut(0);
@@ -173,37 +161,35 @@ for (let year = currentYear; year >= startYear; year--) {
     }
   };
 
-  // Handle window resize
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Fetch data when component mounts or selectedPeriod changes
   useEffect(() => {
     fetchFinancialData();
-  }, [companyId, selectedPeriod]);
+  }, [companyIdLocal, selectedPeriod, t]);
 
-  const handlePeriodChange = (period) => {
-    setSelectedPeriod(period);
+  const handlePeriodChange = (periodValue) => {
+    setSelectedPeriod(periodValue);
     setIsOpen(false);
   };
 
-  if (loading) return <div className="text-[#201D1E]">Loading...</div>;
+  if (loading) return <div className="text-[#201D1E]">{t('messages.loading')}</div>;
   if (error) return <div className="text-[#E44747]">{error}</div>;
 
   return (
     <div className="p-5 rounded-md w-[65%] border border-[#E9E9E9] chart2">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="revenue-report-head">Revenue Report</h1>
+        <h1 className="revenue-report-head">{title || t('chart2.title')}</h1>
         <div className="relative">
           <motion.button
             className="flex items-center gap-2 px-3 py-[5px] border rounded-md select-period"
             onClick={() => setIsOpen(!isOpen)}
             whileTap={{ scale: 0.97 }}
           >
-            <span>{selectedPeriod}</span>
+            <span>{periods.find((p) => p.value === selectedPeriod)?.label || selectedPeriod}</span>
             <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.3 }}>
               <ChevronDown size={20} />
             </motion.div>
@@ -219,13 +205,13 @@ for (let year = currentYear; year >= startYear; year--) {
               >
                 {periods.map((period) => (
                   <motion.button
-                    key={period}
+                    key={period.value}
                     className="w-full text-left py-2 hover:bg-gray-100 rounded period-options"
-                    onClick={() => handlePeriodChange(period)}
+                    onClick={() => handlePeriodChange(period.value)}
                     whileHover={{ x: 2 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <p className="px-2">{period}</p>
+                    <p className="px-2">{period.label}</p>
                   </motion.button>
                 ))}
               </motion.div>
@@ -300,9 +286,9 @@ for (let year = currentYear; year >= startYear; year--) {
               <CountUp end={totalMoneyIn} duration={1} decimals={2} prefix="$" />
             </motion.div>
             <div className="flex justify-between items-center">
-              <span className="money-in-head">Money In</span>
+              <span className="money-in-head">{t('chart2.money_in')}</span>
               <div className="flex items-center">
-                <img src={moneyin} alt="Money In" className="w-[18px] h-[18px]" />
+                <img src={moneyin} alt={t('logo_alt.money_in')} className="w-[18px] h-[18px]" />
                 <span className="percentage ml-[5.46px]">0%</span>
               </div>
             </div>
@@ -319,25 +305,24 @@ for (let year = currentYear; year >= startYear; year--) {
               <CountUp end={totalMoneyOut} duration={1} decimals={2} prefix="$" />
             </motion.div>
             <div className="flex justify-between items-center">
-              <span className="money-out-head">Money Out</span>
+              <span className="money-out-head">{t('chart2.money_out')}</span>
               <div className="flex items-center">
-                <img src={moneyout} alt="Money Out" className="w-[18px] h-[18px]" />
+                <img src={moneyout} alt={t('logo_alt.money_out')} className="w-[18px] h-[18px]" />
                 <span className="percentage ml-[5.46px]">{overallPercentage.toFixed(2)}%</span>
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
       <div className="flex items-center justify-start mt-6 gap-8">
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded-full bg-[#1458A2]"></div>
-          <span className="earning-text">Collections</span>
+          <span className="earning-text">{t('chart2.earning')}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded-full bg-[#FF9F43]"></div>
-          <span className="expense-text">Expenses</span>
+          <span className="expense-text">{t('chart2.expense')}</span>
         </div>
       </div>
 
@@ -353,9 +338,9 @@ for (let year = currentYear; year >= startYear; year--) {
             <CountUp end={totalMoneyIn} duration={1} decimals={2} prefix="$" />
           </motion.div>
           <div className="flex justify-between items-center money-in-div">
-            <span className="money-in-head">Money In</span>
+            <span className="money-in-head">{t('chart2.money_in')}</span>
             <div className="flex items-center">
-              <img src={moneyin} alt="Money In" className="w-[18px] h-[18px]" />
+              <img src={moneyin} alt={t('logo_alt.money_in')} className="w-[18px] h-[18px]" />
               <span className="percentage ml-[5.46px]">0%</span>
             </div>
           </div>
@@ -372,19 +357,14 @@ for (let year = currentYear; year >= startYear; year--) {
             <CountUp end={totalMoneyOut} duration={1} decimals={2} prefix="$" />
           </motion.div>
           <div className="flex justify-between items-center money-out-div">
-            <span className="money-out-head">Money Out</span>
+            <span className="money-out-head">{t('chart2.money_out')}</span>
             <div className="flex items-center">
-              <img src={moneyout} alt="Money Out" className="w-[18px] h-[18px]" />
+              <img src={moneyout} alt={t('logo_alt.money_out')} className="w-[18px] h-[18px]" />
               <span className="percentage ml-[5.46px]">{overallPercentage.toFixed(2)}%</span>
             </div>
           </div>
         </div>
-
-       
       </div>
-
-      
-      
     </div>
   );
 };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import CountUp from 'react-countup';
@@ -6,7 +7,6 @@ import "./collectionrent.css";
 import axios from 'axios';
 import { BASE_URL } from '../../../utils/config';
 
-// Function to get user company ID from localStorage
 const getUserCompanyId = () => {
   const role = localStorage.getItem("role")?.toLowerCase();
   if (role === "company") {
@@ -24,6 +24,7 @@ const getUserCompanyId = () => {
 };
 
 const CollectionRent = () => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [animateProgress, setAnimateProgress] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('This Month');
@@ -39,7 +40,7 @@ const CollectionRent = () => {
 
   const fetchRentData = async () => {
     if (!companyId) {
-      setError('No company ID found');
+      setError(t('errors.no_company_id'));
       setLoading(false);
       return;
     }
@@ -63,7 +64,7 @@ const CollectionRent = () => {
       setError(null);
     } catch (err) {
       console.error('Error fetching rent data:', err);
-      setError('Failed to load rent data');
+      setError(t('errors.fetch_rent_failed'));
     } finally {
       setLoading(false);
       setAnimateProgress(true);
@@ -75,26 +76,28 @@ const CollectionRent = () => {
   }, [companyId, selectedPeriod]);
 
   const handlePeriodChange = (period) => {
-    setSelectedPeriod(period);
+    setSelectedPeriod(t(`periods.${period.toLowerCase().replace(' ', '_')}`));
     setIsOpen(false);
   };
 
+  const periods = ['This Month', 'Last Month', 'Last 3 Months', 'This Year'];
+
   const progressPercentage = data.total > 0 ? (data.collected / data.total) * 100 : 0;
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div>{t('messages.loading')}</div>;
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (
     <div className="rounded-md border border-[#E9E9E9] p-5 w-[40%] h-auto collection-rent">
       <div className="flex justify-between items-center mb-[14px]">
-        <h2 className="rent-head">Collection of Rent</h2>
+        <h2 className="rent-head">{t('collection_rent.title')}</h2>
         <div className="relative">
           <motion.button
             onClick={() => setIsOpen(!isOpen)}
             className="flex items-center gap-2 px-3 py-[5px] bg-[#FBFBFB] rounded-md border border-[#E9E9E9] hover:bg-gray-100 duration-100 period-tab"
             whileTap={{ scale: 0.97 }}
           >
-            <span className="period-text">{selectedPeriod}</span>
+            <span className="period-text">{t(`periods.${selectedPeriod.toLowerCase().replace(' ', '_')}`)}</span>
             <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.3 }}>
               <ChevronDown className="h-5 w-5 text-[#201D1E]" />
             </motion.div>
@@ -110,17 +113,19 @@ const CollectionRent = () => {
                 className="absolute right-0 mt-2 w-40 bg-white shadow-md rounded-md z-10 border border-gray-100 overflow-hidden"
               >
                 <ul className="py-1">
-                  {['This Month', 'Last Month', 'Last 3 Months', 'This Year'].map((period) => (
+                  {periods.map((period) => (
                     <motion.li
                       key={period}
                       onClick={() => handlePeriodChange(period)}
                       className={`px-3 py-2 hover:bg-blue-50 cursor-pointer transition-colors period-options ${
-                        selectedPeriod === period ? 'bg-blue-50 text-[#1458A2]' : 'text-[#201D1E]'
+                        selectedPeriod === t(`periods.${period.toLowerCase().replace(' ', '_')}`)
+                          ? 'bg-blue-50 text-[#1458A2]'
+                          : 'text-[#201D1E]'
                       }`}
                       whileHover={{ x: 2 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      {period}
+                      {t(`periods.${period.toLowerCase().replace(' ', '_')}`)}
                     </motion.li>
                   ))}
                 </ul>
@@ -131,7 +136,7 @@ const CollectionRent = () => {
       </div>
 
       <div>
-        <p className="total-text mb-1">Total</p>
+        <p className="total-text mb-1">{t('collection_rent.total')}</p>
         <motion.h3
           key={data.total}
           initial={{ scale: 0.9, opacity: 0 }}
@@ -157,7 +162,7 @@ const CollectionRent = () => {
 
       <div className="flex justify-between">
         <div>
-          <p className="text-[#68C68D] collected-text mb-[6px]">Collected</p>
+          <p className="text-[#68C68D] collected-text mb-[6px]">{t('collection_rent.collected')}</p>
           <motion.p
             key={data.collected}
             initial={{ y: 20, opacity: 0 }}
@@ -170,7 +175,7 @@ const CollectionRent = () => {
         </div>
 
         <div className="text-right">
-          <p className="text-[#E44747] pending-text mb-[6px]">Pending</p>
+          <p className="text-[#E44747] pending-text mb-[6px]">{t('collection_rent.pending')}</p>
           <motion.p
             key={data.pending}
             initial={{ y: 20, opacity: 0 }}

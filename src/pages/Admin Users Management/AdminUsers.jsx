@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import plusicon from "../../assets/Images/Admin Users Management/plus-icon.svg";
 import downloadicon from "../../assets/Images/Admin Users Management/download-icon.svg";
 import editicon from "../../assets/Images/Admin Users Management/edit-icon.svg";
@@ -14,6 +15,7 @@ import CustomDropDown from "../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
 
 const AdminUsers = () => {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -28,11 +30,11 @@ const AdminUsers = () => {
   const itemsPerPage = 10;
   const filteredData = users;
 
-  // Dropdown options for status filter
+  // Dropdown options for status filter with translated labels
   const statusFilterOptions = [
-    { label: "All", value: "" },
-    { label: "Active", value: "active" },
-    { label: "Blocked", value: "blocked" },
+    { label: t("sidebar.users"), value: "" }, // "All" or its translation
+    { label: t("status.active"), value: "active" },
+    { label: t("status.blocked"), value: "blocked" },
   ];
 
   const getUserCompanyId = () => {
@@ -62,7 +64,7 @@ const AdminUsers = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       if (!companyId) {
-        setError("Company ID not found. Please log in again.");
+        setError(t("errors.company_id_not_found"));
         setLoading(false);
         return;
       }
@@ -81,12 +83,11 @@ const AdminUsers = () => {
           }
         );
         const userData = response.data.results || [];
-        console.log(response.data);
         setUsers(userData);
         setTotalCount(response.data.count);
       } catch (error) {
         console.error("Error fetching users:", error);
-        // setError("Failed to load users. Please try again later.");
+        // setError(t("errors.fetch_users_failed"));
       } finally {
         setLoading(false);
       }
@@ -102,8 +103,7 @@ const AdminUsers = () => {
   ]);
 
   const handleEditUser = (user) => {
-    console.log("User data passed to modal:", user);
-    openModal("user-update", "Edit User", {
+    openModal("user-update", t("actions.edit_user"), {
       id: user.id,
       name: user.name,
       username: user.username,
@@ -115,15 +115,15 @@ const AdminUsers = () => {
 
   const handleToggle = async (id) => {
     if (!companyId) {
-      setError("Company ID not found. Please log in again.");
-      toast.error("Company ID not found. Please log in again.");
+      setError(t("errors.company_id_not_found"));
+      toast.error(t("errors.company_id_not_found"));
       return;
     }
 
     const user = users.find((u) => u.id === id);
     if (!user) {
-      setError("User not found. Please try again.");
-      toast.error("User not found. Please try again.");
+      setError(t("errors.user_not_found"));
+      toast.error(t("errors.user_not_found"));
       return;
     }
 
@@ -139,14 +139,13 @@ const AdminUsers = () => {
       });
 
       if (response.data.status !== newStatus) {
-        throw new Error("Status update failed on the server.");
+        throw new Error(t("errors.status_update_failed"));
       }
-      toast.success(`User ${newStatus} successfully.`);
+      toast.success(t("success.user_status_updated", { status: newStatus }));
     } catch (error) {
       console.error("Error updating user status:", error);
       const errorMessage =
-        error.response?.data?.message ||
-        "Failed to update user status. Please try again.";
+        error.response?.data?.message || t("errors.status_update_failed");
       setError(errorMessage);
       toast.error(errorMessage);
 
@@ -158,8 +157,8 @@ const AdminUsers = () => {
 
   const handleDelete = (id) => {
     if (!companyId) {
-      setError("Company ID not found. Please log in again.");
-      toast.error("Company ID not found. Please log in again.");
+      setError(t("errors.company_id_not_found"));
+      toast.error(t("errors.company_id_not_found"));
       return;
     }
     setUserIdToDelete(id);
@@ -172,12 +171,11 @@ const AdminUsers = () => {
     try {
       await axios.delete(`${BASE_URL}/company/users/${userIdToDelete}/`);
       setUsers((prev) => prev.filter((u) => u.id !== userIdToDelete));
-      toast.success("User deleted successfully.");
+      toast.success(t("success.user_deleted"));
     } catch (error) {
       console.error("Error deleting user:", error);
       const errorMessage =
-        error.response?.data?.message ||
-        "Failed to delete user. Please try again.";
+        error.response?.data?.message || t("errors.delete_user_failed");
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -246,43 +244,43 @@ const AdminUsers = () => {
     <div className="border border-[#E9E9E9] rounded-md user-table">
       <Toaster />
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] user-table-header">
-        <h1 className="users-head">Users</h1>
+        <h1 className="users-head">{t("sidebar.users")}</h1>
         <div className="flex flex-col md:flex-row gap-[10px] user-inputs-container">
           <div className="flex flex-col md:flex-row gap-[10px] w-full">
             <input
               type="text"
-              placeholder="Search"
+              placeholder={t("actions.search")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 user-search"
             />
             <div className="relative w-[40%] md:w-auto">
-            <CustomDropDown
-              options={statusFilterOptions}
-              value={selectedStatus}
-              onChange={setSelectedStatus}
-              placeholder="Select Status"
-              dropdownClassName="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 user-selection"
-            />
+              <CustomDropDown
+                options={statusFilterOptions}
+                value={selectedStatus}
+                onChange={setSelectedStatus}
+                placeholder={t("actions.select_status")}
+                dropdownClassName="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 user-selection"
+              />
             </div>
           </div>
           <div className="flex gap-[10px] user-action-buttons-container w-full md:w-auto justify-start">
             <button
               className="flex items-center justify-center gap-2 h-[38px] rounded-md user-create-btn duration-200 w-[176px]"
-              onClick={() => openModal("user-create", "Create User")}
+              onClick={() => openModal("user-create", t("actions.create_user"))}
             >
-              Create User
+              {t("sidebar.create_user")}
               <img
                 src={plusicon}
-                alt="plus icon"
+                alt={t("logo_alt.plus_icon")}
                 className="relative right-[5px] md:right-0 w-[15px] h-[15px]"
               />
             </button>
             <button className="flex items-center justify-center gap-2 h-[38px] rounded-md duration-200 user-download-btn w-[122px]">
-              Download
+              {t("actions.download")}
               <img
                 src={downloadicon}
-                alt="Download Icon"
+                alt={t("logo_alt.download_icon")}
                 className="w-[15px] h-[15px] user-download-icon"
               />
             </button>
@@ -294,23 +292,35 @@ const AdminUsers = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-[#E9E9E9] h-[57px]">
-              <th className="px-5 text-left user-thead">ID</th>
+              <th className="px-5 text-left user-thead">{t("table.id")}</th>
               <th className="px-5 text-left user-thead w-[12%]">
-                CREATED DATE
+                {t("table.created_date")}
               </th>
-              <th className="pl-5 text-left user-thead w-[15%]">NAME</th>
-              <th className="px-5 text-left user-thead">USERNAME</th>
-              <th className="pl-12 pr-5 text-left user-thead w-[18%]">ROLE</th>
-              <th className="px-5 text-left user-thead w-[12%]">STATUS</th>
-              <th className="px-5 text-left user-thead w-[8%]">BLOCK</th>
-              <th className="px-5 pr-6 text-right user-thead">ACTION</th>
+              <th className="pl-5 text-left user-thead w-[15%]">
+                {t("table.name")}
+              </th>
+              <th className="px-5 text-left user-thead">
+                {t("table.username")}
+              </th>
+              <th className="pl-12 pr-5 text-left user-thead w-[18%]">
+                {t("table.role")}
+              </th>
+              <th className="px-5 text-left user-thead w-[12%]">
+                {t("table.status")}
+              </th>
+              <th className="px-5 text-left user-thead w-[8%]">
+                {t("table.block")}
+              </th>
+              <th className="px-5 pr-6 text-right user-thead">
+                {t("table.action")}
+              </th>
             </tr>
           </thead>
           <tbody>
             {users.length === 0 ? (
               <tr>
                 <td colSpan={8} className="px-5 py-8 text-center text-gray-500">
-                  No users found
+                  {t("messages.no_users_found")}
                 </td>
               </tr>
             ) : (
@@ -324,21 +334,24 @@ const AdminUsers = () => {
                   </td>
                   <td className="px-5 text-left user-data">
                     {user.created_at
-                      ? new Date(user.created_at).toLocaleDateString("en-GB", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        })
-                      : "N/A"}
+                      ? new Date(user.created_at).toLocaleDateString(
+                          t("locale"),
+                          {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          }
+                        )
+                      : t("messages.na")}
                   </td>
                   <td className="pl-5 text-left user-data">
-                    {user.name || "N/A"}
+                    {user.name || t("messages.na")}
                   </td>
                   <td className="px-5 text-left user-data">
-                    {user.username || "N/A"}
+                    {user.username || t("messages.na")}
                   </td>
                   <td className="pl-12 pr-5 text-left user-data">
-                    {user.user_role || "N/A"}
+                    {user.user_role || t("messages.na")}
                   </td>
                   <td className="px-5 text-left user-data">
                     <span
@@ -348,8 +361,7 @@ const AdminUsers = () => {
                           : "bg-[#FFE1E1] text-[#C72828]"
                       }`}
                     >
-                      {user.status.charAt(0).toUpperCase() +
-                        user.status.slice(1)}
+                      {t(`status.${user.status}`)}
                     </span>
                   </td>
                   <td className="px-5 text-left user-data">
@@ -363,14 +375,14 @@ const AdminUsers = () => {
                     <button onClick={() => handleEditUser(user)}>
                       <img
                         src={editicon}
-                        alt="Edit"
+                        alt={t("logo_alt.edit_icon")}
                         className="w-[18px] h-[18px] action-btn duration-200"
                       />
                     </button>
                     <button onClick={() => handleDelete(user.id)}>
                       <img
                         src={deletesicon}
-                        alt="Delete"
+                        alt={t("logo_alt.delete_icon")}
                         className="w-[18px] h-[18px] action-btn duration-200"
                       />
                     </button>
@@ -387,9 +399,11 @@ const AdminUsers = () => {
           <thead>
             <tr className="user-table-row-head">
               <th className="px-5 w-[38%] text-left user-thead user-id-column">
-                ID
+                {t("table.id")}
               </th>
-              <th className="px-5 w-[60%] text-left user-thead">NAME</th>
+              <th className="px-5 w-[60%] text-left user-thead">
+                {t("table.name")}
+              </th>
               <th className="px-5 text-right user-thead"></th>
             </tr>
           </thead>
@@ -397,7 +411,7 @@ const AdminUsers = () => {
             {users.length === 0 ? (
               <tr>
                 <td colSpan={3} className="px-5 py-4 text-center">
-                  No users found.
+                  {t("messages.no_users_found")}
                 </td>
               </tr>
             ) : (
@@ -414,7 +428,7 @@ const AdminUsers = () => {
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
                     <td className="px-5 text-left user-data">
-                      {user.name || "N/A"}
+                      {user.name || t("messages.na")}
                     </td>
                     <td className="py-4 flex items-center justify-end h-[57px]">
                       <div
@@ -425,7 +439,7 @@ const AdminUsers = () => {
                       >
                         <img
                           src={downarrow}
-                          alt="drop-down-arrow"
+                          alt={t("logo_alt.dropdown_arrow")}
                           className={`user-dropdown-img ${
                             expandedRows[user.id] ? "text-white" : ""
                           }`}
@@ -447,37 +461,41 @@ const AdminUsers = () => {
                             <div className="user-grid">
                               <div className="user-grid-item w-[33.33%]">
                                 <div className="dropdown-label">
-                                  CREATED DATE
+                                  {t("table.created_date")}
                                 </div>
                                 <div className="dropdown-value">
                                   {user.created_at
                                     ? new Date(
                                         user.created_at
-                                      ).toLocaleDateString("en-GB", {
+                                      ).toLocaleDateString(t("locale"), {
                                         day: "2-digit",
                                         month: "short",
                                         year: "numeric",
                                       })
-                                    : "N/A"}
+                                    : t("messages.na")}
                                 </div>
                               </div>
                               <div className="user-grid-item w-[35.33%]">
-                                <div className="dropdown-label">USERNAME</div>
+                                <div className="dropdown-label">
+                                  {t("table.username")}
+                                </div>
                                 <div className="dropdown-value">
-                                  {user.username || "N/A"}
+                                  {user.username || t("messages.na")}
                                 </div>
                               </div>
                               <div className="user-grid-item w-[20%]">
-                                <div className="dropdown-label">ROLE</div>
+                                <div className="dropdown-label">
+                                  {t("table.role")}
+                                </div>
                                 <div className="dropdown-value">
-                                  {user.user_role || "N/A"}
+                                  {user.user_role || t("messages.na")}
                                 </div>
                               </div>
                             </div>
                             <div className="user-grid">
                               <div className="user-grid-item w-[33.33%]">
                                 <div className="dropdown-label !mb-[10px]">
-                                  STATUS
+                                  {t("table.status")}
                                 </div>
                                 <div className="dropdown-value">
                                   <span
@@ -487,13 +505,14 @@ const AdminUsers = () => {
                                         : "bg-[#FFE1E1] text-[#C72828] !pr-[5px] !pl-[5px]"
                                     }`}
                                   >
-                                    {user.status.charAt(0).toUpperCase() +
-                                      user.status.slice(1)}
+                                    {t(`status.${user.status}`)}
                                   </span>
                                 </div>
                               </div>
                               <div className="user-grid-item w-[35.33%]">
-                                <div className="dropdown-label">BLOCK</div>
+                                <div className="dropdown-label">
+                                  {t("table.block")}
+                                </div>
                                 <div className="dropdown-value flex items-center gap-2 mt-[10px]">
                                   <ToggleSwitch
                                     id={user.id}
@@ -503,19 +522,21 @@ const AdminUsers = () => {
                                 </div>
                               </div>
                               <div className="user-grid-item w-[20%]">
-                                <div className="dropdown-label">ACTION</div>
+                                <div className="dropdown-label">
+                                  {t("table.action")}
+                                </div>
                                 <div className="dropdown-value flex items-center gap-[15px] ml-[5px] mt-[10px]">
                                   <button onClick={() => handleEditUser(user)}>
                                     <img
                                       src={editicon}
-                                      alt="Edit"
+                                      alt={t("logo_alt.edit_icon")}
                                       className="w-[18px] h-[18px] action-btn duration-200"
                                     />
                                   </button>
                                   <button onClick={() => handleDelete(user.id)}>
                                     <img
                                       src={deletesicon}
-                                      alt="Delete"
+                                      alt={t("logo_alt.delete_icon")}
                                       className="w-[18px] h-[18px] action-btn duration-200"
                                     />
                                   </button>
@@ -536,9 +557,11 @@ const AdminUsers = () => {
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
         <span className="pagination collection-list-pagination">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, totalCount)}{" "}
-          to {Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount}{" "}
-          entries
+          {t("pagination.showing", {
+            start: Math.min((currentPage - 1) * itemsPerPage + 1, totalCount),
+            end: Math.min(currentPage * itemsPerPage, totalCount),
+            total: totalCount,
+          })}
         </span>
         <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
           <button
@@ -546,7 +569,7 @@ const AdminUsers = () => {
             disabled={currentPage === 1}
             onClick={() => setCurrentPage(currentPage - 1)}
           >
-            Previous
+            {t("pagination.previous")}
           </button>
           {startPage > 1 && (
             <button
@@ -586,17 +609,17 @@ const AdminUsers = () => {
             disabled={currentPage === totalPages}
             onClick={() => setCurrentPage(currentPage + 1)}
           >
-            Next
+            {t("pagination.next")}
           </button>
         </div>
       </div>
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
         type="delete"
-        title="Delete User"
-        message="Are you sure you want to delete this user?"
-        confirmButtonText="Delete"
-        cancelButtonText="Cancel"
+        title={t("actions.delete_user")}
+        message={t("messages.confirm_delete_user")}
+        confirmButtonText={t("actions.delete")}
+        cancelButtonText={t("actions.cancel")}
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
       />

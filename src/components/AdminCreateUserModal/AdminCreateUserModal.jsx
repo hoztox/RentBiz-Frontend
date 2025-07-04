@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import "./AdminCreateUserModal.css";
 import addImageIcon from "../../assets/Images/Admin Create Modal/addImageIcon.svg";
 import { ChevronDown, X } from "lucide-react";
@@ -10,6 +11,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const AdminCreateUserModal = () => {
+  const { t } = useTranslation();
   const { modalState, closeModal, triggerRefresh } = useModal();
   const [isLoading, setIsLoading] = useState(false);
   const [isRoleSelectOpen, setIsRoleSelectOpen] = useState(false);
@@ -67,13 +69,12 @@ const AdminCreateUserModal = () => {
       if (/\s/.test(value)) {
         setFieldErrors((prev) => ({
           ...prev,
-          username: "Username cannot contain spaces",
+          username: t("admin_create_user.errors.username_no_spaces"),
         }));
       } else if (!/^(?=.*[a-z])[a-z0-9._-]*$/.test(value.toLowerCase())) {
         setFieldErrors((prev) => ({
           ...prev,
-          username:
-            "Username must contain at least one letter and only letters, numbers, underscores, hyphens, or dots",
+          username: t("admin_create_user.errors.username_format"),
         }));
       } else {
         setFieldErrors((prev) => ({ ...prev, username: "" }));
@@ -90,18 +91,17 @@ const AdminCreateUserModal = () => {
       if (!emailRegex.test(formData.email)) {
         setFieldErrors((prev) => ({
           ...prev,
-          email:
-            "Please enter a valid email address with a recognized domain (e.g., user@domain.com)",
+          email: t("admin_create_user.errors.email_invalid"),
         }));
       } else if (formData.email.length > 254) {
         setFieldErrors((prev) => ({
           ...prev,
-          email: "Email address is too long (max 254 characters)",
+          email: t("admin_create_user.errors.email_too_long"),
         }));
       } else if (/\.\./.test(formData.email)) {
         setFieldErrors((prev) => ({
           ...prev,
-          email: "Email cannot contain consecutive dots",
+          email: t("admin_create_user.errors.email_consecutive_dots"),
         }));
       } else {
         setFieldErrors((prev) => ({ ...prev, email: "" }));
@@ -117,13 +117,13 @@ const AdminCreateUserModal = () => {
     const file = e.target.files[0];
     if (file) {
       if (!file.type.startsWith("image/")) {
-        toast.error("Please select a valid image file");
+        toast.error(t("admin_create_user.errors.invalid_image"));
         return;
       }
 
       const maxSize = 5 * 1024 * 1024; // 5MB
       if (file.size > maxSize) {
-        toast.error("File size should be less than 5MB");
+        toast.error(t("admin_create_user.errors.image_too_large"));
         return;
       }
 
@@ -150,71 +150,72 @@ const AdminCreateUserModal = () => {
 
     // Name validation
     if (!formData.name.trim()) {
-      errors.name = "Name is required";
+      errors.name = t("admin_create_user.errors.name_required");
       isValid = false;
     }
 
     // Username validation
     if (!formData.username.trim()) {
-      errors.username = "Username is required";
+      errors.username = t("admin_create_user.errors.username_required");
       isValid = false;
     } else {
       if (/\s/.test(formData.username)) {
-        errors.username = "Username cannot contain spaces";
+        errors.username = t("admin_create_user.errors.username_no_spaces");
         isValid = false;
       } else if (!/^(?=.*[a-z])[a-z0-9._-]*$/.test(formData.username)) {
-        errors.username =
-          "Username must contain at least one letter and only letters, numbers, underscores, hyphens, or dots";
+        errors.username = t("admin_create_user.errors.username_format");
         isValid = false;
       }
     }
 
     // Email validation
     if (!formData.email.trim()) {
-      errors.email = "Email is required";
+      errors.email = t("admin_create_user.errors.email_required");
       isValid = false;
     } else {
       const emailRegex =
         /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|mil|biz|info|io|co|us|ca|uk|au|de|fr|jp|cn|in)$/;
       if (!emailRegex.test(formData.email)) {
-        errors.email =
-          "Please enter a valid email address with a recognized domain (e.g., user@domain.com)";
+        errors.email = t("admin_create_user.errors.email_invalid");
         isValid = false;
       } else if (formData.email.length > 254) {
-        errors.email = "Email address is too long (max 254 characters)";
+        errors.email = t("admin_create_user.errors.email_too_long");
         isValid = false;
       } else if (/\.\./.test(formData.email)) {
-        errors.email = "Email cannot contain consecutive dots";
+        errors.email = t("admin_create_user.errors.email_consecutive_dots");
         isValid = false;
       }
     }
 
     // Role validation
     if (!formData.user_role) {
-      errors.user_role = "Role is required";
+      errors.user_role = t("admin_create_user.errors.role_required");
       isValid = false;
     }
 
     // Password validation
     if (!formData.password) {
-      errors.password = "Password is required";
+      errors.password = t("admin_create_user.errors.password_required");
       isValid = false;
     } else {
       const passwordRegex =
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
       if (!passwordRegex.test(formData.password)) {
-        errors.password =
-          "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*)";
+        errors.password = t("admin_create_user.errors.password_format");
         isValid = false;
       }
     }
 
     // Confirm password validation
     if (!formData.confirm_password) {
-      errors.confirm_password = "Please confirm your password";
+      errors.confirm_password = t(
+        "admin_create_user.errors.confirm_password_required"
+      );
       isValid = false;
     } else if (formData.password !== formData.confirm_password) {
-      errors.confirm_password = "Passwords do not match";
+      errors.confirm_password = t(
+        "admin_create_user.errors.confirm_password_mismatch"
+      );
       isValid = false;
     }
 
@@ -233,7 +234,7 @@ const AdminCreateUserModal = () => {
     }
 
     setIsLoading(true);
-    const toastId = toast.loading("Creating user...");
+    const toastId = toast.loading(t("admin_create_user.messages.creating_user"));
 
     try {
       const companyId = getUserCompanyId();
@@ -261,7 +262,9 @@ const AdminCreateUserModal = () => {
       );
 
       if (response.status === 200 || response.status === 201) {
-        toast.success("User created successfully!", { id: toastId });
+        toast.success(t("admin_create_user.messages.user_created"), {
+          id: toastId,
+        });
         triggerRefresh();
         closeModal();
         navigate("/admin/users-manage");
@@ -294,22 +297,24 @@ const AdminCreateUserModal = () => {
 
       if (error.response) {
         const errorData = error.response.data;
-        let errorMessage = "An error occurred while creating the user.";
+        let errorMessage = t("admin_create_user.errors.create_user_failed");
 
         if (error.response.status === 400) {
           if (errorData.username) {
             setFieldErrors((prev) => ({
               ...prev,
               username:
-                errorData.username[0] || "This username is already taken.",
+                errorData.username[0] ||
+                t("admin_create_user.errors.username_taken"),
             }));
-            errorMessage = "This username is already taken.";
+            errorMessage = t("admin_create_user.errors.username_taken");
           } else if (errorData.email) {
             setFieldErrors((prev) => ({
               ...prev,
-              email: errorData.email[0] || "This email is already in use.",
+              email:
+                errorData.email[0] || t("admin_create_user.errors.email_in_use"),
             }));
-            errorMessage = "This email is already in use.";
+            errorMessage = t("admin_create_user.errors.email_in_use");
           } else {
             errorMessage =
               errorData.message ||
@@ -325,14 +330,11 @@ const AdminCreateUserModal = () => {
 
         toast.error(errorMessage, { id: toastId });
       } else if (error.request) {
-        toast.error(
-          "Network error. Please check your connection and try again.",
-          {
-            id: toastId,
-          }
-        );
+        toast.error(t("admin_create_user.errors.network_error"), {
+          id: toastId,
+        });
       } else {
-        toast.error("An unexpected error occurred. Please try again.", {
+        toast.error(t("admin_create_user.errors.unexpected_error"), {
           id: toastId,
         });
       }
@@ -346,12 +348,12 @@ const AdminCreateUserModal = () => {
       <div className="modal-container relative bg-white rounded-[6px] overflow-hidden shadow-lg w-full max-w-[830px] h-auto md:h-[600px] flex flex-col">
         <div className="h-[100px] md:h-[133px] md:bg-[#F8F9FA] rounded-t-[6px] flex justify-between items-start px-4 md:px-6 pt-6">
           <h2 className="absolute top-[30px] md:top-[40px] left-4 md:left-[30px] heading-text">
-            Create User
+            {t("admin_create_user.title")}
           </h2>
           <button
             className="close-button hover:bg-gray-200 duration-200"
             onClick={closeModal}
-            aria-label="Close modal"
+            aria-label={t("admin_create_user.close_modal")}
           >
             <X size={20} />
           </button>
@@ -362,7 +364,7 @@ const AdminCreateUserModal = () => {
             {imagePreview && (
               <img
                 src={imagePreview}
-                alt="Profile preview"
+                alt={t("admin_create_user.image_alt.profile_preview")}
                 className="w-full h-full object-cover rounded-full"
               />
             )}
@@ -373,7 +375,7 @@ const AdminCreateUserModal = () => {
             >
               <img
                 src={addImageIcon}
-                alt="Add image"
+                alt={t("admin_create_user.image_alt.add_image")}
                 className="h-[18px] md:h-[22px] w-[18px] md:w-[22px]"
               />
             </div>
@@ -390,14 +392,14 @@ const AdminCreateUserModal = () => {
         <div className="px-4 md:px-6 pt-4 md:pt-0 grid grid-cols-1 md:grid-cols-2 gap-x-3 gap-y-4 md:gap-y-5 mt-[40px] md:mt-[68px] overflow-y-auto flex-1">
           <div>
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
-              Name *
+              {t("admin_create_user.labels.name")} *
             </label>
             <input
               type="text"
               name="name"
               value={formData.name}
               onChange={handleInputChange}
-              placeholder="Enter Name"
+              placeholder={t("admin_create_user.placeholders.name")}
               className={`input-style ${
                 fieldErrors.name
                   ? "border-red-500 focus:border-red-500"
@@ -412,14 +414,14 @@ const AdminCreateUserModal = () => {
 
           <div>
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
-              Username *
+              {t("admin_create_user.labels.username")} *
             </label>
             <input
               type="text"
               name="username"
               value={formData.username}
               onChange={handleInputChange}
-              placeholder="Enter Username"
+              placeholder={t("admin_create_user.placeholders.username")}
               className={`input-style ${
                 fieldErrors.username
                   ? "border-red-500 focus:border-red-500"
@@ -436,7 +438,7 @@ const AdminCreateUserModal = () => {
 
           <div>
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
-              Email *
+              {t("admin_create_user.labels.email")} *
             </label>
             <input
               type="email"
@@ -444,7 +446,7 @@ const AdminCreateUserModal = () => {
               value={formData.email}
               onChange={handleInputChange}
               onBlur={handleEmailBlur}
-              placeholder="Enter Email"
+              placeholder={t("admin_create_user.placeholders.email")}
               className={`input-style ${
                 fieldErrors.email
                   ? "border-red-500 focus:border-red-500"
@@ -462,7 +464,7 @@ const AdminCreateUserModal = () => {
 
           <div className="relative">
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mt-[-5px]">
-              Role *
+              {t("admin_create_user.labels.role")} *
             </label>
             <select
               name="user_role"
@@ -476,10 +478,10 @@ const AdminCreateUserModal = () => {
               onFocus={() => setIsRoleSelectOpen(true)}
               onBlur={() => setIsRoleSelectOpen(false)}
             >
-              <option value="">Select Role</option>
-              <option value="Admin">Admin</option>
-              <option value="Sales">Sales</option>
-              <option value="Store">Store</option>
+              <option value="">{t("admin_create_user.placeholders.role")}</option>
+              <option value="Admin">{t("admin_create_user.roles.admin")}</option>
+              <option value="Sales">{t("admin_create_user.roles.sales")}</option>
+              <option value="Store">{t("admin_create_user.roles.store")}</option>
             </select>
             <ChevronDown
               className={`absolute right-[20px] md:right-[15px] top-[36px] md:top-[33px] text-gray-400 pointer-events-none transition-transform duration-300 drop-down-icon ${
@@ -498,7 +500,7 @@ const AdminCreateUserModal = () => {
 
           <div className="relative">
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
-              Password *
+              {t("admin_create_user.labels.password")} *
             </label>
             <div className="relative group">
               <input
@@ -506,7 +508,7 @@ const AdminCreateUserModal = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                placeholder="Enter Password"
+                placeholder={t("admin_create_user.placeholders.password")}
                 className={`input-style ${
                   fieldErrors.password
                     ? "border-red-500 focus:border-red-500"
@@ -522,9 +524,7 @@ const AdminCreateUserModal = () => {
                 {passwordVisible ? <IoEyeOff size={20} /> : <IoEye size={20} />}
               </span>
               <div className="absolute hidden group-hover:block group-focus-within:block bg-gray-800 text-white text-xs rounded py-1 px-2 left-0 bottom-full mb-1 w-[300px] z-10">
-                Password must be at least 8 characters long and include at least
-                one uppercase letter, one lowercase letter, one number, and one
-                special character (!@#$%^&*).
+                {t("admin_create_user.password_hint")}
               </div>
             </div>
             {fieldErrors.password && (
@@ -536,7 +536,7 @@ const AdminCreateUserModal = () => {
 
           <div className="relative">
             <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
-              Confirm Password *
+              {t("admin_create_user.labels.confirm_password")} *
             </label>
             <div className="relative">
               <input
@@ -544,7 +544,7 @@ const AdminCreateUserModal = () => {
                 name="confirm_password"
                 value={formData.confirm_password}
                 onChange={handleInputChange}
-                placeholder="Enter Confirm Password"
+                placeholder={t("admin_create_user.placeholders.confirm_password")}
                 className={`input-style ${
                   fieldErrors.confirm_password
                     ? "border-red-500 focus:border-red-500"
@@ -585,7 +585,9 @@ const AdminCreateUserModal = () => {
             onClick={handleSubmit}
             disabled={isLoading}
           >
-            {isLoading ? "Creating..." : "Create User"}
+            {isLoading
+              ? t("admin_create_user.buttons.creating")
+              : t("admin_create_user.buttons.create_user")}
           </button>
         </div>
       </div>
