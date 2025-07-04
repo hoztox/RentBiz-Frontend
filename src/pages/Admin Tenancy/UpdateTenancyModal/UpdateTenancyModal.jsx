@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./UpdateTenancyModal.css";
-import { ChevronDown, X, Trash2, Plus } from "lucide-react";
+import { ChevronDown, X, Plus } from "lucide-react";
+import deleteicon from "../../../assets/Images/Admin Tenancy/delete-icon.svg"
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
@@ -56,7 +57,7 @@ const UpdateTenancyModal = () => {
         const userCompanyId = localStorage.getItem("company_id");
         return userCompanyId ? JSON.parse(userCompanyId) : null;
       } catch (e) {
-        console.error("Error parsing user company ID:", e);
+        toast.error("Error parsing user company ID:", e);
         return null;
       }
     }
@@ -97,8 +98,8 @@ const UpdateTenancyModal = () => {
           ? parseFloat(tenancy.total_rent_receivable).toFixed(2)
           : "",
         deposit: tenancy.deposit ? parseFloat(tenancy.deposit).toFixed(2) : "",
-        commission: tenancy.commision
-          ? parseFloat(tenancy.commision).toFixed(2)
+        commission: tenancy.commission
+          ? parseFloat(tenancy.commission).toFixed(2)
           : "",
         remarks: tenancy.remarks || "",
         status: tenancy.status || "pending",
@@ -106,17 +107,23 @@ const UpdateTenancyModal = () => {
       setFormData(newFormData);
 
       const newAdditionalCharges =
-        tenancy.additional_charges?.map((charge, index) => ({
-          id: (index + 1).toString().padStart(2, "0"),
-          charge_type: charge.charge_type?.id?.toString() || "",
-          reason: charge.reason || "",
-          due_date: charge.due_date || "",
-          status: charge.status || "pending",
-          amount: charge.amount ? parseFloat(charge.amount).toFixed(2) : "",
-          tax: charge.tax ? parseFloat(charge.tax).toFixed(2) : "0.00",
-          total: charge.total ? parseFloat(charge.total).toFixed(2) : "0.00",
-          tax_details: charge.tax_details || [],
-        })) || [];
+        tenancy.additional_charges?.map((charge, index) => {
+          const chargeType = chargeTypes.find(
+            (type) => type.name === charge.charge_type
+          );
+          return {
+            id: (index + 1).toString().padStart(2, "0"),
+            charge_type: chargeType?.id?.toString() || "", // Use the ID if found, else empty string
+            charge_type_name: charge.charge_type || "", // Store the original charge_type string
+            reason: charge.reason || "",
+            due_date: charge.due_date || "",
+            status: charge.status || "pending",
+            amount: charge.amount ? parseFloat(charge.amount).toFixed(2) : "",
+            tax: charge.tax ? parseFloat(charge.tax).toFixed(2) : "0.00",
+            total: charge.total ? parseFloat(charge.total).toFixed(2) : "0.00",
+            tax_details: charge.tax_details || [],
+          };
+        }) || [];
       setAdditionalCharges(newAdditionalCharges);
 
       const newPaymentSchedule =
@@ -146,7 +153,7 @@ const UpdateTenancyModal = () => {
 
       setError(null);
     }
-  }, [modalState.isOpen, modalState.type, modalState.data]);
+  }, [modalState.isOpen, modalState.type, modalState.data, chargeTypes]);
 
   // Fetch data from APIs
   useEffect(() => {
@@ -211,7 +218,7 @@ const UpdateTenancyModal = () => {
           );
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        toast.error("Error fetching data:", error);
         const errorMessage =
           error.response?.data?.message ||
           "Failed to load tenancy data. Please try again.";
@@ -362,7 +369,7 @@ const UpdateTenancyModal = () => {
             schedules.reduce((acc, item) => ({ ...acc, [item.id]: false }), {})
           );
         } catch (error) {
-          console.error("Error fetching payment schedule preview:", error);
+          toast.error("Error fetching payment schedule preview:", error);
           setPaymentSchedule([]);
           toast.error("Failed to load payment schedule preview.");
         } finally {
@@ -413,7 +420,7 @@ const UpdateTenancyModal = () => {
             )
           );
         } catch (error) {
-          console.error(
+          toast.error(
             "Error fetching tax preview for additional charge:",
             error
           );
@@ -678,12 +685,12 @@ const UpdateTenancyModal = () => {
       if (response.status !== 200 && response.status !== 201) {
         throw new Error("Failed to update tenancy");
       }
-
+      toast.log("Tenancy Updated: ", response.data);
       toast.success("Tenancy updated successfully");
       triggerRefresh();
       closeModal();
     } catch (error) {
-      console.error(
+      toast.error(
         "Error updating tenancy:",
         error.response?.data || error.message
       );
@@ -1051,14 +1058,23 @@ const UpdateTenancyModal = () => {
                           disabled={loading}
                         >
                           <option value="">Choose</option>
-                          {Array.isArray(chargeTypes) ? (
+                          {charge.charge_type &&
+                          !chargeTypes.find(
+                            (type) => type.id === parseInt(charge.charge_type)
+                          ) ? (
+                            <option value={charge.charge_type} disabled>
+                              {charge.charge_type_name || "Unknown Charge"}
+                            </option>
+                          ) : null}
+                          {Array.isArray(chargeTypes) &&
+                          chargeTypes.length > 0 ? (
                             chargeTypes.map((type) => (
                               <option key={type.id} value={type.id}>
                                 {type.name || "Unnamed Charge"}
                               </option>
                             ))
                           ) : (
-                            <option disabled>No charge types available</option>
+                            <option disabled>Loading charge types...</option>
                           )}
                         </select>
                         <ChevronDown
@@ -1137,13 +1153,13 @@ const UpdateTenancyModal = () => {
                       <td className="px-[10px] py-[5px] w-[43px] text-[14px] text-[#201D1E]">
                         {charge.total}
                       </td>
-                      <td className="px-[10px] py-[5px] w-[61px]">
+                      <td className="px-[10px] py-[5px] text-center w-[61px]">
                         <button
                           onClick={() => removeRow(charge.id)}
                           aria-label="Remove charge"
                           disabled={loading}
                         >
-                          <Trash2 size={20} color="#201D1E" />
+                          <img src={deleteicon} className="mt-1 w-[18px] h-[18px] tenancy-action-btn duration-200" alt="Delete" />
                         </button>
                       </td>
                     </tr>
@@ -1303,7 +1319,7 @@ const UpdateTenancyModal = () => {
                         onClick={() => removeRow(charge.id)}
                         disabled={loading}
                       >
-                        <Trash2 size={20} color="#201D1E" />
+                        <img src={deleteicon} className="w-[18px] h-[18px] -mt-1 mr-5 tenancy-action-btn duration-200" alt="Delete" />
                       </button>
                     </div>
                   </div>
