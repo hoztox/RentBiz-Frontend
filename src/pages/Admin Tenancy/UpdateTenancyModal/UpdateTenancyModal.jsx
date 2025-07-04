@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./UpdateTenancyModal.css";
-import { ChevronDown, X, Trash2, Plus } from "lucide-react";
+import { ChevronDown, X, Plus } from "lucide-react";
+import deleteicon from "../../../assets/Images/Admin Tenancy/delete-icon.svg"
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../../../context/ModalContext";
 import { toast, Toaster } from "react-hot-toast";
@@ -56,7 +57,7 @@ const UpdateTenancyModal = () => {
         const userCompanyId = localStorage.getItem("company_id");
         return userCompanyId ? JSON.parse(userCompanyId) : null;
       } catch (e) {
-        console.error("Error parsing user company ID:", e);
+        toast.error("Error parsing user company ID:", e);
         return null;
       }
     }
@@ -154,11 +155,6 @@ const UpdateTenancyModal = () => {
     }
   }, [modalState.isOpen, modalState.type, modalState.data, chargeTypes]);
 
-  console.log(
-    "Additional Charges from modalState:",
-    modalState.data.additional_charges
-  );
-
   // Fetch data from APIs
   useEffect(() => {
     const fetchData = async () => {
@@ -222,7 +218,7 @@ const UpdateTenancyModal = () => {
           );
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        toast.error("Error fetching data:", error);
         const errorMessage =
           error.response?.data?.message ||
           "Failed to load tenancy data. Please try again.";
@@ -373,7 +369,7 @@ const UpdateTenancyModal = () => {
             schedules.reduce((acc, item) => ({ ...acc, [item.id]: false }), {})
           );
         } catch (error) {
-          console.error("Error fetching payment schedule preview:", error);
+          toast.error("Error fetching payment schedule preview:", error);
           setPaymentSchedule([]);
           toast.error("Failed to load payment schedule preview.");
         } finally {
@@ -424,7 +420,7 @@ const UpdateTenancyModal = () => {
             )
           );
         } catch (error) {
-          console.error(
+          toast.error(
             "Error fetching tax preview for additional charge:",
             error
           );
@@ -689,12 +685,12 @@ const UpdateTenancyModal = () => {
       if (response.status !== 200 && response.status !== 201) {
         throw new Error("Failed to update tenancy");
       }
-      console.log("Tenancy Updated: ", response.data);
+      toast.log("Tenancy Updated: ", response.data);
       toast.success("Tenancy updated successfully");
       triggerRefresh();
       closeModal();
     } catch (error) {
-      console.error(
+      toast.error(
         "Error updating tenancy:",
         error.response?.data || error.message
       );
@@ -1157,13 +1153,13 @@ const UpdateTenancyModal = () => {
                       <td className="px-[10px] py-[5px] w-[43px] text-[14px] text-[#201D1E]">
                         {charge.total}
                       </td>
-                      <td className="px-[10px] py-[5px] w-[61px]">
+                      <td className="px-[10px] py-[5px] text-center w-[61px]">
                         <button
                           onClick={() => removeRow(charge.id)}
                           aria-label="Remove charge"
                           disabled={loading}
                         >
-                          <Trash2 size={20} color="#201D1E" />
+                          <img src={deleteicon} className="mt-1 w-[18px] h-[18px] tenancy-action-btn duration-200" alt="Delete" />
                         </button>
                       </td>
                     </tr>
@@ -1323,7 +1319,7 @@ const UpdateTenancyModal = () => {
                         onClick={() => removeRow(charge.id)}
                         disabled={loading}
                       >
-                        <Trash2 size={20} color="#201D1E" />
+                        <img src={deleteicon} className="w-[18px] h-[18px] -mt-1 mr-5 tenancy-action-btn duration-200" alt="Delete" />
                       </button>
                     </div>
                   </div>

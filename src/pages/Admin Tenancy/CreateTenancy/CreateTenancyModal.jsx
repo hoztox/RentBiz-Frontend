@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./CreateTenancyModal.css";
-import { X, Trash2, Plus, ChevronDown } from "lucide-react";
+import { X, Plus, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useModal } from "../../../context/ModalContext";
 import { BASE_URL } from "../../../utils/config";
 import toast from "react-hot-toast";
+import deleteicon from "../../../assets/Images/Admin Tenancy/delete-icon.svg";
 
 const CreateTenancyModal = () => {
   const { modalState, closeModal, triggerRefresh } = useModal();
@@ -99,9 +100,21 @@ const CreateTenancyModal = () => {
           axios.get(`${BASE_URL}/company/charges/company/${companyId}/`),
         ]);
 
-        setTenants(Array.isArray(tenantsRes.data) ? tenantsRes.data : tenantsRes.data.results || []);
-        setBuildings(Array.isArray(buildingsRes.data) ? buildingsRes.data : buildingsRes.data.results || []);
-        setChargeTypes(Array.isArray(chargeTypesRes.data) ? chargeTypesRes.data : chargeTypesRes.data.results || []);
+        setTenants(
+          Array.isArray(tenantsRes.data)
+            ? tenantsRes.data
+            : tenantsRes.data.results || []
+        );
+        setBuildings(
+          Array.isArray(buildingsRes.data)
+            ? buildingsRes.data
+            : buildingsRes.data.results || []
+        );
+        setChargeTypes(
+          Array.isArray(chargeTypesRes.data)
+            ? chargeTypesRes.data
+            : chargeTypesRes.data.results || []
+        );
       } catch (error) {
         console.error("Error fetching data:", error);
         setError("Failed to load data. Please try again.");
@@ -124,7 +137,11 @@ const CreateTenancyModal = () => {
           const response = await axios.get(
             `${BASE_URL}/company/units/${formData.building}/vacant-units/`
           );
-          setUnits(Array.isArray(response.data) ? response.data : response.data.results || []);
+          setUnits(
+            Array.isArray(response.data)
+              ? response.data
+              : response.data.results || []
+          );
         } catch (error) {
           console.error("Error fetching units:", error);
           setUnits([]);
@@ -161,7 +178,8 @@ const CreateTenancyModal = () => {
 
     if (formData.rental_months && formData.rent_per_frequency) {
       const total = (
-        parseInt(formData.rental_months) * parseFloat(formData.rent_per_frequency || 0)
+        parseInt(formData.rental_months) *
+        parseFloat(formData.rent_per_frequency || 0)
       ).toFixed(2);
       setFormData((prev) => ({
         ...prev,
@@ -173,7 +191,11 @@ const CreateTenancyModal = () => {
         total_receivable: "0.00",
       }));
     }
-  }, [formData.start_date, formData.rental_months, formData.rent_per_frequency]);
+  }, [
+    formData.start_date,
+    formData.rental_months,
+    formData.rent_per_frequency,
+  ]);
 
   // Reset payment schedule when relevant form fields change
   useEffect(() => {
@@ -267,11 +289,19 @@ const CreateTenancyModal = () => {
             )
           );
         } catch (error) {
-          console.error("Error fetching tax preview for additional charge:", error);
+          console.error(
+            "Error fetching tax preview for additional charge:",
+            error
+          );
           setAdditionalCharges((prev) =>
             prev.map((c) =>
               c.id === charge.id
-                ? { ...c, tax: "0.00", total: c.amount || "0.00", tax_details: [] }
+                ? {
+                    ...c,
+                    tax: "0.00",
+                    total: c.amount || "0.00",
+                    tax_details: [],
+                  }
                 : c
             )
           );
@@ -280,7 +310,12 @@ const CreateTenancyModal = () => {
         setAdditionalCharges((prev) =>
           prev.map((c) =>
             c.id === charge.id
-              ? { ...c, tax: "0.00", total: c.amount || "0.00", tax_details: [] }
+              ? {
+                  ...c,
+                  tax: "0.00",
+                  total: c.amount || "0.00",
+                  tax_details: [],
+                }
               : c
           )
         );
@@ -288,7 +323,12 @@ const CreateTenancyModal = () => {
     };
 
     additionalCharges.forEach((charge) => {
-      if (charge.charge_type && charge.amount && charge.due_date && charge.reason) {
+      if (
+        charge.charge_type &&
+        charge.amount &&
+        charge.due_date &&
+        charge.reason
+      ) {
         fetchTaxPreview(charge);
       }
     });
@@ -367,7 +407,9 @@ const CreateTenancyModal = () => {
 
   const removeRow = (id) => {
     if (additionalCharges.length > 1) {
-      setAdditionalCharges(additionalCharges.filter((charge) => charge.id !== id));
+      setAdditionalCharges(
+        additionalCharges.filter((charge) => charge.id !== id)
+      );
     } else {
       setAdditionalCharges([
         {
@@ -415,7 +457,8 @@ const CreateTenancyModal = () => {
     }
 
     const validAdditionalCharges = additionalCharges.filter(
-      (charge) => charge.charge_type && charge.reason && charge.due_date && charge.amount
+      (charge) =>
+        charge.charge_type && charge.reason && charge.due_date && charge.amount
     );
 
     const companyId = getUserCompanyId();
@@ -432,7 +475,9 @@ const CreateTenancyModal = () => {
       end_date: formData.end_date,
       no_payments: parseInt(formData.no_payments),
       first_rent_due_on: formData.first_rent_due_on,
-      rent_per_frequency: parseFloat(formData.rent_per_frequency || 0).toFixed(2),
+      rent_per_frequency: parseFloat(formData.rent_per_frequency || 0).toFixed(
+        2
+      ),
       deposit: parseFloat(formData.deposit || 0).toFixed(2),
       commission: parseFloat(formData.commission || 0).toFixed(2),
       remarks: formData.remarks,
@@ -454,7 +499,7 @@ const CreateTenancyModal = () => {
         payload
       );
       console.log("Tenancy created successfully:", response.data);
-      toast.success("Tenancy created successfully")
+      toast.success("Tenancy created successfully");
       triggerRefresh();
       closeModal();
       navigate("/admin/tenancy-master");
@@ -610,7 +655,9 @@ const CreateTenancyModal = () => {
                 </div>
               </div>
               <div className="w-1/2">
-                <label className="block tenancy-modal-label">Rental Months*</label>
+                <label className="block tenancy-modal-label">
+                  Rental Months*
+                </label>
                 <input
                   type="number"
                   name="rental_months"
@@ -650,7 +697,9 @@ const CreateTenancyModal = () => {
             </div>
             <div className="md:flex tenancy-modal-column gap-4">
               <div className="w-1/2">
-                <label className="block tenancy-modal-label">No. of Payments*</label>
+                <label className="block tenancy-modal-label">
+                  No. of Payments*
+                </label>
                 <input
                   type="number"
                   name="no_payments"
@@ -662,7 +711,9 @@ const CreateTenancyModal = () => {
                 />
               </div>
               <div className="w-1/2">
-                <label className="block tenancy-modal-label">First Rent Due On*</label>
+                <label className="block tenancy-modal-label">
+                  First Rent Due On*
+                </label>
                 <div className="relative">
                   <input
                     type="date"
@@ -675,7 +726,9 @@ const CreateTenancyModal = () => {
               </div>
             </div>
             <div>
-              <label className="block tenancy-modal-label">Rent Per Frequency</label>
+              <label className="block tenancy-modal-label">
+                Rent Per Frequency
+              </label>
               <input
                 type="number"
                 name="rent_per_frequency"
@@ -688,7 +741,9 @@ const CreateTenancyModal = () => {
               />
             </div>
             <div>
-              <label className="block tenancy-modal-label">Total Receivable</label>
+              <label className="block tenancy-modal-label">
+                Total Receivable
+              </label>
               <input
                 type="text"
                 name="total_receivable"
@@ -698,7 +753,9 @@ const CreateTenancyModal = () => {
               />
             </div>
             <div>
-              <label className="block tenancy-modal-label">Deposit (If any)</label>
+              <label className="block tenancy-modal-label">
+                Deposit (If any)
+              </label>
               <input
                 type="number"
                 name="deposit"
@@ -711,7 +768,9 @@ const CreateTenancyModal = () => {
               />
             </div>
             <div>
-              <label className="block tenancy-modal-label">Commission (If any)</label>
+              <label className="block tenancy-modal-label">
+                Commission (If any)
+              </label>
               <input
                 type="number"
                 name="commission"
@@ -803,7 +862,9 @@ const CreateTenancyModal = () => {
                                 </option>
                               ))
                             ) : (
-                              <option disabled>No charge types available</option>
+                              <option disabled>
+                                No charge types available
+                              </option>
                             )}
                           </select>
                           <ChevronDown
@@ -872,12 +933,12 @@ const CreateTenancyModal = () => {
                         <td className="px-[10px] py-[5px] w-[43px] text-[14px] text-[#201D1E]">
                           {charge.total}
                         </td>
-                        <td className="px-[10px] py-[5px] w-[30px]">
+                        <td className="px-[10px] py-[5px] w-[30px] text-center">
                           <button onClick={() => removeRow(charge.id)}>
-                            <Trash2
-                              size={20}
-                              color="#201D1E"
-                              className="mt-1"
+                            <img
+                              src={deleteicon}
+                              className="mt-1 w-[18px] h-[18px] tenancy-action-btn duration-200"
+                              alt="Delete"
                             />
                           </button>
                         </td>
@@ -1029,7 +1090,11 @@ const CreateTenancyModal = () => {
                     <div className="flex justify-between h-[57px]">
                       <div className="px-[10px] py-[3px] flex justify-center">
                         <button onClick={() => removeRow(charge.id)}>
-                          <Trash2 size={20} color="#201D1E" />
+                          <img
+                            src={deleteicon}
+                            className="w-[18px] h-[18px] ml-2 tenancy-action-btn duration-200"
+                            alt="Delete"
+                          />
                         </button>
                       </div>
                     </div>
@@ -1130,7 +1195,10 @@ const CreateTenancyModal = () => {
                           ))
                         ) : (
                           <tr>
-                            <td colSpan={8} className="px-[10px] py-[5px] text-center text-[14px] text-[#201D1E]">
+                            <td
+                              colSpan={8}
+                              className="px-[10px] py-[5px] text-center text-[14px] text-[#201D1E]"
+                            >
                               No payment schedules available
                             </td>
                           </tr>
@@ -1200,7 +1268,9 @@ const CreateTenancyModal = () => {
                             </div>
                             <div className="px-[10px] py-[13px] w-full">
                               <button
-                                onClick={() => showTaxDetails(schedule.id, false)}
+                                onClick={() =>
+                                  showTaxDetails(schedule.id, false)
+                                }
                                 className="text-[#2892CE] underline"
                                 disabled={!schedule.tax}
                               >
