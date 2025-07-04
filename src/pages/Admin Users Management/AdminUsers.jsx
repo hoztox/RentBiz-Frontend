@@ -1,39 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { toast, Toaster } from "react-hot-toast";
 import plusicon from "../../assets/Images/Admin Users Management/plus-icon.svg";
 import downloadicon from "../../assets/Images/Admin Users Management/download-icon.svg";
 import editicon from "../../assets/Images/Admin Users Management/edit-icon.svg";
 import deletesicon from "../../assets/Images/Admin Users Management/delete-icon.svg";
-import "./AdminUsers.css";
-import downarrow from "../../assets/Images/Admin Users Management/downarrow.svg";
 import { useModal } from "../../context/ModalContext";
 import { BASE_URL } from "../../utils/config";
-import ConfirmationModal from "../../components/ConfirmationModal/ConfirmationModal";
-import CustomDropDown from "../../components/CustomDropDown";
-import { motion, AnimatePresence } from "framer-motion";
+import GenericTable from "../../components/ui/GenericTable";
 
 const AdminUsers = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
-  const [users, setUsers] = useState([]);
-  const [expandedRows, setExpandedRows] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const { openModal, refreshCounter } = useModal();
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [userIdToDelete, setUserIdToDelete] = useState(null);
-  const itemsPerPage = 10;
-  const filteredData = users;
-
-  // Dropdown options for status filter
-  const statusFilterOptions = [
-    { label: "All", value: "" },
-    { label: "Active", value: "active" },
-    { label: "Blocked", value: "blocked" },
-  ];
+  const [searchTerm, setSearchTerm] = useState("");
 
   const getUserCompanyId = () => {
     const storedCompanyId = localStorage.getItem("company_id");
@@ -53,56 +31,183 @@ const AdminUsers = () => {
     return null;
   };
 
-  const companyId = getUserCompanyId();
+  const handleToggle = async (id, currentStatus, updateItem) => {
+    const companyId = getUserCompanyId();
+    if (!companyId) {
+      toast.error("Company ID not found. Please log in again.");
+      return false;
+    }
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, selectedStatus]);
+    const newStatus = currentStatus === "active" ? "blocked" : "active";
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      if (!companyId) {
-        setError("Company ID not found. Please log in again.");
-        setLoading(false);
-        return;
-      }
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await axios.get(
-          `${BASE_URL}/company/users/company/${companyId}/`,
-          {
-            params: {
-              search: searchTerm,
-              status: selectedStatus,
-              page: currentPage,
-              pageSize: itemsPerPage,
-            },
-          }
-        );
-        const userData = response.data.results || [];
-        console.log(response.data);
-        setUsers(userData);
-        setTotalCount(response.data.count);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-        // setError("Failed to load users. Please try again later.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUsers();
-  }, [
-    companyId,
-    refreshCounter,
-    currentPage,
-    itemsPerPage,
-    searchTerm,
-    selectedStatus,
-  ]);
+    try {
+      await axios.put(`${BASE_URL}/company/users/${id}/`, {
+        status: newStatus,
+      });
+      
+      // Update the specific item in the table data
+      updateItem(id, { status: newStatus });
+      
+      toast.success(`User ${newStatus} successfully.`);
+      return true;
+    } catch (error) {
+      console.error("Error updating user status:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to update user status. Please try again.";
+      toast.error(errorMessage);
+      return false;
+    }
+  };
+
+  const handleDelete = async (id, updateData) => {
+    const companyId = getUserCompanyId();
+    if (!companyId) {
+      toast.error("Company ID not found. Please log in again.");
+      return false;
+    }
+
+    try {
+      await axios.delete(`${BASE_URL}/company/users/${id}/`);
+      toast.success("User deleted successfully.");
+      if (updateData) updateData();
+      return true;
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      const errorMessage =
+        error.response?.data?.message ||
+        "Failed to delete user. Please try again.";
+      toast.error(errorMessage);
+      return false;
+    }
+  };
+
+  const statusFilterOptions = [
+    { label: "All", value: "" },
+    { label: "Active", value: "active" },
+    { label: "Blocked", value: "blocked" },
+  ];
+
+  const ToggleSwitch = ({ id, isActive, onChange }) => {
+    return (
+      <div
+        className={`toggle-switch ${isActive ? "active" : ""}`}
+        onClick={onChange}
+      >
+        <div className="toggle-circle"></div>
+      </div>
+    );
+  };
+
+  const columns = {
+    main: [
+      {
+        key: "id",
+        label: "ID",
+        className: "text-left user-data",
+        render: (item, updateItem, index) => index + 1,
+      },
+      {
+        key: "created_at",
+        label: "CREATED DATE",
+        className: "text-left user-data w-[12%]",
+        render: (item) =>
+          item.created_at
+            ? new Date(item.created_at).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })
+            : "N/A",
+      },
+      {
+        key: "name",
+        label: "NAME",
+        className: "text-left user-data w-[15%]",
+      },
+      {
+        key: "username",
+        label: "USERNAME",
+        className: "text-left user-data",
+      },
+      {
+        key: "user_role",
+        label: "ROLE",
+        className: "text-left user-data w-[18%] pl-12",
+      },
+      {
+        key: "status",
+        label: "STATUS",
+        className: "text-left user-data w-[12%]",
+        render: (item) => (
+          <span
+            className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
+              item.status === "active"
+                ? "bg-[#e1ffea] text-[#28C76F]"
+                : "bg-[#FFE1E1] text-[#C72828]"
+            }`}
+          >
+            {item.status?.charAt(0).toUpperCase() + item.status?.slice(1)}
+          </span>
+        ),
+      },
+      {
+        key: "block",
+        label: "BLOCK",
+        className: "text-left user-data w-[8%]",
+        render: (item, updateItem) => (
+          <ToggleSwitch
+            id={item.id}
+            isActive={item.status === "blocked"}
+            onChange={() => handleToggle(item.id, item.status, updateItem)}
+          />
+        ),
+      },
+      {
+        key: "actions",
+        label: "ACTION",
+        className: "text-right pr-6",
+        render: (item, updateItem) => (
+          <div className="flex gap-[23px] items-center justify-end h-[57px]">
+            <button onClick={() => handleEditUser(item)}>
+              <img
+                src={editicon}
+                alt="Edit"
+                className="w-[18px] h-[18px] action-btn duration-200"
+              />
+            </button>
+            <button onClick={() => handleDelete(item.id, updateItem)}>
+              <img
+                src={deletesicon}
+                alt="Delete"
+                className="w-[18px] h-[18px] action-btn duration-200"
+              />
+            </button>
+          </div>
+        ),
+      },
+    ],
+    mobile: [
+      {
+        key: "id",
+        label: "ID",
+        className: "text-left user-data user-id-column",
+        render: (item, updateItem, index) => index + 1,
+      },
+      {
+        key: "name",
+        label: "NAME",
+        className: "text-left user-data",
+      },
+      {
+        key: "dropdown",
+        label: "",
+        className: "text-right",
+      },
+    ],
+  };
 
   const handleEditUser = (user) => {
-    console.log("User data passed to modal:", user);
     openModal("user-update", "Edit User", {
       id: user.id,
       name: user.name,
@@ -113,494 +218,122 @@ const AdminUsers = () => {
     });
   };
 
-  const handleToggle = async (id) => {
-    if (!companyId) {
-      setError("Company ID not found. Please log in again.");
-      toast.error("Company ID not found. Please log in again.");
-      return;
-    }
-
-    const user = users.find((u) => u.id === id);
-    if (!user) {
-      setError("User not found. Please try again.");
-      toast.error("User not found. Please try again.");
-      return;
-    }
-
-    const newStatus = user.status === "active" ? "blocked" : "active";
-
-    setUsers((prev) =>
-      prev.map((u) => (u.id === id ? { ...u, status: newStatus } : u))
-    );
-
-    try {
-      const response = await axios.put(`${BASE_URL}/company/users/${id}/`, {
-        status: newStatus,
-      });
-
-      if (response.data.status !== newStatus) {
-        throw new Error("Status update failed on the server.");
-      }
-      toast.success(`User ${newStatus} successfully.`);
-    } catch (error) {
-      console.error("Error updating user status:", error);
-      const errorMessage =
-        error.response?.data?.message ||
-        "Failed to update user status. Please try again.";
-      setError(errorMessage);
-      toast.error(errorMessage);
-
-      setUsers((prev) =>
-        prev.map((u) => (u.id === id ? { ...u, status: user.status } : u))
-      );
-    }
-  };
-
-  const handleDelete = (id) => {
-    if (!companyId) {
-      setError("Company ID not found. Please log in again.");
-      toast.error("Company ID not found. Please log in again.");
-      return;
-    }
-    setUserIdToDelete(id);
-    setIsDeleteModalOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!userIdToDelete) return;
-
-    try {
-      await axios.delete(`${BASE_URL}/company/users/${userIdToDelete}/`);
-      setUsers((prev) => prev.filter((u) => u.id !== userIdToDelete));
-      toast.success("User deleted successfully.");
-    } catch (error) {
-      console.error("Error deleting user:", error);
-      const errorMessage =
-        error.response?.data?.message ||
-        "Failed to delete user. Please try again.";
-      setError(errorMessage);
-      toast.error(errorMessage);
-    } finally {
-      setIsDeleteModalOpen(false);
-      setUserIdToDelete(null);
-    }
-  };
-
-  const handleCancelDelete = () => {
-    setIsDeleteModalOpen(false);
-    setUserIdToDelete(null);
-  };
-
-  const toggleRowExpand = (id) => {
-    setExpandedRows((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
-
-  const dropdownVariants = {
-    hidden: {
-      opacity: 0,
-      height: 0,
-      transition: {
-        duration: 0.2,
-        ease: "easeInOut",
-      },
-    },
-    visible: {
-      opacity: 1,
-      height: "auto",
-      transition: {
-        duration: 0.3,
-        ease: "easeInOut",
-      },
-    },
-  };
-
-  const isBlocked = (id) =>
-    users.find((u) => u.id === id)?.status === "blocked";
-
-  const totalPages = Math.ceil(totalCount / itemsPerPage);
-  const paginatedData = users;
-
-  const maxPageButtons = 5;
-  const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
-  const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
-
-  const ToggleSwitch = ({ id, isActive, onChange }) => {
-    return (
-      <div
-        className={`toggle-switch ${isActive ? "active" : ""}`}
-        onClick={() => onChange(id)}
-      >
-        <div className="toggle-circle"></div>
+  const customMobileRow = (item, updateItem) => (
+    <div className="user-dropdown-content">
+      <div className="user-grid">
+        <div className="user-grid-item w-[33.33%]">
+          <div className="dropdown-label">CREATED DATE</div>
+          <div className="dropdown-value">
+            {item.created_at
+              ? new Date(item.created_at).toLocaleDateString("en-GB", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })
+              : "N/A"}
+          </div>
+        </div>
+        <div className="user-grid-item w-[35.33%]">
+          <div className="dropdown-label">USERNAME</div>
+          <div className="dropdown-value">{item.username || "N/A"}</div>
+        </div>
+        <div className="user-grid-item w-[20%]">
+          <div className="dropdown-label">ROLE</div>
+          <div className="dropdown-value">{item.user_role || "N/A"}</div>
+        </div>
       </div>
-    );
-  };
+      <div className="user-grid">
+        <div className="user-grid-item w-[33.33%]">
+          <div className="dropdown-label !mb-[10px]">STATUS</div>
+          <div className="dropdown-value">
+            <span
+              className={`px-[10px] py-[5px] w-[53px] h-[24px] rounded-[4px] user-status ${
+                item.status === "active"
+                  ? "bg-[#e1ffea] text-[#28C76F]"
+                  : "bg-[#FFE1E1] text-[#C72828] !pr-[5px] !pl-[5px]"
+              }`}
+            >
+              {item.status?.charAt(0).toUpperCase() + item.status?.slice(1)}
+            </span>
+          </div>
+        </div>
+        <div className="user-grid-item w-[35.33%]">
+          <div className="dropdown-label">BLOCK</div>
+          <div className="dropdown-value flex items-center gap-2 mt-[10px]">
+            <ToggleSwitch
+              id={item.id}
+              isActive={item.status === "blocked"}
+              onChange={() => handleToggle(item.id, item.status, updateItem)}
+            />
+          </div>
+        </div>
+        <div className="user-grid-item w-[20%]">
+          <div className="dropdown-label">ACTION</div>
+          <div className="dropdown-value flex items-center gap-[15px] ml-[5px] mt-[10px]">
+            <button onClick={() => handleEditUser(item)}>
+              <img
+                src={editicon}
+                alt="Edit"
+                className="w-[18px] h-[18px] action-btn duration-200"
+              />
+            </button>
+            <button onClick={() => handleDelete(item.id, updateItem)}>
+              <img
+                src={deletesicon}
+                alt="Delete"
+                className="w-[18px] h-[18px] action-btn duration-200"
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
-  if (error) {
-    return <div className="p-5 text-red-500">{error}</div>;
-  }
+  const filterOptions = [
+    {
+      key: "status",
+      label: "Status",
+      type: "dropdown",
+      options: () => statusFilterOptions,
+    },
+  ];
 
   return (
-    <div className="border border-[#E9E9E9] rounded-md user-table">
+    <>
       <Toaster />
-      <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] user-table-header">
-        <h1 className="users-head">Users</h1>
-        <div className="flex flex-col md:flex-row gap-[10px] user-inputs-container">
-          <div className="flex flex-col md:flex-row gap-[10px] w-full">
-            <input
-              type="text"
-              placeholder="Search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-[14px] py-[7px] outline-none border border-[#201D1E20] rounded-md w-full md:w-[302px] focus:border-gray-300 duration-200 user-search"
-            />
-            <div className="relative w-[40%] md:w-auto">
-            <CustomDropDown
-              options={statusFilterOptions}
-              value={selectedStatus}
-              onChange={setSelectedStatus}
-              placeholder="Select Status"
-              dropdownClassName="appearance-none px-[14px] py-[7px] border border-[#201D1E20] bg-transparent rounded-md w-full md:w-[121px] cursor-pointer focus:border-gray-300 duration-200 user-selection"
-            />
-            </div>
-          </div>
-          <div className="flex gap-[10px] user-action-buttons-container w-full md:w-auto justify-start">
-            <button
-              className="flex items-center justify-center gap-2 h-[38px] rounded-md user-create-btn duration-200 w-[176px]"
-              onClick={() => openModal("user-create", "Create User")}
-            >
-              Create User
-              <img
-                src={plusicon}
-                alt="plus icon"
-                className="relative right-[5px] md:right-0 w-[15px] h-[15px]"
-              />
-            </button>
-            <button className="flex items-center justify-center gap-2 h-[38px] rounded-md duration-200 user-download-btn w-[122px]">
-              Download
-              <img
-                src={downloadicon}
-                alt="Download Icon"
-                className="w-[15px] h-[15px] user-download-icon"
-              />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="desktop-only">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b border-[#E9E9E9] h-[57px]">
-              <th className="px-5 text-left user-thead">ID</th>
-              <th className="px-5 text-left user-thead w-[12%]">
-                CREATED DATE
-              </th>
-              <th className="pl-5 text-left user-thead w-[15%]">NAME</th>
-              <th className="px-5 text-left user-thead">USERNAME</th>
-              <th className="pl-12 pr-5 text-left user-thead w-[18%]">ROLE</th>
-              <th className="px-5 text-left user-thead w-[12%]">STATUS</th>
-              <th className="px-5 text-left user-thead w-[8%]">BLOCK</th>
-              <th className="px-5 pr-6 text-right user-thead">ACTION</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="px-5 py-8 text-center text-gray-500">
-                  No users found
-                </td>
-              </tr>
-            ) : (
-              users.map((user, index) => (
-                <tr
-                  key={user.id}
-                  className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
-                >
-                  <td className="px-5 text-left user-data">
-                    {(currentPage - 1) * itemsPerPage + index + 1}
-                  </td>
-                  <td className="px-5 text-left user-data">
-                    {user.created_at
-                      ? new Date(user.created_at).toLocaleDateString("en-GB", {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        })
-                      : "N/A"}
-                  </td>
-                  <td className="pl-5 text-left user-data">
-                    {user.name || "N/A"}
-                  </td>
-                  <td className="px-5 text-left user-data">
-                    {user.username || "N/A"}
-                  </td>
-                  <td className="pl-12 pr-5 text-left user-data">
-                    {user.user_role || "N/A"}
-                  </td>
-                  <td className="px-5 text-left user-data">
-                    <span
-                      className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
-                        user.status === "active"
-                          ? "bg-[#e1ffea] text-[#28C76F]"
-                          : "bg-[#FFE1E1] text-[#C72828]"
-                      }`}
-                    >
-                      {user.status.charAt(0).toUpperCase() +
-                        user.status.slice(1)}
-                    </span>
-                  </td>
-                  <td className="px-5 text-left user-data">
-                    <ToggleSwitch
-                      id={user.id}
-                      isActive={isBlocked(user.id)}
-                      onChange={handleToggle}
-                    />
-                  </td>
-                  <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                    <button onClick={() => handleEditUser(user)}>
-                      <img
-                        src={editicon}
-                        alt="Edit"
-                        className="w-[18px] h-[18px] action-btn duration-200"
-                      />
-                    </button>
-                    <button onClick={() => handleDelete(user.id)}>
-                      <img
-                        src={deletesicon}
-                        alt="Delete"
-                        className="w-[18px] h-[18px] action-btn duration-200"
-                      />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="block md:hidden">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="user-table-row-head">
-              <th className="px-5 w-[38%] text-left user-thead user-id-column">
-                ID
-              </th>
-              <th className="px-5 w-[60%] text-left user-thead">NAME</th>
-              <th className="px-5 text-right user-thead"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.length === 0 ? (
-              <tr>
-                <td colSpan={3} className="px-5 py-4 text-center">
-                  No users found.
-                </td>
-              </tr>
-            ) : (
-              users.map((user, index) => (
-                <React.Fragment key={user.id}>
-                  <tr
-                    className={`${
-                      expandedRows[user.id]
-                        ? "mobile-no-border"
-                        : "mobile-with-border"
-                    } border-b border-[#E9E9E9] h-[57px]`}
-                  >
-                    <td className="px-5 text-left user-data">
-                      {(currentPage - 1) * itemsPerPage + index + 1}
-                    </td>
-                    <td className="px-5 text-left user-data">
-                      {user.name || "N/A"}
-                    </td>
-                    <td className="py-4 flex items-center justify-end h-[57px]">
-                      <div
-                        className={`user-dropdown-field ${
-                          expandedRows[user.id] ? "active" : ""
-                        }`}
-                        onClick={() => toggleRowExpand(user.id)}
-                      >
-                        <img
-                          src={downarrow}
-                          alt="drop-down-arrow"
-                          className={`user-dropdown-img ${
-                            expandedRows[user.id] ? "text-white" : ""
-                          }`}
-                        />
-                      </div>
-                    </td>
-                  </tr>
-                  <AnimatePresence>
-                    {expandedRows[user.id] && (
-                      <motion.tr
-                        className="mobile-with-border border-b border-[#E9E9E9]"
-                        initial="hidden"
-                        animate="visible"
-                        exit="hidden"
-                        variants={dropdownVariants}
-                      >
-                        <td colSpan={3} className="px-5">
-                          <div className="user-dropdown-content">
-                            <div className="user-grid">
-                              <div className="user-grid-item w-[33.33%]">
-                                <div className="dropdown-label">
-                                  CREATED DATE
-                                </div>
-                                <div className="dropdown-value">
-                                  {user.created_at
-                                    ? new Date(
-                                        user.created_at
-                                      ).toLocaleDateString("en-GB", {
-                                        day: "2-digit",
-                                        month: "short",
-                                        year: "numeric",
-                                      })
-                                    : "N/A"}
-                                </div>
-                              </div>
-                              <div className="user-grid-item w-[35.33%]">
-                                <div className="dropdown-label">USERNAME</div>
-                                <div className="dropdown-value">
-                                  {user.username || "N/A"}
-                                </div>
-                              </div>
-                              <div className="user-grid-item w-[20%]">
-                                <div className="dropdown-label">ROLE</div>
-                                <div className="dropdown-value">
-                                  {user.user_role || "N/A"}
-                                </div>
-                              </div>
-                            </div>
-                            <div className="user-grid">
-                              <div className="user-grid-item w-[33.33%]">
-                                <div className="dropdown-label !mb-[10px]">
-                                  STATUS
-                                </div>
-                                <div className="dropdown-value">
-                                  <span
-                                    className={`px-[10px] py-[5px] w-[53px] h-[24px] rounded-[4px] user-status ${
-                                      user.status === "active"
-                                        ? "bg-[#e1ffea] text-[#28C76F]"
-                                        : "bg-[#FFE1E1] text-[#C72828] !pr-[5px] !pl-[5px]"
-                                    }`}
-                                  >
-                                    {user.status.charAt(0).toUpperCase() +
-                                      user.status.slice(1)}
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="user-grid-item w-[35.33%]">
-                                <div className="dropdown-label">BLOCK</div>
-                                <div className="dropdown-value flex items-center gap-2 mt-[10px]">
-                                  <ToggleSwitch
-                                    id={user.id}
-                                    isActive={isBlocked(user.id)}
-                                    onChange={handleToggle}
-                                  />
-                                </div>
-                              </div>
-                              <div className="user-grid-item w-[20%]">
-                                <div className="dropdown-label">ACTION</div>
-                                <div className="dropdown-value flex items-center gap-[15px] ml-[5px] mt-[10px]">
-                                  <button onClick={() => handleEditUser(user)}>
-                                    <img
-                                      src={editicon}
-                                      alt="Edit"
-                                      className="w-[18px] h-[18px] action-btn duration-200"
-                                    />
-                                  </button>
-                                  <button onClick={() => handleDelete(user.id)}>
-                                    <img
-                                      src={deletesicon}
-                                      alt="Delete"
-                                      className="w-[18px] h-[18px] action-btn duration-200"
-                                    />
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                      </motion.tr>
-                    )}
-                  </AnimatePresence>
-                </React.Fragment>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
-        <span className="pagination collection-list-pagination">
-          Showing {Math.min((currentPage - 1) * itemsPerPage + 1, totalCount)}{" "}
-          to {Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount}{" "}
-          entries
-        </span>
-        <div className="flex gap-[4px] overflow-x-auto md:py-2 w-full md:w-auto pagination-buttons">
-          <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage(currentPage - 1)}
-          >
-            Previous
-          </button>
-          {startPage > 1 && (
-            <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
-              onClick={() => setCurrentPage(1)}
-            >
-              1
-            </button>
-          )}
-          {startPage > 2 && <span className="px-2 flex items-center">...</span>}
-          {[...Array(endPage - startPage + 1)].map((_, i) => (
-            <button
-              key={startPage + i}
-              className={`px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns ${
-                currentPage === startPage + i
-                  ? "bg-[#1458A2] text-white"
-                  : "bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#8a94a3]"
-              }`}
-              onClick={() => setCurrentPage(startPage + i)}
-            >
-              {startPage + i}
-            </button>
-          ))}
-          {endPage < totalPages - 1 && (
-            <span className="px-2 flex items-center">...</span>
-          )}
-          {endPage < totalPages && (
-            <button
-              className="px-4 h-[38px] rounded-md cursor-pointer duration-200 page-no-btns bg-[#F4F4F4] hover:bg-[#e6e6e6] text-[#677487]"
-              onClick={() => setCurrentPage(totalPages)}
-            >
-              {totalPages}
-            </button>
-          )}
-          <button
-            className="px-[10px] py-[6px] rounded-md bg-[#F4F4F4] hover:bg-[#e6e6e6] duration-200 cursor-pointer pagination-btn"
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage(currentPage + 1)}
-          >
-            Next
-          </button>
-        </div>
-      </div>
-      <ConfirmationModal
-        isOpen={isDeleteModalOpen}
-        type="delete"
-        title="Delete User"
-        message="Are you sure you want to delete this user?"
-        confirmButtonText="Delete"
-        cancelButtonText="Cancel"
-        onConfirm={handleConfirmDelete}
-        onCancel={handleCancelDelete}
+      <GenericTable
+        title="Users"
+        apiEndpoint={(companyId) => `${BASE_URL}/company/users/company/${companyId}/`}
+        columns={columns}
+        filterOptions={filterOptions}
+        dataKey="id"
+        getCompanyId={getUserCompanyId}
+        modalConfig={{
+          create: {
+            label: "Create User",
+            icon: plusicon,
+            onClick: () => openModal("user-create", "Create User"),
+          },
+        }}
+        customMobileRow={customMobileRow}
+        downloadEndpoint={(companyId) => `${BASE_URL}/company/users/company/${companyId}/export/`}
+        customStyles={{
+          container: "user-table",
+          header: "user-table-header",
+          title: "users-head",
+          searchInput: "user-search",
+          dropdown: "user-selection",
+          createButton: "user-create-btn",
+          downloadButton: "user-download-btn",
+          table: "user-table",
+          thead: "user-thead",
+          tdata: "user-data",
+          pagination: "user-pagination",
+        }}
+        refreshDependencies={[refreshCounter]}
       />
-    </div>
+    </>
   );
 };
 
