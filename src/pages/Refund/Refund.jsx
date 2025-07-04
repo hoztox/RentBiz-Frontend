@@ -64,9 +64,8 @@ const Refund = () => {
     fetchRefunds();
   }, [currentPage, searchTerm, selectedOption]);
 
-  const handleEditClick = (refund) => {
-    console.log("Refund ID:", refund);
-    openModal("update-refund", "Update Refund", refund);
+  const handleEditClick = (refundId) => {
+    openModal("update-refund", "Update Refund", { id: refundId });
   };
 
   const toggleRowExpand = (id) => {
@@ -177,23 +176,23 @@ const Refund = () => {
               >
                 <td className="px-5 text-left refund-data">{refund.id}</td>
                 <td className="px-5 text-left refund-data">{refund.processed_date}</td>
-                <td className="pl-5 text-left refund-data">{refund.tenancy_id}</td>
-                <td className="pl-5 text-left refund-data">{refund.tenant_name}</td>
-                <td className="px-5 text-left refund-data">{refund.amount}</td>
+                <td className="pl-5 text-left refund-data">{refund.tenancy?.id || 'N/A'}</td>
+                <td className="pl-5 text-left refund-data">{refund.tenancy?.tenant_name || 'N/A'}</td>
+                <td className="px-5 text-left refund-data">{Number(refund.amount).toFixed(2)}</td>
                 <td className="px-5 text-left refund-data">{refund.refund_method}</td>
                 <td className="px-5 text-left refund-data">
                   <span
                     className={`px-[10px] py-[5px] rounded-[4px] w-[69px] h-[28px] ${
-                      refund.status === "Paid"
+                      refund.status === "completed"
                         ? "bg-[#28C76F29] text-[#28C76F]"
                         : "bg-[#FFE1E1] text-[#C72828]"
                     }`}
                   >
-                    {refund.status}
+                    {refund.status || 'Completed'}
                   </span>
                 </td>
                 <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
-                  <button onClick={() => handleEditClick(refund)}>
+                  <button onClick={() => handleEditClick(refund.id)}>
                     <img
                       src={editicon}
                       alt="Edit"
@@ -242,7 +241,7 @@ const Refund = () => {
                 >
                   <td className="px-5 pl-[12px] text-left refund-data refund-id-column">{refund.id}</td>
                   <td className="px-5 text-left refund-data refund-date-column">{refund.processed_date}</td>
-                  <td className="px-5 text-left refund-data refund-tenancy-id-column">{refund.tenancy_id}</td>
+                  <td className="px-5 text-left refund-data refund-tenancy-id-column">{refund.tenancy?.id || 'N/A'}</td>
                   <td className="py-4 flex items-center justify-end h-[57px]">
                     <div
                       className={`refund-dropdown-field ${
@@ -274,11 +273,11 @@ const Refund = () => {
                           <div className="refund-dropdown-grid">
                             <div className="refund-dropdown-item refund-tenant-name-column">
                               <div className="refund-dropdown-label">TENANT NAME</div>
-                              <div className="refund-dropdown-value">{refund.tenant_name}</div>
+                              <div className="refund-dropdown-value">{refund.tenancy?.tenant_name || 'N/A'}</div>
                             </div>
                             <div className="refund-dropdown-item refund-amount-column">
                               <div className="refund-dropdown-label">AMOUNT</div>
-                              <div className="refund-dropdown-value">{refund.amount}</div>
+                              <div className="refund-dropdown-value">{Number(refund.amount).toFixed(2)}</div>
                             </div>
                             <div className="refund-dropdown-item refund-payment-method-column">
                               <div className="refund-dropdown-label">PAYMENT METHOD</div>
@@ -291,19 +290,19 @@ const Refund = () => {
                               <div className="refund-dropdown-value">
                                 <span
                                   className={`refund-status ${
-                                    refund.status === "Paid"
+                                    refund.status === "completed"
                                       ? "bg-[#28C76F29] text-[#28C76F]"
                                       : "bg-[#FFE1E1] text-[#C72828]"
                                   }`}
                                 >
-                                  {refund.status}
+                                  {refund.status || 'Completed'}
                                 </span>
                               </div>
                             </div>
                             <div className="refund-dropdown-item refund-action-column">
                               <div className="refund-dropdown-label">ACTION</div>
                               <div className="refund-dropdown-value flex items-center gap-4 p-[5px]">
-                                <button onClick={() => handleEditClick(refund)}>
+                                <button onClick={() => handleEditClick(refund.id)}>
                                   <img
                                     src={editicon}
                                     alt="Edit"

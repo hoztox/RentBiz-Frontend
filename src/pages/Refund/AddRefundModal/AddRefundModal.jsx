@@ -65,7 +65,6 @@ const AddRefundModal = () => {
     try {
       setLoading(true);
       setError("");
-      setError("");
       const role = localStorage.getItem("role")?.toLowerCase();
       if (role === "company") {
         const companyId = getUserCompanyId();
@@ -102,7 +101,6 @@ const AddRefundModal = () => {
       }
       setLoading(true);
       setError("");
-      setError("");
       const response = await axios.get(
         `${BASE_URL}/company/buildings/occupied/${companyId}/`
       );
@@ -133,7 +131,6 @@ const AddRefundModal = () => {
         return;
       }
       setLoading(true);
-      setError("");
       setError("");
       const response = await axios.get(
         `${BASE_URL}/company/units/${buildingId}/occupied-units/`
@@ -166,7 +163,6 @@ const AddRefundModal = () => {
       }
       setLoading(true);
       setError("");
-      setError("");
       const response = await axios.get(
         `${BASE_URL}/company/tenancies/company/${companyId}/${unitId}/`
       );
@@ -193,7 +189,6 @@ const AddRefundModal = () => {
   const fetchExcessDeposits = async (tenancyId) => {
     try {
       setLoading(true);
-      setError("");
       setError("");
       const response = await axios.get(
         `${BASE_URL}/finance/${tenancyId}/excess-deposits/`
@@ -324,7 +319,6 @@ const AddRefundModal = () => {
         refundItems: [],
       });
       setError("");
-      setError("");
       setBuildings([]);
       setUnits([]);
       setTenancies([]);
@@ -415,11 +409,10 @@ const AddRefundModal = () => {
     try {
       setLoading(true);
       setError("");
-      setError("");
       const payload = {
         tenancy_id: parseInt(selectTenancy),
         amount_refunded: parseFloat(amountToRefund),
-        collection_mode: paymentMethod,
+        payment_method: paymentMethod,
         payment_date: formatDateForBackend(paymentDate),
         remarks: form.remarks || "",
         reference_number: referenceNumber || null,
@@ -442,7 +435,6 @@ const AddRefundModal = () => {
         payload
       );
       console.log("Refund created:", response.data);
-      toast.success("Refund created successfully!");
       toast.success("Refund created successfully!");
       closeModal();
     } catch (err) {

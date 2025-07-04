@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./adminsidebar.css";
 import { ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import logo from "../../assets/Images/Admin Sidebar/Rentbiz Logo.svg";
 import dashboard from "../../assets/Images/Admin Sidebar/dashboard.svg";
 import users from "../../assets/Images/Admin Sidebar/users.svg";
@@ -16,9 +17,6 @@ import monthlyInvoice from "../../assets/Images/Admin Sidebar/monthly invoice.sv
 import financialCollection from "../../assets/Images/Admin Sidebar/financial collection.svg";
 import expense from "../../assets/Images/Admin Sidebar/expense.svg";
 import refund from "../../assets/Images/Admin Sidebar/refund.svg";
-// import tenancyReport from "../../assets/Images/Admin Sidebar/tenancy report.svg";
-// import upcomingCollection from "../../assets/Images/Admin Sidebar/upcoming collection.svg";
-// import reportCollection from "../../assets/Images/Admin Sidebar/report collection.svg";
 import incomeExpense from "../../assets/Images/Admin Sidebar/income-expense.svg";
 import logoutIcon from "../../assets/Images/Admin Sidebar/logout-icon.svg";
 import CreateTenantModal from "../../pages/Admin Tenants/CreateTenantModal/CreateTenantModal";
@@ -27,6 +25,7 @@ import { useAuth } from "../../context/AuthContext";
 import { toast } from 'react-hot-toast';
 
 const AdminSidebar = () => {
+  const { t } = useTranslation();
   const [activeItem, setActiveItem] = useState("Dashboard");
   const navigate = useNavigate();
   const { openModal, closeModal } = useModal();
@@ -94,7 +93,7 @@ const AdminSidebar = () => {
     logout();
 
     // Show toast
-    toast.success("Logged out successfully!");
+    toast.success(t('toast.logout_success'));
 
     // Update active item
     setActiveItem("Logout");
@@ -106,7 +105,7 @@ const AdminSidebar = () => {
       <div className="flex justify-center items-center pt-[30px] pb-[32px]">
         <img
           src={logo}
-          alt="Rentbiz Logo"
+          alt={t('logo_alt')}
           className="h-[78px] w-[128px] cursor-pointer"
           onClick={handleLogoClick}
         />
@@ -127,16 +126,16 @@ const AdminSidebar = () => {
           >
             <img
               src={dashboard}
-              alt="Dashboard"
+              alt={t('sidebar.dashboard')}
               className="w-[18px] sidebar-icon"
             />
-            <p className="pb-[2px] menu-text">Dashboard</p>
+            <p className="pb-[2px] menu-text">{t('sidebar.dashboard')}</p>
           </div>
         </div>
 
         {/* User Management */}
         <div className="mx-5">
-          <h3 className="pb-3 category-head">USER MANAGEMENT</h3>
+          <h3 className="pb-3 category-head">{t('sidebar.user_management')}</h3>
           <div
             className={`flex items-center justify-between px-3 py-[7px] rounded-[4px] mb-3 cursor-pointer transition-all duration-300 ease-in-out ${
               activeItem === "Users"
@@ -149,8 +148,8 @@ const AdminSidebar = () => {
             }}
           >
             <div className="flex items-center gap-[10px]">
-              <img src={users} alt="Users" className="w-[18px] sidebar-icon" />
-              <p className="pb-[2px] menu-text">Users</p>
+              <img src={users} alt={t('sidebar.users')} className="w-[18px] sidebar-icon" />
+              <p className="pb-[2px] menu-text">{t('sidebar.users')}</p>
             </div>
             <ChevronDown
               className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${
@@ -172,10 +171,10 @@ const AdminSidebar = () => {
                 }`}
                 onClick={() => {
                   setActiveItem("Create User");
-                  openModal("user-create", "Create User");
+                  openModal("user-create", t('sidebar.create_user'));
                 }}
               >
-                <p className="pl-10 py-[7px]">Create User</p>
+                <p className="pl-10 py-[7px]">{t('sidebar.create_user')}</p>
               </div>
 
               <div
@@ -187,7 +186,7 @@ const AdminSidebar = () => {
                   navigate("/admin/users-manage");
                 }}
               >
-                <p className="pl-10 py-[7px]">Manage Users</p>
+                <p className="pl-10 py-[7px]">{t('sidebar.manage_users')}</p>
               </div>
             </div>
           </div>
@@ -195,7 +194,7 @@ const AdminSidebar = () => {
         </div>
 
         <div className="mx-5">
-          <h3 className="pb-3 category-head">OPERATIONS</h3>
+          <h3 className="pb-3 category-head">{t('sidebar.operations')}</h3>
 
           {/* Properties with dropdown */}
           <div>
@@ -213,10 +212,10 @@ const AdminSidebar = () => {
               <div className="flex items-center gap-[10px]">
                 <img
                   src={properties}
-                  alt="Properties"
+                  alt={t('sidebar.properties')}
                   className="w-[18px] sidebar-icon"
                 />
-                <p className="pb-[2px] menu-text">Properties</p>
+                <p className="pb-[2px] menu-text">{t('sidebar.properties')}</p>
               </div>
               <ChevronDown
                 className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${
@@ -241,7 +240,7 @@ const AdminSidebar = () => {
                     navigate("/admin/buildings");
                   }}
                 >
-                  <p className="pl-10 py-[7px]">Buildings</p>
+                  <p className="pl-10 py-[7px]">{t('sidebar.buildings')}</p>
                 </div>
 
                 <div
@@ -253,7 +252,7 @@ const AdminSidebar = () => {
                     navigate("/admin/units");
                   }}
                 >
-                  <p className="pl-10 py-[7px]">Units</p>
+                  <p className="pl-10 py-[7px]">{t('sidebar.units')}</p>
                 </div>
               </div>
             </div>
@@ -275,10 +274,10 @@ const AdminSidebar = () => {
               <div className="flex items-center gap-[10px]">
                 <img
                   src={tenants}
-                  alt="Tenants"
+                  alt={t('sidebar.tenants')}
                   className="w-[18px] sidebar-icon"
                 />
-                <p className="pb-[2px] menu-text">Tenants</p>
+                <p className="pb-[2px] menu-text">{t('sidebar.tenants')}</p>
               </div>
               <ChevronDown
                 className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${
@@ -303,7 +302,7 @@ const AdminSidebar = () => {
                     navigate("/admin/tenants");
                   }}
                 >
-                  <p className="pl-10 py-[7px]">Tenants Master</p>
+                  <p className="pl-10 py-[7px]">{t('sidebar.tenants_master')}</p>
                 </div>
 
                 <div
@@ -312,12 +311,11 @@ const AdminSidebar = () => {
                   }`}
                   onClick={() => {
                     setActiveItem("Create Tenant");
-                    // openCreateTenantModal();
                     navigate("/admin/tenants");
-                    openModal("create-tenant", "Create New Tenant");
+                    openModal("create-tenant", t('sidebar.create_tenant'));
                   }}
                 >
-                  <p className="pl-10 py-[7px]">Create Tenant</p>
+                  <p className="pl-10 py-[7px]">{t('sidebar.create_tenant')}</p>
                 </div>
               </div>
             </div>
@@ -347,10 +345,10 @@ const AdminSidebar = () => {
               <div className="flex items-center gap-[10px]">
                 <img
                   src={tenancy}
-                  alt="Tenancy"
+                  alt={t('sidebar.tenancy')}
                   className="w-[18px] sidebar-icon"
                 />
-                <p className="pb-[2px] menu-text">Tenancy</p>
+                <p className="pb-[2px] menu-text">{t('sidebar.tenancy')}</p>
               </div>
               <ChevronDown
                 className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${
@@ -378,7 +376,7 @@ const AdminSidebar = () => {
                     navigate("/admin/tenancy-master");
                   }}
                 >
-                  <p className="pl-10 py-[7px]">Create Tenancy</p>
+                  <p className="pl-10 py-[7px]">{t('sidebar.create_tenancy')}</p>
                 </div>
                 <div
                   className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
@@ -389,7 +387,7 @@ const AdminSidebar = () => {
                     navigate("/admin/tenancy-master");
                   }}
                 >
-                  <p className="pl-10 py-[7px]">Tenancy Master</p>
+                  <p className="pl-10 py-[7px]">{t('sidebar.tenancy_master')}</p>
                 </div>
                 <div
                   className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
@@ -400,7 +398,7 @@ const AdminSidebar = () => {
                     navigate("/admin/tenancy-confirm");
                   }}
                 >
-                  <p className="pl-10 py-[7px]">Tenancy Confirm</p>
+                  <p className="pl-10 py-[7px]">{t('sidebar.tenancy_confirm')}</p>
                 </div>
                 <div
                   className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
@@ -411,7 +409,7 @@ const AdminSidebar = () => {
                     navigate("/admin/tenancy-renewal");
                   }}
                 >
-                  <p className="pl-10 py-[7px]">Tenancy Renewal</p>
+                  <p className="pl-10 py-[7px]">{t('sidebar.tenancy_renewal')}</p>
                 </div>
                 <div
                   className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
@@ -422,7 +420,7 @@ const AdminSidebar = () => {
                     navigate("/admin/tenancy-termination");
                   }}
                 >
-                  <p className="pl-10 py-[7px]">Tenancy Termination</p>
+                  <p className="pl-10 py-[7px]">{t('sidebar.tenancy_termination')}</p>
                 </div>
                 <div
                   className={`cursor-pointer transition-all duration-300 ease-in-out sub-menu rounded-md h-[36px] flex items-center ${
@@ -433,7 +431,7 @@ const AdminSidebar = () => {
                     navigate("/admin/tenancy-close");
                   }}
                 >
-                  <p className="pl-10 py-[7px]">Close Tenancy</p>
+                  <p className="pl-10 py-[7px]">{t('sidebar.close_tenancy')}</p>
                 </div>
               </div>
             </div>
@@ -442,7 +440,7 @@ const AdminSidebar = () => {
         </div>
 
         <div className="mx-5">
-          <h3 className="pb-3 category-head">MASTERS</h3>
+          <h3 className="pb-3 category-head">{t('sidebar.masters')}</h3>
           {/* Masters with dropdown */}
           <div>
             <div
@@ -459,10 +457,10 @@ const AdminSidebar = () => {
               <div className="flex items-center gap-[10px]">
                 <img
                   src={masters}
-                  alt="Masters"
+                  alt={t('sidebar.masters')}
                   className="w-[18px] sidebar-icon"
                 />
-                <p className="pb-[2px] menu-text">Masters</p>
+                <p className="pb-[2px] menu-text">{t('sidebar.masters')}</p>
               </div>
               <ChevronDown
                 className={`w-4 h-4 transform transition-transform duration-300 ease-in-out ${
@@ -487,7 +485,7 @@ const AdminSidebar = () => {
                     navigate("/admin/masters-unit-type");
                   }}
                 >
-                  <p className="pl-10 py-[7px]">Unit Type</p>
+                  <p className="pl-10 py-[7px]">{t('sidebar.unit_type')}</p>
                 </div>
 
                 <div
@@ -499,7 +497,7 @@ const AdminSidebar = () => {
                     navigate("/admin/masters-id-type");
                   }}
                 >
-                  <p className="pl-10 py-[7px]">ID Type</p>
+                  <p className="pl-10 py-[7px]">{t('sidebar.id_type')}</p>
                 </div>
 
                 <div
@@ -511,7 +509,7 @@ const AdminSidebar = () => {
                     navigate("/admin/masters-charge-code");
                   }}
                 >
-                  <p className="pl-10 py-[7px]">Charge Code</p>
+                  <p className="pl-10 py-[7px]">{t('sidebar.charge_code')}</p>
                 </div>
 
                 <div
@@ -523,7 +521,7 @@ const AdminSidebar = () => {
                     navigate("/admin/masters-taxes");
                   }}
                 >
-                  <p className="pl-10 py-[7px]">Taxes</p>
+                  <p className="pl-10 py-[7px]">{t('sidebar.taxes')}</p>
                 </div>
 
                 <div
@@ -535,7 +533,7 @@ const AdminSidebar = () => {
                     navigate("/admin/masters-charges");
                   }}
                 >
-                  <p className="pl-10 py-[7px]">Charges</p>
+                  <p className="pl-10 py-[7px]">{t('sidebar.charges')}</p>
                 </div>
 
                 <div
@@ -547,7 +545,7 @@ const AdminSidebar = () => {
                     navigate("/admin/masters-document-type");
                   }}
                 >
-                  <p className="pl-10 py-[7px]">Document Type</p>
+                  <p className="pl-10 py-[7px]">{t('sidebar.document_type')}</p>
                 </div>
 
                 <div
@@ -559,7 +557,7 @@ const AdminSidebar = () => {
                     navigate("/admin/masters-translate");
                   }}
                 >
-                  <p className="pl-10 py-[7px]">Translate</p>
+                  <p className="pl-10 py-[7px]">{t('sidebar.translate')}</p>
                 </div>
               </div>
             </div>
@@ -579,17 +577,17 @@ const AdminSidebar = () => {
             >
               <img
                 src={currency}
-                alt="Currency"
+                alt={t('sidebar.currency')}
                 className="w-[18px] sidebar-icon"
               />
-              <p className="pb-[2px] menu-text">Currency</p>
+              <p className="pb-[2px] menu-text">{t('sidebar.currency')}</p>
             </div>
           </div>
           <div className="border-t border-[#E8E8E8] mb-6"></div>
         </div>
 
         <div className="mx-5">
-          <h3 className="pb-3 category-head">FINANCIAL</h3>
+          <h3 className="pb-3 category-head">{t('sidebar.financial')}</h3>
           <div
             className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
               activeItem === "AdditionalCharges"
@@ -605,10 +603,10 @@ const AdminSidebar = () => {
           >
             <img
               src={additionalCharges}
-              alt="Additional Charges"
+              alt={t('sidebar.additional_charges')}
               className="w-[18px] sidebar-icon"
             />
-            <p className="pb-[2px] menu-text">Additional Charges</p>
+            <p className="pb-[2px] menu-text">{t('sidebar.additional_charges')}</p>
           </div>
           <div
             className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
@@ -620,10 +618,10 @@ const AdminSidebar = () => {
           >
             <img
               src={invoice}
-              alt="Invoice"
+              alt={t('sidebar.invoice')}
               className="w-[18px] sidebar-icon"
             />
-            <p className="pb-[2px] menu-text">Invoice</p>
+            <p className="pb-[2px] menu-text">{t('sidebar.invoice')}</p>
           </div>
           <div
             className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
@@ -637,10 +635,10 @@ const AdminSidebar = () => {
           >
             <img
               src={monthlyInvoice}
-              alt="Monthly Invoice"
+              alt={t('sidebar.monthly_invoice')}
               className="w-[18px] sidebar-icon"
             />
-            <p className="pb-[2px] menu-text">Invoice (Auto)</p>
+            <p className="pb-[2px] menu-text">{t('sidebar.monthly_invoice')}</p>
           </div>
           <div
             className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
@@ -654,10 +652,10 @@ const AdminSidebar = () => {
           >
             <img
               src={financialCollection}
-              alt="Financial Collection"
+              alt={t('sidebar.collection')}
               className="w-[18px] sidebar-icon"
             />
-            <p className="pb-[2px] menu-text">Collection</p>
+            <p className="pb-[2px] menu-text">{t('sidebar.collection')}</p>
           </div>
           <div
             className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
@@ -669,10 +667,10 @@ const AdminSidebar = () => {
           >
             <img
               src={expense}
-              alt="Expense"
+              alt={t('sidebar.expense')}
               className="w-[18px] sidebar-icon"
             />
-            <p className="pb-[2px] menu-text">Expense</p>
+            <p className="pb-[2px] menu-text">{t('sidebar.expense')}</p>
           </div>
           <div
             className={`flex items-center py-[7px] px-3 mb-6 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
@@ -682,71 +680,14 @@ const AdminSidebar = () => {
             }`}
             onClick={() => handleNonDropdownClick("Refund", "/admin/refund")}
           >
-            <img src={refund} alt="Refund" className="w-[18px] sidebar-icon" />
-            <p className="pb-[2px] menu-text">Refund</p>
+            <img src={refund} alt={t('sidebar.refund')} className="w-[18px] sidebar-icon" />
+            <p className="pb-[2px] menu-text">{t('sidebar.refund')}</p>
           </div>
           <div className="border-t border-[#E8E8E8] mb-6"></div>
         </div>
 
         <div className="mx-5">
-          <h3 className="pb-3 category-head">REPORTS</h3>
-          {/* <div
-            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
-              activeItem === "TenancyReport"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
-            onClick={() =>
-              handleNonDropdownClick("TenancyReport", "/admin/tenancy-report")
-            }
-          >
-            <img
-              src={tenancyReport}
-              alt="Tenancy Report"
-              className="w-[18px] sidebar-icon"
-            />
-            <p className="pb-[2px] menu-text">Tenancy Report</p>
-          </div> */}
-          {/* <div
-            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
-              activeItem === "UpcomingCollection"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
-            onClick={() =>
-              handleNonDropdownClick(
-                "UpcomingCollection",
-                "/admin/upcoming-collection"
-              )
-            }
-          >
-            <img
-              src={upcomingCollection}
-              alt="Upcoming Collection"
-              className="w-[18px] sidebar-icon"
-            />
-            <p className="pb-[2px] menu-text">Upcoming Collection</p>
-          </div> */}
-          {/* <div
-            className={`flex items-center py-[7px] px-3 mb-3 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
-              activeItem === "ReportCollection"
-                ? "menu-active"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
-            onClick={() =>
-              handleNonDropdownClick(
-                "ReportCollection",
-                "/admin/collection-report"
-              )
-            }
-          >
-            <img
-              src={reportCollection}
-              alt="Report Collection"
-              className="w-[18px] sidebar-icon"
-            />
-            <p className="pb-[2px] menu-text">Collection</p>
-          </div> */}
+          <h3 className="pb-3 category-head">{t('sidebar.reports')}</h3>
           <div
             className={`flex items-center py-[7px] px-3 mb-6 gap-[10px] rounded-[4px] cursor-pointer transition-all duration-300 ease-in-out ${
               activeItem === "IncomeExpense"
@@ -762,10 +703,10 @@ const AdminSidebar = () => {
           >
             <img
               src={incomeExpense}
-              alt="Income Expense"
+              alt={t('sidebar.income_expense')}
               className="w-[18px] sidebar-icon"
             />
-            <p className="pb-[2px] menu-text">Income/Expense</p>
+            <p className="pb-[2px] menu-text">{t('sidebar.income_expense')}</p>
           </div>
           <div className="border-t border-[#E8E8E8] mb-6"></div>
         </div>
@@ -777,7 +718,7 @@ const AdminSidebar = () => {
             }`}
             onClick={handleLogout}
             role="button"
-            aria-label="Logout"
+            aria-label={t('sidebar.logout')}
             tabIndex={0}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
@@ -785,8 +726,8 @@ const AdminSidebar = () => {
               }
             }}
           >
-            <img src={logoutIcon} alt="Logout" className="w-[18px] sidebar-icon" />
-            <p className="pb-[2px] menu-text">Logout</p>
+            <img src={logoutIcon} alt={t('sidebar.logout')} className="w-[18px] sidebar-icon" />
+            <p className="pb-[2px] menu-text">{t('sidebar.logout')}</p>
           </div>
         </div>
       </div>
@@ -794,7 +735,7 @@ const AdminSidebar = () => {
       <CreateTenantModal open={isCreateTenantModalOpen} onClose={closeCreateTenantModal} />
 
       <div className="mx-5 border-t border-[#E8E8E8] text-start py-6 side-footer-text">
-        Powered By RentBiz - 2025
+        {t('sidebar.footer')}
       </div>
     </div>
   );

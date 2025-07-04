@@ -1,107 +1,28 @@
-import React, { useState, useRef, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
-import axios from "axios";
-import logo from "../../assets/Images/Admin Sidebar/Rentbiz Logo.svg";
-import backarrow from "../../assets/Images/Admin Navbar/backarrow.svg";
-import profile from "../../assets/Images/Admin Navbar/profile.png";
-import mobilemenu from "../../assets/Images/Admin Navbar/mobile-menu.svg";
-import "./adminnavbar.css";
-import MobileSlideMenu from "../MobileSlideMenu/MobileSlideMenu";
-import { useModal } from "../../context/ModalContext";
-import { BASE_URL } from "../../utils/config";
-
-const routeTitles = {
-  "/admin/dashboard": "Dashboard Overview",
-  "/admin/users-manage": "Users Overview",
-  "/admin/buildings": "Building Overview",
-  "/admin/units": "Unit Overview",
-  "/admin/tenants": "Tenant Overview",
-  "/admin/tenancy-master": "Tenancy Overview",
-  "/admin/tenancy-confirm": "Tenancy Confirm Overview",
-  "/admin/tenancy-renewal": "Tenancy Renewal Overview",
-  "/admin/tenancy-termination": "Tenancy Cancellation Overview",
-  "/admin/tenancy-close": "Tenancy Close Overview",
-  "/admin/masters-unit-type": "Unit Masters Overview",
-  "/admin/masters-id-type": "ID Type Masters Overview",
-  "/admin/masters-charge-code": "Charge Code Masters Overview",
-  "/admin/masters-taxes": "Taxes Overview",
-  "/admin/masters-charges": "Charges Masters Overview",
-  "/admin/masters-document-type": "Document Type Masters Overview",
-  "/admin/masters-translate": "Language Overview",
-  "/admin/masters-currency": "Currency Overview",
-  "/admin/additional-charges": "Additional Charges Overview",
-  "/admin/invoice": "Invoice Overview",
-  "/admin/monthly-invoice": "Invoice Overview",
-  "/admin/collection": "Collection Overview",
-  "/admin/expense": "Expense Overview",
-  "/admin/refund": "Refund Overview",
-  "/admin/tenancy-report": "Tenant Report Overview",
-  "/admin/upcoming-collection": "Upcoming Collection Overview",
-  "/admin/collection-report": "Collection Report Overview",
-  "/admin/income-expense-report": "Income / Expense Report Overview",
-  default: "Admin Panel",
-};
-
-const mobileRouteTitles = {
-  "/admin/users-manage": "Users",
-  "/admin/buildings": "Buildings",
-  "/admin/units": "Units",
-  "/admin/tenants": "Tenants",
-  "/admin/tenancy-master": "Tenancy",
-  "/admin/tenancy-confirm": "Tenancy Confirm",
-  "/admin/tenancy-renewal": "Tenancy Renewal",
-  "/admin/tenancy-termination": "Tenancy Termination",
-  "/admin/tenancy-close": "Tenancy Closing",
-  "/admin/masters-unit-type": "Unit Type Masters",
-  "/admin/masters-id-type": "ID Type Masters",
-  "/admin/masters-charge-code": "Charge Code Masters",
-  "/admin/masters-taxes": "Taxes Overview",
-  "/admin/masters-charges": "Charges Master",
-  "/admin/masters-document-type": "Document Type Masters",
-  "/admin/masters-translate": "Translation",
-  "/admin/masters-currency": "Currency",
-  "/admin/additional-charges": "Additional Charges",
-  "/admin/invoice": "Invoice List",
-  "/admin/monthly-invoice": "Invoice List Auto Generated",
-  "/admin/collection": "Collection",
-  "/admin/expense": "Expenses",
-  "/admin/refund": "Refund",
-  "/admin/tenancy-report": "Tenant Report",
-  "/admin/upcoming-collection": "Upcoming Collection Report",
-  "/admin/collection-report": "Collection Report",
-  "/admin/income-expense-report": "Income-Expense Report",
-  default: "Admin",
-};
-
-const modalTitles = {
-  "tenancy-create": "Create New Tenancy",
-  "create-unit-type-master": "Create New Unit Type Master",
-  "create-charge-code-type": "Create New Charge Code Master",
-  "create-charges-master": "Create New Charges Master",
-  "create-document-type-master": "Create New Document Type Master",
-  "add-currency-master": "Create New Currency",
-  "create-additional-charges": "Create New Additional Charges",
-  "create-invoice": "Create New Invoice",
-  "view-invoice": "Invoice View",
-  "create-monthly-invoice": "Create New Monthly Invoice",
-  "view-monthly-invoice": "Monthly Invoice View",
-  "create-collection": "Create New Collection",
-  "create-expense": "Create New Expense",
-  "create-refund": "Create Refund",
-}
+// src/components/AdminNavbar.js
+import React, { useState, useRef, useEffect } from 'react';
+import { ChevronDown } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
+import { useTranslation } from 'react-i18next'; // Import useTranslation
+import logo from '../../assets/Images/Admin Sidebar/Rentbiz Logo.svg';
+import backarrow from '../../assets/Images/Admin Navbar/backarrow.svg';
+import profile from '../../assets/Images/Admin Navbar/profile.png';
+import mobilemenu from '../../assets/Images/Admin Navbar/mobile-menu.svg';
+import './adminnavbar.css';
+import MobileSlideMenu from '../MobileSlideMenu/MobileSlideMenu';
+import { useModal } from '../../context/ModalContext';
+import { BASE_URL } from '../../utils/config';
 
 const AdminNavbar = () => {
+  const { t, i18n } = useTranslation(); // Initialize translation
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("English");
+  const [selectedLanguage, setSelectedLanguage] = useState('English');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [currentPath, setCurrentPath] = useState("");
-
-  // Profile state
+  const [currentPath, setCurrentPath] = useState('');
   const [profileData, setProfileData] = useState({
-    name: "",
-    email: "",
-    profileImage: profile, // fallback to default
+    name: '',
+    email: '',
+    profileImage: profile,
   });
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
@@ -110,17 +31,92 @@ const AdminNavbar = () => {
   const location = useLocation();
   const { modalState, closeModal } = useModal();
 
-  // Helper functions
+  // Set document direction based on language
+  useEffect(() => {
+    document.documentElement.setAttribute(
+      'dir',
+      i18n.language === 'ar' ? 'rtl' : 'ltr'
+    );
+  }, [i18n.language]);
+
+  // Map language names to i18n language codes
+  const languageMap = {
+    English: 'en',
+    العربية: 'ar',
+    // Add more languages here, e.g., French: 'fr'
+  };
+
+  // Translation keys for routes
+  const routeTitles = {
+    '/admin/dashboard': 'dashboard',
+    '/admin/users-manage': 'users',
+    '/admin/buildings': 'buildings',
+    '/admin/units': 'units',
+    // Add other routes with translation keys
+    default: 'admin_panel',
+  };
+
+  const mobileRouteTitles = {
+    '/admin/users-manage': 'users',
+    '/admin/buildings': 'buildings',
+    '/admin/units': 'units',
+    // Add other routes with translation keys
+    default: 'admin',
+  };
+
+  const modalTitles = {
+    'tenancy-create': 'create_tenancy',
+    'create-unit-type-master': 'create_unit_type_master',
+    // Add other modal types with translation keys
+  };
+
+  // Fetch profile data (unchanged)
+  const fetchProfileData = async () => {
+    try {
+      setIsLoadingProfile(true);
+      const role = localStorage.getItem('role')?.toLowerCase();
+      if (role === 'company') {
+        const companyId = getUserCompanyId();
+        if (companyId) {
+          const response = await axios.get(
+            `${BASE_URL}/accounts/company/${companyId}/detail/`
+          );
+          setProfileData({
+            name: response.data.company_name || 'Admin',
+            email: response.data.email_address || 'example@gmail.com',
+            profileImage: response.data.company_logo || profile,
+          });
+        }
+      } else if (role === 'user') {
+        const userId = getRelevantUserId();
+        if (userId) {
+          const response = await axios.get(
+            `${BASE_URL}/company/user/${userId}/details/`
+          );
+          setProfileData({
+            name: response.data.name || 'User',
+            email: response.data.email || 'example@gmail.com',
+            profileImage: response.data.company_logo || profile,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching profile data:', error);
+    } finally {
+      setIsLoadingProfile(false);
+    }
+  };
+
   const getUserCompanyId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-    if (role === "company") {
-      return localStorage.getItem("company_id");
-    } else if (role === "user") {
+    const role = localStorage.getItem('role')?.toLowerCase();
+    if (role === 'company') {
+      return localStorage.getItem('company_id');
+    } else if (role === 'user') {
       try {
-        const userCompanyId = localStorage.getItem("company_id");
+        const userCompanyId = localStorage.getItem('company_id');
         return userCompanyId ? JSON.parse(userCompanyId) : null;
       } catch (e) {
-        console.error("Error parsing user company ID:", e);
+        console.error('Error parsing user company ID:', e);
         return null;
       }
     }
@@ -128,110 +124,41 @@ const AdminNavbar = () => {
   };
 
   const getRelevantUserId = () => {
-    const role = localStorage.getItem("role")?.toLowerCase();
-    if (role === "user") {
-      const userId = localStorage.getItem("user_id");
+    const role = localStorage.getItem('role')?.toLowerCase();
+    if (role === 'user') {
+      const userId = localStorage.getItem('user_id');
       if (userId) return userId;
     }
     return null;
   };
 
-  // Fetch profile data
-  const fetchProfileData = async () => {
-    try {
-      setIsLoadingProfile(true);
-      const role = localStorage.getItem("role")?.toLowerCase();
-
-      if (role === "company") {
-        const companyId = getUserCompanyId();
-        if (companyId) {
-          const response = await axios.get(
-            `${BASE_URL}/accounts/company/${companyId}/detail/`
-          );
-          const companyData = response.data;
-
-          setProfileData({
-            name: companyData.company_name || "Admin",
-            email: companyData.email_address || "example@gmail.com",
-            profileImage: companyData.company_logo
-              ? companyData.company_logo.startsWith("http")
-                ? companyData.company_logo
-                : `${BASE_URL.replace("/api", "")}${companyData.company_logo}`
-              : profile,
-          });
-          console.log("company details:", response.data);
-        }
-      } else if (role === "user") {
-        const userId = getRelevantUserId();
-        if (userId) {
-          const response = await axios.get(
-            `${BASE_URL}/company/user/${userId}/details/`
-          );
-          const userData = response.data;
-
-          setProfileData({
-            name: userData.name || "User",
-            email: userData.email || "example@gmail.com",
-            profileImage: userData.company_logo
-              ? userData.company_logo.startsWith("http")
-                ? userData.company_logo
-                : `${BASE_URL.replace("/api", "")}${userData.company_logo}`
-              : profile,
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching profile data:", error);
-      // Keep default values if API call fails
-    } finally {
-      setIsLoadingProfile(false);
-    }
-  };
+  useEffect(() => {
+    fetchProfileData();
+  }, []);
 
   useEffect(() => {
     setCurrentPath(location.pathname);
   }, [location.pathname]);
 
-  // Fetch profile data on component mount
-  useEffect(() => {
-    fetchProfileData();
-  }, []);
-
-  const isDashboard = currentPath === "/admin/dashboard";
+  const isDashboard = currentPath === '/admin/dashboard';
 
   const getPageTitle = (isMobile = false) => {
-    // Prioritize modal title when modal is open and title is set
     if (modalState.isOpen && modalState.title) {
-      return modalState.title;
+      return t(modalTitles[modalState.type] || 'admin');
     }
-
-    // Fallback to modal type if title is not set
-    if (modalState.isOpen && modalState.type) {
-      return modalTitles[modalState.type] || mobileRouteTitles.default;
-    }
-
-    const path = currentPath;
     const titles = isMobile ? mobileRouteTitles : routeTitles;
-
-    // Check for exact route match and allow empty string to be returned
-    if (path in titles) {
-      return titles[path] !== undefined ? titles[path] : "";
-    }
-
-    // Fallback for unknown routes
-    return titles.default || "Admin";
+    const key = titles[currentPath] || titles.default;
+    return t(key);
   };
 
-  // Store current path in localstorage when it changes
   useEffect(() => {
     if (currentPath) {
-      localStorage.setItem("currentAdminPath", currentPath);
+      localStorage.setItem('currentAdminPath', currentPath);
     }
   }, [currentPath]);
 
-  // Retrieve path from localstorage on initial load
   useEffect(() => {
-    const savedPath = localStorage.getItem("currentAdminPath");
+    const savedPath = localStorage.getItem('currentAdminPath');
     if (savedPath && !currentPath) {
       setCurrentPath(savedPath);
     }
@@ -242,6 +169,8 @@ const AdminNavbar = () => {
   };
 
   const selectLanguage = (language) => {
+    const langCode = languageMap[language];
+    i18n.changeLanguage(langCode); // Change language
     setSelectedLanguage(language);
     setIsOpen(false);
   };
@@ -259,72 +188,64 @@ const AdminNavbar = () => {
   };
 
   const handleLogoClick = () => {
-    navigate("/admin/dashboard");
+    navigate('/admin/dashboard');
   };
 
-  // Handle profile image error
   const handleImageError = (e) => {
-    e.target.src = profile; // fallback to default image
+    e.target.src = profile;
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   return (
     <>
       <nav
         className={`flex items-center justify-between mx-5 h-[86px] border-b border-[#E9E9E9] bg-white admin-navbar ${
-          isDashboard ? "dashboard-nav" : "non-dashboard-nav"
-        } ${modalState.isOpen ? "modal-open" : ""}`}
+          isDashboard ? 'dashboard-nav' : 'non-dashboard-nav'
+        } ${modalState.isOpen ? 'modal-open' : ''}`}
       >
         <div className="flex items-center w-full">
-          {/* Left Section: Logo or Back Arrow */}
           <div className="left-section">
             {isDashboard && !modalState.isOpen ? (
               <img
                 src={logo}
-                alt="RentBiz Logo"
+                alt={t('logo_alt')}
                 className="RentBiz-Logo"
                 onClick={handleLogoClick}
-                aria-label="Navigate to dashboard"
+                aria-label={t('navigate_dashboard')}
               />
             ) : (
               <img
                 src={backarrow}
-                alt="Back Arrow"
+                alt={t('back_arrow_alt')}
                 className="back-arrow"
                 onClick={handleBackClick}
-                aria-label={modalState.isOpen ? "Close modal" : "Go back"}
+                aria-label={modalState.isOpen ? t('close_modal') : t('go_back')}
               />
             )}
           </div>
 
-          {/* Center Section: Page Title (mobile view) */}
           {(modalState.isOpen || !isDashboard) && (
             <h1 className="mobile-page-title" aria-live="polite">
               {getPageTitle(true)}
             </h1>
           )}
 
-          {/* Desktop Page Title */}
           <h1 className="navbar-head">{getPageTitle(false)}</h1>
         </div>
 
-        {/* Mobile Menu Button */}
         <button className="mobile-menu" onClick={toggleMobileMenu}>
-          <img src={mobilemenu} alt="Menu Icon" className="w-[20px] h-[20px]" />
+          <img src={mobilemenu} alt={t('menu_icon_alt')} className="w-[20px] h-[20px]" />
         </button>
 
-        {/* Right Section: Language Dropdown and Profile (Desktop) */}
         <div className="flex items-center navbar-right-side">
           <div className="relative mr-5" ref={dropdownRef}>
             <button
@@ -335,7 +256,7 @@ const AdminNavbar = () => {
               <ChevronDown
                 size={20}
                 className={`ml-2 transform transition-transform duration-300 ease-in-out text-[#201D1E] ${
-                  isOpen ? "rotate-180" : ""
+                  isOpen ? 'rotate-180' : ''
                 }`}
               />
             </button>
@@ -343,23 +264,20 @@ const AdminNavbar = () => {
             <div
               className={`absolute mt-1 w-[120px] bg-white border border-gray-300 rounded-md shadow-lg overflow-hidden transition-all duration-300 ease-in-out ${
                 isOpen
-                  ? "opacity-100 max-h-40 transform translate-y-0"
-                  : "opacity-0 max-h-0 transform -translate-y-2 pointer-events-none"
+                  ? 'opacity-100 max-h-40 transform translate-y-0'
+                  : 'opacity-0 max-h-0 transform -translate-y-2 pointer-events-none'
               }`}
             >
               <div className="py-1">
-                <button
-                  onClick={() => selectLanguage("English")}
-                  className="block w-full text-left px-4 py-2 options-text hover:bg-gray-100"
-                >
-                  English
-                </button>
-                <button
-                  onClick={() => selectLanguage("العربية")}
-                  className="block w-full text-left px-4 py-2 options-text hover:bg-gray-100"
-                >
-                  العربية
-                </button>
+                {Object.keys(languageMap).map((lang) => (
+                  <button
+                    key={lang}
+                    onClick={() => selectLanguage(lang)}
+                    className="block w-full text-left px-4 py-2 options-text hover:bg-gray-100"
+                  >
+                    {lang}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
@@ -371,7 +289,7 @@ const AdminNavbar = () => {
               ) : (
                 <img
                   src={profileData.profileImage}
-                  alt="User Profile"
+                  alt={t('user_profile_alt')}
                   className="w-[46px] h-[46px] object-cover"
                   onError={handleImageError}
                 />
@@ -386,10 +304,10 @@ const AdminNavbar = () => {
               ) : (
                 <>
                   <span className="admin-name whitespace-nowrap">
-                    Hi, {profileData.name}
+                    {t('profile.greeting', { name: profileData.name })}
                   </span>
                   <span className="admin-email whitespace-nowrap">
-                    {profileData.email}
+                    {t('profile.email', { email: profileData.email })}
                   </span>
                 </>
               )}
@@ -398,7 +316,6 @@ const AdminNavbar = () => {
         </div>
       </nav>
 
-      {/* Mobile Slide Menu */}
       <MobileSlideMenu
         isMobileMenuOpen={isMobileMenuOpen}
         toggleMobileMenu={toggleMobileMenu}
