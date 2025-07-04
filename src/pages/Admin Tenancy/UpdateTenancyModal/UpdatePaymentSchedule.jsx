@@ -14,7 +14,8 @@ const UpdatePaymentScheduleModal = () => {
   const { modalState, closeModal } = useModal();
 
   // Only render for "update-payment-schedule" type
-  if (!modalState.isOpen || modalState.type !== "update-payment-schedule") return null;
+  if (!modalState.isOpen || modalState.type !== "update-payment-schedule")
+    return null;
 
   const { tenancy, paymentSchedules } = modalState.data || {};
   if (!tenancy || !paymentSchedules) return null; // Safeguard against missing data
@@ -62,7 +63,7 @@ const UpdatePaymentScheduleModal = () => {
       toast.success("Payment schedule updated successfully");
       closeModal();
     } catch (error) {
-      toast.error("Error updating payment schedule")
+      toast.error("Error updating payment schedule");
     }
   };
 
@@ -155,10 +156,12 @@ const UpdatePaymentScheduleModal = () => {
                           <span
                             className={`px-3 py-1 rounded-md text-sm ${
                               schedule.status === "pending"
-                                ? "bg-[#FFF7E9] text-[#FBAD27]"
+                                ? "bg-[#FFE6E6] text-[#D32F2F]"
                                 : schedule.status === "paid"
                                 ? "bg-[#DDF6E8] text-[#28C76F]"
-                                : "bg-[#E8EFF6] text-[#1458A2]"
+                                : schedule.status === "partially_paid"
+                                ? "bg-[#FFF7E9] text-[#FBAD27]" 
+                                : "bg-[#E8EFF6] text-[#1458A2]" 
                             }`}
                           >
                             {schedule.status.charAt(0).toUpperCase() +
@@ -383,7 +386,9 @@ const UpdatePaymentScheduleModal = () => {
                                           ? "bg-[#FFF7E9] text-[#FBAD27]"
                                           : schedule.status === "paid"
                                           ? "bg-[#DDF6E8] text-[#28C76F]"
-                                          : "bg-[#E8EFF6] text-[#1458A2]"
+                                          : schedule.status === "partially_paid"
+                                          ? "bg-[#EDE9FE] text-[#6D28D9]" // Add this for partially paid
+                                          : "bg-[#E8EFF6] text-[#1458A2]" // Invoiced and others
                                       }`}
                                     >
                                       {schedule.status.charAt(0).toUpperCase() +
