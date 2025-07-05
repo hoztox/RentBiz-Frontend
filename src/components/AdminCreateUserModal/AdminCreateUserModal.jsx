@@ -11,7 +11,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const AdminCreateUserModal = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { modalState, closeModal, triggerRefresh } = useModal();
   const [isLoading, setIsLoading] = useState(false);
   const [isRoleSelectOpen, setIsRoleSelectOpen] = useState(false);
@@ -20,8 +20,10 @@ const AdminCreateUserModal = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const fileInputRef = useRef(null);
-
   const navigate = useNavigate();
+
+  // Determine the direction (ltr or rtl)
+  const isRtl = i18n.dir() === "rtl";
 
   const getUserCompanyId = () => {
     const role = localStorage.getItem("role")?.toLowerCase();
@@ -344,14 +346,23 @@ const AdminCreateUserModal = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 modal-overlay"
+      dir={isRtl ? "rtl" : "ltr"}
+    >
       <div className="modal-container relative bg-white rounded-[6px] overflow-hidden shadow-lg w-full max-w-[830px] h-auto md:h-[600px] flex flex-col">
         <div className="h-[100px] md:h-[133px] md:bg-[#F8F9FA] rounded-t-[6px] flex justify-between items-start px-4 md:px-6 pt-6">
-          <h2 className="absolute top-[30px] md:top-[40px] left-4 md:left-[30px] heading-text">
+          <h2
+            className={`absolute top-[30px] md:top-[40px] heading-text ${
+              isRtl ? "right-4 md:right-[30px]" : "left-4 md:left-[30px]"
+            }`}
+          >
             {t("admin_create_user.title")}
           </h2>
           <button
-            className="close-button hover:bg-gray-200 duration-200"
+            className={`close-button hover:bg-gray-200 duration-200 ${
+              isRtl ? "left-4 md:left-[30px]" : "right-4"
+            }`}
             onClick={closeModal}
             aria-label={t("admin_create_user.close_modal")}
           >
@@ -359,7 +370,9 @@ const AdminCreateUserModal = () => {
           </button>
         </div>
 
-        <div className="absolute top-[50px] md:top-[71px] left-1/2 transform -translate-x-1/2 flex justify-center">
+        <div
+          className={`absolute top-[50px] md:top-[71px] left-1/2 transform -translate-x-1/2 flex justify-center`}
+        >
           <div className="relative top-[-30px] w-[100px] md:w-[123px] h-[100px] md:h-[123px] bg-[#F3F3F3] rounded-full border overflow-hidden">
             {imagePreview && (
               <img
@@ -389,9 +402,17 @@ const AdminCreateUserModal = () => {
           </div>
         </div>
 
-        <div className="px-4 md:px-6 pt-4 md:pt-0 grid grid-cols-1 md:grid-cols-2 gap-x-3 gap-y-4 md:gap-y-5 mt-[40px] md:mt-[68px] overflow-y-auto flex-1">
+        <div
+          className={`px-4 md:px-6 pt-4 md:pt-0 grid grid-cols-1 md:grid-cols-2 gap-x-3 gap-y-4 md:gap-y-5 mt-[40px] md:mt-[68px] overflow-y-auto flex-1 ${
+            isRtl ? "rtl-grid" : ""
+          }`}
+        >
           <div>
-            <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
+            <label
+              className={`block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label ${
+                isRtl ? "text-right" : ""
+              }`}
+            >
               {t("admin_create_user.labels.name")} *
             </label>
             <input
@@ -404,16 +425,22 @@ const AdminCreateUserModal = () => {
                 fieldErrors.name
                   ? "border-red-500 focus:border-red-500"
                   : "focus:border-gray-700"
-              }`}
+              } ${isRtl ? "text-right" : ""}`}
               required
             />
             {fieldErrors.name && (
-              <p className="text-red-600 text-xs mt-1">{fieldErrors.name}</p>
+              <p className={`text-red-600 text-xs mt-1 ${isRtl ? "text-right" : ""}`}>
+                {fieldErrors.name}
+              </p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
+            <label
+              className={`block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label ${
+                isRtl ? "text-right" : ""
+              }`}
+            >
               {t("admin_create_user.labels.username")} *
             </label>
             <input
@@ -426,18 +453,22 @@ const AdminCreateUserModal = () => {
                 fieldErrors.username
                   ? "border-red-500 focus:border-red-500"
                   : "focus:border-gray-700"
-              }`}
+              } ${isRtl ? "text-right" : ""}`}
               required
             />
             {fieldErrors.username && (
-              <p className="text-red-600 text-xs mt-1">
+              <p className={`text-red-600 text-xs mt-1 ${isRtl ? "text-right" : ""}`}>
                 {fieldErrors.username}
               </p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
+            <label
+              className={`block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label ${
+                isRtl ? "text-right" : ""
+              }`}
+            >
               {t("admin_create_user.labels.email")} *
             </label>
             <input
@@ -451,19 +482,26 @@ const AdminCreateUserModal = () => {
                 fieldErrors.email
                   ? "border-red-500 focus:border-red-500"
                   : "focus:border-gray-700"
-              }`}
+              } ${isRtl ? "text-right" : ""}`}
               required
               aria-describedby="email-error"
             />
             {fieldErrors.email && (
-              <p id="email-error" className="text-red-600 text-xs mt-1">
+              <p
+                id="email-error"
+                className={`text-red-600 text-xs mt-1 ${isRtl ? "text-right" : ""}`}
+              >
                 {fieldErrors.email}
               </p>
             )}
           </div>
 
           <div className="relative">
-            <label className="block text-sm text-[#201D1E] mb-[8px] md:mt-[-5px]">
+            <label
+              className={`block text-sm text-[#201D1E] mb-[8px] md:mt-[-5px] ${
+                isRtl ? "text-right" : ""
+              }`}
+            >
               {t("admin_create_user.labels.role")} *
             </label>
             <select
@@ -474,7 +512,7 @@ const AdminCreateUserModal = () => {
                 fieldErrors.user_role
                   ? "border-red-500 focus:border-red-500"
                   : "focus:border-gray-700"
-              }`}
+              } ${isRtl ? "text-right" : ""}`}
               onFocus={() => setIsRoleSelectOpen(true)}
               onBlur={() => setIsRoleSelectOpen(false)}
             >
@@ -484,22 +522,28 @@ const AdminCreateUserModal = () => {
               <option value="Store">{t("admin_create_user.roles.store")}</option>
             </select>
             <ChevronDown
-              className={`absolute right-[20px] md:right-[15px] top-[36px] md:top-[33px] text-gray-400 pointer-events-none transition-transform duration-300 drop-down-icon ${
-                isRoleSelectOpen ? "rotate-180" : "rotate-0"
-              }`}
+              className={`absolute top-[36px] md:top-[33px] text-gray-400 pointer-events-none transition-transform duration-300 drop-down-icon ${
+                isRtl
+                  ? "left-[20px] md:left-[15px]"
+                  : "right-[20px] md:right-[15px] rotate-0"
+              } ${isRoleSelectOpen ? "rotate-180" : ""}`}
               width={20}
               height={20}
               color="#201D1E"
             />
             {fieldErrors.user_role && (
-              <p className="text-red-600 text-xs mt-1">
+              <p className={`text-red-600 text-xs mt-1 ${isRtl ? "text-right" : ""}`}>
                 {fieldErrors.user_role}
               </p>
             )}
           </div>
 
           <div className="relative">
-            <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
+            <label
+              className={`block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label ${
+                isRtl ? "text-right" : ""
+              }`}
+            >
               {t("admin_create_user.labels.password")} *
             </label>
             <div className="relative group">
@@ -513,29 +557,42 @@ const AdminCreateUserModal = () => {
                   fieldErrors.password
                     ? "border-red-500 focus:border-red-500"
                     : "focus:border-gray-700"
-                } pr-10`}
+                } ${isRtl ? "text-right pr-10 pl-4" : "pr-10"}`}
                 required
                 aria-describedby="password-error"
               />
               <span
-                className="absolute inset-y-0 right-4 flex items-center text-gray-400 cursor-pointer"
+                className={`absolute inset-y-0 flex items-center text-gray-400 cursor-pointer ${
+                  isRtl ? "left-4" : "right-4"
+                }`}
                 onClick={togglePasswordVisibility}
               >
                 {passwordVisible ? <IoEyeOff size={20} /> : <IoEye size={20} />}
               </span>
-              <div className="absolute hidden group-hover:block group-focus-within:block bg-gray-800 text-white text-xs rounded py-1 px-2 left-0 bottom-full mb-1 w-[300px] z-10">
+              <div
+                className={`absolute hidden group-hover:block group-focus-within:block bg-gray-800 text-white text-xs rounded py-1 px-2 ${
+                  isRtl ? "right-0" : "left-0"
+                } bottom-full mb-1 w-[300px] z-10`}
+              >
                 {t("admin_create_user.password_hint")}
               </div>
             </div>
             {fieldErrors.password && (
-              <p id="password-error" className="text-red-600 text-xs mt-1">
+              <p
+                id="password-error"
+                className={`text-red-600 text-xs mt-1 ${isRtl ? "text-right" : ""}`}
+              >
                 {fieldErrors.password}
               </p>
             )}
           </div>
 
           <div className="relative">
-            <label className="block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label">
+            <label
+              className={`block text-sm text-[#201D1E] mb-[8px] md:mb-[10px] form-label ${
+                isRtl ? "text-right" : ""
+              }`}
+            >
               {t("admin_create_user.labels.confirm_password")} *
             </label>
             <div className="relative">
@@ -549,12 +606,14 @@ const AdminCreateUserModal = () => {
                   fieldErrors.confirm_password
                     ? "border-red-500 focus:border-red-500"
                     : "focus:border-gray-700"
-                } pr-10`}
+                } ${isRtl ? "text-right pr-10 pl-4" : "pr-10"} `}
                 required
                 aria-describedby="confirm-password-error"
               />
               <span
-                className="absolute inset-y-0 right-4 flex items-center text-gray-400 cursor-pointer"
+                className={`absolute inset-y-0 flex items-center text-gray-400 cursor-pointer ${
+                  isRtl ? "left-4" : "right-4"
+                }`}
                 onClick={toggleConfirmPasswordVisibility}
               >
                 {confirmPasswordVisible ? (
@@ -567,7 +626,7 @@ const AdminCreateUserModal = () => {
             {fieldErrors.confirm_password && (
               <p
                 id="confirm-password-error"
-                className="text-red-600 text-xs mt-1"
+                className={`text-red-600 text-xs mt-1 ${isRtl ? "text-right" : ""}`}
               >
                 {fieldErrors.confirm_password}
               </p>
@@ -575,7 +634,11 @@ const AdminCreateUserModal = () => {
           </div>
         </div>
 
-        <div className="px-4 md:px-6 mt-6 md:mt-1 mb-5 flex justify-end">
+        <div
+          className={`px-4 md:px-6 mt-6 md:mt-1 mb-5 flex ${
+            isRtl ? "justify-start" : "justify-end"
+          }`}
+        >
           <button
             className={`create-user-button duration-200 ${
               isLoading

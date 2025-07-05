@@ -1,5 +1,5 @@
 .users-head {
-  font-family: "Inter Tight";
+  font-family: "Inter Tight", "Almarai";
   font-size: 21px;
   font-style: normal;
   font-weight: 500;
@@ -8,7 +8,7 @@
 }
 
 .user-search {
-  font-family: "Inter Tight";
+  font-family: "Inter Tight", "Almarai";
   font-size: 15px;
   font-style: normal;
   font-weight: 400;
@@ -26,7 +26,7 @@
 }
 
 .user-selection {
-  font-family: "Public Sans", sans-serif;
+  font-family: "Public Sans", "Almarai";
   font-size: 15px;
   font-style: normal;
   font-weight: 400;
@@ -36,8 +36,13 @@
   box-sizing: border-box;
 }
 
+[dir="rtl"] .user-selection,
+.rtl .user-selection {
+  font-size: 12px; /* Reduced font size for Arabic */
+}
+
 .user-thead {
-  font-family: "Inter Tight";
+  font-family: "Inter Tight", "Almarai";
   font-size: 13px;
   font-style: normal;
   font-weight: 500;
@@ -47,7 +52,7 @@
 }
 
 .user-data {
-  font-family: "Inter Tight";
+  font-family: "Inter Tight", "Almarai";
   font-size: 14px;
   font-style: normal;
   font-weight: 400;
@@ -60,8 +65,8 @@
     hue-rotate(289deg) brightness(100%) contrast(91%);
 }
 
-.collection-list-pagination {
-  font-family: "Inter Tight";
+.admin-users-collection-list-pagination {
+  font-family: "Inter Tight", "Almarai";
   font-size: 13px;
   font-style: normal;
   font-weight: 400;
@@ -70,7 +75,7 @@
 }
 
 .pagination-btn {
-  font-family: "Inter Tight";
+  font-family: "Inter Tight", "Almarai" !important;
   font-size: 15px;
   font-style: normal;
   font-weight: 500;
@@ -80,7 +85,7 @@
 }
 
 .page-no-btns {
-  font-family: "Inter Tight";
+  font-family: "Inter Tight", "Almarai", sans-serif;
   font-size: 15px;
   font-style: normal;
   font-weight: 500;
@@ -114,6 +119,7 @@
   border-radius: 50%;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transition: transform 0.4s ease-in-out, background-color 0.4s ease-in-out;
+  left: 3px;
 }
 
 .toggle-switch.active .toggle-circle {
@@ -127,7 +133,6 @@
   border-radius: 100%;
   width: 20px;
   height: 20px;
-  margin-right: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -151,8 +156,12 @@
   width: 100%;
 }
 
+.rtl-grid {
+  direction: rtl;
+}
+
 .dropdown-label {
-  font-family: "Inter Tight";
+  font-family: "Inter Tight", "Almarai", sans-serif;
   font-size: 12px;
   font-style: normal;
   font-weight: 500;
@@ -163,7 +172,7 @@
 }
 
 .dropdown-value {
-  font-family: "Inter Tight";
+  font-family: "Inter Tight", "Almarai", sans-serif;
   font-size: 13px;
   font-style: normal;
   font-weight: 400;
@@ -191,7 +200,6 @@
   border-bottom: 1px solid #e9e9e9;
 }
 
-/* New styles for action button container */
 .user-action-buttons-container {
   display: flex;
   gap: 10px;
@@ -200,7 +208,7 @@
 .user-create-btn {
   background-color: #2892ce;
   color: white;
-  font-family: "Inter Tight";
+  font-family: "Inter Tight", "Almarai";
   font-size: 15px;
   font-style: normal;
   font-weight: 400;
@@ -215,7 +223,7 @@
 
 .user-download-btn {
   background-color: #f0f0f0;
-  font-family: "Inter Tight";
+  font-family: "Inter Tight", "Almarai";
   font-size: 15px;
   font-style: normal;
   font-weight: 400;
@@ -233,6 +241,12 @@
 .user-download-btn:hover .user-download-icon {
   filter: brightness(0) saturate(100%) invert(100%) sepia(2%) saturate(537%)
     hue-rotate(47deg) brightness(118%) contrast(100%);
+}
+
+/* Ensure pagination buttons maintain LTR and right-aligned position in RTL */
+.pagination-buttons {
+  direction: rtl;
+  justify-content: flex-end !important;
 }
 
 /* Responsive Styles */
@@ -300,6 +314,7 @@
     justify-content: center;
     width: 100%;
     overflow-y: hidden;
+    direction: ltr !important; /* Maintain LTR for mobile */
   }
   .user-thead {
     padding-right: 0px;

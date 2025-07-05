@@ -15,7 +15,7 @@ import CustomDropDown from "../../components/CustomDropDown";
 import { motion, AnimatePresence } from "framer-motion";
 
 const AdminUsers = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,9 +30,12 @@ const AdminUsers = () => {
   const itemsPerPage = 10;
   const filteredData = users;
 
+  // Determine the direction (ltr or rtl) for table list only
+  const isRtl = i18n.dir() === "rtl";
+
   // Dropdown options for status filter with translated labels
   const statusFilterOptions = [
-    { label: t("sidebar.users"), value: "" }, // "All" or its translation
+    { label: t("sidebar.users"), value: "" },
     { label: t("status.active"), value: "active" },
     { label: t("status.blocked"), value: "blocked" },
   ];
@@ -87,7 +90,6 @@ const AdminUsers = () => {
         setTotalCount(response.data.count);
       } catch (error) {
         console.error("Error fetching users:", error);
-        // setError(t("errors.fetch_users_failed"));
       } finally {
         setLoading(false);
       }
@@ -241,7 +243,7 @@ const AdminUsers = () => {
   }
 
   return (
-    <div className="border border-[#E9E9E9] rounded-md user-table">
+    <div className="border border-[#E9E9E9] rounded-md user-table" dir={isRtl ? "rtl" : "ltr"}>
       <Toaster />
       <div className="flex justify-between items-center p-5 border-b border-[#E9E9E9] user-table-header">
         <h1 className="users-head">{t("sidebar.users")}</h1>
@@ -292,34 +294,28 @@ const AdminUsers = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b border-[#E9E9E9] h-[57px]">
-              <th className="px-5 text-left user-thead">{t("table.id")}</th>
-              <th className="px-5 text-left user-thead w-[12%]">
+              <th className={`px-5 user-thead ${isRtl ? "text-right" : "text-left"}`}>{t("table.id")}</th>
+              <th className={`px-5 user-thead w-[12%] ${isRtl ? "text-right" : "text-left"}`}>
                 {t("table.created_date")}
               </th>
-              <th className="pl-5 text-left user-thead w-[15%]">
+              <th className={`pl-5 user-thead w-[15%] ${isRtl ? "text-right pr-5 pl-12" : "text-left"}`}>
                 {t("table.name")}
               </th>
-              <th className="px-5 text-left user-thead">
-                {t("table.username")}
-              </th>
-              <th className="pl-12 pr-5 text-left user-thead w-[18%]">
+              <th className={`px-5 user-thead ${isRtl ? "text-right" : "text-left"}`}>{t("table.username")}</th>
+              <th className={`pl-12 pr-5 user-thead w-[18%] ${isRtl ? "text-right pr-12 pl-5" : "text-left"}`}>
                 {t("table.role")}
               </th>
-              <th className="px-5 text-left user-thead w-[12%]">
+              <th className={`px-5 user-thead w-[12%] ${isRtl ? "text-right" : "text-left"}`}>
                 {t("table.status")}
               </th>
-              <th className="px-5 text-left user-thead w-[8%]">
-                {t("table.block")}
-              </th>
-              <th className="px-5 pr-6 text-right user-thead">
-                {t("table.action")}
-              </th>
+              <th className={`px-5 user-thead w-[8%] ${isRtl ? "text-right" : "text-left"}`}>{t("table.block")}</th>
+              <th className={`px-5 pr-6 user-thead ${isRtl ? "text-left pl-6" : "text-right"}`}>{t("table.action")}</th>
             </tr>
           </thead>
           <tbody>
             {users.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-5 py-8 text-center text-gray-500">
+                <td colSpan={8} className={`px-5 py-8 text-center text-gray-500 ${isRtl ? "text-right" : ""}`}>
                   {t("messages.no_users_found")}
                 </td>
               </tr>
@@ -329,10 +325,10 @@ const AdminUsers = () => {
                   key={user.id}
                   className="border-b border-[#E9E9E9] h-[57px] hover:bg-gray-50 cursor-pointer"
                 >
-                  <td className="px-5 text-left user-data">
+                  <td className={`px-5 user-data ${isRtl ? "text-right" : "text-left"}`}>
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </td>
-                  <td className="px-5 text-left user-data">
+                  <td className={`px-5 user-data ${isRtl ? "text-right" : "text-left"}`}>
                     {user.created_at
                       ? new Date(user.created_at).toLocaleDateString(
                           t("locale"),
@@ -344,16 +340,16 @@ const AdminUsers = () => {
                         )
                       : t("messages.na")}
                   </td>
-                  <td className="pl-5 text-left user-data">
+                  <td className={`pl-5 user-data ${isRtl ? "text-right pr-5 pl-12" : "text-left"}`}>
                     {user.name || t("messages.na")}
                   </td>
-                  <td className="px-5 text-left user-data">
+                  <td className={`px-5 user-data ${isRtl ? "text-right" : "text-left"}`}>
                     {user.username || t("messages.na")}
                   </td>
-                  <td className="pl-12 pr-5 text-left user-data">
+                  <td className={`pl-12 pr-5 user-data ${isRtl ? "text-right pr-12 pl-5" : "text-left"}`}>
                     {user.user_role || t("messages.na")}
                   </td>
-                  <td className="px-5 text-left user-data">
+                  <td className={`px-5 user-data ${isRtl ? "text-right" : "text-left"}`}>
                     <span
                       className={`px-[10px] py-[5px] rounded-[4px] w-[69px] ${
                         user.status === "active"
@@ -364,14 +360,18 @@ const AdminUsers = () => {
                       {t(`status.${user.status}`)}
                     </span>
                   </td>
-                  <td className="px-5 text-left user-data">
+                  <td className={`px-5 user-data ${isRtl ? "text-right" : "text-left"}`}>
                     <ToggleSwitch
                       id={user.id}
                       isActive={isBlocked(user.id)}
                       onChange={handleToggle}
                     />
                   </td>
-                  <td className="px-5 flex gap-[23px] items-center justify-end h-[57px]">
+                  <td
+                    className={`px-5 flex gap-[23px] items-center h-[57px] ${
+                      isRtl ? "justify-end" : "justify-end"
+                    }`}
+                  >
                     <button onClick={() => handleEditUser(user)}>
                       <img
                         src={editicon}
@@ -398,19 +398,17 @@ const AdminUsers = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="user-table-row-head">
-              <th className="px-5 w-[38%] text-left user-thead user-id-column">
+              <th className={`px-5 w-[38%] user-thead user-id-column ${isRtl ? "text-right" : "text-left"}`}>
                 {t("table.id")}
               </th>
-              <th className="px-5 w-[60%] text-left user-thead">
-                {t("table.name")}
-              </th>
-              <th className="px-5 text-right user-thead"></th>
+              <th className={`px-5 w-[60%] user-thead ${isRtl ? "text-right" : "text-left"}`}>{t("table.name")}</th>
+              <th className={`px-5 user-thead ${isRtl ? "text-left" : "text-right"}`}></th>
             </tr>
           </thead>
           <tbody>
             {users.length === 0 ? (
               <tr>
-                <td colSpan={3} className="px-5 py-4 text-center">
+                <td colSpan={3} className={`px-5 py-4 text-center ${isRtl ? "text-right" : ""}`}>
                   {t("messages.no_users_found")}
                 </td>
               </tr>
@@ -424,24 +422,24 @@ const AdminUsers = () => {
                         : "mobile-with-border"
                     } border-b border-[#E9E9E9] h-[57px]`}
                   >
-                    <td className="px-5 text-left user-data">
+                    <td className={`px-5 user-data ${isRtl ? "text-right" : "text-left"}`}>
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
-                    <td className="px-5 text-left user-data">
+                    <td className={`px-5 user-data ${isRtl ? "text-right" : "text-left"}`}>
                       {user.name || t("messages.na")}
                     </td>
-                    <td className="py-4 flex items-center justify-end h-[57px]">
+                    <td className={`py-4 flex items-center h-[57px] ${isRtl ? "justify-start" : "justify-end"}`}>
                       <div
                         className={`user-dropdown-field ${
                           expandedRows[user.id] ? "active" : ""
-                        }`}
+                        } ${isRtl ? "ml-[15px] mr-0" : "mr-[15px]"}`}
                         onClick={() => toggleRowExpand(user.id)}
                       >
                         <img
                           src={downarrow}
                           alt={t("logo_alt.dropdown_arrow")}
                           className={`user-dropdown-img ${
-                            expandedRows[user.id] ? "text-white" : ""
+                            expandedRows[user.id] ? "text-white rotate-180" : ""
                           }`}
                         />
                       </div>
@@ -457,13 +455,13 @@ const AdminUsers = () => {
                         variants={dropdownVariants}
                       >
                         <td colSpan={3} className="px-5">
-                          <div className="user-dropdown-content">
-                            <div className="user-grid">
+                          <div className={`user-dropdown-content ${isRtl ? "rtl-grid" : ""}`}>
+                            <div className={`user-grid ${isRtl ? "flex-row-reverse" : ""}`}>
                               <div className="user-grid-item w-[33.33%]">
-                                <div className="dropdown-label">
+                                <div className={`dropdown-label ${isRtl ? "text-right" : ""}`}>
                                   {t("table.created_date")}
                                 </div>
-                                <div className="dropdown-value">
+                                <div className={`dropdown-value ${isRtl ? "text-right" : ""}`}>
                                   {user.created_at
                                     ? new Date(
                                         user.created_at
@@ -476,25 +474,25 @@ const AdminUsers = () => {
                                 </div>
                               </div>
                               <div className="user-grid-item w-[35.33%]">
-                                <div className="dropdown-label">
+                                <div className={`dropdown-label ${isRtl ? "text-right" : ""}`}>
                                   {t("table.username")}
                                 </div>
-                                <div className="dropdown-value">
+                                <div className={`dropdown-value ${isRtl ? "text-right" : ""}`}>
                                   {user.username || t("messages.na")}
                                 </div>
                               </div>
                               <div className="user-grid-item w-[20%]">
-                                <div className="dropdown-label">
+                                <div className={`dropdown-label ${isRtl ? "text-right" : ""}`}>
                                   {t("table.role")}
                                 </div>
-                                <div className="dropdown-value">
+                                <div className={`dropdown-value ${isRtl ? "text-right" : ""}`}>
                                   {user.user_role || t("messages.na")}
                                 </div>
                               </div>
                             </div>
-                            <div className="user-grid">
+                            <div className={`user-grid ${isRtl ? "flex-row-reverse" : ""}`}>
                               <div className="user-grid-item w-[33.33%]">
-                                <div className="dropdown-label !mb-[10px]">
+                                <div className={`dropdown-label !mb-[10px] ${isRtl ? "text-right" : ""}`}>
                                   {t("table.status")}
                                 </div>
                                 <div className="dropdown-value">
@@ -510,10 +508,10 @@ const AdminUsers = () => {
                                 </div>
                               </div>
                               <div className="user-grid-item w-[35.33%]">
-                                <div className="dropdown-label">
+                                <div className={`dropdown-label ${isRtl ? "text-right" : ""}`}>
                                   {t("table.block")}
                                 </div>
-                                <div className="dropdown-value flex items-center gap-2 mt-[10px]">
+                                <div className={`dropdown-value flex items-center gap-2 mt-[10px] ${isRtl ? "justify-end" : ""}`}>
                                   <ToggleSwitch
                                     id={user.id}
                                     isActive={isBlocked(user.id)}
@@ -522,10 +520,10 @@ const AdminUsers = () => {
                                 </div>
                               </div>
                               <div className="user-grid-item w-[20%]">
-                                <div className="dropdown-label">
+                                <div className={`dropdown-label ${isRtl ? "text-right" : ""}`}>
                                   {t("table.action")}
                                 </div>
-                                <div className="dropdown-value flex items-center gap-[15px] ml-[5px] mt-[10px]">
+                                <div className={`dropdown-value flex items-center gap-[15px] mt-[10px] ${isRtl ? "mr-[5px] justify-end flex-row-reverse" : "ml-[5px]"}`}>
                                   <button onClick={() => handleEditUser(user)}>
                                     <img
                                       src={editicon}
@@ -556,7 +554,7 @@ const AdminUsers = () => {
       </div>
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center py-2 md:px-5 pagination-container">
-        <span className="pagination collection-list-pagination">
+        <span className="pagination admin-users-collection-list-pagination">
           {t("pagination.showing", {
             start: Math.min((currentPage - 1) * itemsPerPage + 1, totalCount),
             end: Math.min(currentPage * itemsPerPage, totalCount),
