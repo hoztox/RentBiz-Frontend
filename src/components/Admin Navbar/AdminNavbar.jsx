@@ -52,6 +52,7 @@ const AdminNavbar = () => {
     '/admin/users-manage': 'users',
     '/admin/buildings': 'buildings',
     '/admin/units': 'units',
+    '/admin/tenants': 'tenants',
     // Add other routes with translation keys
     default: 'admin_panel',
   };
