@@ -3,8 +3,8 @@
   max-width: 100vw;
   height: 100vh;
   border-radius: 0;
-  /* background-color: #F8F9FA; */
   box-sizing: border-box;
+  direction: inherit;
 }
 
 @media (min-width: 768px) {
@@ -28,10 +28,13 @@
     height: 100vh;
     max-height: calc(100vh - 90px);
     overflow-y: auto;
-    /* background-color: #f8f9fa; */
     padding: 10px;
     z-index: 100;
   }
+}
+
+.modal-container[dir="rtl"] {
+  font-family: 'Almrai', sans-serif;
 }
 
 .modal-overlay {
@@ -55,7 +58,7 @@
 }
 
 .heading-text {
-  font-family: "Inter Tight";
+  font-family: "Inter Tight", "Almarai";
   font-weight: 500;
   font-size: 18px;
   line-height: 22px;
@@ -74,6 +77,17 @@
   .heading-text {
     display: none;
   }
+}
+
+.heading-text.right-4 {
+  right: 30px;
+  left: auto;
+  text-align: right;
+}
+
+.heading-text.left-4 {
+  left: 30px;
+  right: auto;
 }
 
 .input-style {
@@ -102,7 +116,7 @@
 }
 
 .input-style::placeholder {
-  font-family: "Inter Tight";
+  font-family: "Inter Tight", "Almarai", sans-serif;
   font-weight: 400;
   font-size: 15px;
   line-height: 24px;
@@ -112,30 +126,44 @@
 }
 
 .input-style.select {
-  padding-right: 40px;
+  /* padding-right: 40px; */
   appearance: none;
+}
+
+.input-style.text-right {
+  text-align: right;
 }
 
 .custom-select {
   font-size: 15px;
   font-weight: 400;
-  font-family: "Inter Tight";
+  font-family: "Inter Tight", "Almarai", sans-serif;
   color: #cfcfcf;
   appearance: none;
   outline: none;
 }
 
 .custom-select option {
-  font-family: "Inter Tight";
+  font-family: "Inter Tight", "Almarai", sans-serif;
   font-size: 15px;
   font-weight: 400;
   color: #201d1e;
 }
 
-@media(max-width: 480px) {
-  .drop-down-icon {
+.rtl-grid {
+  direction: rtl;
+}
+
+.rtl-grid .drop-down-icon {
+  left: 15px;
+  right: auto;
+}
+
+@media (max-width: 480px) {
+  .rtl-grid .drop-down-icon {
+    left: 15px;
+    right: auto;
     top: 38px;
-    right: 15px;
   }
 }
 
@@ -144,7 +172,6 @@
   width: 42px;
   height: 42px;
   top: 20px;
-  right: 20px;
   border-radius: 60px;
   border: 1px solid #e9e9e9;
   display: flex;
@@ -155,12 +182,19 @@
 @media (min-width: 768px) {
   .close-button {
     top: 31px;
-    left: 758px;
+  }
+  .close-button.left-4 {
+    left: 30px;
+    right: auto;
+  }
+  .close-button.right-4 {
+    right: 30px;
+    left: auto;
   }
 }
 
 .form-label {
-  font-family: "Inter Tight";
+  font-family: "Inter Tight", "Almarai", sans-serif;
   font-weight: 400;
   font-size: 13px;
   line-height: 100%;
@@ -168,12 +202,16 @@
   vertical-align: middle;
 }
 
+.form-label.text-right {
+  text-align: right;
+}
+
 .create-user-button {
   width: 385px;
   height: 38px;
   border-radius: 6px;
   color: white;
-  font-family: 'Inter Tight';
+  font-family: 'Inter Tight', 'Almarai', sans-serif;
   font-weight: 500;
   font-size: 16px;
   line-height: 18px;
@@ -184,6 +222,12 @@
   background-color: #2892CE;
 }
 
+@media (max-width: 480px) {
+  .create-user-button {
+    max-width: calc(100vw - 35px);
+  }
+}
+
 /* Error state for inputs */
 .input-style.border-red-500 {
   border-color: #dc2626 !important;
@@ -191,10 +235,4 @@
 
 .input-style.focus\:border-red-500:focus {
   border-color: #dc2626 !important;
-}
-
-@media (max-width: 480px) {
-  .create-user-button {
-    max-width: calc(100vw - 35px);
-  }
 }
