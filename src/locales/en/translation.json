@@ -4,6 +4,7 @@
   "users": "Users Overview",
   "buildings": "Building Overview",
   "units": "Unit Overview",
+  "tenants": "Tenants Overview",
   "admin_panel": "Admin Panel",
   "admin": "Admin",
   "logo_alt": {
@@ -90,18 +91,18 @@
   },
   "table": {
     "id": "ID",
-    "created_date": "Created Date",
-    "name": "Name",
-    "username": "Username",
-    "role": "Role",
-    "status": "Status",
-    "block": "Block",
-    "action": "Action",
-    "tenant_name": "Tenant Name",
-    "building_name": "Building Name",
-    "unit_name": "Unit Name",
-    "total": "Total",
-    "due_date": "Due Date"
+    "created_date": "CREATED DATE",
+    "name": "NAME",
+    "username": "USERNAME",
+    "role": "ROLE",
+    "status": "STATUS",
+    "block": "BLOCK",
+    "action": "ACTION",
+    "tenant_name": "TENANT NAME",
+    "building_name": "BUILDING NAME",
+    "unit_name": "UNIT NAME",
+    "total": "TOTAL",
+    "due_date": "DUE DATE"
   },
   "messages": {
     "no_users_found": "No users found",
@@ -164,7 +165,7 @@
     "chart2": "Chart 2"
   },
   "chart1": {
-    "title": "Tenancy Expiring",
+    "title": "Tenancy Which are Expiring",
     "properties": "Properties",
     "days_0_30": "0-30 Days",
     "days_31_60": "31-60 Days",
@@ -245,6 +246,10 @@
       "email_in_use": "This email is already in use",
       "network_error": "Network error. Please check your connection and try again",
       "unexpected_error": "An unexpected error occurred. Please try again"
+    },
+    "buttons": {
+      "create_user": "Create User",
+      "creating": "Creating..."
     },
     "messages": {
       "creating_user": "Creating user...",
