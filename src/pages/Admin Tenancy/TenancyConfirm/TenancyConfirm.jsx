@@ -140,6 +140,30 @@ const TenancyConfirm = () => {
     }));
   };
 
+const handleCancelAction = async () => {
+  try {
+    await axios.post(
+      `${BASE_URL}/company/tenancies/${selectedTenancy.id}/?action=reject`
+
+    );
+
+    console.log("Cancelled Tenancy:", selectedTenancy.id);
+    toast.success("Tenancy cancelled successfully");
+    setOpenCancelModal(false);
+    setRefreshTrigger((prev) => prev + 1);
+  } catch (error) {
+    console.error("Error cancelling tenancy:", error);
+    if (error.response?.data?.errors) {
+      toast.error(
+        `Failed to cancel tenancy: ${error.response.data.errors.join(", ")}`
+      );
+    } else {
+      toast.error("Failed to cancel tenancy. Please try again.");
+    }
+  }
+};
+
+
   const dropdownVariants = {
     hidden: {
       opacity: 0,
@@ -570,6 +594,7 @@ const TenancyConfirm = () => {
           <TenancyCancelModal
             isOpen={openCancelModal}
             onCancel={() => setOpenCancelModal(false)}
+            onReject={handleCancelAction}
             tenancy={selectedTenancy}
           />
         </>
