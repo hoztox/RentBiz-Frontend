@@ -28,8 +28,8 @@ const Charts = () => {
 
   return (
     <div className="flex w-full gap-5 mb-5 charts">
-      <Chart1 companyId={companyId} title={t('charts.chart1')} />
-      <Chart2 companyId={companyId} title={t('charts.chart2')} />
+      <Chart1 companyId={companyId} title={t('chart1.title')} />
+      <Chart2 companyId={companyId} title={t('chart2.title')} />
     </div>
   );
 };

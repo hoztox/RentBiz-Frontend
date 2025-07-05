@@ -1,141 +1,143 @@
 .revenue-report-head {
-    font-family: 'Inter Tight';
-    font-size: 21px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: normal;
-    color: #201D1E;
+  font-family: "Inter Tight";
+  font-size: 21px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  color: #201d1e;
 }
 
 .select-period {
-    font-family: 'Inter Tight';
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    color: #201D1E;
+  font-family: "Inter Tight";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  color: #201d1e;
 }
 
 .money-in {
-    background-color: #F8F8FF;
-    border-radius: 6px;
+  background-color: #f8f8ff;
+  border-radius: 6px;
 }
 
 .money-out {
-    background-color: #FFFAF8;
-    border-radius: 6px;
+  background-color: #fffaf8;
+  border-radius: 6px;
 }
 
 .money-in-count {
-    font-family: 'Inter Tight';
-    font-size: 24px;
-    font-style: normal;
-    line-height: normal;
-    font-weight: 600;
-    color: #1458A2;
+  font-family: "Inter Tight";
+  font-size: 24px;
+  font-style: normal;
+  line-height: normal;
+  font-weight: 600;
+  color: #1458a2;
 }
 
 .money-out-count {
-    font-family: 'Inter Tight';
-    font-size: 24px;
-    font-style: normal;
-    line-height: normal;
-    font-weight: 600;
-    color: #FF9F43;
+  font-family: "Inter Tight";
+  font-size: 24px;
+  font-style: normal;
+  line-height: normal;
+  font-weight: 600;
+  color: #ff9f43;
 }
 
 .money-in-head,
 .percentage,
 .money-out-head {
-    font-family: 'Inter Tight';
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: normal;
-    color: #201D1E;
+  font-family: "Inter Tight";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  color: #201d1e;
 }
 
 .entry-name {
-    font-family: 'Inter Tight';
-    font-size: 14px;
-    color: #201D1E;
+  font-family: "Inter Tight";
+  font-size: 14px;
+  color: #201d1e;
 }
 
 .label,
 .entry-amount {
-    font-family: 'Inter Tight';
-    color: #201D1E;
-    font-weight: 600;
+  font-family: "Inter Tight";
+  color: #201d1e;
+  font-weight: 600;
 }
 
 .earning-text,
 .expense-text {
-    font-family: 'Inter Tight';
-    font-size: 13px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 20px;
-    color: #677487;
+  font-family: "Inter Tight";
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  color: #677487;
 }
 
-
-@media(min-width:481px) {
-    .money-status-mob {
-        display: none;
-    }
+@media (min-width: 481px) {
+  .money-status-mob {
+    display: none;
+  }
 }
 
+@media (max-width: 480px) {
+  .chart2 {
+    width: 100%;
+    height: 100%;
+  }
 
-@media(max-width:480px) {
-    .chart2 {
-        width: 100%;
-        height: 100%;
-    }
+  .line-chart {
+    border-bottom: 1px solid #e9e9e9;
+  }
+  .money-status-desktop {
+    display: none;
+  }
+  .money-status-mob {
+    flex-direction: row;
+  }
+  .money-in-div,
+  .money-out-div {
+    flex-direction: column;
+    align-items: start;
+  }
 
-    .line-chart {
-        border-bottom: 1px solid #E9E9E9;
-    }
-    .money-status-desktop {
-        display: none;
-    }
-    .money-status-mob {
-        flex-direction: row;
-    }
-    .money-in-div, .money-out-div {
-        flex-direction: column;
-        align-items: start;
-    }
+  .money-in,
+  .money-out {
+    width: 100%;
+    height: 100%;
+    margin-bottom: 0px;
+    margin-top: 24px;
+  }
 
-    .money-in, .money-out {
-        width: 100%;
-        height: 100%;
-        margin-bottom: 0px;
-        margin-top: 24px;
-    }
+  .select-period {
+    padding-right: 5px;
+    padding-left: 5px;
+    justify-content: end;
+  }
 
-    .select-period {
-        padding-right: 5px;
-        padding-left: 5px;
-        justify-content: end;
-    }
-
-    .revenue-report-head {
+  /* .revenue-report-head {
         width: 90px;
-    }
-    .money-in-count, .money-out-count {
-        font-size: 21px;
-    }
-    .money-in-head, .money-out-head {
-        margin-bottom: 8px;
-        font-size: 14px;
-    }
+    } */
+  .money-in-count,
+  .money-out-count {
+    font-size: 21px;
+  }
+  .money-in-head,
+  .money-out-head {
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
 }
 
-@media(max-width:370px) {
-     .revenue-report-head {
-        font-size: 20px;
-    }
-    .select-period {
-        font-size: 11px;
-    }
+@media (max-width: 370px) {
+  .revenue-report-head {
+    font-size: 20px;
+  }
+  .select-period {
+    font-size: 11px;
+  }
 }
